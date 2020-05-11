@@ -14,163 +14,3609 @@ public final class MessagesRobocupSslGeometry {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  public interface Vector2fOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Vector2f)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required float x = 1;</code>
+     * @return Whether the x field is set.
+     */
+    boolean hasX();
+    /**
+     * <code>required float x = 1;</code>
+     * @return The x.
+     */
+    float getX();
+
+    /**
+     * <code>required float y = 2;</code>
+     * @return Whether the y field is set.
+     */
+    boolean hasY();
+    /**
+     * <code>required float y = 2;</code>
+     * @return The y.
+     */
+    float getY();
+  }
+  /**
+   * <pre>
+   * A 2D float vector.
+   * </pre>
+   *
+   * Protobuf type {@code Vector2f}
+   */
+  public  static final class Vector2f extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Vector2f)
+      Vector2fOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Vector2f.newBuilder() to construct.
+    private Vector2f(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Vector2f() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new Vector2f();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Vector2f(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 13: {
+              bitField0_ |= 0x00000001;
+              x_ = input.readFloat();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              y_ = input.readFloat();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return MessagesRobocupSslGeometry.internal_static_Vector2f_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return MessagesRobocupSslGeometry.internal_static_Vector2f_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              MessagesRobocupSslGeometry.Vector2f.class, MessagesRobocupSslGeometry.Vector2f.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int X_FIELD_NUMBER = 1;
+    private float x_;
+    /**
+     * <code>required float x = 1;</code>
+     * @return Whether the x field is set.
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>required float x = 1;</code>
+     * @return The x.
+     */
+    public float getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 2;
+    private float y_;
+    /**
+     * <code>required float y = 2;</code>
+     * @return Whether the y field is set.
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>required float y = 2;</code>
+     * @return The y.
+     */
+    public float getY() {
+      return y_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasX()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasY()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeFloat(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeFloat(2, y_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, y_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof MessagesRobocupSslGeometry.Vector2f)) {
+        return super.equals(obj);
+      }
+      MessagesRobocupSslGeometry.Vector2f other = (MessagesRobocupSslGeometry.Vector2f) obj;
+
+      if (hasX() != other.hasX()) return false;
+      if (hasX()) {
+        if (java.lang.Float.floatToIntBits(getX())
+            != java.lang.Float.floatToIntBits(
+                other.getX())) return false;
+      }
+      if (hasY() != other.hasY()) return false;
+      if (hasY()) {
+        if (java.lang.Float.floatToIntBits(getY())
+            != java.lang.Float.floatToIntBits(
+                other.getY())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasX()) {
+        hash = (37 * hash) + X_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getX());
+      }
+      if (hasY()) {
+        hash = (37 * hash) + Y_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getY());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.Vector2f parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(MessagesRobocupSslGeometry.Vector2f prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A 2D float vector.
+     * </pre>
+     *
+     * Protobuf type {@code Vector2f}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Vector2f)
+        MessagesRobocupSslGeometry.Vector2fOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return MessagesRobocupSslGeometry.internal_static_Vector2f_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return MessagesRobocupSslGeometry.internal_static_Vector2f_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                MessagesRobocupSslGeometry.Vector2f.class, MessagesRobocupSslGeometry.Vector2f.Builder.class);
+      }
+
+      // Construct using MessagesRobocupSslGeometry.Vector2f.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        x_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        y_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return MessagesRobocupSslGeometry.internal_static_Vector2f_descriptor;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.Vector2f getDefaultInstanceForType() {
+        return MessagesRobocupSslGeometry.Vector2f.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.Vector2f build() {
+        MessagesRobocupSslGeometry.Vector2f result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.Vector2f buildPartial() {
+        MessagesRobocupSslGeometry.Vector2f result = new MessagesRobocupSslGeometry.Vector2f(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.x_ = x_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.y_ = y_;
+          to_bitField0_ |= 0x00000002;
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof MessagesRobocupSslGeometry.Vector2f) {
+          return mergeFrom((MessagesRobocupSslGeometry.Vector2f)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(MessagesRobocupSslGeometry.Vector2f other) {
+        if (other == MessagesRobocupSslGeometry.Vector2f.getDefaultInstance()) return this;
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        if (!hasX()) {
+          return false;
+        }
+        if (!hasY()) {
+          return false;
+        }
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        MessagesRobocupSslGeometry.Vector2f parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (MessagesRobocupSslGeometry.Vector2f) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float x_ ;
+      /**
+       * <code>required float x = 1;</code>
+       * @return Whether the x field is set.
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>required float x = 1;</code>
+       * @return The x.
+       */
+      public float getX() {
+        return x_;
+      }
+      /**
+       * <code>required float x = 1;</code>
+       * @param value The x to set.
+       * @return This builder for chaining.
+       */
+      public Builder setX(float value) {
+        bitField0_ |= 0x00000001;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float x = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        x_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float y_ ;
+      /**
+       * <code>required float y = 2;</code>
+       * @return Whether the y field is set.
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>required float y = 2;</code>
+       * @return The y.
+       */
+      public float getY() {
+        return y_;
+      }
+      /**
+       * <code>required float y = 2;</code>
+       * @param value The y to set.
+       * @return This builder for chaining.
+       */
+      public Builder setY(float value) {
+        bitField0_ |= 0x00000002;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float y = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        y_ = 0F;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:Vector2f)
+    }
+
+    // @@protoc_insertion_point(class_scope:Vector2f)
+    private static final MessagesRobocupSslGeometry.Vector2f DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new MessagesRobocupSslGeometry.Vector2f();
+    }
+
+    public static MessagesRobocupSslGeometry.Vector2f getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Vector2f>
+        PARSER = new com.google.protobuf.AbstractParser<Vector2f>() {
+      @java.lang.Override
+      public Vector2f parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Vector2f(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Vector2f> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Vector2f> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public MessagesRobocupSslGeometry.Vector2f getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface SSL_FieldLineSegmentOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:SSL_FieldLineSegment)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return Whether the name field is set.
+     */
+    boolean hasName();
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     * @return Whether the p1 field is set.
+     */
+    boolean hasP1();
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     * @return The p1.
+     */
+    MessagesRobocupSslGeometry.Vector2f getP1();
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     */
+    MessagesRobocupSslGeometry.Vector2fOrBuilder getP1OrBuilder();
+
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     * @return Whether the p2 field is set.
+     */
+    boolean hasP2();
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     * @return The p2.
+     */
+    MessagesRobocupSslGeometry.Vector2f getP2();
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     */
+    MessagesRobocupSslGeometry.Vector2fOrBuilder getP2OrBuilder();
+
+    /**
+     * <pre>
+     * Thickness of the line segment.
+     * </pre>
+     *
+     * <code>required float thickness = 4;</code>
+     * @return Whether the thickness field is set.
+     */
+    boolean hasThickness();
+    /**
+     * <pre>
+     * Thickness of the line segment.
+     * </pre>
+     *
+     * <code>required float thickness = 4;</code>
+     * @return The thickness.
+     */
+    float getThickness();
+  }
+  /**
+   * <pre>
+   * Represents a field marking as a line segment represented by a start point p1,
+   * and end point p2, and a line thickness. The start and end points are along
+   * the center of the line, so the thickness of the line extends by thickness / 2
+   * on either side of the line.
+   * </pre>
+   *
+   * Protobuf type {@code SSL_FieldLineSegment}
+   */
+  public  static final class SSL_FieldLineSegment extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:SSL_FieldLineSegment)
+      SSL_FieldLineSegmentOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use SSL_FieldLineSegment.newBuilder() to construct.
+    private SSL_FieldLineSegment(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private SSL_FieldLineSegment() {
+      name_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new SSL_FieldLineSegment();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SSL_FieldLineSegment(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              name_ = bs;
+              break;
+            }
+            case 18: {
+              MessagesRobocupSslGeometry.Vector2f.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) != 0)) {
+                subBuilder = p1_.toBuilder();
+              }
+              p1_ = input.readMessage(MessagesRobocupSslGeometry.Vector2f.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(p1_);
+                p1_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 26: {
+              MessagesRobocupSslGeometry.Vector2f.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) != 0)) {
+                subBuilder = p2_.toBuilder();
+              }
+              p2_ = input.readMessage(MessagesRobocupSslGeometry.Vector2f.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(p2_);
+                p2_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              thickness_ = input.readFloat();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return MessagesRobocupSslGeometry.internal_static_SSL_FieldLineSegment_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return MessagesRobocupSslGeometry.internal_static_SSL_FieldLineSegment_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              MessagesRobocupSslGeometry.SSL_FieldLineSegment.class, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int NAME_FIELD_NUMBER = 1;
+    private volatile java.lang.Object name_;
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return Whether the name field is set.
+     */
+    public boolean hasName() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The name.
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          name_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The bytes for name.
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int P1_FIELD_NUMBER = 2;
+    private MessagesRobocupSslGeometry.Vector2f p1_;
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     * @return Whether the p1 field is set.
+     */
+    public boolean hasP1() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     * @return The p1.
+     */
+    public MessagesRobocupSslGeometry.Vector2f getP1() {
+      return p1_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p1_;
+    }
+    /**
+     * <pre>
+     * Start point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p1 = 2;</code>
+     */
+    public MessagesRobocupSslGeometry.Vector2fOrBuilder getP1OrBuilder() {
+      return p1_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p1_;
+    }
+
+    public static final int P2_FIELD_NUMBER = 3;
+    private MessagesRobocupSslGeometry.Vector2f p2_;
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     * @return Whether the p2 field is set.
+     */
+    public boolean hasP2() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     * @return The p2.
+     */
+    public MessagesRobocupSslGeometry.Vector2f getP2() {
+      return p2_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p2_;
+    }
+    /**
+     * <pre>
+     * End point of the line segment.
+     * </pre>
+     *
+     * <code>required .Vector2f p2 = 3;</code>
+     */
+    public MessagesRobocupSslGeometry.Vector2fOrBuilder getP2OrBuilder() {
+      return p2_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p2_;
+    }
+
+    public static final int THICKNESS_FIELD_NUMBER = 4;
+    private float thickness_;
+    /**
+     * <pre>
+     * Thickness of the line segment.
+     * </pre>
+     *
+     * <code>required float thickness = 4;</code>
+     * @return Whether the thickness field is set.
+     */
+    public boolean hasThickness() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <pre>
+     * Thickness of the line segment.
+     * </pre>
+     *
+     * <code>required float thickness = 4;</code>
+     * @return The thickness.
+     */
+    public float getThickness() {
+      return thickness_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasName()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasP1()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasP2()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasThickness()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getP1().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getP2().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeMessage(2, getP1());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeMessage(3, getP2());
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeFloat(4, thickness_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getP1());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getP2());
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, thickness_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof MessagesRobocupSslGeometry.SSL_FieldLineSegment)) {
+        return super.equals(obj);
+      }
+      MessagesRobocupSslGeometry.SSL_FieldLineSegment other = (MessagesRobocupSslGeometry.SSL_FieldLineSegment) obj;
+
+      if (hasName() != other.hasName()) return false;
+      if (hasName()) {
+        if (!getName()
+            .equals(other.getName())) return false;
+      }
+      if (hasP1() != other.hasP1()) return false;
+      if (hasP1()) {
+        if (!getP1()
+            .equals(other.getP1())) return false;
+      }
+      if (hasP2() != other.hasP2()) return false;
+      if (hasP2()) {
+        if (!getP2()
+            .equals(other.getP2())) return false;
+      }
+      if (hasThickness() != other.hasThickness()) return false;
+      if (hasThickness()) {
+        if (java.lang.Float.floatToIntBits(getThickness())
+            != java.lang.Float.floatToIntBits(
+                other.getThickness())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (hasP1()) {
+        hash = (37 * hash) + P1_FIELD_NUMBER;
+        hash = (53 * hash) + getP1().hashCode();
+      }
+      if (hasP2()) {
+        hash = (37 * hash) + P2_FIELD_NUMBER;
+        hash = (53 * hash) + getP2().hashCode();
+      }
+      if (hasThickness()) {
+        hash = (37 * hash) + THICKNESS_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getThickness());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(MessagesRobocupSslGeometry.SSL_FieldLineSegment prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents a field marking as a line segment represented by a start point p1,
+     * and end point p2, and a line thickness. The start and end points are along
+     * the center of the line, so the thickness of the line extends by thickness / 2
+     * on either side of the line.
+     * </pre>
+     *
+     * Protobuf type {@code SSL_FieldLineSegment}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:SSL_FieldLineSegment)
+        MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldLineSegment_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldLineSegment_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                MessagesRobocupSslGeometry.SSL_FieldLineSegment.class, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder.class);
+      }
+
+      // Construct using MessagesRobocupSslGeometry.SSL_FieldLineSegment.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getP1FieldBuilder();
+          getP2FieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        name_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (p1Builder_ == null) {
+          p1_ = null;
+        } else {
+          p1Builder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (p2Builder_ == null) {
+          p2_ = null;
+        } else {
+          p2Builder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        thickness_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldLineSegment_descriptor;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment getDefaultInstanceForType() {
+        return MessagesRobocupSslGeometry.SSL_FieldLineSegment.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment build() {
+        MessagesRobocupSslGeometry.SSL_FieldLineSegment result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment buildPartial() {
+        MessagesRobocupSslGeometry.SSL_FieldLineSegment result = new MessagesRobocupSslGeometry.SSL_FieldLineSegment(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.name_ = name_;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          if (p1Builder_ == null) {
+            result.p1_ = p1_;
+          } else {
+            result.p1_ = p1Builder_.build();
+          }
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          if (p2Builder_ == null) {
+            result.p2_ = p2_;
+          } else {
+            result.p2_ = p2Builder_.build();
+          }
+          to_bitField0_ |= 0x00000004;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.thickness_ = thickness_;
+          to_bitField0_ |= 0x00000008;
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof MessagesRobocupSslGeometry.SSL_FieldLineSegment) {
+          return mergeFrom((MessagesRobocupSslGeometry.SSL_FieldLineSegment)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(MessagesRobocupSslGeometry.SSL_FieldLineSegment other) {
+        if (other == MessagesRobocupSslGeometry.SSL_FieldLineSegment.getDefaultInstance()) return this;
+        if (other.hasName()) {
+          bitField0_ |= 0x00000001;
+          name_ = other.name_;
+          onChanged();
+        }
+        if (other.hasP1()) {
+          mergeP1(other.getP1());
+        }
+        if (other.hasP2()) {
+          mergeP2(other.getP2());
+        }
+        if (other.hasThickness()) {
+          setThickness(other.getThickness());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        if (!hasName()) {
+          return false;
+        }
+        if (!hasP1()) {
+          return false;
+        }
+        if (!hasP2()) {
+          return false;
+        }
+        if (!hasThickness()) {
+          return false;
+        }
+        if (!getP1().isInitialized()) {
+          return false;
+        }
+        if (!getP2().isInitialized()) {
+          return false;
+        }
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        MessagesRobocupSslGeometry.SSL_FieldLineSegment parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (MessagesRobocupSslGeometry.SSL_FieldLineSegment) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object name_ = "";
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return Whether the name field is set.
+       */
+      public boolean hasName() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            name_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private MessagesRobocupSslGeometry.Vector2f p1_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> p1Builder_;
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       * @return Whether the p1 field is set.
+       */
+      public boolean hasP1() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       * @return The p1.
+       */
+      public MessagesRobocupSslGeometry.Vector2f getP1() {
+        if (p1Builder_ == null) {
+          return p1_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p1_;
+        } else {
+          return p1Builder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public Builder setP1(MessagesRobocupSslGeometry.Vector2f value) {
+        if (p1Builder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          p1_ = value;
+          onChanged();
+        } else {
+          p1Builder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public Builder setP1(
+          MessagesRobocupSslGeometry.Vector2f.Builder builderForValue) {
+        if (p1Builder_ == null) {
+          p1_ = builderForValue.build();
+          onChanged();
+        } else {
+          p1Builder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public Builder mergeP1(MessagesRobocupSslGeometry.Vector2f value) {
+        if (p1Builder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+              p1_ != null &&
+              p1_ != MessagesRobocupSslGeometry.Vector2f.getDefaultInstance()) {
+            p1_ =
+              MessagesRobocupSslGeometry.Vector2f.newBuilder(p1_).mergeFrom(value).buildPartial();
+          } else {
+            p1_ = value;
+          }
+          onChanged();
+        } else {
+          p1Builder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public Builder clearP1() {
+        if (p1Builder_ == null) {
+          p1_ = null;
+          onChanged();
+        } else {
+          p1Builder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2f.Builder getP1Builder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getP1FieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2fOrBuilder getP1OrBuilder() {
+        if (p1Builder_ != null) {
+          return p1Builder_.getMessageOrBuilder();
+        } else {
+          return p1_ == null ?
+              MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p1_;
+        }
+      }
+      /**
+       * <pre>
+       * Start point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p1 = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> 
+          getP1FieldBuilder() {
+        if (p1Builder_ == null) {
+          p1Builder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder>(
+                  getP1(),
+                  getParentForChildren(),
+                  isClean());
+          p1_ = null;
+        }
+        return p1Builder_;
+      }
+
+      private MessagesRobocupSslGeometry.Vector2f p2_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> p2Builder_;
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       * @return Whether the p2 field is set.
+       */
+      public boolean hasP2() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       * @return The p2.
+       */
+      public MessagesRobocupSslGeometry.Vector2f getP2() {
+        if (p2Builder_ == null) {
+          return p2_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p2_;
+        } else {
+          return p2Builder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public Builder setP2(MessagesRobocupSslGeometry.Vector2f value) {
+        if (p2Builder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          p2_ = value;
+          onChanged();
+        } else {
+          p2Builder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public Builder setP2(
+          MessagesRobocupSslGeometry.Vector2f.Builder builderForValue) {
+        if (p2Builder_ == null) {
+          p2_ = builderForValue.build();
+          onChanged();
+        } else {
+          p2Builder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public Builder mergeP2(MessagesRobocupSslGeometry.Vector2f value) {
+        if (p2Builder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0) &&
+              p2_ != null &&
+              p2_ != MessagesRobocupSslGeometry.Vector2f.getDefaultInstance()) {
+            p2_ =
+              MessagesRobocupSslGeometry.Vector2f.newBuilder(p2_).mergeFrom(value).buildPartial();
+          } else {
+            p2_ = value;
+          }
+          onChanged();
+        } else {
+          p2Builder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public Builder clearP2() {
+        if (p2Builder_ == null) {
+          p2_ = null;
+          onChanged();
+        } else {
+          p2Builder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2f.Builder getP2Builder() {
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return getP2FieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2fOrBuilder getP2OrBuilder() {
+        if (p2Builder_ != null) {
+          return p2Builder_.getMessageOrBuilder();
+        } else {
+          return p2_ == null ?
+              MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : p2_;
+        }
+      }
+      /**
+       * <pre>
+       * End point of the line segment.
+       * </pre>
+       *
+       * <code>required .Vector2f p2 = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> 
+          getP2FieldBuilder() {
+        if (p2Builder_ == null) {
+          p2Builder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder>(
+                  getP2(),
+                  getParentForChildren(),
+                  isClean());
+          p2_ = null;
+        }
+        return p2Builder_;
+      }
+
+      private float thickness_ ;
+      /**
+       * <pre>
+       * Thickness of the line segment.
+       * </pre>
+       *
+       * <code>required float thickness = 4;</code>
+       * @return Whether the thickness field is set.
+       */
+      public boolean hasThickness() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <pre>
+       * Thickness of the line segment.
+       * </pre>
+       *
+       * <code>required float thickness = 4;</code>
+       * @return The thickness.
+       */
+      public float getThickness() {
+        return thickness_;
+      }
+      /**
+       * <pre>
+       * Thickness of the line segment.
+       * </pre>
+       *
+       * <code>required float thickness = 4;</code>
+       * @param value The thickness to set.
+       * @return This builder for chaining.
+       */
+      public Builder setThickness(float value) {
+        bitField0_ |= 0x00000008;
+        thickness_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Thickness of the line segment.
+       * </pre>
+       *
+       * <code>required float thickness = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearThickness() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        thickness_ = 0F;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:SSL_FieldLineSegment)
+    }
+
+    // @@protoc_insertion_point(class_scope:SSL_FieldLineSegment)
+    private static final MessagesRobocupSslGeometry.SSL_FieldLineSegment DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new MessagesRobocupSslGeometry.SSL_FieldLineSegment();
+    }
+
+    public static MessagesRobocupSslGeometry.SSL_FieldLineSegment getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<SSL_FieldLineSegment>
+        PARSER = new com.google.protobuf.AbstractParser<SSL_FieldLineSegment>() {
+      @java.lang.Override
+      public SSL_FieldLineSegment parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SSL_FieldLineSegment(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SSL_FieldLineSegment> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SSL_FieldLineSegment> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public MessagesRobocupSslGeometry.SSL_FieldLineSegment getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface SSL_FieldCicularArcOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:SSL_FieldCicularArc)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return Whether the name field is set.
+     */
+    boolean hasName();
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     * @return Whether the center field is set.
+     */
+    boolean hasCenter();
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     * @return The center.
+     */
+    MessagesRobocupSslGeometry.Vector2f getCenter();
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     */
+    MessagesRobocupSslGeometry.Vector2fOrBuilder getCenterOrBuilder();
+
+    /**
+     * <pre>
+     * Radius of the arc.
+     * </pre>
+     *
+     * <code>required float radius = 3;</code>
+     * @return Whether the radius field is set.
+     */
+    boolean hasRadius();
+    /**
+     * <pre>
+     * Radius of the arc.
+     * </pre>
+     *
+     * <code>required float radius = 3;</code>
+     * @return The radius.
+     */
+    float getRadius();
+
+    /**
+     * <pre>
+     * Start angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a1 = 4;</code>
+     * @return Whether the a1 field is set.
+     */
+    boolean hasA1();
+    /**
+     * <pre>
+     * Start angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a1 = 4;</code>
+     * @return The a1.
+     */
+    float getA1();
+
+    /**
+     * <pre>
+     * End angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a2 = 5;</code>
+     * @return Whether the a2 field is set.
+     */
+    boolean hasA2();
+    /**
+     * <pre>
+     * End angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a2 = 5;</code>
+     * @return The a2.
+     */
+    float getA2();
+
+    /**
+     * <pre>
+     * Thickness of the arc.
+     * </pre>
+     *
+     * <code>required float thickness = 6;</code>
+     * @return Whether the thickness field is set.
+     */
+    boolean hasThickness();
+    /**
+     * <pre>
+     * Thickness of the arc.
+     * </pre>
+     *
+     * <code>required float thickness = 6;</code>
+     * @return The thickness.
+     */
+    float getThickness();
+  }
+  /**
+   * <pre>
+   * Represents a field marking as a circular arc segment represented by center point, a
+   * start angle, an end angle, and an arc thickness.
+   * </pre>
+   *
+   * Protobuf type {@code SSL_FieldCicularArc}
+   */
+  public  static final class SSL_FieldCicularArc extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:SSL_FieldCicularArc)
+      SSL_FieldCicularArcOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use SSL_FieldCicularArc.newBuilder() to construct.
+    private SSL_FieldCicularArc(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private SSL_FieldCicularArc() {
+      name_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new SSL_FieldCicularArc();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SSL_FieldCicularArc(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              name_ = bs;
+              break;
+            }
+            case 18: {
+              MessagesRobocupSslGeometry.Vector2f.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) != 0)) {
+                subBuilder = center_.toBuilder();
+              }
+              center_ = input.readMessage(MessagesRobocupSslGeometry.Vector2f.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(center_);
+                center_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              radius_ = input.readFloat();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              a1_ = input.readFloat();
+              break;
+            }
+            case 45: {
+              bitField0_ |= 0x00000010;
+              a2_ = input.readFloat();
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000020;
+              thickness_ = input.readFloat();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return MessagesRobocupSslGeometry.internal_static_SSL_FieldCicularArc_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return MessagesRobocupSslGeometry.internal_static_SSL_FieldCicularArc_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              MessagesRobocupSslGeometry.SSL_FieldCicularArc.class, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int NAME_FIELD_NUMBER = 1;
+    private volatile java.lang.Object name_;
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return Whether the name field is set.
+     */
+    public boolean hasName() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The name.
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          name_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Name of this field marking.
+     * </pre>
+     *
+     * <code>required string name = 1;</code>
+     * @return The bytes for name.
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CENTER_FIELD_NUMBER = 2;
+    private MessagesRobocupSslGeometry.Vector2f center_;
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     * @return Whether the center field is set.
+     */
+    public boolean hasCenter() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     * @return The center.
+     */
+    public MessagesRobocupSslGeometry.Vector2f getCenter() {
+      return center_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : center_;
+    }
+    /**
+     * <pre>
+     * Center point of the circular arc.
+     * </pre>
+     *
+     * <code>required .Vector2f center = 2;</code>
+     */
+    public MessagesRobocupSslGeometry.Vector2fOrBuilder getCenterOrBuilder() {
+      return center_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : center_;
+    }
+
+    public static final int RADIUS_FIELD_NUMBER = 3;
+    private float radius_;
+    /**
+     * <pre>
+     * Radius of the arc.
+     * </pre>
+     *
+     * <code>required float radius = 3;</code>
+     * @return Whether the radius field is set.
+     */
+    public boolean hasRadius() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <pre>
+     * Radius of the arc.
+     * </pre>
+     *
+     * <code>required float radius = 3;</code>
+     * @return The radius.
+     */
+    public float getRadius() {
+      return radius_;
+    }
+
+    public static final int A1_FIELD_NUMBER = 4;
+    private float a1_;
+    /**
+     * <pre>
+     * Start angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a1 = 4;</code>
+     * @return Whether the a1 field is set.
+     */
+    public boolean hasA1() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <pre>
+     * Start angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a1 = 4;</code>
+     * @return The a1.
+     */
+    public float getA1() {
+      return a1_;
+    }
+
+    public static final int A2_FIELD_NUMBER = 5;
+    private float a2_;
+    /**
+     * <pre>
+     * End angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a2 = 5;</code>
+     * @return Whether the a2 field is set.
+     */
+    public boolean hasA2() {
+      return ((bitField0_ & 0x00000010) != 0);
+    }
+    /**
+     * <pre>
+     * End angle in counter-clockwise order.
+     * </pre>
+     *
+     * <code>required float a2 = 5;</code>
+     * @return The a2.
+     */
+    public float getA2() {
+      return a2_;
+    }
+
+    public static final int THICKNESS_FIELD_NUMBER = 6;
+    private float thickness_;
+    /**
+     * <pre>
+     * Thickness of the arc.
+     * </pre>
+     *
+     * <code>required float thickness = 6;</code>
+     * @return Whether the thickness field is set.
+     */
+    public boolean hasThickness() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <pre>
+     * Thickness of the arc.
+     * </pre>
+     *
+     * <code>required float thickness = 6;</code>
+     * @return The thickness.
+     */
+    public float getThickness() {
+      return thickness_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasName()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasCenter()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasRadius()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasA1()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasA2()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasThickness()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getCenter().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeMessage(2, getCenter());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeFloat(3, radius_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeFloat(4, a1_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        output.writeFloat(5, a2_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        output.writeFloat(6, thickness_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getCenter());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, radius_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, a1_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, a2_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, thickness_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof MessagesRobocupSslGeometry.SSL_FieldCicularArc)) {
+        return super.equals(obj);
+      }
+      MessagesRobocupSslGeometry.SSL_FieldCicularArc other = (MessagesRobocupSslGeometry.SSL_FieldCicularArc) obj;
+
+      if (hasName() != other.hasName()) return false;
+      if (hasName()) {
+        if (!getName()
+            .equals(other.getName())) return false;
+      }
+      if (hasCenter() != other.hasCenter()) return false;
+      if (hasCenter()) {
+        if (!getCenter()
+            .equals(other.getCenter())) return false;
+      }
+      if (hasRadius() != other.hasRadius()) return false;
+      if (hasRadius()) {
+        if (java.lang.Float.floatToIntBits(getRadius())
+            != java.lang.Float.floatToIntBits(
+                other.getRadius())) return false;
+      }
+      if (hasA1() != other.hasA1()) return false;
+      if (hasA1()) {
+        if (java.lang.Float.floatToIntBits(getA1())
+            != java.lang.Float.floatToIntBits(
+                other.getA1())) return false;
+      }
+      if (hasA2() != other.hasA2()) return false;
+      if (hasA2()) {
+        if (java.lang.Float.floatToIntBits(getA2())
+            != java.lang.Float.floatToIntBits(
+                other.getA2())) return false;
+      }
+      if (hasThickness() != other.hasThickness()) return false;
+      if (hasThickness()) {
+        if (java.lang.Float.floatToIntBits(getThickness())
+            != java.lang.Float.floatToIntBits(
+                other.getThickness())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (hasCenter()) {
+        hash = (37 * hash) + CENTER_FIELD_NUMBER;
+        hash = (53 * hash) + getCenter().hashCode();
+      }
+      if (hasRadius()) {
+        hash = (37 * hash) + RADIUS_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getRadius());
+      }
+      if (hasA1()) {
+        hash = (37 * hash) + A1_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getA1());
+      }
+      if (hasA2()) {
+        hash = (37 * hash) + A2_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getA2());
+      }
+      if (hasThickness()) {
+        hash = (37 * hash) + THICKNESS_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getThickness());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(MessagesRobocupSslGeometry.SSL_FieldCicularArc prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents a field marking as a circular arc segment represented by center point, a
+     * start angle, an end angle, and an arc thickness.
+     * </pre>
+     *
+     * Protobuf type {@code SSL_FieldCicularArc}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:SSL_FieldCicularArc)
+        MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldCicularArc_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldCicularArc_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                MessagesRobocupSslGeometry.SSL_FieldCicularArc.class, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder.class);
+      }
+
+      // Construct using MessagesRobocupSslGeometry.SSL_FieldCicularArc.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getCenterFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        name_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (centerBuilder_ == null) {
+          center_ = null;
+        } else {
+          centerBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        radius_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        a1_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        a2_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        thickness_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return MessagesRobocupSslGeometry.internal_static_SSL_FieldCicularArc_descriptor;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc getDefaultInstanceForType() {
+        return MessagesRobocupSslGeometry.SSL_FieldCicularArc.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc build() {
+        MessagesRobocupSslGeometry.SSL_FieldCicularArc result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc buildPartial() {
+        MessagesRobocupSslGeometry.SSL_FieldCicularArc result = new MessagesRobocupSslGeometry.SSL_FieldCicularArc(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.name_ = name_;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          if (centerBuilder_ == null) {
+            result.center_ = center_;
+          } else {
+            result.center_ = centerBuilder_.build();
+          }
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.radius_ = radius_;
+          to_bitField0_ |= 0x00000004;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.a1_ = a1_;
+          to_bitField0_ |= 0x00000008;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.a2_ = a2_;
+          to_bitField0_ |= 0x00000010;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.thickness_ = thickness_;
+          to_bitField0_ |= 0x00000020;
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof MessagesRobocupSslGeometry.SSL_FieldCicularArc) {
+          return mergeFrom((MessagesRobocupSslGeometry.SSL_FieldCicularArc)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(MessagesRobocupSslGeometry.SSL_FieldCicularArc other) {
+        if (other == MessagesRobocupSslGeometry.SSL_FieldCicularArc.getDefaultInstance()) return this;
+        if (other.hasName()) {
+          bitField0_ |= 0x00000001;
+          name_ = other.name_;
+          onChanged();
+        }
+        if (other.hasCenter()) {
+          mergeCenter(other.getCenter());
+        }
+        if (other.hasRadius()) {
+          setRadius(other.getRadius());
+        }
+        if (other.hasA1()) {
+          setA1(other.getA1());
+        }
+        if (other.hasA2()) {
+          setA2(other.getA2());
+        }
+        if (other.hasThickness()) {
+          setThickness(other.getThickness());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        if (!hasName()) {
+          return false;
+        }
+        if (!hasCenter()) {
+          return false;
+        }
+        if (!hasRadius()) {
+          return false;
+        }
+        if (!hasA1()) {
+          return false;
+        }
+        if (!hasA2()) {
+          return false;
+        }
+        if (!hasThickness()) {
+          return false;
+        }
+        if (!getCenter().isInitialized()) {
+          return false;
+        }
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        MessagesRobocupSslGeometry.SSL_FieldCicularArc parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (MessagesRobocupSslGeometry.SSL_FieldCicularArc) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object name_ = "";
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return Whether the name field is set.
+       */
+      public boolean hasName() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            name_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of this field marking.
+       * </pre>
+       *
+       * <code>required string name = 1;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private MessagesRobocupSslGeometry.Vector2f center_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> centerBuilder_;
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       * @return Whether the center field is set.
+       */
+      public boolean hasCenter() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       * @return The center.
+       */
+      public MessagesRobocupSslGeometry.Vector2f getCenter() {
+        if (centerBuilder_ == null) {
+          return center_ == null ? MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : center_;
+        } else {
+          return centerBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public Builder setCenter(MessagesRobocupSslGeometry.Vector2f value) {
+        if (centerBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          center_ = value;
+          onChanged();
+        } else {
+          centerBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public Builder setCenter(
+          MessagesRobocupSslGeometry.Vector2f.Builder builderForValue) {
+        if (centerBuilder_ == null) {
+          center_ = builderForValue.build();
+          onChanged();
+        } else {
+          centerBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public Builder mergeCenter(MessagesRobocupSslGeometry.Vector2f value) {
+        if (centerBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+              center_ != null &&
+              center_ != MessagesRobocupSslGeometry.Vector2f.getDefaultInstance()) {
+            center_ =
+              MessagesRobocupSslGeometry.Vector2f.newBuilder(center_).mergeFrom(value).buildPartial();
+          } else {
+            center_ = value;
+          }
+          onChanged();
+        } else {
+          centerBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public Builder clearCenter() {
+        if (centerBuilder_ == null) {
+          center_ = null;
+          onChanged();
+        } else {
+          centerBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2f.Builder getCenterBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getCenterFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      public MessagesRobocupSslGeometry.Vector2fOrBuilder getCenterOrBuilder() {
+        if (centerBuilder_ != null) {
+          return centerBuilder_.getMessageOrBuilder();
+        } else {
+          return center_ == null ?
+              MessagesRobocupSslGeometry.Vector2f.getDefaultInstance() : center_;
+        }
+      }
+      /**
+       * <pre>
+       * Center point of the circular arc.
+       * </pre>
+       *
+       * <code>required .Vector2f center = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder> 
+          getCenterFieldBuilder() {
+        if (centerBuilder_ == null) {
+          centerBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              MessagesRobocupSslGeometry.Vector2f, MessagesRobocupSslGeometry.Vector2f.Builder, MessagesRobocupSslGeometry.Vector2fOrBuilder>(
+                  getCenter(),
+                  getParentForChildren(),
+                  isClean());
+          center_ = null;
+        }
+        return centerBuilder_;
+      }
+
+      private float radius_ ;
+      /**
+       * <pre>
+       * Radius of the arc.
+       * </pre>
+       *
+       * <code>required float radius = 3;</code>
+       * @return Whether the radius field is set.
+       */
+      public boolean hasRadius() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <pre>
+       * Radius of the arc.
+       * </pre>
+       *
+       * <code>required float radius = 3;</code>
+       * @return The radius.
+       */
+      public float getRadius() {
+        return radius_;
+      }
+      /**
+       * <pre>
+       * Radius of the arc.
+       * </pre>
+       *
+       * <code>required float radius = 3;</code>
+       * @param value The radius to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRadius(float value) {
+        bitField0_ |= 0x00000004;
+        radius_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Radius of the arc.
+       * </pre>
+       *
+       * <code>required float radius = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRadius() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        radius_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float a1_ ;
+      /**
+       * <pre>
+       * Start angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a1 = 4;</code>
+       * @return Whether the a1 field is set.
+       */
+      public boolean hasA1() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <pre>
+       * Start angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a1 = 4;</code>
+       * @return The a1.
+       */
+      public float getA1() {
+        return a1_;
+      }
+      /**
+       * <pre>
+       * Start angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a1 = 4;</code>
+       * @param value The a1 to set.
+       * @return This builder for chaining.
+       */
+      public Builder setA1(float value) {
+        bitField0_ |= 0x00000008;
+        a1_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Start angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a1 = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearA1() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        a1_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float a2_ ;
+      /**
+       * <pre>
+       * End angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a2 = 5;</code>
+       * @return Whether the a2 field is set.
+       */
+      public boolean hasA2() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <pre>
+       * End angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a2 = 5;</code>
+       * @return The a2.
+       */
+      public float getA2() {
+        return a2_;
+      }
+      /**
+       * <pre>
+       * End angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a2 = 5;</code>
+       * @param value The a2 to set.
+       * @return This builder for chaining.
+       */
+      public Builder setA2(float value) {
+        bitField0_ |= 0x00000010;
+        a2_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * End angle in counter-clockwise order.
+       * </pre>
+       *
+       * <code>required float a2 = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearA2() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        a2_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float thickness_ ;
+      /**
+       * <pre>
+       * Thickness of the arc.
+       * </pre>
+       *
+       * <code>required float thickness = 6;</code>
+       * @return Whether the thickness field is set.
+       */
+      public boolean hasThickness() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <pre>
+       * Thickness of the arc.
+       * </pre>
+       *
+       * <code>required float thickness = 6;</code>
+       * @return The thickness.
+       */
+      public float getThickness() {
+        return thickness_;
+      }
+      /**
+       * <pre>
+       * Thickness of the arc.
+       * </pre>
+       *
+       * <code>required float thickness = 6;</code>
+       * @param value The thickness to set.
+       * @return This builder for chaining.
+       */
+      public Builder setThickness(float value) {
+        bitField0_ |= 0x00000020;
+        thickness_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Thickness of the arc.
+       * </pre>
+       *
+       * <code>required float thickness = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearThickness() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        thickness_ = 0F;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:SSL_FieldCicularArc)
+    }
+
+    // @@protoc_insertion_point(class_scope:SSL_FieldCicularArc)
+    private static final MessagesRobocupSslGeometry.SSL_FieldCicularArc DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new MessagesRobocupSslGeometry.SSL_FieldCicularArc();
+    }
+
+    public static MessagesRobocupSslGeometry.SSL_FieldCicularArc getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<SSL_FieldCicularArc>
+        PARSER = new com.google.protobuf.AbstractParser<SSL_FieldCicularArc>() {
+      @java.lang.Override
+      public SSL_FieldCicularArc parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SSL_FieldCicularArc(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SSL_FieldCicularArc> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SSL_FieldCicularArc> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public MessagesRobocupSslGeometry.SSL_FieldCicularArc getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface SSL_GeometryFieldSizeOrBuilder extends
       // @@protoc_insertion_point(interface_extends:SSL_GeometryFieldSize)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 line_width = 1;</code>
-     * @return Whether the lineWidth field is set.
-     */
-    boolean hasLineWidth();
-    /**
-     * <code>required int32 line_width = 1;</code>
-     * @return The lineWidth.
-     */
-    int getLineWidth();
-
-    /**
-     * <code>required int32 field_length = 2;</code>
+     * <code>required int32 field_length = 1;</code>
      * @return Whether the fieldLength field is set.
      */
     boolean hasFieldLength();
     /**
-     * <code>required int32 field_length = 2;</code>
+     * <code>required int32 field_length = 1;</code>
      * @return The fieldLength.
      */
     int getFieldLength();
 
     /**
-     * <code>required int32 field_width = 3;</code>
+     * <code>required int32 field_width = 2;</code>
      * @return Whether the fieldWidth field is set.
      */
     boolean hasFieldWidth();
     /**
-     * <code>required int32 field_width = 3;</code>
+     * <code>required int32 field_width = 2;</code>
      * @return The fieldWidth.
      */
     int getFieldWidth();
 
     /**
-     * <code>required int32 boundary_width = 4;</code>
-     * @return Whether the boundaryWidth field is set.
-     */
-    boolean hasBoundaryWidth();
-    /**
-     * <code>required int32 boundary_width = 4;</code>
-     * @return The boundaryWidth.
-     */
-    int getBoundaryWidth();
-
-    /**
-     * <code>required int32 referee_width = 5;</code>
-     * @return Whether the refereeWidth field is set.
-     */
-    boolean hasRefereeWidth();
-    /**
-     * <code>required int32 referee_width = 5;</code>
-     * @return The refereeWidth.
-     */
-    int getRefereeWidth();
-
-    /**
-     * <code>required int32 goal_width = 6;</code>
+     * <code>required int32 goal_width = 3;</code>
      * @return Whether the goalWidth field is set.
      */
     boolean hasGoalWidth();
     /**
-     * <code>required int32 goal_width = 6;</code>
+     * <code>required int32 goal_width = 3;</code>
      * @return The goalWidth.
      */
     int getGoalWidth();
 
     /**
-     * <code>required int32 goal_depth = 7;</code>
+     * <code>required int32 goal_depth = 4;</code>
      * @return Whether the goalDepth field is set.
      */
     boolean hasGoalDepth();
     /**
-     * <code>required int32 goal_depth = 7;</code>
+     * <code>required int32 goal_depth = 4;</code>
      * @return The goalDepth.
      */
     int getGoalDepth();
 
     /**
-     * <code>required int32 goal_wall_width = 8;</code>
-     * @return Whether the goalWallWidth field is set.
+     * <code>required int32 boundary_width = 5;</code>
+     * @return Whether the boundaryWidth field is set.
      */
-    boolean hasGoalWallWidth();
+    boolean hasBoundaryWidth();
     /**
-     * <code>required int32 goal_wall_width = 8;</code>
-     * @return The goalWallWidth.
+     * <code>required int32 boundary_width = 5;</code>
+     * @return The boundaryWidth.
      */
-    int getGoalWallWidth();
+    int getBoundaryWidth();
 
     /**
-     * <code>required int32 center_circle_radius = 9;</code>
-     * @return Whether the centerCircleRadius field is set.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    boolean hasCenterCircleRadius();
+    java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment> 
+        getFieldLinesList();
     /**
-     * <code>required int32 center_circle_radius = 9;</code>
-     * @return The centerCircleRadius.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    int getCenterCircleRadius();
+    MessagesRobocupSslGeometry.SSL_FieldLineSegment getFieldLines(int index);
+    /**
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+     */
+    int getFieldLinesCount();
+    /**
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+     */
+    java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder> 
+        getFieldLinesOrBuilderList();
+    /**
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+     */
+    MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder getFieldLinesOrBuilder(
+        int index);
 
     /**
-     * <code>required int32 defense_radius = 10;</code>
-     * @return Whether the defenseRadius field is set.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    boolean hasDefenseRadius();
+    java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc> 
+        getFieldArcsList();
     /**
-     * <code>required int32 defense_radius = 10;</code>
-     * @return The defenseRadius.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    int getDefenseRadius();
-
+    MessagesRobocupSslGeometry.SSL_FieldCicularArc getFieldArcs(int index);
     /**
-     * <code>required int32 defense_stretch = 11;</code>
-     * @return Whether the defenseStretch field is set.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    boolean hasDefenseStretch();
+    int getFieldArcsCount();
     /**
-     * <code>required int32 defense_stretch = 11;</code>
-     * @return The defenseStretch.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    int getDefenseStretch();
-
+    java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder> 
+        getFieldArcsOrBuilderList();
     /**
-     * <code>required int32 free_kick_from_defense_dist = 12;</code>
-     * @return Whether the freeKickFromDefenseDist field is set.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    boolean hasFreeKickFromDefenseDist();
-    /**
-     * <code>required int32 free_kick_from_defense_dist = 12;</code>
-     * @return The freeKickFromDefenseDist.
-     */
-    int getFreeKickFromDefenseDist();
-
-    /**
-     * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-     * @return Whether the penaltySpotFromFieldLineDist field is set.
-     */
-    boolean hasPenaltySpotFromFieldLineDist();
-    /**
-     * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-     * @return The penaltySpotFromFieldLineDist.
-     */
-    int getPenaltySpotFromFieldLineDist();
-
-    /**
-     * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-     * @return Whether the penaltyLineFromSpotDist field is set.
-     */
-    boolean hasPenaltyLineFromSpotDist();
-    /**
-     * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-     * @return The penaltyLineFromSpotDist.
-     */
-    int getPenaltyLineFromSpotDist();
+    MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder getFieldArcsOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code SSL_GeometryFieldSize}
@@ -185,6 +3631,8 @@ public final class MessagesRobocupSslGeometry {
       super(builder);
     }
     private SSL_GeometryFieldSize() {
+      fieldLines_ = java.util.Collections.emptyList();
+      fieldArcs_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -220,72 +3668,45 @@ public final class MessagesRobocupSslGeometry {
               break;
             case 8: {
               bitField0_ |= 0x00000001;
-              lineWidth_ = input.readInt32();
+              fieldLength_ = input.readInt32();
               break;
             }
             case 16: {
               bitField0_ |= 0x00000002;
-              fieldLength_ = input.readInt32();
+              fieldWidth_ = input.readInt32();
               break;
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              fieldWidth_ = input.readInt32();
+              goalWidth_ = input.readInt32();
               break;
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              boundaryWidth_ = input.readInt32();
+              goalDepth_ = input.readInt32();
               break;
             }
             case 40: {
               bitField0_ |= 0x00000010;
-              refereeWidth_ = input.readInt32();
+              boundaryWidth_ = input.readInt32();
               break;
             }
-            case 48: {
-              bitField0_ |= 0x00000020;
-              goalWidth_ = input.readInt32();
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) != 0)) {
+                fieldLines_ = new java.util.ArrayList<MessagesRobocupSslGeometry.SSL_FieldLineSegment>();
+                mutable_bitField0_ |= 0x00000020;
+              }
+              fieldLines_.add(
+                  input.readMessage(MessagesRobocupSslGeometry.SSL_FieldLineSegment.PARSER, extensionRegistry));
               break;
             }
-            case 56: {
-              bitField0_ |= 0x00000040;
-              goalDepth_ = input.readInt32();
-              break;
-            }
-            case 64: {
-              bitField0_ |= 0x00000080;
-              goalWallWidth_ = input.readInt32();
-              break;
-            }
-            case 72: {
-              bitField0_ |= 0x00000100;
-              centerCircleRadius_ = input.readInt32();
-              break;
-            }
-            case 80: {
-              bitField0_ |= 0x00000200;
-              defenseRadius_ = input.readInt32();
-              break;
-            }
-            case 88: {
-              bitField0_ |= 0x00000400;
-              defenseStretch_ = input.readInt32();
-              break;
-            }
-            case 96: {
-              bitField0_ |= 0x00000800;
-              freeKickFromDefenseDist_ = input.readInt32();
-              break;
-            }
-            case 104: {
-              bitField0_ |= 0x00001000;
-              penaltySpotFromFieldLineDist_ = input.readInt32();
-              break;
-            }
-            case 112: {
-              bitField0_ |= 0x00002000;
-              penaltyLineFromSpotDist_ = input.readInt32();
+            case 58: {
+              if (!((mutable_bitField0_ & 0x00000040) != 0)) {
+                fieldArcs_ = new java.util.ArrayList<MessagesRobocupSslGeometry.SSL_FieldCicularArc>();
+                mutable_bitField0_ |= 0x00000040;
+              }
+              fieldArcs_.add(
+                  input.readMessage(MessagesRobocupSslGeometry.SSL_FieldCicularArc.PARSER, extensionRegistry));
               break;
             }
             default: {
@@ -303,6 +3724,12 @@ public final class MessagesRobocupSslGeometry {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000020) != 0)) {
+          fieldLines_ = java.util.Collections.unmodifiableList(fieldLines_);
+        }
+        if (((mutable_bitField0_ & 0x00000040) != 0)) {
+          fieldArcs_ = java.util.Collections.unmodifiableList(fieldArcs_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -321,242 +3748,159 @@ public final class MessagesRobocupSslGeometry {
     }
 
     private int bitField0_;
-    public static final int LINE_WIDTH_FIELD_NUMBER = 1;
-    private int lineWidth_;
-    /**
-     * <code>required int32 line_width = 1;</code>
-     * @return Whether the lineWidth field is set.
-     */
-    public boolean hasLineWidth() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>required int32 line_width = 1;</code>
-     * @return The lineWidth.
-     */
-    public int getLineWidth() {
-      return lineWidth_;
-    }
-
-    public static final int FIELD_LENGTH_FIELD_NUMBER = 2;
+    public static final int FIELD_LENGTH_FIELD_NUMBER = 1;
     private int fieldLength_;
     /**
-     * <code>required int32 field_length = 2;</code>
+     * <code>required int32 field_length = 1;</code>
      * @return Whether the fieldLength field is set.
      */
     public boolean hasFieldLength() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>required int32 field_length = 2;</code>
+     * <code>required int32 field_length = 1;</code>
      * @return The fieldLength.
      */
     public int getFieldLength() {
       return fieldLength_;
     }
 
-    public static final int FIELD_WIDTH_FIELD_NUMBER = 3;
+    public static final int FIELD_WIDTH_FIELD_NUMBER = 2;
     private int fieldWidth_;
     /**
-     * <code>required int32 field_width = 3;</code>
+     * <code>required int32 field_width = 2;</code>
      * @return Whether the fieldWidth field is set.
      */
     public boolean hasFieldWidth() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>required int32 field_width = 3;</code>
+     * <code>required int32 field_width = 2;</code>
      * @return The fieldWidth.
      */
     public int getFieldWidth() {
       return fieldWidth_;
     }
 
-    public static final int BOUNDARY_WIDTH_FIELD_NUMBER = 4;
-    private int boundaryWidth_;
-    /**
-     * <code>required int32 boundary_width = 4;</code>
-     * @return Whether the boundaryWidth field is set.
-     */
-    public boolean hasBoundaryWidth() {
-      return ((bitField0_ & 0x00000008) != 0);
-    }
-    /**
-     * <code>required int32 boundary_width = 4;</code>
-     * @return The boundaryWidth.
-     */
-    public int getBoundaryWidth() {
-      return boundaryWidth_;
-    }
-
-    public static final int REFEREE_WIDTH_FIELD_NUMBER = 5;
-    private int refereeWidth_;
-    /**
-     * <code>required int32 referee_width = 5;</code>
-     * @return Whether the refereeWidth field is set.
-     */
-    public boolean hasRefereeWidth() {
-      return ((bitField0_ & 0x00000010) != 0);
-    }
-    /**
-     * <code>required int32 referee_width = 5;</code>
-     * @return The refereeWidth.
-     */
-    public int getRefereeWidth() {
-      return refereeWidth_;
-    }
-
-    public static final int GOAL_WIDTH_FIELD_NUMBER = 6;
+    public static final int GOAL_WIDTH_FIELD_NUMBER = 3;
     private int goalWidth_;
     /**
-     * <code>required int32 goal_width = 6;</code>
+     * <code>required int32 goal_width = 3;</code>
      * @return Whether the goalWidth field is set.
      */
     public boolean hasGoalWidth() {
-      return ((bitField0_ & 0x00000020) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>required int32 goal_width = 6;</code>
+     * <code>required int32 goal_width = 3;</code>
      * @return The goalWidth.
      */
     public int getGoalWidth() {
       return goalWidth_;
     }
 
-    public static final int GOAL_DEPTH_FIELD_NUMBER = 7;
+    public static final int GOAL_DEPTH_FIELD_NUMBER = 4;
     private int goalDepth_;
     /**
-     * <code>required int32 goal_depth = 7;</code>
+     * <code>required int32 goal_depth = 4;</code>
      * @return Whether the goalDepth field is set.
      */
     public boolean hasGoalDepth() {
-      return ((bitField0_ & 0x00000040) != 0);
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>required int32 goal_depth = 7;</code>
+     * <code>required int32 goal_depth = 4;</code>
      * @return The goalDepth.
      */
     public int getGoalDepth() {
       return goalDepth_;
     }
 
-    public static final int GOAL_WALL_WIDTH_FIELD_NUMBER = 8;
-    private int goalWallWidth_;
+    public static final int BOUNDARY_WIDTH_FIELD_NUMBER = 5;
+    private int boundaryWidth_;
     /**
-     * <code>required int32 goal_wall_width = 8;</code>
-     * @return Whether the goalWallWidth field is set.
+     * <code>required int32 boundary_width = 5;</code>
+     * @return Whether the boundaryWidth field is set.
      */
-    public boolean hasGoalWallWidth() {
-      return ((bitField0_ & 0x00000080) != 0);
+    public boolean hasBoundaryWidth() {
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>required int32 goal_wall_width = 8;</code>
-     * @return The goalWallWidth.
+     * <code>required int32 boundary_width = 5;</code>
+     * @return The boundaryWidth.
      */
-    public int getGoalWallWidth() {
-      return goalWallWidth_;
-    }
-
-    public static final int CENTER_CIRCLE_RADIUS_FIELD_NUMBER = 9;
-    private int centerCircleRadius_;
-    /**
-     * <code>required int32 center_circle_radius = 9;</code>
-     * @return Whether the centerCircleRadius field is set.
-     */
-    public boolean hasCenterCircleRadius() {
-      return ((bitField0_ & 0x00000100) != 0);
-    }
-    /**
-     * <code>required int32 center_circle_radius = 9;</code>
-     * @return The centerCircleRadius.
-     */
-    public int getCenterCircleRadius() {
-      return centerCircleRadius_;
+    public int getBoundaryWidth() {
+      return boundaryWidth_;
     }
 
-    public static final int DEFENSE_RADIUS_FIELD_NUMBER = 10;
-    private int defenseRadius_;
+    public static final int FIELD_LINES_FIELD_NUMBER = 6;
+    private java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment> fieldLines_;
     /**
-     * <code>required int32 defense_radius = 10;</code>
-     * @return Whether the defenseRadius field is set.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    public boolean hasDefenseRadius() {
-      return ((bitField0_ & 0x00000200) != 0);
+    public java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment> getFieldLinesList() {
+      return fieldLines_;
     }
     /**
-     * <code>required int32 defense_radius = 10;</code>
-     * @return The defenseRadius.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    public int getDefenseRadius() {
-      return defenseRadius_;
-    }
-
-    public static final int DEFENSE_STRETCH_FIELD_NUMBER = 11;
-    private int defenseStretch_;
-    /**
-     * <code>required int32 defense_stretch = 11;</code>
-     * @return Whether the defenseStretch field is set.
-     */
-    public boolean hasDefenseStretch() {
-      return ((bitField0_ & 0x00000400) != 0);
+    public java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder> 
+        getFieldLinesOrBuilderList() {
+      return fieldLines_;
     }
     /**
-     * <code>required int32 defense_stretch = 11;</code>
-     * @return The defenseStretch.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    public int getDefenseStretch() {
-      return defenseStretch_;
-    }
-
-    public static final int FREE_KICK_FROM_DEFENSE_DIST_FIELD_NUMBER = 12;
-    private int freeKickFromDefenseDist_;
-    /**
-     * <code>required int32 free_kick_from_defense_dist = 12;</code>
-     * @return Whether the freeKickFromDefenseDist field is set.
-     */
-    public boolean hasFreeKickFromDefenseDist() {
-      return ((bitField0_ & 0x00000800) != 0);
+    public int getFieldLinesCount() {
+      return fieldLines_.size();
     }
     /**
-     * <code>required int32 free_kick_from_defense_dist = 12;</code>
-     * @return The freeKickFromDefenseDist.
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
      */
-    public int getFreeKickFromDefenseDist() {
-      return freeKickFromDefenseDist_;
+    public MessagesRobocupSslGeometry.SSL_FieldLineSegment getFieldLines(int index) {
+      return fieldLines_.get(index);
+    }
+    /**
+     * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+     */
+    public MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder getFieldLinesOrBuilder(
+        int index) {
+      return fieldLines_.get(index);
     }
 
-    public static final int PENALTY_SPOT_FROM_FIELD_LINE_DIST_FIELD_NUMBER = 13;
-    private int penaltySpotFromFieldLineDist_;
+    public static final int FIELD_ARCS_FIELD_NUMBER = 7;
+    private java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc> fieldArcs_;
     /**
-     * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-     * @return Whether the penaltySpotFromFieldLineDist field is set.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    public boolean hasPenaltySpotFromFieldLineDist() {
-      return ((bitField0_ & 0x00001000) != 0);
+    public java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc> getFieldArcsList() {
+      return fieldArcs_;
     }
     /**
-     * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-     * @return The penaltySpotFromFieldLineDist.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    public int getPenaltySpotFromFieldLineDist() {
-      return penaltySpotFromFieldLineDist_;
-    }
-
-    public static final int PENALTY_LINE_FROM_SPOT_DIST_FIELD_NUMBER = 14;
-    private int penaltyLineFromSpotDist_;
-    /**
-     * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-     * @return Whether the penaltyLineFromSpotDist field is set.
-     */
-    public boolean hasPenaltyLineFromSpotDist() {
-      return ((bitField0_ & 0x00002000) != 0);
+    public java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder> 
+        getFieldArcsOrBuilderList() {
+      return fieldArcs_;
     }
     /**
-     * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-     * @return The penaltyLineFromSpotDist.
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
      */
-    public int getPenaltyLineFromSpotDist() {
-      return penaltyLineFromSpotDist_;
+    public int getFieldArcsCount() {
+      return fieldArcs_.size();
+    }
+    /**
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+     */
+    public MessagesRobocupSslGeometry.SSL_FieldCicularArc getFieldArcs(int index) {
+      return fieldArcs_.get(index);
+    }
+    /**
+     * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+     */
+    public MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder getFieldArcsOrBuilder(
+        int index) {
+      return fieldArcs_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -566,23 +3910,11 @@ public final class MessagesRobocupSslGeometry {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasLineWidth()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       if (!hasFieldLength()) {
         memoizedIsInitialized = 0;
         return false;
       }
       if (!hasFieldWidth()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasBoundaryWidth()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasRefereeWidth()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -594,33 +3926,21 @@ public final class MessagesRobocupSslGeometry {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasGoalWallWidth()) {
+      if (!hasBoundaryWidth()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasCenterCircleRadius()) {
-        memoizedIsInitialized = 0;
-        return false;
+      for (int i = 0; i < getFieldLinesCount(); i++) {
+        if (!getFieldLines(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
-      if (!hasDefenseRadius()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDefenseStretch()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasFreeKickFromDefenseDist()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasPenaltySpotFromFieldLineDist()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasPenaltyLineFromSpotDist()) {
-        memoizedIsInitialized = 0;
-        return false;
+      for (int i = 0; i < getFieldArcsCount(); i++) {
+        if (!getFieldArcs(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       memoizedIsInitialized = 1;
       return true;
@@ -630,46 +3950,25 @@ public final class MessagesRobocupSslGeometry {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeInt32(1, lineWidth_);
+        output.writeInt32(1, fieldLength_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeInt32(2, fieldLength_);
+        output.writeInt32(2, fieldWidth_);
       }
       if (((bitField0_ & 0x00000004) != 0)) {
-        output.writeInt32(3, fieldWidth_);
+        output.writeInt32(3, goalWidth_);
       }
       if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeInt32(4, boundaryWidth_);
+        output.writeInt32(4, goalDepth_);
       }
       if (((bitField0_ & 0x00000010) != 0)) {
-        output.writeInt32(5, refereeWidth_);
+        output.writeInt32(5, boundaryWidth_);
       }
-      if (((bitField0_ & 0x00000020) != 0)) {
-        output.writeInt32(6, goalWidth_);
+      for (int i = 0; i < fieldLines_.size(); i++) {
+        output.writeMessage(6, fieldLines_.get(i));
       }
-      if (((bitField0_ & 0x00000040) != 0)) {
-        output.writeInt32(7, goalDepth_);
-      }
-      if (((bitField0_ & 0x00000080) != 0)) {
-        output.writeInt32(8, goalWallWidth_);
-      }
-      if (((bitField0_ & 0x00000100) != 0)) {
-        output.writeInt32(9, centerCircleRadius_);
-      }
-      if (((bitField0_ & 0x00000200) != 0)) {
-        output.writeInt32(10, defenseRadius_);
-      }
-      if (((bitField0_ & 0x00000400) != 0)) {
-        output.writeInt32(11, defenseStretch_);
-      }
-      if (((bitField0_ & 0x00000800) != 0)) {
-        output.writeInt32(12, freeKickFromDefenseDist_);
-      }
-      if (((bitField0_ & 0x00001000) != 0)) {
-        output.writeInt32(13, penaltySpotFromFieldLineDist_);
-      }
-      if (((bitField0_ & 0x00002000) != 0)) {
-        output.writeInt32(14, penaltyLineFromSpotDist_);
+      for (int i = 0; i < fieldArcs_.size(); i++) {
+        output.writeMessage(7, fieldArcs_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -682,59 +3981,31 @@ public final class MessagesRobocupSslGeometry {
       size = 0;
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, lineWidth_);
+          .computeInt32Size(1, fieldLength_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, fieldLength_);
+          .computeInt32Size(2, fieldWidth_);
       }
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, fieldWidth_);
+          .computeInt32Size(3, goalWidth_);
       }
       if (((bitField0_ & 0x00000008) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, boundaryWidth_);
+          .computeInt32Size(4, goalDepth_);
       }
       if (((bitField0_ & 0x00000010) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, refereeWidth_);
+          .computeInt32Size(5, boundaryWidth_);
       }
-      if (((bitField0_ & 0x00000020) != 0)) {
+      for (int i = 0; i < fieldLines_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, goalWidth_);
+          .computeMessageSize(6, fieldLines_.get(i));
       }
-      if (((bitField0_ & 0x00000040) != 0)) {
+      for (int i = 0; i < fieldArcs_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, goalDepth_);
-      }
-      if (((bitField0_ & 0x00000080) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, goalWallWidth_);
-      }
-      if (((bitField0_ & 0x00000100) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(9, centerCircleRadius_);
-      }
-      if (((bitField0_ & 0x00000200) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(10, defenseRadius_);
-      }
-      if (((bitField0_ & 0x00000400) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(11, defenseStretch_);
-      }
-      if (((bitField0_ & 0x00000800) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(12, freeKickFromDefenseDist_);
-      }
-      if (((bitField0_ & 0x00001000) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(13, penaltySpotFromFieldLineDist_);
-      }
-      if (((bitField0_ & 0x00002000) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(14, penaltyLineFromSpotDist_);
+          .computeMessageSize(7, fieldArcs_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -751,11 +4022,6 @@ public final class MessagesRobocupSslGeometry {
       }
       MessagesRobocupSslGeometry.SSL_GeometryFieldSize other = (MessagesRobocupSslGeometry.SSL_GeometryFieldSize) obj;
 
-      if (hasLineWidth() != other.hasLineWidth()) return false;
-      if (hasLineWidth()) {
-        if (getLineWidth()
-            != other.getLineWidth()) return false;
-      }
       if (hasFieldLength() != other.hasFieldLength()) return false;
       if (hasFieldLength()) {
         if (getFieldLength()
@@ -765,16 +4031,6 @@ public final class MessagesRobocupSslGeometry {
       if (hasFieldWidth()) {
         if (getFieldWidth()
             != other.getFieldWidth()) return false;
-      }
-      if (hasBoundaryWidth() != other.hasBoundaryWidth()) return false;
-      if (hasBoundaryWidth()) {
-        if (getBoundaryWidth()
-            != other.getBoundaryWidth()) return false;
-      }
-      if (hasRefereeWidth() != other.hasRefereeWidth()) return false;
-      if (hasRefereeWidth()) {
-        if (getRefereeWidth()
-            != other.getRefereeWidth()) return false;
       }
       if (hasGoalWidth() != other.hasGoalWidth()) return false;
       if (hasGoalWidth()) {
@@ -786,41 +4042,15 @@ public final class MessagesRobocupSslGeometry {
         if (getGoalDepth()
             != other.getGoalDepth()) return false;
       }
-      if (hasGoalWallWidth() != other.hasGoalWallWidth()) return false;
-      if (hasGoalWallWidth()) {
-        if (getGoalWallWidth()
-            != other.getGoalWallWidth()) return false;
+      if (hasBoundaryWidth() != other.hasBoundaryWidth()) return false;
+      if (hasBoundaryWidth()) {
+        if (getBoundaryWidth()
+            != other.getBoundaryWidth()) return false;
       }
-      if (hasCenterCircleRadius() != other.hasCenterCircleRadius()) return false;
-      if (hasCenterCircleRadius()) {
-        if (getCenterCircleRadius()
-            != other.getCenterCircleRadius()) return false;
-      }
-      if (hasDefenseRadius() != other.hasDefenseRadius()) return false;
-      if (hasDefenseRadius()) {
-        if (getDefenseRadius()
-            != other.getDefenseRadius()) return false;
-      }
-      if (hasDefenseStretch() != other.hasDefenseStretch()) return false;
-      if (hasDefenseStretch()) {
-        if (getDefenseStretch()
-            != other.getDefenseStretch()) return false;
-      }
-      if (hasFreeKickFromDefenseDist() != other.hasFreeKickFromDefenseDist()) return false;
-      if (hasFreeKickFromDefenseDist()) {
-        if (getFreeKickFromDefenseDist()
-            != other.getFreeKickFromDefenseDist()) return false;
-      }
-      if (hasPenaltySpotFromFieldLineDist() != other.hasPenaltySpotFromFieldLineDist()) return false;
-      if (hasPenaltySpotFromFieldLineDist()) {
-        if (getPenaltySpotFromFieldLineDist()
-            != other.getPenaltySpotFromFieldLineDist()) return false;
-      }
-      if (hasPenaltyLineFromSpotDist() != other.hasPenaltyLineFromSpotDist()) return false;
-      if (hasPenaltyLineFromSpotDist()) {
-        if (getPenaltyLineFromSpotDist()
-            != other.getPenaltyLineFromSpotDist()) return false;
-      }
+      if (!getFieldLinesList()
+          .equals(other.getFieldLinesList())) return false;
+      if (!getFieldArcsList()
+          .equals(other.getFieldArcsList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -832,10 +4062,6 @@ public final class MessagesRobocupSslGeometry {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasLineWidth()) {
-        hash = (37 * hash) + LINE_WIDTH_FIELD_NUMBER;
-        hash = (53 * hash) + getLineWidth();
-      }
       if (hasFieldLength()) {
         hash = (37 * hash) + FIELD_LENGTH_FIELD_NUMBER;
         hash = (53 * hash) + getFieldLength();
@@ -843,14 +4069,6 @@ public final class MessagesRobocupSslGeometry {
       if (hasFieldWidth()) {
         hash = (37 * hash) + FIELD_WIDTH_FIELD_NUMBER;
         hash = (53 * hash) + getFieldWidth();
-      }
-      if (hasBoundaryWidth()) {
-        hash = (37 * hash) + BOUNDARY_WIDTH_FIELD_NUMBER;
-        hash = (53 * hash) + getBoundaryWidth();
-      }
-      if (hasRefereeWidth()) {
-        hash = (37 * hash) + REFEREE_WIDTH_FIELD_NUMBER;
-        hash = (53 * hash) + getRefereeWidth();
       }
       if (hasGoalWidth()) {
         hash = (37 * hash) + GOAL_WIDTH_FIELD_NUMBER;
@@ -860,33 +4078,17 @@ public final class MessagesRobocupSslGeometry {
         hash = (37 * hash) + GOAL_DEPTH_FIELD_NUMBER;
         hash = (53 * hash) + getGoalDepth();
       }
-      if (hasGoalWallWidth()) {
-        hash = (37 * hash) + GOAL_WALL_WIDTH_FIELD_NUMBER;
-        hash = (53 * hash) + getGoalWallWidth();
+      if (hasBoundaryWidth()) {
+        hash = (37 * hash) + BOUNDARY_WIDTH_FIELD_NUMBER;
+        hash = (53 * hash) + getBoundaryWidth();
       }
-      if (hasCenterCircleRadius()) {
-        hash = (37 * hash) + CENTER_CIRCLE_RADIUS_FIELD_NUMBER;
-        hash = (53 * hash) + getCenterCircleRadius();
+      if (getFieldLinesCount() > 0) {
+        hash = (37 * hash) + FIELD_LINES_FIELD_NUMBER;
+        hash = (53 * hash) + getFieldLinesList().hashCode();
       }
-      if (hasDefenseRadius()) {
-        hash = (37 * hash) + DEFENSE_RADIUS_FIELD_NUMBER;
-        hash = (53 * hash) + getDefenseRadius();
-      }
-      if (hasDefenseStretch()) {
-        hash = (37 * hash) + DEFENSE_STRETCH_FIELD_NUMBER;
-        hash = (53 * hash) + getDefenseStretch();
-      }
-      if (hasFreeKickFromDefenseDist()) {
-        hash = (37 * hash) + FREE_KICK_FROM_DEFENSE_DIST_FIELD_NUMBER;
-        hash = (53 * hash) + getFreeKickFromDefenseDist();
-      }
-      if (hasPenaltySpotFromFieldLineDist()) {
-        hash = (37 * hash) + PENALTY_SPOT_FROM_FIELD_LINE_DIST_FIELD_NUMBER;
-        hash = (53 * hash) + getPenaltySpotFromFieldLineDist();
-      }
-      if (hasPenaltyLineFromSpotDist()) {
-        hash = (37 * hash) + PENALTY_LINE_FROM_SPOT_DIST_FIELD_NUMBER;
-        hash = (53 * hash) + getPenaltyLineFromSpotDist();
+      if (getFieldArcsCount() > 0) {
+        hash = (37 * hash) + FIELD_ARCS_FIELD_NUMBER;
+        hash = (53 * hash) + getFieldArcsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1016,39 +4218,35 @@ public final class MessagesRobocupSslGeometry {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getFieldLinesFieldBuilder();
+          getFieldArcsFieldBuilder();
         }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        lineWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000001);
         fieldLength_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
         fieldWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        boundaryWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        refereeWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000002);
         goalWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000004);
         goalDepth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000040);
-        goalWallWidth_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000080);
-        centerCircleRadius_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000100);
-        defenseRadius_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000200);
-        defenseStretch_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000400);
-        freeKickFromDefenseDist_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000800);
-        penaltySpotFromFieldLineDist_ = 0;
-        bitField0_ = (bitField0_ & ~0x00001000);
-        penaltyLineFromSpotDist_ = 0;
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000008);
+        boundaryWidth_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        if (fieldLinesBuilder_ == null) {
+          fieldLines_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000020);
+        } else {
+          fieldLinesBuilder_.clear();
+        }
+        if (fieldArcsBuilder_ == null) {
+          fieldArcs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+        } else {
+          fieldArcsBuilder_.clear();
+        }
         return this;
       }
 
@@ -1078,60 +4276,42 @@ public final class MessagesRobocupSslGeometry {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.lineWidth_ = lineWidth_;
+          result.fieldLength_ = fieldLength_;
           to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.fieldLength_ = fieldLength_;
+          result.fieldWidth_ = fieldWidth_;
           to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.fieldWidth_ = fieldWidth_;
+          result.goalWidth_ = goalWidth_;
           to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.boundaryWidth_ = boundaryWidth_;
+          result.goalDepth_ = goalDepth_;
           to_bitField0_ |= 0x00000008;
         }
         if (((from_bitField0_ & 0x00000010) != 0)) {
-          result.refereeWidth_ = refereeWidth_;
+          result.boundaryWidth_ = boundaryWidth_;
           to_bitField0_ |= 0x00000010;
         }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
-          result.goalWidth_ = goalWidth_;
-          to_bitField0_ |= 0x00000020;
+        if (fieldLinesBuilder_ == null) {
+          if (((bitField0_ & 0x00000020) != 0)) {
+            fieldLines_ = java.util.Collections.unmodifiableList(fieldLines_);
+            bitField0_ = (bitField0_ & ~0x00000020);
+          }
+          result.fieldLines_ = fieldLines_;
+        } else {
+          result.fieldLines_ = fieldLinesBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) != 0)) {
-          result.goalDepth_ = goalDepth_;
-          to_bitField0_ |= 0x00000040;
-        }
-        if (((from_bitField0_ & 0x00000080) != 0)) {
-          result.goalWallWidth_ = goalWallWidth_;
-          to_bitField0_ |= 0x00000080;
-        }
-        if (((from_bitField0_ & 0x00000100) != 0)) {
-          result.centerCircleRadius_ = centerCircleRadius_;
-          to_bitField0_ |= 0x00000100;
-        }
-        if (((from_bitField0_ & 0x00000200) != 0)) {
-          result.defenseRadius_ = defenseRadius_;
-          to_bitField0_ |= 0x00000200;
-        }
-        if (((from_bitField0_ & 0x00000400) != 0)) {
-          result.defenseStretch_ = defenseStretch_;
-          to_bitField0_ |= 0x00000400;
-        }
-        if (((from_bitField0_ & 0x00000800) != 0)) {
-          result.freeKickFromDefenseDist_ = freeKickFromDefenseDist_;
-          to_bitField0_ |= 0x00000800;
-        }
-        if (((from_bitField0_ & 0x00001000) != 0)) {
-          result.penaltySpotFromFieldLineDist_ = penaltySpotFromFieldLineDist_;
-          to_bitField0_ |= 0x00001000;
-        }
-        if (((from_bitField0_ & 0x00002000) != 0)) {
-          result.penaltyLineFromSpotDist_ = penaltyLineFromSpotDist_;
-          to_bitField0_ |= 0x00002000;
+        if (fieldArcsBuilder_ == null) {
+          if (((bitField0_ & 0x00000040) != 0)) {
+            fieldArcs_ = java.util.Collections.unmodifiableList(fieldArcs_);
+            bitField0_ = (bitField0_ & ~0x00000040);
+          }
+          result.fieldArcs_ = fieldArcs_;
+        } else {
+          result.fieldArcs_ = fieldArcsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -1182,20 +4362,11 @@ public final class MessagesRobocupSslGeometry {
 
       public Builder mergeFrom(MessagesRobocupSslGeometry.SSL_GeometryFieldSize other) {
         if (other == MessagesRobocupSslGeometry.SSL_GeometryFieldSize.getDefaultInstance()) return this;
-        if (other.hasLineWidth()) {
-          setLineWidth(other.getLineWidth());
-        }
         if (other.hasFieldLength()) {
           setFieldLength(other.getFieldLength());
         }
         if (other.hasFieldWidth()) {
           setFieldWidth(other.getFieldWidth());
-        }
-        if (other.hasBoundaryWidth()) {
-          setBoundaryWidth(other.getBoundaryWidth());
-        }
-        if (other.hasRefereeWidth()) {
-          setRefereeWidth(other.getRefereeWidth());
         }
         if (other.hasGoalWidth()) {
           setGoalWidth(other.getGoalWidth());
@@ -1203,26 +4374,60 @@ public final class MessagesRobocupSslGeometry {
         if (other.hasGoalDepth()) {
           setGoalDepth(other.getGoalDepth());
         }
-        if (other.hasGoalWallWidth()) {
-          setGoalWallWidth(other.getGoalWallWidth());
+        if (other.hasBoundaryWidth()) {
+          setBoundaryWidth(other.getBoundaryWidth());
         }
-        if (other.hasCenterCircleRadius()) {
-          setCenterCircleRadius(other.getCenterCircleRadius());
+        if (fieldLinesBuilder_ == null) {
+          if (!other.fieldLines_.isEmpty()) {
+            if (fieldLines_.isEmpty()) {
+              fieldLines_ = other.fieldLines_;
+              bitField0_ = (bitField0_ & ~0x00000020);
+            } else {
+              ensureFieldLinesIsMutable();
+              fieldLines_.addAll(other.fieldLines_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.fieldLines_.isEmpty()) {
+            if (fieldLinesBuilder_.isEmpty()) {
+              fieldLinesBuilder_.dispose();
+              fieldLinesBuilder_ = null;
+              fieldLines_ = other.fieldLines_;
+              bitField0_ = (bitField0_ & ~0x00000020);
+              fieldLinesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getFieldLinesFieldBuilder() : null;
+            } else {
+              fieldLinesBuilder_.addAllMessages(other.fieldLines_);
+            }
+          }
         }
-        if (other.hasDefenseRadius()) {
-          setDefenseRadius(other.getDefenseRadius());
-        }
-        if (other.hasDefenseStretch()) {
-          setDefenseStretch(other.getDefenseStretch());
-        }
-        if (other.hasFreeKickFromDefenseDist()) {
-          setFreeKickFromDefenseDist(other.getFreeKickFromDefenseDist());
-        }
-        if (other.hasPenaltySpotFromFieldLineDist()) {
-          setPenaltySpotFromFieldLineDist(other.getPenaltySpotFromFieldLineDist());
-        }
-        if (other.hasPenaltyLineFromSpotDist()) {
-          setPenaltyLineFromSpotDist(other.getPenaltyLineFromSpotDist());
+        if (fieldArcsBuilder_ == null) {
+          if (!other.fieldArcs_.isEmpty()) {
+            if (fieldArcs_.isEmpty()) {
+              fieldArcs_ = other.fieldArcs_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+            } else {
+              ensureFieldArcsIsMutable();
+              fieldArcs_.addAll(other.fieldArcs_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.fieldArcs_.isEmpty()) {
+            if (fieldArcsBuilder_.isEmpty()) {
+              fieldArcsBuilder_.dispose();
+              fieldArcsBuilder_ = null;
+              fieldArcs_ = other.fieldArcs_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+              fieldArcsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getFieldArcsFieldBuilder() : null;
+            } else {
+              fieldArcsBuilder_.addAllMessages(other.fieldArcs_);
+            }
+          }
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1231,19 +4436,10 @@ public final class MessagesRobocupSslGeometry {
 
       @java.lang.Override
       public final boolean isInitialized() {
-        if (!hasLineWidth()) {
-          return false;
-        }
         if (!hasFieldLength()) {
           return false;
         }
         if (!hasFieldWidth()) {
-          return false;
-        }
-        if (!hasBoundaryWidth()) {
-          return false;
-        }
-        if (!hasRefereeWidth()) {
           return false;
         }
         if (!hasGoalWidth()) {
@@ -1252,26 +4448,18 @@ public final class MessagesRobocupSslGeometry {
         if (!hasGoalDepth()) {
           return false;
         }
-        if (!hasGoalWallWidth()) {
+        if (!hasBoundaryWidth()) {
           return false;
         }
-        if (!hasCenterCircleRadius()) {
-          return false;
+        for (int i = 0; i < getFieldLinesCount(); i++) {
+          if (!getFieldLines(i).isInitialized()) {
+            return false;
+          }
         }
-        if (!hasDefenseRadius()) {
-          return false;
-        }
-        if (!hasDefenseStretch()) {
-          return false;
-        }
-        if (!hasFreeKickFromDefenseDist()) {
-          return false;
-        }
-        if (!hasPenaltySpotFromFieldLineDist()) {
-          return false;
-        }
-        if (!hasPenaltyLineFromSpotDist()) {
-          return false;
+        for (int i = 0; i < getFieldArcsCount(); i++) {
+          if (!getFieldArcs(i).isInitialized()) {
+            return false;
+          }
         }
         return true;
       }
@@ -1296,75 +4484,38 @@ public final class MessagesRobocupSslGeometry {
       }
       private int bitField0_;
 
-      private int lineWidth_ ;
-      /**
-       * <code>required int32 line_width = 1;</code>
-       * @return Whether the lineWidth field is set.
-       */
-      public boolean hasLineWidth() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>required int32 line_width = 1;</code>
-       * @return The lineWidth.
-       */
-      public int getLineWidth() {
-        return lineWidth_;
-      }
-      /**
-       * <code>required int32 line_width = 1;</code>
-       * @param value The lineWidth to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLineWidth(int value) {
-        bitField0_ |= 0x00000001;
-        lineWidth_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 line_width = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearLineWidth() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        lineWidth_ = 0;
-        onChanged();
-        return this;
-      }
-
       private int fieldLength_ ;
       /**
-       * <code>required int32 field_length = 2;</code>
+       * <code>required int32 field_length = 1;</code>
        * @return Whether the fieldLength field is set.
        */
       public boolean hasFieldLength() {
-        return ((bitField0_ & 0x00000002) != 0);
+        return ((bitField0_ & 0x00000001) != 0);
       }
       /**
-       * <code>required int32 field_length = 2;</code>
+       * <code>required int32 field_length = 1;</code>
        * @return The fieldLength.
        */
       public int getFieldLength() {
         return fieldLength_;
       }
       /**
-       * <code>required int32 field_length = 2;</code>
+       * <code>required int32 field_length = 1;</code>
        * @param value The fieldLength to set.
        * @return This builder for chaining.
        */
       public Builder setFieldLength(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000001;
         fieldLength_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 field_length = 2;</code>
+       * <code>required int32 field_length = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearFieldLength() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
         fieldLength_ = 0;
         onChanged();
         return this;
@@ -1372,147 +4523,73 @@ public final class MessagesRobocupSslGeometry {
 
       private int fieldWidth_ ;
       /**
-       * <code>required int32 field_width = 3;</code>
+       * <code>required int32 field_width = 2;</code>
        * @return Whether the fieldWidth field is set.
        */
       public boolean hasFieldWidth() {
-        return ((bitField0_ & 0x00000004) != 0);
+        return ((bitField0_ & 0x00000002) != 0);
       }
       /**
-       * <code>required int32 field_width = 3;</code>
+       * <code>required int32 field_width = 2;</code>
        * @return The fieldWidth.
        */
       public int getFieldWidth() {
         return fieldWidth_;
       }
       /**
-       * <code>required int32 field_width = 3;</code>
+       * <code>required int32 field_width = 2;</code>
        * @param value The fieldWidth to set.
        * @return This builder for chaining.
        */
       public Builder setFieldWidth(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000002;
         fieldWidth_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 field_width = 3;</code>
+       * <code>required int32 field_width = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearFieldWidth() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000002);
         fieldWidth_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int boundaryWidth_ ;
-      /**
-       * <code>required int32 boundary_width = 4;</code>
-       * @return Whether the boundaryWidth field is set.
-       */
-      public boolean hasBoundaryWidth() {
-        return ((bitField0_ & 0x00000008) != 0);
-      }
-      /**
-       * <code>required int32 boundary_width = 4;</code>
-       * @return The boundaryWidth.
-       */
-      public int getBoundaryWidth() {
-        return boundaryWidth_;
-      }
-      /**
-       * <code>required int32 boundary_width = 4;</code>
-       * @param value The boundaryWidth to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBoundaryWidth(int value) {
-        bitField0_ |= 0x00000008;
-        boundaryWidth_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 boundary_width = 4;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearBoundaryWidth() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        boundaryWidth_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int refereeWidth_ ;
-      /**
-       * <code>required int32 referee_width = 5;</code>
-       * @return Whether the refereeWidth field is set.
-       */
-      public boolean hasRefereeWidth() {
-        return ((bitField0_ & 0x00000010) != 0);
-      }
-      /**
-       * <code>required int32 referee_width = 5;</code>
-       * @return The refereeWidth.
-       */
-      public int getRefereeWidth() {
-        return refereeWidth_;
-      }
-      /**
-       * <code>required int32 referee_width = 5;</code>
-       * @param value The refereeWidth to set.
-       * @return This builder for chaining.
-       */
-      public Builder setRefereeWidth(int value) {
-        bitField0_ |= 0x00000010;
-        refereeWidth_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 referee_width = 5;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearRefereeWidth() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        refereeWidth_ = 0;
         onChanged();
         return this;
       }
 
       private int goalWidth_ ;
       /**
-       * <code>required int32 goal_width = 6;</code>
+       * <code>required int32 goal_width = 3;</code>
        * @return Whether the goalWidth field is set.
        */
       public boolean hasGoalWidth() {
-        return ((bitField0_ & 0x00000020) != 0);
+        return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>required int32 goal_width = 6;</code>
+       * <code>required int32 goal_width = 3;</code>
        * @return The goalWidth.
        */
       public int getGoalWidth() {
         return goalWidth_;
       }
       /**
-       * <code>required int32 goal_width = 6;</code>
+       * <code>required int32 goal_width = 3;</code>
        * @param value The goalWidth to set.
        * @return This builder for chaining.
        */
       public Builder setGoalWidth(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000004;
         goalWidth_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 goal_width = 6;</code>
+       * <code>required int32 goal_width = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearGoalWidth() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000004);
         goalWidth_ = 0;
         onChanged();
         return this;
@@ -1520,298 +4597,556 @@ public final class MessagesRobocupSslGeometry {
 
       private int goalDepth_ ;
       /**
-       * <code>required int32 goal_depth = 7;</code>
+       * <code>required int32 goal_depth = 4;</code>
        * @return Whether the goalDepth field is set.
        */
       public boolean hasGoalDepth() {
-        return ((bitField0_ & 0x00000040) != 0);
+        return ((bitField0_ & 0x00000008) != 0);
       }
       /**
-       * <code>required int32 goal_depth = 7;</code>
+       * <code>required int32 goal_depth = 4;</code>
        * @return The goalDepth.
        */
       public int getGoalDepth() {
         return goalDepth_;
       }
       /**
-       * <code>required int32 goal_depth = 7;</code>
+       * <code>required int32 goal_depth = 4;</code>
        * @param value The goalDepth to set.
        * @return This builder for chaining.
        */
       public Builder setGoalDepth(int value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000008;
         goalDepth_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 goal_depth = 7;</code>
+       * <code>required int32 goal_depth = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearGoalDepth() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000008);
         goalDepth_ = 0;
         onChanged();
         return this;
       }
 
-      private int goalWallWidth_ ;
+      private int boundaryWidth_ ;
       /**
-       * <code>required int32 goal_wall_width = 8;</code>
-       * @return Whether the goalWallWidth field is set.
+       * <code>required int32 boundary_width = 5;</code>
+       * @return Whether the boundaryWidth field is set.
        */
-      public boolean hasGoalWallWidth() {
-        return ((bitField0_ & 0x00000080) != 0);
+      public boolean hasBoundaryWidth() {
+        return ((bitField0_ & 0x00000010) != 0);
       }
       /**
-       * <code>required int32 goal_wall_width = 8;</code>
-       * @return The goalWallWidth.
+       * <code>required int32 boundary_width = 5;</code>
+       * @return The boundaryWidth.
        */
-      public int getGoalWallWidth() {
-        return goalWallWidth_;
+      public int getBoundaryWidth() {
+        return boundaryWidth_;
       }
       /**
-       * <code>required int32 goal_wall_width = 8;</code>
-       * @param value The goalWallWidth to set.
+       * <code>required int32 boundary_width = 5;</code>
+       * @param value The boundaryWidth to set.
        * @return This builder for chaining.
        */
-      public Builder setGoalWallWidth(int value) {
-        bitField0_ |= 0x00000080;
-        goalWallWidth_ = value;
+      public Builder setBoundaryWidth(int value) {
+        bitField0_ |= 0x00000010;
+        boundaryWidth_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 goal_wall_width = 8;</code>
+       * <code>required int32 boundary_width = 5;</code>
        * @return This builder for chaining.
        */
-      public Builder clearGoalWallWidth() {
-        bitField0_ = (bitField0_ & ~0x00000080);
-        goalWallWidth_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int centerCircleRadius_ ;
-      /**
-       * <code>required int32 center_circle_radius = 9;</code>
-       * @return Whether the centerCircleRadius field is set.
-       */
-      public boolean hasCenterCircleRadius() {
-        return ((bitField0_ & 0x00000100) != 0);
-      }
-      /**
-       * <code>required int32 center_circle_radius = 9;</code>
-       * @return The centerCircleRadius.
-       */
-      public int getCenterCircleRadius() {
-        return centerCircleRadius_;
-      }
-      /**
-       * <code>required int32 center_circle_radius = 9;</code>
-       * @param value The centerCircleRadius to set.
-       * @return This builder for chaining.
-       */
-      public Builder setCenterCircleRadius(int value) {
-        bitField0_ |= 0x00000100;
-        centerCircleRadius_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 center_circle_radius = 9;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearCenterCircleRadius() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        centerCircleRadius_ = 0;
+      public Builder clearBoundaryWidth() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        boundaryWidth_ = 0;
         onChanged();
         return this;
       }
 
-      private int defenseRadius_ ;
-      /**
-       * <code>required int32 defense_radius = 10;</code>
-       * @return Whether the defenseRadius field is set.
-       */
-      public boolean hasDefenseRadius() {
-        return ((bitField0_ & 0x00000200) != 0);
-      }
-      /**
-       * <code>required int32 defense_radius = 10;</code>
-       * @return The defenseRadius.
-       */
-      public int getDefenseRadius() {
-        return defenseRadius_;
-      }
-      /**
-       * <code>required int32 defense_radius = 10;</code>
-       * @param value The defenseRadius to set.
-       * @return This builder for chaining.
-       */
-      public Builder setDefenseRadius(int value) {
-        bitField0_ |= 0x00000200;
-        defenseRadius_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 defense_radius = 10;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearDefenseRadius() {
-        bitField0_ = (bitField0_ & ~0x00000200);
-        defenseRadius_ = 0;
-        onChanged();
-        return this;
+      private java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment> fieldLines_ =
+        java.util.Collections.emptyList();
+      private void ensureFieldLinesIsMutable() {
+        if (!((bitField0_ & 0x00000020) != 0)) {
+          fieldLines_ = new java.util.ArrayList<MessagesRobocupSslGeometry.SSL_FieldLineSegment>(fieldLines_);
+          bitField0_ |= 0x00000020;
+         }
       }
 
-      private int defenseStretch_ ;
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          MessagesRobocupSslGeometry.SSL_FieldLineSegment, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder, MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder> fieldLinesBuilder_;
+
       /**
-       * <code>required int32 defense_stretch = 11;</code>
-       * @return Whether the defenseStretch field is set.
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
        */
-      public boolean hasDefenseStretch() {
-        return ((bitField0_ & 0x00000400) != 0);
+      public java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment> getFieldLinesList() {
+        if (fieldLinesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(fieldLines_);
+        } else {
+          return fieldLinesBuilder_.getMessageList();
+        }
       }
       /**
-       * <code>required int32 defense_stretch = 11;</code>
-       * @return The defenseStretch.
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
        */
-      public int getDefenseStretch() {
-        return defenseStretch_;
+      public int getFieldLinesCount() {
+        if (fieldLinesBuilder_ == null) {
+          return fieldLines_.size();
+        } else {
+          return fieldLinesBuilder_.getCount();
+        }
       }
       /**
-       * <code>required int32 defense_stretch = 11;</code>
-       * @param value The defenseStretch to set.
-       * @return This builder for chaining.
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
        */
-      public Builder setDefenseStretch(int value) {
-        bitField0_ |= 0x00000400;
-        defenseStretch_ = value;
-        onChanged();
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment getFieldLines(int index) {
+        if (fieldLinesBuilder_ == null) {
+          return fieldLines_.get(index);
+        } else {
+          return fieldLinesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder setFieldLines(
+          int index, MessagesRobocupSslGeometry.SSL_FieldLineSegment value) {
+        if (fieldLinesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldLinesIsMutable();
+          fieldLines_.set(index, value);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.setMessage(index, value);
+        }
         return this;
       }
       /**
-       * <code>required int32 defense_stretch = 11;</code>
-       * @return This builder for chaining.
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
        */
-      public Builder clearDefenseStretch() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        defenseStretch_ = 0;
-        onChanged();
+      public Builder setFieldLines(
+          int index, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder builderForValue) {
+        if (fieldLinesBuilder_ == null) {
+          ensureFieldLinesIsMutable();
+          fieldLines_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          fieldLinesBuilder_.setMessage(index, builderForValue.build());
+        }
         return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder addFieldLines(MessagesRobocupSslGeometry.SSL_FieldLineSegment value) {
+        if (fieldLinesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldLinesIsMutable();
+          fieldLines_.add(value);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder addFieldLines(
+          int index, MessagesRobocupSslGeometry.SSL_FieldLineSegment value) {
+        if (fieldLinesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldLinesIsMutable();
+          fieldLines_.add(index, value);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder addFieldLines(
+          MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder builderForValue) {
+        if (fieldLinesBuilder_ == null) {
+          ensureFieldLinesIsMutable();
+          fieldLines_.add(builderForValue.build());
+          onChanged();
+        } else {
+          fieldLinesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder addFieldLines(
+          int index, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder builderForValue) {
+        if (fieldLinesBuilder_ == null) {
+          ensureFieldLinesIsMutable();
+          fieldLines_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          fieldLinesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder addAllFieldLines(
+          java.lang.Iterable<? extends MessagesRobocupSslGeometry.SSL_FieldLineSegment> values) {
+        if (fieldLinesBuilder_ == null) {
+          ensureFieldLinesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, fieldLines_);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder clearFieldLines() {
+        if (fieldLinesBuilder_ == null) {
+          fieldLines_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000020);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public Builder removeFieldLines(int index) {
+        if (fieldLinesBuilder_ == null) {
+          ensureFieldLinesIsMutable();
+          fieldLines_.remove(index);
+          onChanged();
+        } else {
+          fieldLinesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder getFieldLinesBuilder(
+          int index) {
+        return getFieldLinesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder getFieldLinesOrBuilder(
+          int index) {
+        if (fieldLinesBuilder_ == null) {
+          return fieldLines_.get(index);  } else {
+          return fieldLinesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder> 
+           getFieldLinesOrBuilderList() {
+        if (fieldLinesBuilder_ != null) {
+          return fieldLinesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(fieldLines_);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder addFieldLinesBuilder() {
+        return getFieldLinesFieldBuilder().addBuilder(
+            MessagesRobocupSslGeometry.SSL_FieldLineSegment.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder addFieldLinesBuilder(
+          int index) {
+        return getFieldLinesFieldBuilder().addBuilder(
+            index, MessagesRobocupSslGeometry.SSL_FieldLineSegment.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SSL_FieldLineSegment field_lines = 6;</code>
+       */
+      public java.util.List<MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder> 
+           getFieldLinesBuilderList() {
+        return getFieldLinesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          MessagesRobocupSslGeometry.SSL_FieldLineSegment, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder, MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder> 
+          getFieldLinesFieldBuilder() {
+        if (fieldLinesBuilder_ == null) {
+          fieldLinesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              MessagesRobocupSslGeometry.SSL_FieldLineSegment, MessagesRobocupSslGeometry.SSL_FieldLineSegment.Builder, MessagesRobocupSslGeometry.SSL_FieldLineSegmentOrBuilder>(
+                  fieldLines_,
+                  ((bitField0_ & 0x00000020) != 0),
+                  getParentForChildren(),
+                  isClean());
+          fieldLines_ = null;
+        }
+        return fieldLinesBuilder_;
       }
 
-      private int freeKickFromDefenseDist_ ;
-      /**
-       * <code>required int32 free_kick_from_defense_dist = 12;</code>
-       * @return Whether the freeKickFromDefenseDist field is set.
-       */
-      public boolean hasFreeKickFromDefenseDist() {
-        return ((bitField0_ & 0x00000800) != 0);
-      }
-      /**
-       * <code>required int32 free_kick_from_defense_dist = 12;</code>
-       * @return The freeKickFromDefenseDist.
-       */
-      public int getFreeKickFromDefenseDist() {
-        return freeKickFromDefenseDist_;
-      }
-      /**
-       * <code>required int32 free_kick_from_defense_dist = 12;</code>
-       * @param value The freeKickFromDefenseDist to set.
-       * @return This builder for chaining.
-       */
-      public Builder setFreeKickFromDefenseDist(int value) {
-        bitField0_ |= 0x00000800;
-        freeKickFromDefenseDist_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 free_kick_from_defense_dist = 12;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearFreeKickFromDefenseDist() {
-        bitField0_ = (bitField0_ & ~0x00000800);
-        freeKickFromDefenseDist_ = 0;
-        onChanged();
-        return this;
+      private java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc> fieldArcs_ =
+        java.util.Collections.emptyList();
+      private void ensureFieldArcsIsMutable() {
+        if (!((bitField0_ & 0x00000040) != 0)) {
+          fieldArcs_ = new java.util.ArrayList<MessagesRobocupSslGeometry.SSL_FieldCicularArc>(fieldArcs_);
+          bitField0_ |= 0x00000040;
+         }
       }
 
-      private int penaltySpotFromFieldLineDist_ ;
-      /**
-       * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-       * @return Whether the penaltySpotFromFieldLineDist field is set.
-       */
-      public boolean hasPenaltySpotFromFieldLineDist() {
-        return ((bitField0_ & 0x00001000) != 0);
-      }
-      /**
-       * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-       * @return The penaltySpotFromFieldLineDist.
-       */
-      public int getPenaltySpotFromFieldLineDist() {
-        return penaltySpotFromFieldLineDist_;
-      }
-      /**
-       * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-       * @param value The penaltySpotFromFieldLineDist to set.
-       * @return This builder for chaining.
-       */
-      public Builder setPenaltySpotFromFieldLineDist(int value) {
-        bitField0_ |= 0x00001000;
-        penaltySpotFromFieldLineDist_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 penalty_spot_from_field_line_dist = 13;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearPenaltySpotFromFieldLineDist() {
-        bitField0_ = (bitField0_ & ~0x00001000);
-        penaltySpotFromFieldLineDist_ = 0;
-        onChanged();
-        return this;
-      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          MessagesRobocupSslGeometry.SSL_FieldCicularArc, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder, MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder> fieldArcsBuilder_;
 
-      private int penaltyLineFromSpotDist_ ;
       /**
-       * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-       * @return Whether the penaltyLineFromSpotDist field is set.
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
        */
-      public boolean hasPenaltyLineFromSpotDist() {
-        return ((bitField0_ & 0x00002000) != 0);
+      public java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc> getFieldArcsList() {
+        if (fieldArcsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(fieldArcs_);
+        } else {
+          return fieldArcsBuilder_.getMessageList();
+        }
       }
       /**
-       * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-       * @return The penaltyLineFromSpotDist.
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
        */
-      public int getPenaltyLineFromSpotDist() {
-        return penaltyLineFromSpotDist_;
+      public int getFieldArcsCount() {
+        if (fieldArcsBuilder_ == null) {
+          return fieldArcs_.size();
+        } else {
+          return fieldArcsBuilder_.getCount();
+        }
       }
       /**
-       * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-       * @param value The penaltyLineFromSpotDist to set.
-       * @return This builder for chaining.
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
        */
-      public Builder setPenaltyLineFromSpotDist(int value) {
-        bitField0_ |= 0x00002000;
-        penaltyLineFromSpotDist_ = value;
-        onChanged();
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc getFieldArcs(int index) {
+        if (fieldArcsBuilder_ == null) {
+          return fieldArcs_.get(index);
+        } else {
+          return fieldArcsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder setFieldArcs(
+          int index, MessagesRobocupSslGeometry.SSL_FieldCicularArc value) {
+        if (fieldArcsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldArcsIsMutable();
+          fieldArcs_.set(index, value);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.setMessage(index, value);
+        }
         return this;
       }
       /**
-       * <code>required int32 penalty_line_from_spot_dist = 14;</code>
-       * @return This builder for chaining.
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
        */
-      public Builder clearPenaltyLineFromSpotDist() {
-        bitField0_ = (bitField0_ & ~0x00002000);
-        penaltyLineFromSpotDist_ = 0;
-        onChanged();
+      public Builder setFieldArcs(
+          int index, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder builderForValue) {
+        if (fieldArcsBuilder_ == null) {
+          ensureFieldArcsIsMutable();
+          fieldArcs_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          fieldArcsBuilder_.setMessage(index, builderForValue.build());
+        }
         return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder addFieldArcs(MessagesRobocupSslGeometry.SSL_FieldCicularArc value) {
+        if (fieldArcsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldArcsIsMutable();
+          fieldArcs_.add(value);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder addFieldArcs(
+          int index, MessagesRobocupSslGeometry.SSL_FieldCicularArc value) {
+        if (fieldArcsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFieldArcsIsMutable();
+          fieldArcs_.add(index, value);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder addFieldArcs(
+          MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder builderForValue) {
+        if (fieldArcsBuilder_ == null) {
+          ensureFieldArcsIsMutable();
+          fieldArcs_.add(builderForValue.build());
+          onChanged();
+        } else {
+          fieldArcsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder addFieldArcs(
+          int index, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder builderForValue) {
+        if (fieldArcsBuilder_ == null) {
+          ensureFieldArcsIsMutable();
+          fieldArcs_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          fieldArcsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder addAllFieldArcs(
+          java.lang.Iterable<? extends MessagesRobocupSslGeometry.SSL_FieldCicularArc> values) {
+        if (fieldArcsBuilder_ == null) {
+          ensureFieldArcsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, fieldArcs_);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder clearFieldArcs() {
+        if (fieldArcsBuilder_ == null) {
+          fieldArcs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public Builder removeFieldArcs(int index) {
+        if (fieldArcsBuilder_ == null) {
+          ensureFieldArcsIsMutable();
+          fieldArcs_.remove(index);
+          onChanged();
+        } else {
+          fieldArcsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder getFieldArcsBuilder(
+          int index) {
+        return getFieldArcsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder getFieldArcsOrBuilder(
+          int index) {
+        if (fieldArcsBuilder_ == null) {
+          return fieldArcs_.get(index);  } else {
+          return fieldArcsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public java.util.List<? extends MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder> 
+           getFieldArcsOrBuilderList() {
+        if (fieldArcsBuilder_ != null) {
+          return fieldArcsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(fieldArcs_);
+        }
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder addFieldArcsBuilder() {
+        return getFieldArcsFieldBuilder().addBuilder(
+            MessagesRobocupSslGeometry.SSL_FieldCicularArc.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder addFieldArcsBuilder(
+          int index) {
+        return getFieldArcsFieldBuilder().addBuilder(
+            index, MessagesRobocupSslGeometry.SSL_FieldCicularArc.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .SSL_FieldCicularArc field_arcs = 7;</code>
+       */
+      public java.util.List<MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder> 
+           getFieldArcsBuilderList() {
+        return getFieldArcsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          MessagesRobocupSslGeometry.SSL_FieldCicularArc, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder, MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder> 
+          getFieldArcsFieldBuilder() {
+        if (fieldArcsBuilder_ == null) {
+          fieldArcsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              MessagesRobocupSslGeometry.SSL_FieldCicularArc, MessagesRobocupSslGeometry.SSL_FieldCicularArc.Builder, MessagesRobocupSslGeometry.SSL_FieldCicularArcOrBuilder>(
+                  fieldArcs_,
+                  ((bitField0_ & 0x00000040) != 0),
+                  getParentForChildren(),
+                  isClean());
+          fieldArcs_ = null;
+        }
+        return fieldArcsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -2036,10 +5371,6 @@ public final class MessagesRobocupSslGeometry {
     float getDerivedCameraWorldTz();
   }
   /**
-   * <pre>
-   * SSL_GeometryCameraCalibration is identical to the one defined in
-   * </pre>
-   *
    * Protobuf type {@code SSL_GeometryCameraCalibration}
    */
   public  static final class SSL_GeometryCameraCalibration extends
@@ -2909,10 +6240,6 @@ public final class MessagesRobocupSslGeometry {
       return builder;
     }
     /**
-     * <pre>
-     * SSL_GeometryCameraCalibration is identical to the one defined in
-     * </pre>
-     *
      * Protobuf type {@code SSL_GeometryCameraCalibration}
      */
     public static final class Builder extends
@@ -4857,6 +8184,21 @@ public final class MessagesRobocupSslGeometry {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Vector2f_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Vector2f_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_SSL_FieldLineSegment_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_SSL_FieldLineSegment_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_SSL_FieldCicularArc_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_SSL_FieldCicularArc_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_SSL_GeometryFieldSize_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -4880,47 +8222,67 @@ public final class MessagesRobocupSslGeometry {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n#messages_robocup_ssl_geometry.proto\"\212\003" +
-      "\n\025SSL_GeometryFieldSize\022\022\n\nline_width\030\001 " +
-      "\002(\005\022\024\n\014field_length\030\002 \002(\005\022\023\n\013field_width" +
-      "\030\003 \002(\005\022\026\n\016boundary_width\030\004 \002(\005\022\025\n\rrefere" +
-      "e_width\030\005 \002(\005\022\022\n\ngoal_width\030\006 \002(\005\022\022\n\ngoa" +
-      "l_depth\030\007 \002(\005\022\027\n\017goal_wall_width\030\010 \002(\005\022\034" +
-      "\n\024center_circle_radius\030\t \002(\005\022\026\n\016defense_" +
-      "radius\030\n \002(\005\022\027\n\017defense_stretch\030\013 \002(\005\022#\n" +
-      "\033free_kick_from_defense_dist\030\014 \002(\005\022)\n!pe" +
-      "nalty_spot_from_field_line_dist\030\r \002(\005\022#\n" +
-      "\033penalty_line_from_spot_dist\030\016 \002(\005\"\311\002\n\035S" +
-      "SL_GeometryCameraCalibration\022\021\n\tcamera_i" +
-      "d\030\001 \002(\r\022\024\n\014focal_length\030\002 \002(\002\022\031\n\021princip" +
-      "al_point_x\030\003 \002(\002\022\031\n\021principal_point_y\030\004 " +
-      "\002(\002\022\022\n\ndistortion\030\005 \002(\002\022\n\n\002q0\030\006 \002(\002\022\n\n\002q" +
-      "1\030\007 \002(\002\022\n\n\002q2\030\010 \002(\002\022\n\n\002q3\030\t \002(\002\022\n\n\002tx\030\n " +
-      "\002(\002\022\n\n\002ty\030\013 \002(\002\022\n\n\002tz\030\014 \002(\002\022\037\n\027derived_c" +
-      "amera_world_tx\030\r \001(\002\022\037\n\027derived_camera_w" +
-      "orld_ty\030\016 \001(\002\022\037\n\027derived_camera_world_tz" +
-      "\030\017 \001(\002\"h\n\020SSL_GeometryData\022%\n\005field\030\001 \002(" +
-      "\0132\026.SSL_GeometryFieldSize\022-\n\005calib\030\002 \003(\013" +
-      "2\036.SSL_GeometryCameraCalibration"
+      "\n#messages_robocup_ssl_geometry.proto\" \n" +
+      "\010Vector2f\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\"e\n\024SSL_F" +
+      "ieldLineSegment\022\014\n\004name\030\001 \002(\t\022\025\n\002p1\030\002 \002(" +
+      "\0132\t.Vector2f\022\025\n\002p2\030\003 \002(\0132\t.Vector2f\022\021\n\tt" +
+      "hickness\030\004 \002(\002\"y\n\023SSL_FieldCicularArc\022\014\n" +
+      "\004name\030\001 \002(\t\022\031\n\006center\030\002 \002(\0132\t.Vector2f\022\016" +
+      "\n\006radius\030\003 \002(\002\022\n\n\002a1\030\004 \002(\002\022\n\n\002a2\030\005 \002(\002\022\021" +
+      "\n\tthickness\030\006 \002(\002\"\330\001\n\025SSL_GeometryFieldS" +
+      "ize\022\024\n\014field_length\030\001 \002(\005\022\023\n\013field_width" +
+      "\030\002 \002(\005\022\022\n\ngoal_width\030\003 \002(\005\022\022\n\ngoal_depth" +
+      "\030\004 \002(\005\022\026\n\016boundary_width\030\005 \002(\005\022*\n\013field_" +
+      "lines\030\006 \003(\0132\025.SSL_FieldLineSegment\022(\n\nfi" +
+      "eld_arcs\030\007 \003(\0132\024.SSL_FieldCicularArc\"\311\002\n" +
+      "\035SSL_GeometryCameraCalibration\022\021\n\tcamera" +
+      "_id\030\001 \002(\r\022\024\n\014focal_length\030\002 \002(\002\022\031\n\021princ" +
+      "ipal_point_x\030\003 \002(\002\022\031\n\021principal_point_y\030" +
+      "\004 \002(\002\022\022\n\ndistortion\030\005 \002(\002\022\n\n\002q0\030\006 \002(\002\022\n\n" +
+      "\002q1\030\007 \002(\002\022\n\n\002q2\030\010 \002(\002\022\n\n\002q3\030\t \002(\002\022\n\n\002tx\030" +
+      "\n \002(\002\022\n\n\002ty\030\013 \002(\002\022\n\n\002tz\030\014 \002(\002\022\037\n\027derived" +
+      "_camera_world_tx\030\r \001(\002\022\037\n\027derived_camera" +
+      "_world_ty\030\016 \001(\002\022\037\n\027derived_camera_world_" +
+      "tz\030\017 \001(\002\"h\n\020SSL_GeometryData\022%\n\005field\030\001 " +
+      "\002(\0132\026.SSL_GeometryFieldSize\022-\n\005calib\030\002 \003" +
+      "(\0132\036.SSL_GeometryCameraCalibration"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_SSL_GeometryFieldSize_descriptor =
+    internal_static_Vector2f_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_Vector2f_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Vector2f_descriptor,
+        new java.lang.String[] { "X", "Y", });
+    internal_static_SSL_FieldLineSegment_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_SSL_FieldLineSegment_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_SSL_FieldLineSegment_descriptor,
+        new java.lang.String[] { "Name", "P1", "P2", "Thickness", });
+    internal_static_SSL_FieldCicularArc_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_SSL_FieldCicularArc_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_SSL_FieldCicularArc_descriptor,
+        new java.lang.String[] { "Name", "Center", "Radius", "A1", "A2", "Thickness", });
+    internal_static_SSL_GeometryFieldSize_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_SSL_GeometryFieldSize_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SSL_GeometryFieldSize_descriptor,
-        new java.lang.String[] { "LineWidth", "FieldLength", "FieldWidth", "BoundaryWidth", "RefereeWidth", "GoalWidth", "GoalDepth", "GoalWallWidth", "CenterCircleRadius", "DefenseRadius", "DefenseStretch", "FreeKickFromDefenseDist", "PenaltySpotFromFieldLineDist", "PenaltyLineFromSpotDist", });
+        new java.lang.String[] { "FieldLength", "FieldWidth", "GoalWidth", "GoalDepth", "BoundaryWidth", "FieldLines", "FieldArcs", });
     internal_static_SSL_GeometryCameraCalibration_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_SSL_GeometryCameraCalibration_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SSL_GeometryCameraCalibration_descriptor,
         new java.lang.String[] { "CameraId", "FocalLength", "PrincipalPointX", "PrincipalPointY", "Distortion", "Q0", "Q1", "Q2", "Q3", "Tx", "Ty", "Tz", "DerivedCameraWorldTx", "DerivedCameraWorldTy", "DerivedCameraWorldTz", });
     internal_static_SSL_GeometryData_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_SSL_GeometryData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SSL_GeometryData_descriptor,

@@ -19,12 +19,22 @@ public class Runner {
         
         //Connection connection1 = new Connection(); // Where is this used?
         VisionConnection vision = new VisionConnection(VISION_MULTICAST_ADDR, VISION_PORT);
-        FieldMonitor fieldMonitor = new FieldMonitor(vision, new FieldConfiguration());
-        vision.addObserver(fieldMonitor);
+        FieldDetection fieldDetection = new FieldDetection();
+        FieldGeometry fieldGeometry = new FieldGeometry();
+        vision.addObserver(fieldDetection);
+        vision.addObserver(fieldGeometry);
 
-        for(int i = 0; i < 3; i++) { 
+
+        for(int i = 0; i < 200; i++) { // preheating by ignore the first couple hundreds of problematic data
+            vision.collectData(1); 
+        }
+        vision.collectData(1);
+        System.out.println(fieldGeometry.geometry.toString());
+        
+        for(int i = 0; i < 0; i++) { 
             vision.collectData(4);
-            System.out.println(fieldMonitor.detection.toString());
+            System.out.println(fieldDetection.detection.toString());
+            
         }
         
         /*

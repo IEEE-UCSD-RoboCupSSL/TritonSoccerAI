@@ -25,3 +25,9 @@ AI software specifically designed to run the virtual robots in the GrSim simulat
     ./run.sh
     ```
 
+
+
+## Known Issues
+
+* Currently only support single camera configuration (for coding simplicity) since grSim simulates the game setup (virtual setup) with only one global vision camera. (number of cameras for the physical setup varies depending on the actual competition setup)
+* Number of robots per team is fixed to 6, this can be manually changed by modifying the DetectionType.java file, along with modifying the way how VisionConnection class handles the data packet, typically by changing the number of iterations needed to obtain the full information from multiple consecutive packets. (single packet usually misses few robot's data)

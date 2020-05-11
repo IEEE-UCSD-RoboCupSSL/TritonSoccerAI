@@ -9,6 +9,7 @@ import java.util.logging.*;
 import java.util.List;
 import Protobuf.*;
 import Protobuf.MessagesRobocupSslDetection.*;
+import Protobuf.MessagesRobocupSslGeometry.*;
 
 public class VisionConnection implements Subject {
 
@@ -23,6 +24,7 @@ public class VisionConnection implements Subject {
     Logger logger;
     ArrayList<Observer> observers;
     DetectionType detection;
+    GeometryType geometry;
 
     public void addObserver(Observer observer) {
         this.observers.add(observer);
@@ -33,8 +35,13 @@ public class VisionConnection implements Subject {
     }
 
     public void notifyObservers() {
-        for (Observer obs : this.observers) {
-            obs.update(detection);
+        for (Observer obs : this.observers) {   
+            if(obs.getClassName() == "FieldDetection") {
+                obs.update(detection);
+            }
+            if(obs.getClassName() == "FieldGeometry") {
+                obs.update(geometry);
+            }
         }
     }
 
@@ -44,6 +51,7 @@ public class VisionConnection implements Subject {
         this.buffer = new byte[MAX_BUFFER_SIZE];
         this.logger = Logger.getLogger(VisionConnection.class.getName());
         this.detection = DetectionType.getInstance();
+        this.geometry = GeometryType.getInstance();
         this.observers = new ArrayList<Observer>();
 
         try {
@@ -65,14 +73,27 @@ public class VisionConnection implements Subject {
             MessagesRobocupSslWrapper.SSL_WrapperPacket packet;
             packet = MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(trim(this.dp.getData()));
             SSL_DetectionFrame df = packet.getDetection();
+            SSL_GeometryData gd = packet.getGeometry();
+            
 
             List<SSL_DetectionRobot> yellowRobots = df.getRobotsYellowList();
             List<SSL_DetectionRobot> blueRobots = df.getRobotsBlueList();
             List<SSL_DetectionBall> balls = df.getBallsList();
+            SSL_GeometryFieldSize fieldGeometry = gd.getField();
+            //SSL_GeometryCameraCalibration camCali = gd.getCalibList().get(0); // simulator doesn't have cam calibration
+
+            double t_sent    = df.getTSent();
+            double t_capture = df.getTCapture();
 
             detection.updateRobots(false, yellowRobots);
             detection.updateRobots(true, blueRobots);
             detection.updateBall(balls.get(0)); // There should be only one ball
+            detection.updateTime(t_sent, t_capture);
+
+            geometry.updateFieldGeometry(fieldGeometry);
+            //geometry.updateCameraCalibration(camCali);
+
+            
         } catch (Exception e) {
             logger.log(Level.WARNING, e.toString());
         }

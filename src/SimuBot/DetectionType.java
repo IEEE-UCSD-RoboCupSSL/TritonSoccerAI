@@ -12,12 +12,20 @@ public class DetectionType extends AbstractData {
     public SSL_DetectionRobot[] blueRobots = new SSL_DetectionRobot[NUM_ROBOTS];
     public SSL_DetectionRobot[] yellowRobots = new SSL_DetectionRobot[NUM_ROBOTS];
     public SSL_DetectionBall ball;
+    
+    public double t_capture;
+    public double t_sent;
 
     public DetectionType() {
     }
 
     public static DetectionType getInstance() {
         return DETECTION;
+    }
+
+    public void updateTime(double t_capture, double t_sent) {
+        this.t_capture = t_capture;
+        this.t_sent = t_sent;
     }
     
     public void updateRobot(boolean isBlue, int id, SSL_DetectionRobot robotUpdate) {
@@ -40,7 +48,8 @@ public class DetectionType extends AbstractData {
 
     @Override
     public String toString() {
-        String s = "[[ROBOTS]]=============================\n";
+        String s = "LAST SENT TIME: " + t_sent + " | LAST CAPTURE TIME: " + t_capture + "\n";
+        s += "[[ROBOTS]]=============================\n";
         for(int i = 0; i < NUM_ROBOTS; i++) {
             SSL_DetectionRobot robot = blueRobots[i];
             s += "[BLUE ROBOT " + i + "]-------------------------\n";

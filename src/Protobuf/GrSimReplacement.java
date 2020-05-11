@@ -72,6 +72,17 @@ public final class GrSimReplacement {
      * @return The yellowteam.
      */
     boolean getYellowteam();
+
+    /**
+     * <code>optional bool turnon = 6;</code>
+     * @return Whether the turnon field is set.
+     */
+    boolean hasTurnon();
+    /**
+     * <code>optional bool turnon = 6;</code>
+     * @return The turnon.
+     */
+    boolean getTurnon();
   }
   /**
    * Protobuf type {@code grSim_RobotReplacement}
@@ -142,6 +153,11 @@ public final class GrSimReplacement {
             case 40: {
               bitField0_ |= 0x00000010;
               yellowteam_ = input.readBool();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              turnon_ = input.readBool();
               break;
             }
             default: {
@@ -262,6 +278,23 @@ public final class GrSimReplacement {
       return yellowteam_;
     }
 
+    public static final int TURNON_FIELD_NUMBER = 6;
+    private boolean turnon_;
+    /**
+     * <code>optional bool turnon = 6;</code>
+     * @return Whether the turnon field is set.
+     */
+    public boolean hasTurnon() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <code>optional bool turnon = 6;</code>
+     * @return The turnon.
+     */
+    public boolean getTurnon() {
+      return turnon_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -311,6 +344,9 @@ public final class GrSimReplacement {
       if (((bitField0_ & 0x00000010) != 0)) {
         output.writeBool(5, yellowteam_);
       }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        output.writeBool(6, turnon_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -339,6 +375,10 @@ public final class GrSimReplacement {
       if (((bitField0_ & 0x00000010) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(5, yellowteam_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, turnon_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -383,6 +423,11 @@ public final class GrSimReplacement {
         if (getYellowteam()
             != other.getYellowteam()) return false;
       }
+      if (hasTurnon() != other.hasTurnon()) return false;
+      if (hasTurnon()) {
+        if (getTurnon()
+            != other.getTurnon()) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -417,6 +462,11 @@ public final class GrSimReplacement {
         hash = (37 * hash) + YELLOWTEAM_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getYellowteam());
+      }
+      if (hasTurnon()) {
+        hash = (37 * hash) + TURNON_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getTurnon());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -561,6 +611,8 @@ public final class GrSimReplacement {
         bitField0_ = (bitField0_ & ~0x00000008);
         yellowteam_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
+        turnon_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -608,6 +660,10 @@ public final class GrSimReplacement {
         if (((from_bitField0_ & 0x00000010) != 0)) {
           result.yellowteam_ = yellowteam_;
           to_bitField0_ |= 0x00000010;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.turnon_ = turnon_;
+          to_bitField0_ |= 0x00000020;
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -672,6 +728,9 @@ public final class GrSimReplacement {
         }
         if (other.hasYellowteam()) {
           setYellowteam(other.getYellowteam());
+        }
+        if (other.hasTurnon()) {
+          setTurnon(other.getTurnon());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -902,6 +961,43 @@ public final class GrSimReplacement {
         onChanged();
         return this;
       }
+
+      private boolean turnon_ ;
+      /**
+       * <code>optional bool turnon = 6;</code>
+       * @return Whether the turnon field is set.
+       */
+      public boolean hasTurnon() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <code>optional bool turnon = 6;</code>
+       * @return The turnon.
+       */
+      public boolean getTurnon() {
+        return turnon_;
+      }
+      /**
+       * <code>optional bool turnon = 6;</code>
+       * @param value The turnon to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTurnon(boolean value) {
+        bitField0_ |= 0x00000020;
+        turnon_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool turnon = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearTurnon() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        turnon_ = false;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -960,45 +1056,45 @@ public final class GrSimReplacement {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required double x = 1;</code>
+     * <code>optional double x = 1;</code>
      * @return Whether the x field is set.
      */
     boolean hasX();
     /**
-     * <code>required double x = 1;</code>
+     * <code>optional double x = 1;</code>
      * @return The x.
      */
     double getX();
 
     /**
-     * <code>required double y = 2;</code>
+     * <code>optional double y = 2;</code>
      * @return Whether the y field is set.
      */
     boolean hasY();
     /**
-     * <code>required double y = 2;</code>
+     * <code>optional double y = 2;</code>
      * @return The y.
      */
     double getY();
 
     /**
-     * <code>required double vx = 3;</code>
+     * <code>optional double vx = 3;</code>
      * @return Whether the vx field is set.
      */
     boolean hasVx();
     /**
-     * <code>required double vx = 3;</code>
+     * <code>optional double vx = 3;</code>
      * @return The vx.
      */
     double getVx();
 
     /**
-     * <code>required double vy = 4;</code>
+     * <code>optional double vy = 4;</code>
      * @return Whether the vy field is set.
      */
     boolean hasVy();
     /**
-     * <code>required double vy = 4;</code>
+     * <code>optional double vy = 4;</code>
      * @return The vy.
      */
     double getVy();
@@ -1105,14 +1201,14 @@ public final class GrSimReplacement {
     public static final int X_FIELD_NUMBER = 1;
     private double x_;
     /**
-     * <code>required double x = 1;</code>
+     * <code>optional double x = 1;</code>
      * @return Whether the x field is set.
      */
     public boolean hasX() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>required double x = 1;</code>
+     * <code>optional double x = 1;</code>
      * @return The x.
      */
     public double getX() {
@@ -1122,14 +1218,14 @@ public final class GrSimReplacement {
     public static final int Y_FIELD_NUMBER = 2;
     private double y_;
     /**
-     * <code>required double y = 2;</code>
+     * <code>optional double y = 2;</code>
      * @return Whether the y field is set.
      */
     public boolean hasY() {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>required double y = 2;</code>
+     * <code>optional double y = 2;</code>
      * @return The y.
      */
     public double getY() {
@@ -1139,14 +1235,14 @@ public final class GrSimReplacement {
     public static final int VX_FIELD_NUMBER = 3;
     private double vx_;
     /**
-     * <code>required double vx = 3;</code>
+     * <code>optional double vx = 3;</code>
      * @return Whether the vx field is set.
      */
     public boolean hasVx() {
       return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>required double vx = 3;</code>
+     * <code>optional double vx = 3;</code>
      * @return The vx.
      */
     public double getVx() {
@@ -1156,14 +1252,14 @@ public final class GrSimReplacement {
     public static final int VY_FIELD_NUMBER = 4;
     private double vy_;
     /**
-     * <code>required double vy = 4;</code>
+     * <code>optional double vy = 4;</code>
      * @return Whether the vy field is set.
      */
     public boolean hasVy() {
       return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>required double vy = 4;</code>
+     * <code>optional double vy = 4;</code>
      * @return The vy.
      */
     public double getVy() {
@@ -1177,22 +1273,6 @@ public final class GrSimReplacement {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasX()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasY()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasVx()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasVy()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -1560,18 +1640,6 @@ public final class GrSimReplacement {
 
       @java.lang.Override
       public final boolean isInitialized() {
-        if (!hasX()) {
-          return false;
-        }
-        if (!hasY()) {
-          return false;
-        }
-        if (!hasVx()) {
-          return false;
-        }
-        if (!hasVy()) {
-          return false;
-        }
         return true;
       }
 
@@ -1597,21 +1665,21 @@ public final class GrSimReplacement {
 
       private double x_ ;
       /**
-       * <code>required double x = 1;</code>
+       * <code>optional double x = 1;</code>
        * @return Whether the x field is set.
        */
       public boolean hasX() {
         return ((bitField0_ & 0x00000001) != 0);
       }
       /**
-       * <code>required double x = 1;</code>
+       * <code>optional double x = 1;</code>
        * @return The x.
        */
       public double getX() {
         return x_;
       }
       /**
-       * <code>required double x = 1;</code>
+       * <code>optional double x = 1;</code>
        * @param value The x to set.
        * @return This builder for chaining.
        */
@@ -1622,7 +1690,7 @@ public final class GrSimReplacement {
         return this;
       }
       /**
-       * <code>required double x = 1;</code>
+       * <code>optional double x = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearX() {
@@ -1634,21 +1702,21 @@ public final class GrSimReplacement {
 
       private double y_ ;
       /**
-       * <code>required double y = 2;</code>
+       * <code>optional double y = 2;</code>
        * @return Whether the y field is set.
        */
       public boolean hasY() {
         return ((bitField0_ & 0x00000002) != 0);
       }
       /**
-       * <code>required double y = 2;</code>
+       * <code>optional double y = 2;</code>
        * @return The y.
        */
       public double getY() {
         return y_;
       }
       /**
-       * <code>required double y = 2;</code>
+       * <code>optional double y = 2;</code>
        * @param value The y to set.
        * @return This builder for chaining.
        */
@@ -1659,7 +1727,7 @@ public final class GrSimReplacement {
         return this;
       }
       /**
-       * <code>required double y = 2;</code>
+       * <code>optional double y = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearY() {
@@ -1671,21 +1739,21 @@ public final class GrSimReplacement {
 
       private double vx_ ;
       /**
-       * <code>required double vx = 3;</code>
+       * <code>optional double vx = 3;</code>
        * @return Whether the vx field is set.
        */
       public boolean hasVx() {
         return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>required double vx = 3;</code>
+       * <code>optional double vx = 3;</code>
        * @return The vx.
        */
       public double getVx() {
         return vx_;
       }
       /**
-       * <code>required double vx = 3;</code>
+       * <code>optional double vx = 3;</code>
        * @param value The vx to set.
        * @return This builder for chaining.
        */
@@ -1696,7 +1764,7 @@ public final class GrSimReplacement {
         return this;
       }
       /**
-       * <code>required double vx = 3;</code>
+       * <code>optional double vx = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearVx() {
@@ -1708,21 +1776,21 @@ public final class GrSimReplacement {
 
       private double vy_ ;
       /**
-       * <code>required double vy = 4;</code>
+       * <code>optional double vy = 4;</code>
        * @return Whether the vy field is set.
        */
       public boolean hasVy() {
         return ((bitField0_ & 0x00000008) != 0);
       }
       /**
-       * <code>required double vy = 4;</code>
+       * <code>optional double vy = 4;</code>
        * @return The vy.
        */
       public double getVy() {
         return vy_;
       }
       /**
-       * <code>required double vy = 4;</code>
+       * <code>optional double vy = 4;</code>
        * @param value The vy to set.
        * @return This builder for chaining.
        */
@@ -1733,7 +1801,7 @@ public final class GrSimReplacement {
         return this;
       }
       /**
-       * <code>required double vy = 4;</code>
+       * <code>optional double vy = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearVy() {
@@ -2008,12 +2076,6 @@ public final class GrSimReplacement {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (hasBall()) {
-        if (!getBall().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       for (int i = 0; i < getRobotsCount(); i++) {
         if (!getRobots(i).isInitialized()) {
           memoizedIsInitialized = 0;
@@ -2368,11 +2430,6 @@ public final class GrSimReplacement {
 
       @java.lang.Override
       public final boolean isInitialized() {
-        if (hasBall()) {
-          if (!getBall().isInitialized()) {
-            return false;
-          }
-        }
         for (int i = 0; i < getRobotsCount(); i++) {
           if (!getRobots(i).isInitialized()) {
             return false;
@@ -2837,14 +2894,14 @@ public final class GrSimReplacement {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\027grSim_Replacement.proto\"[\n\026grSim_Robot" +
+      "\n\027grSim_Replacement.proto\"k\n\026grSim_Robot" +
       "Replacement\022\t\n\001x\030\001 \002(\001\022\t\n\001y\030\002 \002(\001\022\013\n\003dir" +
-      "\030\003 \002(\001\022\n\n\002id\030\004 \002(\r\022\022\n\nyellowteam\030\005 \002(\010\"E" +
-      "\n\025grSim_BallReplacement\022\t\n\001x\030\001 \002(\001\022\t\n\001y\030" +
-      "\002 \002(\001\022\n\n\002vx\030\003 \002(\001\022\n\n\002vy\030\004 \002(\001\"b\n\021grSim_R" +
-      "eplacement\022$\n\004ball\030\001 \001(\0132\026.grSim_BallRep" +
-      "lacement\022\'\n\006robots\030\002 \003(\0132\027.grSim_RobotRe" +
-      "placement"
+      "\030\003 \002(\001\022\n\n\002id\030\004 \002(\r\022\022\n\nyellowteam\030\005 \002(\010\022\016" +
+      "\n\006turnon\030\006 \001(\010\"E\n\025grSim_BallReplacement\022" +
+      "\t\n\001x\030\001 \001(\001\022\t\n\001y\030\002 \001(\001\022\n\n\002vx\030\003 \001(\001\022\n\n\002vy\030" +
+      "\004 \001(\001\"b\n\021grSim_Replacement\022$\n\004ball\030\001 \001(\013" +
+      "2\026.grSim_BallReplacement\022\'\n\006robots\030\002 \003(\013" +
+      "2\027.grSim_RobotReplacement"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2855,7 +2912,7 @@ public final class GrSimReplacement {
     internal_static_grSim_RobotReplacement_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_grSim_RobotReplacement_descriptor,
-        new java.lang.String[] { "X", "Y", "Dir", "Id", "Yellowteam", });
+        new java.lang.String[] { "X", "Y", "Dir", "Id", "Yellowteam", "Turnon", });
     internal_static_grSim_BallReplacement_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_grSim_BallReplacement_fieldAccessorTable = new
