@@ -11,9 +11,22 @@ package SimuBot;
  */
 public class Runner {
     
+    private static final String VISION_MULTICAST_ADDR = "224.5.23.3";
+    private static final int VISION_PORT = 10002; 
+
+    
     public static void main(String args[]) {
         
-        Connection connection1 = new Connection();
+        //Connection connection1 = new Connection(); // Where is this used?
+        VisionConnection vision = new VisionConnection(VISION_MULTICAST_ADDR, VISION_PORT);
+        FieldMonitor fieldMonitor = new FieldMonitor(vision, new FieldConfiguration());
+        vision.addObserver(fieldMonitor);
+
+        for(int i = 0; i < 3; i++) { 
+            vision.collectData(4);
+            System.out.println(fieldMonitor.detection.toString());
+        }
+        
         /*
         connection1.setIp("127.0.0.1");
         connection1.setPort(20011);
@@ -52,9 +65,12 @@ public class Runner {
         connection2.send();*/
         
         //System.out.println("******** Connection 1 ********");
-        connection1.receive();
+        
         
         //System.out.println("******** Connection 2 ********");
         //connection2.receive();
+
+
+        
     }
 }

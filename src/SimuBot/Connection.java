@@ -111,10 +111,11 @@ public class Connection {
         }
         return Arrays.copyOf(bytes, i + 1);
     }
-    
+
     /*
      * Author: Zihao Zhou
      */
+     /*
     public void receive() {
         byte[] buffer = new byte[10000000];
         
@@ -125,7 +126,6 @@ public class Connection {
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             
             for(int i = 0; i < 5; i++) {
-
                 ds.receive(dp);
                 MessagesRobocupSslWrapper.SSL_WrapperPacket packet;
                 packet = MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(trim(dp.getData()));
@@ -136,6 +136,7 @@ public class Connection {
             System.out.println(e);
         }
     }
+    */
 
     public void send() {
         GrSimCommands.grSim_Robot_Command command = GrSimCommands.grSim_Robot_Command.newBuilder().setId(this.id)
