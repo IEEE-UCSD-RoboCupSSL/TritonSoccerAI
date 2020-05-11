@@ -32,7 +32,6 @@ public class GeometryType extends AbstractData {
         public int goalWidth;
         public int goalDepth;
         public int boundaryWidth;
-
     }
 
     private static final GeometryType GEOMETRY = new GeometryType();   
@@ -53,9 +52,13 @@ public class GeometryType extends AbstractData {
         return field;
     }
 
+    List<SSL_FieldLineSegment> tmp;
 
     void updateFieldGeometry(SSL_GeometryFieldSize fieldGeometry) {
-        System.out.println("Num of Line Segs = " + fieldGeometry.getFieldLinesCount());
+        // System.out.println("Num of Line Segs = " + fieldGeometry.getFieldLinesCount());
+        if(fieldGeometry.getFieldLinesCount() > 0) { 
+            tmp = fieldGeometry.getFieldLinesList();
+        }
         field.fieldLength = fieldGeometry.getFieldLength();
         field.fieldWidth = fieldGeometry.getFieldWidth();
         field.goalDepth = fieldGeometry.getGoalDepth();
@@ -101,6 +104,19 @@ public class GeometryType extends AbstractData {
         s += "Goal(depth, width) = (" + field.goalDepth + ", "
                                       + field.goalWidth + ")\n";
         s += "Boundary Width = " + field.boundaryWidth + "\n";
+
+        s += "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+
+        
+        System.out.println(tmp.size());
+        for(SSL_FieldLineSegment line : tmp) {
+            s += line.getName() + ": (" + line.getP1().getX() + ", "
+                                        + line.getP1().getY() + ") " 
+                                  + "(" + line.getP2().getX() + ", "
+                                        + line.getP2().getY() + ") "
+                                        + " Thickness: " + line.getThickness() + "\n";
+        }
+
         return s;
     }
 
