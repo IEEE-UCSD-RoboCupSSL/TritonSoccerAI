@@ -1,3 +1,3 @@
-package SimuBot;
+package SimuBot.DesignPattern;
 
 public abstract class AbstractData {}

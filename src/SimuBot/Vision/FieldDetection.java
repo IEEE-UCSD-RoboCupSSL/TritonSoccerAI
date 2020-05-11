@@ -1,16 +1,17 @@
-package SimuBot;
+package SimuBot.Vision;
+import SimuBot.DesignPattern.*;
 
 
 public class FieldDetection implements Observer {
-    public DetectionType detection;
+    public DetectionData detection;
     String className = "FieldDetection";
-    FieldDetection() {}
+    public FieldDetection() {}
 
     public void update(AbstractData data) {
-        this.detection = (DetectionType)data;
+        this.detection = (DetectionData)data;
     }
 
-    public DetectionType getDetection() {
+    public DetectionData getDetectionInstance() {
         return detection;
     }
 

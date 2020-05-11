@@ -1,13 +1,14 @@
-package SimuBot;
+package SimuBot.Vision;
 
+import SimuBot.DesignPattern.*;
 import java.util.List;
 import Protobuf.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Protobuf.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
-public class DetectionType extends AbstractData {
+public class DetectionData extends AbstractData {
 
     public static final int NUM_ROBOTS = 6;
-    private static final DetectionType DETECTION = new DetectionType();
+    private static final DetectionData DETECTION = new DetectionData();
 
     public SSL_DetectionRobot[] blueRobots = new SSL_DetectionRobot[NUM_ROBOTS];
     public SSL_DetectionRobot[] yellowRobots = new SSL_DetectionRobot[NUM_ROBOTS];
@@ -16,10 +17,10 @@ public class DetectionType extends AbstractData {
     public double t_capture;
     public double t_sent;
 
-    public DetectionType() {
+    public DetectionData() {
     }
 
-    public static DetectionType getInstance() {
+    public static DetectionData getInstance() {
         return DETECTION;
     }
 

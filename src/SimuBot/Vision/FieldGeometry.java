@@ -1,14 +1,16 @@
-package SimuBot;
+package SimuBot.Vision;
+import SimuBot.DesignPattern.*;
+
 
 public class FieldGeometry implements Observer {
-    public GeometryType geometry;
+    public GeometryData geometry;
     String className = "FieldGeometry";
-    FieldGeometry() {}
+    public FieldGeometry() {}
     public void update(AbstractData data) {
-        this.geometry = (GeometryType)data;
+        this.geometry = (GeometryData)data;
     }
 
-    public GeometryType getGeometry() {
+    public GeometryData getGeometry() {
         return geometry;
     }
 

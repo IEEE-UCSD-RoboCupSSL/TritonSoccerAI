@@ -1,11 +1,12 @@
-package SimuBot;
-import java.util.List;
+package SimuBot.Vision;
+import SimuBot.DesignPattern.*;
+import java.util.*;
 import Protobuf.MessagesRobocupSslGeometry.*;
-import Protobuf.MessagesRobocupSslGeometry.SSL_GeometryFieldSize.*;
+// import Protobuf.MessagesRobocupSslGeometry.SSL_GeometryFieldSize.*;
 
 
 
-public class GeometryType extends AbstractData {
+public class GeometryData extends AbstractData {
     public class Camera {
         public int cameraID;
         public float focalLength;
@@ -27,20 +28,22 @@ public class GeometryType extends AbstractData {
     }
 
     public class Field {
+    
         public int fieldLength;
         public int fieldWidth;
         public int goalWidth;
         public int goalDepth;
         public int boundaryWidth;
+
     }
 
-    private static final GeometryType GEOMETRY = new GeometryType();   
+    private static final GeometryData GEOMETRY = new GeometryData();   
     public Camera cam = new Camera();
     public Field field = new Field();
 
-    public GeometryType() {}
+    public GeometryData() {}
 
-    public static GeometryType getInstance() {
+    public static GeometryData getInstance() {
         return GEOMETRY;
     }
 

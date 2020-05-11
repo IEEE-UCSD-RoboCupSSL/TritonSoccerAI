@@ -5,6 +5,12 @@
  */
 package SimuBot;
 
+import SimuBot.DesignPattern.*;
+import SimuBot.Vision.*;
+import SimuBot.Control.*;
+import SimuBot.Geometry.*;
+
+
 /**
  *
  * @author kevinzhou

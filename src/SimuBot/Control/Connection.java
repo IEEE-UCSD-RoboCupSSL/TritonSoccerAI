@@ -1,4 +1,4 @@
-package SimuBot;
+package SimuBot.Control;
 
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;

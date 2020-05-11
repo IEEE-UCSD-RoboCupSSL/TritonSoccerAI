@@ -1,4 +1,5 @@
-package SimuBot;
+package SimuBot.Vision;
+import SimuBot.DesignPattern.*;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -23,8 +24,8 @@ public class VisionConnection implements Subject {
     DatagramPacket dp;
     Logger logger;
     ArrayList<Observer> observers;
-    DetectionType detection;
-    GeometryType geometry;
+    DetectionData detection;
+    GeometryData geometry;
 
     public void addObserver(Observer observer) {
         this.observers.add(observer);
@@ -50,8 +51,8 @@ public class VisionConnection implements Subject {
         this.port = port;
         this.buffer = new byte[MAX_BUFFER_SIZE];
         this.logger = Logger.getLogger(VisionConnection.class.getName());
-        this.detection = DetectionType.getInstance();
-        this.geometry = GeometryType.getInstance();
+        this.detection = DetectionData.getInstance();
+        this.geometry = GeometryData.getInstance();
         this.observers = new ArrayList<Observer>();
 
         try {
