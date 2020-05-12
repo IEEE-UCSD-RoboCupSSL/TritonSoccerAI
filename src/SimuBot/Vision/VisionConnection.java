@@ -108,6 +108,11 @@ public class VisionConnection implements Subject {
         notifyObservers();
     }
 
+    public void collectData() {
+        // default configuration with 2x6 robots need 4 packets 
+        collectData(4);
+    }
+
     /*
      * Source: https://bit.ly/3cjWx9U
      */

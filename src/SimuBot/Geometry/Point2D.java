@@ -1,23 +1,13 @@
 package SimuBot.Geometry;
 
-public class Point2D {
-    public double x,y; 
-    private String name;
+public class Point2D extends Vec2D {
+
     public Point2D(double x, double y) {
-        this.x = x;
-        this.y = y;   
+        super(x,y); 
     }
 
     public Point2D(Point2D p) {
-        this.x = p.x;
-        this.y = p.y;
-    }
-
-    void setName(String name) {
-        this.name = name;
-    }
-    String getName() {
-        return this.name;
+       super(p.x, p.y);
     }
 
     @Override
