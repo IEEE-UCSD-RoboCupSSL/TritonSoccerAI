@@ -1,1 +1,1 @@
-* todo: algorithm for constructing an inner region formed by multiple vertices, and decide whether a point or an object with certain radius is within that region 
+* todo: algorithm for constructing a polygon formed by multiple vertices in random order, and decide whether a point or an object with certain radius is within that polygon

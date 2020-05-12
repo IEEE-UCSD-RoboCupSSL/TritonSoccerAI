@@ -118,4 +118,17 @@ public class VisionConnection implements Subject {
         }
         return Arrays.copyOf(bytes, i + 1);
     }
+
+
+    /*
+     * preheating by looping numIter times 
+     * to drain out the initial problematic 
+     * data
+     */
+    public void preheating(int numIter) {
+        for(int i = 0; i < numIter; i++) this.collectData(1);
+    }
+    public void preheating() {
+        preheating(200); // default 200 iters
+    }
 }

@@ -8,7 +8,7 @@ package SimuBot;
 import SimuBot.DesignPattern.*;
 import SimuBot.Vision.*;
 import SimuBot.Control.*;
-import SimuBot.Geometry.*;
+
 
 
 /**
@@ -31,9 +31,7 @@ public class Runner {
         vision.addObserver(fieldGeometry);
 
 
-        for(int i = 0; i < 200; i++) { // preheating by ignore the first couple hundreds of problematic data
-            vision.collectData(1); 
-        }
+        vision.preheating();
         vision.collectData(1);
         System.out.println(fieldGeometry.geometry.toString());
         
