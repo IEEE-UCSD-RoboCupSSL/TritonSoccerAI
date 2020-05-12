@@ -1,6 +1,8 @@
 package SimuBot.Vision;
 
 import SimuBot.DesignPattern.*;
+import SimuBot.Geometry.Point2D;
+
 import java.util.List;
 import Protobuf.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Protobuf.MessagesRobocupSslDetection.SSL_DetectionRobot;
@@ -72,4 +74,5 @@ public class DetectionData extends AbstractData {
         s += "[[BALL]]===============================\n" + ball.toString();
         return s;
     } 
+
 }
