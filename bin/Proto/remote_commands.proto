@@ -31,6 +31,8 @@ message control {
 
 // data to be send to share info to each robot for distributed computation
 message data_send {
+    /* from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+           or public data shared among all robots */
     vec2d ball_location = 1; 
     repeated vec2d robot_locations = 2;
     repeated float robot_orientations = 3;

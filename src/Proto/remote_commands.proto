@@ -61,8 +61,9 @@ message data_request {
 
 
 message remote_commands {
-    string name = 1; // name of the command indicating the type of command
-    control ctrl = 2; // basic control
+    control ctrl = 1; // basic control
+    data_send cdata = 2; /* from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+                          or public data shared among all robots */
     custom_control cust_ctrl = 3; // custom control
     custom_task task = 4; // highlevel task
     data_request request = 5; // AI can request data to fetch from a robot

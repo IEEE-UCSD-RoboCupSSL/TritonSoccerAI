@@ -9132,30 +9132,10 @@ public final class RemoteCommands {
 
     /**
      * <pre>
-     * name of the command indicating the type of command
-     * </pre>
-     *
-     * <code>string name = 1;</code>
-     * @return The name.
-     */
-    java.lang.String getName();
-    /**
-     * <pre>
-     * name of the command indicating the type of command
-     * </pre>
-     *
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
-     */
-    com.google.protobuf.ByteString
-        getNameBytes();
-
-    /**
-     * <pre>
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      * @return Whether the ctrl field is set.
      */
     boolean hasCtrl();
@@ -9164,7 +9144,7 @@ public final class RemoteCommands {
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      * @return The ctrl.
      */
     RemoteCommands.control getCtrl();
@@ -9173,9 +9153,39 @@ public final class RemoteCommands {
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      */
     RemoteCommands.controlOrBuilder getCtrlOrBuilder();
+
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     * @return Whether the cdata field is set.
+     */
+    boolean hasCdata();
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     * @return The cdata.
+     */
+    RemoteCommands.data_send getCdata();
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     */
+    RemoteCommands.data_sendOrBuilder getCdataOrBuilder();
 
     /**
      * <pre>
@@ -9298,7 +9308,6 @@ public final class RemoteCommands {
       super(builder);
     }
     private remote_commands() {
-      name_ = "";
     }
 
     @java.lang.Override
@@ -9332,12 +9341,6 @@ public final class RemoteCommands {
               done = true;
               break;
             case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              name_ = s;
-              break;
-            }
-            case 18: {
               RemoteCommands.control.Builder subBuilder = null;
               if (ctrl_ != null) {
                 subBuilder = ctrl_.toBuilder();
@@ -9346,6 +9349,19 @@ public final class RemoteCommands {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(ctrl_);
                 ctrl_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              RemoteCommands.data_send.Builder subBuilder = null;
+              if (cdata_ != null) {
+                subBuilder = cdata_.toBuilder();
+              }
+              cdata_ = input.readMessage(RemoteCommands.data_send.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(cdata_);
+                cdata_ = subBuilder.buildPartial();
               }
 
               break;
@@ -9434,58 +9450,14 @@ public final class RemoteCommands {
               RemoteCommands.remote_commands.class, RemoteCommands.remote_commands.Builder.class);
     }
 
-    public static final int NAME_FIELD_NUMBER = 1;
-    private volatile java.lang.Object name_;
-    /**
-     * <pre>
-     * name of the command indicating the type of command
-     * </pre>
-     *
-     * <code>string name = 1;</code>
-     * @return The name.
-     */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        name_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     * name of the command indicating the type of command
-     * </pre>
-     *
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
-     */
-    public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        name_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int CTRL_FIELD_NUMBER = 2;
+    public static final int CTRL_FIELD_NUMBER = 1;
     private RemoteCommands.control ctrl_;
     /**
      * <pre>
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      * @return Whether the ctrl field is set.
      */
     public boolean hasCtrl() {
@@ -9496,7 +9468,7 @@ public final class RemoteCommands {
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      * @return The ctrl.
      */
     public RemoteCommands.control getCtrl() {
@@ -9507,10 +9479,48 @@ public final class RemoteCommands {
      * basic control
      * </pre>
      *
-     * <code>.control ctrl = 2;</code>
+     * <code>.control ctrl = 1;</code>
      */
     public RemoteCommands.controlOrBuilder getCtrlOrBuilder() {
       return getCtrl();
+    }
+
+    public static final int CDATA_FIELD_NUMBER = 2;
+    private RemoteCommands.data_send cdata_;
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     * @return Whether the cdata field is set.
+     */
+    public boolean hasCdata() {
+      return cdata_ != null;
+    }
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     * @return The cdata.
+     */
+    public RemoteCommands.data_send getCdata() {
+      return cdata_ == null ? RemoteCommands.data_send.getDefaultInstance() : cdata_;
+    }
+    /**
+     * <pre>
+     * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+     *or public data shared among all robots 
+     * </pre>
+     *
+     * <code>.data_send cdata = 2;</code>
+     */
+    public RemoteCommands.data_sendOrBuilder getCdataOrBuilder() {
+      return getCdata();
     }
 
     public static final int CUST_CTRL_FIELD_NUMBER = 3;
@@ -9667,11 +9677,11 @@ public final class RemoteCommands {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
-      }
       if (ctrl_ != null) {
-        output.writeMessage(2, getCtrl());
+        output.writeMessage(1, getCtrl());
+      }
+      if (cdata_ != null) {
+        output.writeMessage(2, getCdata());
       }
       if (custCtrl_ != null) {
         output.writeMessage(3, getCustCtrl());
@@ -9694,12 +9704,13 @@ public final class RemoteCommands {
       if (size != -1) return size;
 
       size = 0;
-      if (!getNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
-      }
       if (ctrl_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getCtrl());
+          .computeMessageSize(1, getCtrl());
+      }
+      if (cdata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getCdata());
       }
       if (custCtrl_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -9732,12 +9743,15 @@ public final class RemoteCommands {
       }
       RemoteCommands.remote_commands other = (RemoteCommands.remote_commands) obj;
 
-      if (!getName()
-          .equals(other.getName())) return false;
       if (hasCtrl() != other.hasCtrl()) return false;
       if (hasCtrl()) {
         if (!getCtrl()
             .equals(other.getCtrl())) return false;
+      }
+      if (hasCdata() != other.hasCdata()) return false;
+      if (hasCdata()) {
+        if (!getCdata()
+            .equals(other.getCdata())) return false;
       }
       if (hasCustCtrl() != other.hasCustCtrl()) return false;
       if (hasCustCtrl()) {
@@ -9770,11 +9784,13 @@ public final class RemoteCommands {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
       if (hasCtrl()) {
         hash = (37 * hash) + CTRL_FIELD_NUMBER;
         hash = (53 * hash) + getCtrl().hashCode();
+      }
+      if (hasCdata()) {
+        hash = (37 * hash) + CDATA_FIELD_NUMBER;
+        hash = (53 * hash) + getCdata().hashCode();
       }
       if (hasCustCtrl()) {
         hash = (37 * hash) + CUST_CTRL_FIELD_NUMBER;
@@ -9925,13 +9941,17 @@ public final class RemoteCommands {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        name_ = "";
-
         if (ctrlBuilder_ == null) {
           ctrl_ = null;
         } else {
           ctrl_ = null;
           ctrlBuilder_ = null;
+        }
+        if (cdataBuilder_ == null) {
+          cdata_ = null;
+        } else {
+          cdata_ = null;
+          cdataBuilder_ = null;
         }
         if (custCtrlBuilder_ == null) {
           custCtrl_ = null;
@@ -9983,11 +10003,15 @@ public final class RemoteCommands {
       @java.lang.Override
       public RemoteCommands.remote_commands buildPartial() {
         RemoteCommands.remote_commands result = new RemoteCommands.remote_commands(this);
-        result.name_ = name_;
         if (ctrlBuilder_ == null) {
           result.ctrl_ = ctrl_;
         } else {
           result.ctrl_ = ctrlBuilder_.build();
+        }
+        if (cdataBuilder_ == null) {
+          result.cdata_ = cdata_;
+        } else {
+          result.cdata_ = cdataBuilder_.build();
         }
         if (custCtrlBuilder_ == null) {
           result.custCtrl_ = custCtrl_;
@@ -10057,12 +10081,11 @@ public final class RemoteCommands {
 
       public Builder mergeFrom(RemoteCommands.remote_commands other) {
         if (other == RemoteCommands.remote_commands.getDefaultInstance()) return this;
-        if (!other.getName().isEmpty()) {
-          name_ = other.name_;
-          onChanged();
-        }
         if (other.hasCtrl()) {
           mergeCtrl(other.getCtrl());
+        }
+        if (other.hasCdata()) {
+          mergeCdata(other.getCdata());
         }
         if (other.hasCustCtrl()) {
           mergeCustCtrl(other.getCustCtrl());
@@ -10105,102 +10128,6 @@ public final class RemoteCommands {
         return this;
       }
 
-      private java.lang.Object name_ = "";
-      /**
-       * <pre>
-       * name of the command indicating the type of command
-       * </pre>
-       *
-       * <code>string name = 1;</code>
-       * @return The name.
-       */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          name_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * name of the command indicating the type of command
-       * </pre>
-       *
-       * <code>string name = 1;</code>
-       * @return The bytes for name.
-       */
-      public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          name_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * name of the command indicating the type of command
-       * </pre>
-       *
-       * <code>string name = 1;</code>
-       * @param value The name to set.
-       * @return This builder for chaining.
-       */
-      public Builder setName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        name_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * name of the command indicating the type of command
-       * </pre>
-       *
-       * <code>string name = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearName() {
-        
-        name_ = getDefaultInstance().getName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * name of the command indicating the type of command
-       * </pre>
-       *
-       * <code>string name = 1;</code>
-       * @param value The bytes for name to set.
-       * @return This builder for chaining.
-       */
-      public Builder setNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        name_ = value;
-        onChanged();
-        return this;
-      }
-
       private RemoteCommands.control ctrl_;
       private com.google.protobuf.SingleFieldBuilderV3<
           RemoteCommands.control, RemoteCommands.control.Builder, RemoteCommands.controlOrBuilder> ctrlBuilder_;
@@ -10209,7 +10136,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        * @return Whether the ctrl field is set.
        */
       public boolean hasCtrl() {
@@ -10220,7 +10147,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        * @return The ctrl.
        */
       public RemoteCommands.control getCtrl() {
@@ -10235,7 +10162,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public Builder setCtrl(RemoteCommands.control value) {
         if (ctrlBuilder_ == null) {
@@ -10255,7 +10182,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public Builder setCtrl(
           RemoteCommands.control.Builder builderForValue) {
@@ -10273,7 +10200,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public Builder mergeCtrl(RemoteCommands.control value) {
         if (ctrlBuilder_ == null) {
@@ -10295,7 +10222,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public Builder clearCtrl() {
         if (ctrlBuilder_ == null) {
@@ -10313,7 +10240,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public RemoteCommands.control.Builder getCtrlBuilder() {
         
@@ -10325,7 +10252,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       public RemoteCommands.controlOrBuilder getCtrlOrBuilder() {
         if (ctrlBuilder_ != null) {
@@ -10340,7 +10267,7 @@ public final class RemoteCommands {
        * basic control
        * </pre>
        *
-       * <code>.control ctrl = 2;</code>
+       * <code>.control ctrl = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           RemoteCommands.control, RemoteCommands.control.Builder, RemoteCommands.controlOrBuilder> 
@@ -10354,6 +10281,170 @@ public final class RemoteCommands {
           ctrl_ = null;
         }
         return ctrlBuilder_;
+      }
+
+      private RemoteCommands.data_send cdata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          RemoteCommands.data_send, RemoteCommands.data_send.Builder, RemoteCommands.data_sendOrBuilder> cdataBuilder_;
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       * @return Whether the cdata field is set.
+       */
+      public boolean hasCdata() {
+        return cdataBuilder_ != null || cdata_ != null;
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       * @return The cdata.
+       */
+      public RemoteCommands.data_send getCdata() {
+        if (cdataBuilder_ == null) {
+          return cdata_ == null ? RemoteCommands.data_send.getDefaultInstance() : cdata_;
+        } else {
+          return cdataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public Builder setCdata(RemoteCommands.data_send value) {
+        if (cdataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          cdata_ = value;
+          onChanged();
+        } else {
+          cdataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public Builder setCdata(
+          RemoteCommands.data_send.Builder builderForValue) {
+        if (cdataBuilder_ == null) {
+          cdata_ = builderForValue.build();
+          onChanged();
+        } else {
+          cdataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public Builder mergeCdata(RemoteCommands.data_send value) {
+        if (cdataBuilder_ == null) {
+          if (cdata_ != null) {
+            cdata_ =
+              RemoteCommands.data_send.newBuilder(cdata_).mergeFrom(value).buildPartial();
+          } else {
+            cdata_ = value;
+          }
+          onChanged();
+        } else {
+          cdataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public Builder clearCdata() {
+        if (cdataBuilder_ == null) {
+          cdata_ = null;
+          onChanged();
+        } else {
+          cdata_ = null;
+          cdataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public RemoteCommands.data_send.Builder getCdataBuilder() {
+        
+        onChanged();
+        return getCdataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      public RemoteCommands.data_sendOrBuilder getCdataOrBuilder() {
+        if (cdataBuilder_ != null) {
+          return cdataBuilder_.getMessageOrBuilder();
+        } else {
+          return cdata_ == null ?
+              RemoteCommands.data_send.getDefaultInstance() : cdata_;
+        }
+      }
+      /**
+       * <pre>
+       * from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+       *or public data shared among all robots 
+       * </pre>
+       *
+       * <code>.data_send cdata = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          RemoteCommands.data_send, RemoteCommands.data_send.Builder, RemoteCommands.data_sendOrBuilder> 
+          getCdataFieldBuilder() {
+        if (cdataBuilder_ == null) {
+          cdataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              RemoteCommands.data_send, RemoteCommands.data_send.Builder, RemoteCommands.data_sendOrBuilder>(
+                  getCdata(),
+                  getParentForChildren(),
+                  isClean());
+          cdata_ = null;
+        }
+        return cdataBuilder_;
       }
 
       private RemoteCommands.custom_control custCtrl_;
@@ -11102,12 +11193,12 @@ public final class RemoteCommands {
       "_params\030\003 \003(\002\022\022\n\nstr_params\030\004 \003(\t\"c\n\014dat" +
       "a_request\022\014\n\004name\030\001 \001(\t\022\033\n\tctrl_data\030\002 \003" +
       "(\0132\010.control\022\026\n\016numerical_data\030\003 \003(\002\022\020\n\010" +
-      "str_data\030\004 \003(\t\"\266\001\n\017remote_commands\022\014\n\004na" +
-      "me\030\001 \001(\t\022\026\n\004ctrl\030\002 \001(\0132\010.control\022\"\n\tcust" +
-      "_ctrl\030\003 \001(\0132\017.custom_control\022\032\n\004task\030\004 \001" +
-      "(\0132\014.custom_task\022\036\n\007request\030\005 \001(\0132\r.data" +
-      "_request\022\035\n\007to_init\030\006 \001(\0132\014.static_datab" +
-      "\006proto3"
+      "str_data\030\004 \003(\t\"\303\001\n\017remote_commands\022\026\n\004ct" +
+      "rl\030\001 \001(\0132\010.control\022\031\n\005cdata\030\002 \001(\0132\n.data" +
+      "_send\022\"\n\tcust_ctrl\030\003 \001(\0132\017.custom_contro" +
+      "l\022\032\n\004task\030\004 \001(\0132\014.custom_task\022\036\n\007request" +
+      "\030\005 \001(\0132\r.data_request\022\035\n\007to_init\030\006 \001(\0132\014" +
+      ".static_datab\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11166,7 +11257,7 @@ public final class RemoteCommands {
     internal_static_remote_commands_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_remote_commands_descriptor,
-        new java.lang.String[] { "Name", "Ctrl", "CustCtrl", "Task", "Request", "ToInit", });
+        new java.lang.String[] { "Ctrl", "Cdata", "CustCtrl", "Task", "Request", "ToInit", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -12,8 +12,11 @@ import java.util.logging.*;
 import Protobuf.*;
 import Protobuf.RemoteCommands.data_request;
 import Protobuf.RemoteCommands.remote_commands;
+import SimuBot.Vision.FieldDetection;
 
 public class VirtualBot {
+
+
     private static DatagramSocket socket;
     private static String ip;
     private static int port;
@@ -22,7 +25,12 @@ public class VirtualBot {
     private String teamColor;
     
     private RemoteCommands.remote_commands cmds;
-    private RemoteCommands.static_data sdata;
+    
+
+
+    // Internal data/cmd representation
+
+
 
 
 
@@ -54,17 +62,42 @@ public class VirtualBot {
         socket = null;
     }
 
-    public void setCommands(RemoteCommands.remote_commands cmds) {
+    public void receivePacketFromRemote(RemoteCommands.remote_commands cmds) {
         this.cmds = cmds;
+        if(cmds.getCtrl() != null) {
+            updateControl(cmds.getCtrl());
+        }
+        if(cmds.getCdata() != null) {
+            updateCloudData(cmds.getCdata());
+        }
+        if(cmds.getCustCtrl() != null) {
+            updateCustomCtrl(cmds.getCustCtrl());
+        }
+        if(cmds.getTask() != null) {
+            updateTask(cmds.getTask());
+        }
+
     }
 
-    public RemoteCommands.data_request getDataRequested() {
-        // To-do
+    public RemoteCommands.data_request sendDataToRemote() {
+        // for future extension, currently useless 
         return cmds.getRequest();
     }
 
-
-    public void setStaticData(RemoteCommands.static_data sdata) {
-        this.sdata = sdata;
+    void updateControl(RemoteCommands.control ctrl) {
+        // To-do: send packet to grSim
     }
+
+    void updateCloudData(RemoteCommands.data_send cData) {
+        // To-do
+    }
+
+    void updateCustomCtrl(RemoteCommands.custom_control cusCtrl) {
+        // To-do
+    }
+
+    void updateTask(RemoteCommands.custom_task task) {
+        // To-do
+    }
+
 }
