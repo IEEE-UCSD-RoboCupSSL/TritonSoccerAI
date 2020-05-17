@@ -6,7 +6,12 @@
 package SimuBot;
 
 import SimuBot.DesignPattern.*;
+import SimuBot.Utility.keyboardCtrl;
 import SimuBot.Vision.*;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import SimuBot.Control.*;
 
 
@@ -31,10 +36,14 @@ public class Runner {
         vision.addObserver(fieldDetection);
         vision.addObserver(fieldGeometry);
 
+        System.out.println("***************************");
 
+        
         vision.preheating();
         vision.collectData(1);
         System.out.println(fieldGeometry.geometry.toString());
+        
+        
         
         for(int i = 0; i > -1; i++) { 
             vision.collectData(4);
@@ -43,7 +52,11 @@ public class Runner {
                                  + " " + fieldDetection.getCaptureTime());
             
         }
+
+
         
+  
+
         /*
         connection1.setIp("127.0.0.1");
         connection1.setPort(20011);

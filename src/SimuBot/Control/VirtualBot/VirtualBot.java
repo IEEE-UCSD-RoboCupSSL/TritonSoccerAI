@@ -85,7 +85,7 @@ public class VirtualBot {
     }
 
     void updateControl(RemoteCommands.control ctrl) {
-        // To-do: send packet to grSim
+        System.out.println(ctrl.toString());
     }
 
     void updateCloudData(RemoteCommands.data_send cData) {

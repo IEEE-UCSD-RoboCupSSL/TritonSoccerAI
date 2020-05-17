@@ -5,7 +5,7 @@ AI software specifically designed to run the virtual robots in the GrSim simulat
 * Linux/MacOS
 * grSim simulator for RoboCup SSL
 * Google protobuf library version 3.11.4 (libprotoc 3.11.4)
-* Jave 14.0.1 JRE 14.0.1+7
+* Java 11.0.7
 * Apache Ant version 1.10.5
 
 ## Project Structure
