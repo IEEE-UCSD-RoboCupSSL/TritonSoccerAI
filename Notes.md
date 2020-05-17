@@ -6,8 +6,8 @@
     * Python-java interaction through gRPC: outsource middle layer computation from inside java to a separate python program that handle algorithm & sci/math computation for faster development 
     * Python AI code: neuralnet/ML based  AI-models are simpler to implement in python, integrate a AI program written in python with the current java application via gRPC  
   * To-do
-    * convert current prj to a Gradle prj, or integrate the Ant script inside Gradle, because gRPC needs either Maven or Gradle to be plugged in
-    * use gradle to manage protoc
+    * convert current prj to a Maven prj
+    * use Maven to manage protoc
     * update remote_command.proto to include grpc services
     * begin with the simple grpc service without any stream
       * consider this java-software(remote) as the client, and robots as servers

@@ -90,11 +90,10 @@ sudo update-alternatives --config java
 
 ## Google Protobuff library
 
-
+(For java, protobuff is imported by Maven protoc plugin, but we still need to mannualy install it for applications written in other languages)
 
 
 
 ## gRPC
 
-
-
+(For java, gRPC is imported by Maven gRPC plugin, but we still need to mannualy install it for other languages)
