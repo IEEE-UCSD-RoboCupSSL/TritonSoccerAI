@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option java_package = "Proto";
+
+message vec2d {
+    float x = 1;
+    float y = 2;
+}
+
+message polygon { 
+    repeated vec2d vertices = 1; // vec2d here is used as point2d
+}
+
+message static_data {
+    polygon play_area = 1; // play ground formed by Top/bottom touch lines + left/right goal lines
+    polygon penalty_area = 2;
+    polygon center_circle = 3; // use a polygon to represent circle
+    polygon center_line = 4; // consider a line as a polygon (length 2 point_array) as well
+    polygon cross_bar = 5; // a line object as well, once ball pass this bar, u score, yikes!
+    int32 num_robots = 6;
+}
+
+
+// basic control packet
+message control {
+    vec2d velocity = 1;
+    float angular_velocity = 2;
+    float dribbler_pwr = 3;
+    float kicker_pwr = 4;
+    float chippping_pwr = 5;
+}
+
+// data to be send to share info to each robot for distributed computation
+message data_send {
+    vec2d ball_location = 1; 
+    repeated vec2d robot_locations = 2;
+    repeated float robot_orientations = 3;
+    repeated vec2d robot_velocities = 4;
+}
+
+// user-defined control packet 
+message custom_control {
+    string name = 1;
+    repeated float numerical_params = 2;
+}
+
+// user-defined highlevel task to be assigned to a robot
+message custom_task {
+    string name = 1;
+    repeated control ctrl_params = 2;
+    repeated float numerical_params = 3;
+    repeated string str_params = 4;
+}
+
+// request data from a robot
+message data_request {
+    string name = 1;
+    repeated control ctrl_data = 2;
+    repeated float numerical_data = 3;
+    repeated string str_data = 4;
+}
+
+
+message remote_commands {
+    control ctrl = 1; // basic control
+    data_send cdata = 2; /* from the robot's perspective, sharedData is the cloud data bc this code runs in the "cloud"
+                          or public data shared among all robots */
+    custom_control cust_ctrl = 3; // custom control
+    custom_task task = 4; // highlevel task
+    data_request request = 5; // AI can request data to fetch from a robot
+    static_data to_init = 6; // static field object to be initalized on program start
+}
+
