@@ -8,7 +8,7 @@ RC-Core is the **core** component of the **AI software** running on the remote s
 
 RC-Core is written in Java, maintained using **Apache Maven**.
 
-[Simple Maven Tutorials](https://github.com/IEEE-UCSD-RoboCup-2020/SoftExamples-Repo/blob/master/Docs/maven.md)
+[Install Maven and basic usage](https://github.com/IEEE-UCSD-RoboCup-2020/SoftExamples-Repo/blob/master/Docs/maven.md)
 
 RC-Core uses the following Maven **standard project structure**:
 
