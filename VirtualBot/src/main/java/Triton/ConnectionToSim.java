@@ -13,8 +13,15 @@ public class ConnectionToSim {
     private static int port, id;
     private static DatagramSocket socket;
     private static byte[] buffer;
-    private static float timeStamp, kickspeedx, kickspeedz, velx, vely, velz;
-    private static boolean spinner, wheelSpeed, isYellow;
+    private static float timeStamp = 0 , 
+                         kickspeedx = 0, 
+                         kickspeedz = 0, 
+                         velx = 0, 
+                         vely = 0, 
+                         velz = 0;
+    private static boolean spinner = false, 
+                           wheelSpeed = false,
+                           isYellow = false;
     
     public static ConnectionToSim getInstance() 
     { 
