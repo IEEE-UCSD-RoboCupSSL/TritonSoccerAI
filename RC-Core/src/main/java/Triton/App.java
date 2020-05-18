@@ -31,7 +31,7 @@ public class App
         for(int i = 0; i > -1; i++) { 
             vision.collectData(4);
             // System.out.println(fieldDetection.toString());
-            System.out.println(fieldDetection.getRobotLoc(BLUE, 0)
+            System.out.println(fieldDetection.getBallLoc()
                                  + " " + fieldDetection.getCaptureTime());
             
         }
