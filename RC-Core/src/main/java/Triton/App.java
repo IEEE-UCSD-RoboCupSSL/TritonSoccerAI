@@ -6,7 +6,7 @@ import Triton.Vision.*;
 public class App 
 {
     private static final String VISION_MULTICAST_ADDR = "224.5.23.3";
-    private static final int VISION_PORT = 10002; 
+    private static final int VISION_PORT = 10020; 
 
     
     public static void main(String args[]) {

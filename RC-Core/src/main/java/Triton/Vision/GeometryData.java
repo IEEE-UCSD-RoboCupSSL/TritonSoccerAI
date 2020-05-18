@@ -2,10 +2,8 @@ package Triton.Vision;
 import Triton.DesignPattern.*;
 import Triton.Geometry.*;
 import java.util.*;
-import Triton.ExternProto.MessagesRobocupSslGeometry.*;
-// import Triton.ExternProto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize.*;
-
-
+import Proto.MessagesRobocupSslGeometry.*;
+// import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize.*;
 
 public class GeometryData extends AbstractData {
     public class Camera {

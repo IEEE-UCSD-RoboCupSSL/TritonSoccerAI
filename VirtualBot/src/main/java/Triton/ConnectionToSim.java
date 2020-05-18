@@ -1,5 +1,5 @@
 package Triton;
-import Triton.ExternProto.*;
+import Proto.*;
 
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;

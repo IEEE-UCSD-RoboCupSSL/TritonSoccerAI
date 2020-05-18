@@ -4,8 +4,8 @@ import Triton.DesignPattern.*;
 
 
 import java.util.List;
-import Triton.ExternProto.MessagesRobocupSslDetection.SSL_DetectionBall;
-import Triton.ExternProto.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class DetectionData extends AbstractData {
 

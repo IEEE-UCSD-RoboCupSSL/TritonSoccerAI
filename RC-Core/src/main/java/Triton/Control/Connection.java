@@ -5,7 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
-import Triton.ExternProto.*;
+import Proto.*;
 
 public class Connection {
 
@@ -120,7 +120,7 @@ public class Connection {
         byte[] buffer = new byte[10000000];
         
         try {
-            MulticastSocket ds = new MulticastSocket(10002);
+            MulticastSocket ds = new MulticastSocket(10020);
             InetAddress group = InetAddress.getByName("224.5.23.3");
             ds.joinGroup(group);
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);

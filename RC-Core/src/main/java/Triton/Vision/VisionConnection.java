@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.logging.*;
 import java.util.List;
-import Triton.ExternProto.*;
-import Triton.ExternProto.MessagesRobocupSslDetection.*;
-import Triton.ExternProto.MessagesRobocupSslGeometry.*;
+import Proto.*;
+import Proto.MessagesRobocupSslDetection.*;
+import Proto.MessagesRobocupSslGeometry.*;
 
 public class VisionConnection implements Subject {
 

@@ -1,9 +1,6 @@
 package Triton.Control;
 
-
-
 import Proto.*;
-import Triton.ExternProto.*;
 import Triton.Control.VirtualBot.*;
 
 // connection to a virtual bot in grSim simulator
