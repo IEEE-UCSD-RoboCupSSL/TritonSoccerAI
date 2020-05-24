@@ -1,4 +1,4 @@
-package Triton.Control;
+package Triton.Robot;
 
 
 import java.net.DatagramSocket;
@@ -9,7 +9,7 @@ import Proto.RemoteCommands;
 
 // Remote connection to a physical robot
 public class RemoteBotConnection implements RobotConnection{
-    // preserved for future development
+    // reserved for future development
 
     public void connect() {
         // To-do

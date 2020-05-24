@@ -33,6 +33,13 @@ public class ConnectionToSim {
     { 
         if (single_instance == null) 
             single_instance = new ConnectionToSim(); 
+
+        try {
+            socket = new DatagramSocket();
+        }
+        catch (Exception e){ 
+            System.out.println(e);
+        }
   
         t_init = ZonedDateTime.now().toInstant().toEpochMilli();
         return single_instance; 
@@ -64,17 +71,6 @@ public class ConnectionToSim {
         velz = z;
     }
     
-    public static void connectToGrSim() {
-        try {
-            socket = new DatagramSocket();
-        }
-        catch (Exception e){ 
-            System.out.println(e);
-        }
-    }
-    public static void disconnectToGrSim() {
-        socket = null;
-    }
 
     public static void send() {
         timeStamp = (float)getTimeMs();
@@ -106,23 +102,21 @@ public class ConnectionToSim {
         ConnectionToSim.setId(1);
         ConnectionToSim.setIp("127.0.0.1");
         ConnectionToSim.setPort(20011);
-        ConnectionToSim.connectToGrSim();
 
         
-        ConnectionToSim.setVel(0.5f, 0.0f, 0.0f);
+        ConnectionToSim.setVel(1.0f, 0.0f, 0.0f);
         long t0 = getTimeMs();
-        while (getTimeMs() - t0 < 1000) {
-            
+        while (getTimeMs() - t0 < 3000) {
             ConnectionToSim.send();
         }
 
         ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
         t0 = getTimeMs();
-        while(getTimeMs() - t0 < 3000) {
+        while(getTimeMs() - t0 < 1000) {
             ConnectionToSim.send();
         }
 
-        ConnectionToSim.setVel(0.0f, 0.5f, 0.0f);
+        ConnectionToSim.setVel(0.0f, -1.0f, 0.0f);
         t0 = getTimeMs();
         while(getTimeMs() - t0 < 1000) {
             
@@ -131,7 +125,20 @@ public class ConnectionToSim {
 
         ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
         t0 = getTimeMs();
-        while(getTimeMs() - t0 < 3000) { 
+        while(getTimeMs() - t0 < 1000) { 
+            ConnectionToSim.send();
+        }
+
+        ConnectionToSim.setVel(0.0f, 0.0f, 10.0f);
+        t0 = getTimeMs();
+        while(getTimeMs() - t0 < 1000) { 
+            ConnectionToSim.send();
+        }
+
+
+        ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
+        t0 = getTimeMs();
+        while(getTimeMs() - t0 < 1000) { 
             ConnectionToSim.send();
         }
     }

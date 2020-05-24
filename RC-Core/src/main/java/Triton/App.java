@@ -1,5 +1,6 @@
 package Triton;
 
+import Triton.Robot.VirtualBotConnection;
 import Triton.Vision.*;
 
 
@@ -10,6 +11,10 @@ public class App
 
     
     public static void main(String args[]) {
+
+        VirtualBotConnection.test();
+
+        /*
         
         final boolean BLUE = true, YELLOW = false;
         //Connection connection1 = new Connection(); // Where is this used?
@@ -35,5 +40,7 @@ public class App
                                  + " " + fieldDetection.getCaptureTime());
             
         }
+
+        */
     }
 }

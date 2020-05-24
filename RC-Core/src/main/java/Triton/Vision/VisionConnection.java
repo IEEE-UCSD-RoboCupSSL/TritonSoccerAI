@@ -16,16 +16,16 @@ public class VisionConnection implements Subject {
 
     final static int MAX_BUFFER_SIZE = 10000000;
 
-    String ip;
-    int port;
-    byte[] buffer;
-    MulticastSocket ds;
-    InetAddress group;
-    DatagramPacket dp;
-    Logger logger;
-    ArrayList<Observer> observers;
-    DetectionData detection;
-    GeometryData geometry;
+    private String ip;
+    private int port;
+    private byte[] buffer;
+    private MulticastSocket ds;
+    private InetAddress group;
+    private DatagramPacket dp;
+    public static Logger logger = Logger.getLogger(VisionConnection.class.getName());;
+    private ArrayList<Observer> observers;
+    private DetectionData detection;
+    private GeometryData geometry;
 
     public void addObserver(Observer observer) {
         this.observers.add(observer);
@@ -50,7 +50,6 @@ public class VisionConnection implements Subject {
         this.ip = ip;
         this.port = port;
         this.buffer = new byte[MAX_BUFFER_SIZE];
-        this.logger = Logger.getLogger(VisionConnection.class.getName());
         this.detection = DetectionData.getInstance();
         this.geometry = GeometryData.getInstance();
         this.observers = new ArrayList<Observer>();
@@ -61,7 +60,7 @@ public class VisionConnection implements Subject {
             ds.joinGroup(this.group);
             dp = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
-            logger.log(Level.WARNING, e.toString());
+            logger.log(Level.SEVERE, e.toString());
         }
     }
 

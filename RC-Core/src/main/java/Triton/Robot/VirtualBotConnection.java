@@ -1,30 +1,61 @@
-package Triton.Control;
+package Triton.Robot;
 
 import Proto.*;
-import Triton.Control.VirtualBot.*;
+
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.logging.*;
+
 
 // connection to a virtual bot in grSim simulator
 public class VirtualBotConnection implements RobotConnection{
-    private VirtualBot vBot;
+    
+    final static int MAX_BUFFER_SIZE = 10000000;
+
+    public static Logger logger = Logger.getLogger(VirtualBotConnection.class.getName());
     public int botID;
     public String teamColor; 
+    private static InetAddress ip; 
+    private static int port = 8888;
+    private static DatagramSocket socket = null;
+    private byte[] socketBuffer = new byte[MAX_BUFFER_SIZE];
 
-    public VirtualBotConnection(VirtualBot vBot, int botID, String teamColor) {
-        this.vBot = vBot;
+    public static void setIP(String ipAddr) {
+        try {
+            ip = InetAddress.getByName(ipAddr);
+        }
+        catch (Exception e){
+            logger.log(Level.SEVERE, e.toString());
+        }
+    }
+    
+    public static void setPort(int port) {
+        VirtualBotConnection.port = port;
+    }
+
+    public VirtualBotConnection(int botID, String teamColor) {
+        
+        
+        if(socket == null) {
+            try {
+                socket = new DatagramSocket();
+            }
+            catch (Exception e) {
+                logger.log(Level.SEVERE, e.toString());
+            }
+        }
         this.botID = botID;
         this.teamColor = teamColor;
     }
 
     
     public void connect() {
-        if(!VirtualBot.isConnectedToGrSim) {
-            VirtualBot.connectToGrSim();
-        }
-        vBot.setBotID_Color(botID, teamColor);
+        
     }
 
     public void disconnect() {
-        VirtualBot.disconnectToGrSim();
+        
     }
     
     public void initialize(RemoteCommands.static_data staticData) {
@@ -36,7 +67,7 @@ public class VirtualBotConnection implements RobotConnection{
 
     public void sendCommands(RemoteCommands.remote_commands cmds) {
         // receiver from vBot's perspective; sender from this object's perspective
-        vBot.receivePacketFromRemote(cmds);  
+         
     }
 
     public RemoteCommands.data_request receiveDataRequested(String dataName) {
@@ -50,6 +81,11 @@ public class VirtualBotConnection implements RobotConnection{
         sendCommands(cmds);
 
         // sender from vBot's perspective; receiver from this object's perspective
-        return vBot.sendDataToRemote();
+        return null;
+    }
+
+
+    public static void test() {
+
     }
 }
