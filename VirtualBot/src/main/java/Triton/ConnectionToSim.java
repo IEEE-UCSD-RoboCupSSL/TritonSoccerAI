@@ -1,48 +1,41 @@
 package Triton;
+
 import Proto.*;
 
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.time.ZonedDateTime; 
+import java.time.ZonedDateTime;
+import java.util.Scanner;
 
 public class ConnectionToSim {
-    
-    private static ConnectionToSim single_instance = null; 
+
+    private static ConnectionToSim single_instance = null;
 
     private static InetAddress ipAddr;
     private static int port, id;
     private static DatagramSocket socket;
     private static byte[] buffer;
-    private static float timeStamp = 0 , 
-                         kickspeedx = 0, 
-                         kickspeedz = 0, 
-                         velx = 0, 
-                         vely = 0, 
-                         velz = 0;
-    private static boolean spinner = false, 
-                           wheelSpeed = false,
-                           isYellow = false;
+    private static float timeStamp = 0, kickspeedx = 0, kickspeedz = 0, velx = 0, vely = 0, velz = 0;
+    private static boolean spinner = false, wheelSpeed = false, isYellow = false;
     private static long t_init;
 
     private static long getTimeMs() {
         return ZonedDateTime.now().toInstant().toEpochMilli() - t_init;
-    } 
+    }
 
-    public static ConnectionToSim getInstance() 
-    { 
-        if (single_instance == null) 
-            single_instance = new ConnectionToSim(); 
+    public static ConnectionToSim getInstance() {
+        if (single_instance == null)
+            single_instance = new ConnectionToSim();
 
         try {
             socket = new DatagramSocket();
-        }
-        catch (Exception e){ 
+        } catch (Exception e) {
             System.out.println(e);
         }
-  
+
         t_init = ZonedDateTime.now().toInstant().toEpochMilli();
-        return single_instance; 
+        return single_instance;
     }
 
     public static void setIp(String ip) {
@@ -70,14 +63,12 @@ public class ConnectionToSim {
         vely = y;
         velz = z;
     }
-    
 
     public static void send() {
-        timeStamp = (float)getTimeMs();
+        timeStamp = (float) getTimeMs();
         GrSimCommands.grSim_Robot_Command robotCommand = GrSimCommands.grSim_Robot_Command.newBuilder().setId(id)
-                .setKickspeedx(kickspeedx).setKickspeedz(kickspeedz).setVeltangent(velx)
-                .setVelnormal(vely).setVelangular(velz).setSpinner(spinner)
-                .setWheelsspeed(wheelSpeed).build();
+                .setKickspeedx(kickspeedx).setKickspeedz(kickspeedz).setVeltangent(velx).setVelnormal(vely)
+                .setVelangular(velz).setSpinner(spinner).setWheelsspeed(wheelSpeed).build();
         GrSimCommands.grSim_Commands grSimCommand = GrSimCommands.grSim_Commands.newBuilder().setTimestamp(timeStamp)
                 .setIsteamyellow(isYellow).addRobotCommands(robotCommand).build();
         GrSimPacket.grSim_Packet packet = GrSimPacket.grSim_Packet.newBuilder().setCommands(grSimCommand).build();
@@ -87,7 +78,7 @@ public class ConnectionToSim {
         try {
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length, ipAddr, port);
             socket.send(dp);
-            //System.out.println(printBuffer);
+            // System.out.println(printBuffer);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -96,51 +87,38 @@ public class ConnectionToSim {
 
     public static void test() {
         ConnectionToSim.getInstance();
-        
-        
         ConnectionToSim.setIsYellow(false);
         ConnectionToSim.setId(1);
         ConnectionToSim.setIp("127.0.0.1");
         ConnectionToSim.setPort(20011);
 
-        
-        ConnectionToSim.setVel(1.0f, 0.0f, 0.0f);
-        long t0 = getTimeMs();
-        while (getTimeMs() - t0 < 3000) {
-            ConnectionToSim.send();
-        }
+        Scanner sc = new Scanner(System.in);
 
-        ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
-        t0 = getTimeMs();
-        while(getTimeMs() - t0 < 1000) {
-            ConnectionToSim.send();
-        }
+        long t0, t1;
 
-        ConnectionToSim.setVel(0.0f, -1.0f, 0.0f);
-        t0 = getTimeMs();
-        while(getTimeMs() - t0 < 1000) {
+        while (true) {
+            float x = sc.nextFloat();
+            float y = sc.nextFloat();
+            float z = sc.nextFloat();
+
+            ConnectionToSim.setVel(x, y, z);
+            t0 = getTimeMs();
+            while (getTimeMs() - t0 < 1000) {
+                t1 = getTimeMs();
+                ConnectionToSim.send();
+                while(getTimeMs() - t1 < 10);
+            }
+
+            ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
+            t0 = getTimeMs();
+            while (getTimeMs() - t0 < 1000) {
+                t1 = getTimeMs();
+                ConnectionToSim.send();
+                while(getTimeMs() - t1 < 10);
+            }
             
-            ConnectionToSim.send();
-        }
 
-        ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
-        t0 = getTimeMs();
-        while(getTimeMs() - t0 < 1000) { 
-            ConnectionToSim.send();
-        }
-
-        ConnectionToSim.setVel(0.0f, 0.0f, 10.0f);
-        t0 = getTimeMs();
-        while(getTimeMs() - t0 < 1000) { 
-            ConnectionToSim.send();
-        }
-
-
-        ConnectionToSim.setVel(0.0f, 0.0f, 0.0f);
-        t0 = getTimeMs();
-        while(getTimeMs() - t0 < 1000) { 
-            ConnectionToSim.send();
+            System.out.println("XXXXXXX");
         }
     }
-    
 }
