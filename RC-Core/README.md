@@ -75,6 +75,12 @@ The install will invoke protoc to generate the needed proto-java files under
 
 
 
+## VS Code
+
+If you are using VS Code, make sure to run "mvn clean install" every time you open this repository with VS Code. This is due to an issue with VS Code deleting generated-resources files on start up: https://github.com/redhat-developer/vscode-java/issues/177
+
+
+
 ## Compile/Test/Package
 
 To compile, run

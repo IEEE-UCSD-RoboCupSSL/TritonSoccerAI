@@ -116,7 +116,6 @@ public class ConnectionToSim {
                 ConnectionToSim.send();
                 while(getTimeMs() - t1 < 10);
             }
-            
 
             System.out.println("XXXXXXX");
         }
