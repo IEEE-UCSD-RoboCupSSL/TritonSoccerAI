@@ -2,7 +2,6 @@ package Triton.Robot;
 
 import Proto.*;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -12,9 +11,11 @@ import java.util.logging.*;
 // connection to a virtual bot in grSim simulator
 public class VirtualBotConnection implements RobotConnection{
     
-    final static int MAX_BUFFER_SIZE = 65536;
-    final static String CONNECT_REQUEST = "request-connection:";
-    final static String CONNECT_RECEIVED = "connected";
+    final static int MAX_BUFFER_SIZE       = 65536;
+    final static String CONNECT_REQUEST    = "request-connection:";
+    final static String CONNECT_CONFIRM    = "connected";
+    final static String DISCONNECT_REQUEST = "request-disconnect";
+    final static String DISCONNECT_CONFIRM = "disconnected";
 
     public static Logger logger = Logger.getLogger(VirtualBotConnection.class.getName());
     public int botID;
@@ -65,16 +66,38 @@ public class VirtualBotConnection implements RobotConnection{
             catch (Exception e) {
                 logger.log(Level.SEVERE, e.toString());
             }  
-            if(!(received.trim()).equals(CONNECT_RECEIVED)) {
+            if(!(received.trim()).equals(CONNECT_CONFIRM)) {
                 logger.log(Level.SEVERE, "Unable to connect to Robot: " + teamColor + " " + botID 
                     + " ; " + "String received: " + received);
             }
-            // System.out.println(received.trim() + " | " + CONNECT_RECEIVED);
-        } while (!(received.trim()).equals(CONNECT_RECEIVED));
+            // System.out.println(received.trim() + " | " + CONNECT_CONFIRM);
+        } while (!(received.trim()).equals(CONNECT_CONFIRM));
+        logger.log(Level.INFO, "Successfully connected to " + teamColor + " " + botID);
     }
 
     public void disconnect() {
-        socket = null;
+        String received = null;
+        do {
+            socketBuffer = new byte[MAX_BUFFER_SIZE];
+            socketBuffer = DISCONNECT_REQUEST.getBytes();
+            try {
+                socket.send(new DatagramPacket(socketBuffer, socketBuffer.length, ip, port));
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, e.toString());
+            }
+        
+            socketBuffer = new byte[MAX_BUFFER_SIZE];
+            DatagramPacket response = new DatagramPacket(socketBuffer, socketBuffer.length);
+            try {
+                logger.log(Level.INFO, "Disconnecting " + teamColor + " " + botID + " ......");
+                socket.receive(response);
+                received = new String(response.getData(), 0, response.getLength());
+            }
+            catch (Exception e) {
+                logger.log(Level.SEVERE, e.toString());
+            }  
+        } while(!(received.trim()).equals(DISCONNECT_CONFIRM));
+        logger.log(Level.INFO, "Disconnected to " + teamColor + " " + botID);
     }
     
     public void initialize(RemoteCommands.static_data staticData) {
@@ -120,8 +143,10 @@ public class VirtualBotConnection implements RobotConnection{
             botConn.connect();
         }
 
+        /*
         for(VirtualBotConnection botConn : botConns) {
             botConn.disconnect();
         }
+        */
     }
 }

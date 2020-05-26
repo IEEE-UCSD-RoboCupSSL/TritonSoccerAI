@@ -66,11 +66,12 @@ public class ConnectionToSim {
 
     public static void send() {
         timeStamp = (float) getTimeMs();
-        GrSimCommands.grSim_Robot_Command robotCommand = GrSimCommands.grSim_Robot_Command.newBuilder().setId(id)
-                .setKickspeedx(kickspeedx).setKickspeedz(kickspeedz).setVeltangent(velx).setVelnormal(vely)
-                .setVelangular(velz).setSpinner(spinner).setWheelsspeed(wheelSpeed).build();
-        GrSimCommands.grSim_Commands grSimCommand = GrSimCommands.grSim_Commands.newBuilder().setTimestamp(timeStamp)
-                .setIsteamyellow(isYellow).addRobotCommands(robotCommand).build();
+        GrSimCommands.grSim_Robot_Command robotCommand = GrSimCommands.grSim_Robot_Command.newBuilder()
+                .setId(id).setKickspeedx(kickspeedx).setKickspeedz(kickspeedz).setVeltangent(velx)
+                .setVelnormal(vely).setVelangular(velz).setSpinner(spinner)
+                .setWheelsspeed(wheelSpeed).build();
+        GrSimCommands.grSim_Commands grSimCommand = GrSimCommands.grSim_Commands.newBuilder()
+                .setTimestamp(timeStamp).setIsteamyellow(isYellow).addRobotCommands(robotCommand).build();
         GrSimPacket.grSim_Packet packet = GrSimPacket.grSim_Packet.newBuilder().setCommands(grSimCommand).build();
 
         String printBuffer = packet.toString();
@@ -93,7 +94,6 @@ public class ConnectionToSim {
         ConnectionToSim.setPort(20011);
 
         Scanner sc = new Scanner(System.in);
-
         long t0, t1;
 
         while (true) {

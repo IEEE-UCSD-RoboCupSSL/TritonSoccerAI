@@ -1,5 +1,6 @@
 package Triton;
 
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,21 +11,23 @@ import java.util.*;
 
 public class RemoteListener {
     
-    final static int MAX_BUFFER_SIZE = 65536;
-    final static int MAX_NUM_ROBOTS = 6;
-    final static String CONNECT_REQUEST = "request-connection:";
-    final static String CONNECT_RECEIVED = "connected";
+    final static int    MAX_BUFFER_SIZE    = 65536;
+    final static int    MAX_NUM_ROBOTS     = 6;
+    final static String CONNECT_REQUEST    = "request-connection:";
+    final static String CONNECT_CONFIRM    = "connected";
+    final static String DISCONNECT_REQUEST = "request-disconnect";
+    final static String DISCONNECT_CONFIRM = "disconnected";
 
     public static Logger logger = Logger.getLogger(RemoteListener.class.getName());
     
     private static List<Integer> blueRegisteredBots = new ArrayList<Integer>();
     private static List<Integer> yellowRegisteredBots = new ArrayList<Integer>();
-    
 
     private DatagramSocket socket;
     private byte[] socketBuffer;
 
     private int port;
+    private InetAddress ip;
     private boolean available;
 
     private String teamColor;
@@ -35,25 +38,23 @@ public class RemoteListener {
         "[%4$-7s] %5$s %n");
     }
 
-
     public RemoteListener(int portToListen) {
+        this("127.0.0.1", portToListen);
+    }
 
-        
-        available = true;
-        
-        // this program should be a UDP server, which uses localhost: 127.0.0.1 as it's ip address
+    public RemoteListener(String ipAddr, int portToListen) {
         try {
+            this.ip = InetAddress.getByName(ipAddr);
             this.port = portToListen;
-
-            // specifies the port # to listen to
             socket = new DatagramSocket(portToListen);
-        }
+        } 
         catch (Exception e) {
             logger.log(Level.SEVERE, e.toString());
         }
+        available = true;
     }
 
-    public void waitForConnectRequest() {
+    public void waitForConnectRequest() throws IOException {
         DatagramPacket receivedPacket = null;
         DatagramPacket responsePacket;
         StringTokenizer tokenizer;
@@ -66,13 +67,7 @@ public class RemoteListener {
         while(available) {
             socketBuffer = new byte[MAX_BUFFER_SIZE];
             receivedPacket = new DatagramPacket(socketBuffer, socketBuffer.length);
-
-            try {
-                socket.receive(receivedPacket);
-            }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.toString());
-            }
+            socket.receive(receivedPacket);
 
             String received = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
             logger.log(Level.INFO, "Received request message: " + received);
@@ -88,27 +83,22 @@ public class RemoteListener {
                 
                 if(tokens.get(0).trim().equals(CONNECT_REQUEST)) {
                     color = tokens.get(1);
-                    try {
-                        id = Integer.parseInt(tokens.get(2));
-                        if(color.toLowerCase().trim().equals("blue")) {
-                            if(!blueRegisteredBots.contains(id)) {
-                                teamColor = color;
-                                botID = id;
-                                blueRegisteredBots.add(id);
-                                available = false;
-                            }
-                        }
-                        if(color.toLowerCase().trim().equals("yellow")) {
-                            if(!yellowRegisteredBots.contains(id)) {
-                                teamColor = color;
-                                botID = id;
-                                blueRegisteredBots.add(id);
-                                available = false;
-                            }
+                    id = Integer.parseInt(tokens.get(2));
+                    if(color.toLowerCase().trim().equals("blue")) {
+                        if(!blueRegisteredBots.contains(id)) {
+                            teamColor = color;
+                            botID = id;
+                            blueRegisteredBots.add(id);
+                            available = false;
                         }
                     }
-                    catch (Exception e) {
-                        logger.log(Level.SEVERE, e.toString());
+                    if(color.toLowerCase().trim().equals("yellow")) {
+                        if(!yellowRegisteredBots.contains(id)) {
+                            teamColor = color;
+                            botID = id;
+                            blueRegisteredBots.add(id);
+                            available = false;
+                        }
                     }
                 }
             }
@@ -118,12 +108,7 @@ public class RemoteListener {
                 responsePacket = new DatagramPacket(socketBuffer, socketBuffer.length,
                                 receivedPacket.getAddress(),
                                 receivedPacket.getPort());
-                try {
-                    socket.send(responsePacket);
-                }
-                catch (Exception e) {
-                    logger.log(Level.SEVERE, e.toString());
-                }
+                socket.send(responsePacket);
             }
 
         }
@@ -133,17 +118,13 @@ public class RemoteListener {
 
         // reply confirmation
         socketBuffer = new byte[MAX_BUFFER_SIZE];
-        socketBuffer = CONNECT_RECEIVED.getBytes();
+        socketBuffer = CONNECT_CONFIRM.getBytes();
         responsePacket = new DatagramPacket(socketBuffer, socketBuffer.length,
                                 receivedPacket.getAddress(),
                                 receivedPacket.getPort());
-        try {
-            socket.send(responsePacket);
-        }
-        catch (Exception e) {
-            logger.log(Level.SEVERE, e.toString());
-        }
+        socket.send(responsePacket);
     }
+
 
     public static void test() {
         RemoteListener[] listeners = { new RemoteListener(8881),
@@ -153,7 +134,11 @@ public class RemoteListener {
                                        new RemoteListener(8885),
                                        new RemoteListener(8886), };
         for(RemoteListener listener : listeners) {
-            listener.waitForConnectRequest();
+            try {
+                listener.waitForConnectRequest();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, e.toString());
+            }
         }
     }
 
