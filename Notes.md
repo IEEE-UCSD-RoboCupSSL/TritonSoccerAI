@@ -1,4 +1,4 @@
-* To-do: simple algorithm for constructing a polygon formed by multiple vertices in random order, and decide whether a point or an object with certain radius is within that polygon
+* To-do: simple algorithm for constructing a Polygon formed by multiple vertices in random order, and decide whether a point or an object with certain radius is within that Polygon
 * Incorporate gRPC
   *  usages:
     * Remote ctrl bot via distributed computing model: Through gRPC, construct distributed computing model among the AI-software and computer on each robots (gRPC through http2 and netty framework)  

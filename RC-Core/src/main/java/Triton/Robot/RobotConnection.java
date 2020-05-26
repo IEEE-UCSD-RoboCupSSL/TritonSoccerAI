@@ -1,12 +1,13 @@
 package Triton.Robot;
 import Proto.*;
-import Proto.RemoteCommands.data_request;
-import Proto.RemoteCommands.remote_commands;
+import Proto.RemoteCommands.Data_Request;
+import Proto.RemoteCommands.Remote_Commands;
+import java.io.IOException;
 
 public interface RobotConnection {
-    public void connect();
-    public void disconnect();
-    public void initialize(RemoteCommands.static_data sdata);
-    public void sendCommands(RemoteCommands.remote_commands cmds);
-    public RemoteCommands.data_request receiveDataRequested(String dataName);
+    public void connect() throws IOException;
+    public void disconnect() throws IOException;
+    public void initialize(RemoteCommands.Static_Data sdata) throws IOException;
+    public void sendCommands(RemoteCommands.Remote_Commands cmds) throws IOException;
+    public RemoteCommands.Data_Request receiveDataRequested(String dataName) throws IOException;
 }

@@ -2,10 +2,12 @@ package Triton.Robot;
 
 import Proto.*;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.logging.*;
+import java.util.Arrays;
 
 
 // connection to a virtual bot in grSim simulator
@@ -45,85 +47,93 @@ public class VirtualBotConnection implements RobotConnection{
     }
 
     
-    public void connect() {
+    public void connect() throws IOException {
         String received = null;
-        do {    
+        do {
+            // Send connection info (team + ID) to the listener
             socketBuffer = new byte[MAX_BUFFER_SIZE];
             socketBuffer = (CONNECT_REQUEST + " " + teamColor + " " + botID).getBytes();
-            try {
-                socket.send(new DatagramPacket(socketBuffer, socketBuffer.length, ip, port));
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, e.toString());
-            }
+            socket.send(new DatagramPacket(socketBuffer, socketBuffer.length, ip, port));
         
+            // Receive reply message from the listener
             socketBuffer = new byte[MAX_BUFFER_SIZE];
             DatagramPacket response = new DatagramPacket(socketBuffer, socketBuffer.length);
-            try {
-                logger.log(Level.INFO, "Connecting to " + teamColor + " " + botID + " ......");
-                socket.receive(response);
-                received = new String(response.getData(), 0, response.getLength());
-            }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.toString());
-            }  
+            logger.log(Level.INFO, "Connecting to " + teamColor + " " + botID + " ......");
+            socket.receive(response);
+            received = new String(response.getData(), 0, response.getLength());
+
+            // Report error if reply message not received
             if(!(received.trim()).equals(CONNECT_CONFIRM)) {
                 logger.log(Level.SEVERE, "Unable to connect to Robot: " + teamColor + " " + botID 
                     + " ; " + "String received: " + received);
             }
-            // System.out.println(received.trim() + " | " + CONNECT_CONFIRM);
         } while (!(received.trim()).equals(CONNECT_CONFIRM));
         logger.log(Level.INFO, "Successfully connected to " + teamColor + " " + botID);
     }
 
-    public void disconnect() {
+    public void disconnect() throws IOException {
         String received = null;
         do {
+            // Send disconnection info to the listener
             socketBuffer = new byte[MAX_BUFFER_SIZE];
             socketBuffer = DISCONNECT_REQUEST.getBytes();
-            try {
-                socket.send(new DatagramPacket(socketBuffer, socketBuffer.length, ip, port));
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, e.toString());
-            }
+            socket.send(new DatagramPacket(socketBuffer, socketBuffer.length, ip, port));
         
+            // Receive reply message from the listener
             socketBuffer = new byte[MAX_BUFFER_SIZE];
             DatagramPacket response = new DatagramPacket(socketBuffer, socketBuffer.length);
-            try {
-                logger.log(Level.INFO, "Disconnecting " + teamColor + " " + botID + " ......");
-                socket.receive(response);
-                received = new String(response.getData(), 0, response.getLength());
-            }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.toString());
-            }  
+            logger.log(Level.INFO, "Disconnecting " + teamColor + " " + botID + " ......");
+            socket.receive(response);
+            received = new String(response.getData(), 0, response.getLength());
         } while(!(received.trim()).equals(DISCONNECT_CONFIRM));
+        
         logger.log(Level.INFO, "Disconnected to " + teamColor + " " + botID);
     }
+
+    public void sendCommands(RemoteCommands.Remote_Commands cmds) throws IOException {
+        socketBuffer = cmds.toByteArray();
+        DatagramPacket dp = new DatagramPacket(socketBuffer, socketBuffer.length, ip, port);
+        socket.send(dp);
+    }
     
-    public void initialize(RemoteCommands.static_data staticData) {
-        RemoteCommands.remote_commands cmds = RemoteCommands.remote_commands
+    public void initialize(RemoteCommands.Static_Data staticData) {
+        RemoteCommands.Remote_Commands cmds = RemoteCommands.Remote_Commands
             .newBuilder().setToInit(staticData).build();
-        sendCommands(cmds);
+        try {
+            sendCommands(cmds);
+        } catch(IOException e) {
+            logger.log(Level.SEVERE, e.toString());
+        }
     }
 
-
-    public void sendCommands(RemoteCommands.remote_commands cmds) {
-        // receiver from vBot's perspective; sender from this object's perspective
-         
-    }
-
-    public RemoteCommands.data_request receiveDataRequested(String dataName) {
+    public RemoteCommands.Data_Request receiveDataRequested(String dataName) throws IOException {
         
-        RemoteCommands.data_request dr = RemoteCommands.data_request
+        RemoteCommands.Data_Request dr = RemoteCommands.Data_Request
             .newBuilder().setName(dataName).build();
         
-        RemoteCommands.remote_commands cmds = RemoteCommands.remote_commands
+        RemoteCommands.Remote_Commands cmds = RemoteCommands.Remote_Commands
             .newBuilder().setRequest(dr).build();
         
         sendCommands(cmds);
 
-        // sender from vBot's perspective; receiver from this object's perspective
-        return null;
+        socketBuffer = new byte[MAX_BUFFER_SIZE];
+        DatagramPacket receivedPacket = new DatagramPacket(socketBuffer, socketBuffer.length);
+        socket.receive(receivedPacket);
+
+        RemoteCommands.Data_Request data 
+            = RemoteCommands.Data_Request.parseFrom(trim(receivedPacket.getData()));
+        
+        
+
+        return data;
+    }
+
+    public static byte[] trim(byte[] bytes) {
+        int i = bytes.length - 1;
+        while (i >= 0 && bytes[i] == 0) {
+            --i;
+        }
+        return Arrays.copyOf(bytes, i + 1);
     }
 
 
@@ -140,7 +150,12 @@ public class VirtualBotConnection implements RobotConnection{
         // shell cmd to test: nc -lvu [ip] [port]
         // e.g. "nc -lvu 127.0.0.1 8881"
         for(VirtualBotConnection botConn : botConns) {
-            botConn.connect();
+            try {
+                botConn.connect();
+            }
+            catch (Exception e) {
+                logger.log(Level.SEVERE, e.toString());
+            }
         }
 
         /*

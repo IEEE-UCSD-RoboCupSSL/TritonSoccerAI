@@ -19,14 +19,14 @@ public class RemoteBotConnection implements RobotConnection{
         // To-do
     }
 
-    public void initialize(RemoteCommands.static_data sdata) {
+    public void initialize(RemoteCommands.Static_Data sdata) {
         // To-do
     }
-    public void sendCommands(RemoteCommands.remote_commands cmds) {
+    public void sendCommands(RemoteCommands.Remote_Commands cmds) {
         // To-do
     }
-    public RemoteCommands.data_request receiveDataRequested(String dataName) {
+    public RemoteCommands.Data_Request receiveDataRequested(String dataName) {
         // To-do
-        return RemoteCommands.data_request.newBuilder().build();
+        return RemoteCommands.Data_Request.newBuilder().build();
     }
 }

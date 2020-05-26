@@ -71,7 +71,6 @@ public class RemoteListener {
 
             String received = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
             logger.log(Level.INFO, "Received request message: " + received);
-
             
             tokenizer = new StringTokenizer(received, " ");
             tokens = new ArrayList<String>();
@@ -124,6 +123,7 @@ public class RemoteListener {
                                 receivedPacket.getPort());
         socket.send(responsePacket);
     }
+
 
 
     public static void test() {
