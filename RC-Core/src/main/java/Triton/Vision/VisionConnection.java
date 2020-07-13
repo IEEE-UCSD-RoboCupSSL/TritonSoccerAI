@@ -4,10 +4,10 @@ import Triton.DesignPattern.*;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.logging.*;
 import java.util.List;
+import java.io.ByteArrayInputStream;
 import Proto.*;
 import Proto.MessagesRobocupSslDetection.*;
 import Proto.MessagesRobocupSslGeometry.*;
@@ -71,10 +71,10 @@ public class VisionConnection implements Subject {
         try {
             this.ds.receive(dp);
             MessagesRobocupSslWrapper.SSL_WrapperPacket packet;
-            packet = MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(trim(this.dp.getData()));
+            ByteArrayInputStream input = new ByteArrayInputStream(dp.getData(), dp.getOffset(), dp.getLength());
+            packet = MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
             SSL_DetectionFrame df = packet.getDetection();
             SSL_GeometryData gd = packet.getGeometry();
-            
 
             List<SSL_DetectionRobot> yellowRobots = df.getRobotsYellowList();
             List<SSL_DetectionRobot> blueRobots = df.getRobotsBlueList();
@@ -87,13 +87,13 @@ public class VisionConnection implements Subject {
 
             detection.updateRobots(false, yellowRobots);
             detection.updateRobots(true, blueRobots);
-            detection.updateBall(balls.get(0)); // There should be only one ball
+
+            if(balls.size() > 0) {
+                detection.updateBall(balls.get(0)); // There should be only one ball
+            }
             detection.updateTime(t_sent, t_capture);
 
             geometry.updateFieldGeometry(fieldGeometry);
-            //geometry.updateCameraCalibration(camCali);
-
-            
         } catch (Exception e) {
             logger.log(Level.WARNING, e.toString());
         }
@@ -111,18 +111,6 @@ public class VisionConnection implements Subject {
         // default configuration with 2x6 robots need 4 packets 
         collectData(4);
     }
-
-    /*
-     * Source: https://bit.ly/3cjWx9U
-     */
-    public static byte[] trim(byte[] bytes) {
-        int i = bytes.length - 1;
-        while (i >= 0 && bytes[i] == 0) {
-            --i;
-        }
-        return Arrays.copyOf(bytes, i + 1);
-    }
-
 
     /*
      * preheating by looping numIter times 

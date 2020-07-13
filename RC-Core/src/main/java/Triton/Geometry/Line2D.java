@@ -1,5 +1,7 @@
 package Triton.Geometry;
 
+import java.lang.Math;
+
 public class Line2D {
     
     public Point2D p1, p2; 
@@ -12,7 +14,7 @@ public class Line2D {
     }
 
     public Line2D(double p1x, double p1y, double p2x, double p2y) {
-        p1 = new Point2D(p1x, p1y);
+        p1 = new Point2D(p1x, p1y); 
         p2 = new Point2D(p2x, p2y);
     }
 
@@ -40,5 +42,54 @@ public class Line2D {
         s += "[" + p1 + ", " + p2 + "]";
         return s;
     }
+
+    public Line2D[] split() {
+        if(this.p1.x == this.p2.x) { // Vertical line
+            Line2D topLine = new Line2D(p1.x, p1.y, p2.x, (p1.y+p2.y)/2);
+            topLine.name = "Top" + this.name;
+            Line2D bottomLine = new Line2D(p1.x, (p1.y+p2.y)/2, p2.x, p2.y);
+            bottomLine.name = "Bottom" + this.name;
+            Line2D[] results = {topLine, bottomLine};
+            return results;
+        } else { // Horizontal line
+            Line2D leftLine = new Line2D(p1.x, p1.y, (p1.x+p2.x)/2, p2.y);
+            leftLine.name = "Left" + this.name;
+            Line2D rightLine = new Line2D((p1.x+p2.x)/2, p1.y, p2.x, p2.y);
+            rightLine.name = "Right" + this.name;
+            Line2D[] results = {leftLine, rightLine};
+            return results;
+        }
+    } 
+
+    public Point2D midpoint() {
+        return new Point2D((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    }
+    
+    public double length() {
+        return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
