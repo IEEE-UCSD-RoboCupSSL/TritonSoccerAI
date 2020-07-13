@@ -9,46 +9,18 @@ public class DetectionManager {
 
     public static final int ROBOT_COUNT = 6;
 
-    public class TeamID {
-        Team team;
-        int id;
-
-        public TeamID(Team team, int id) {
-            this.team = team;
-            this.id = id;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this)
-                return true;
-
-            if (!(o instanceof TeamID))
-                return false;
-
-            TeamID teamID = (TeamID) o;
-
-            if (team == teamID.team && id == teamID.id)
-                return true;
-
-            return false;
-        }
-    }
-
-    public HashMap<TeamID, Robot> robots;
+    public HashMap<Team, HashMap<Integer, Robot>> robots;
     private int ballCount;
     private Ball ball;
 
-    static TeamID[] YELLOW = new TeamID[ROBOT_COUNT];
-    static TeamID[] BLUE   = new TeamID[ROBOT_COUNT];
-
     public DetectionManager() {
-        robots = new HashMap<TeamID, Robot>();
+        robots = new HashMap<>();
+        robots.put(Team.YELLOW, new HashMap<Integer, Robot>());
+        robots.put(Team.BLUE,   new HashMap<Integer, Robot>());
+
         for (int i = 0; i < ROBOT_COUNT; i++) {
-            YELLOW[i] = new TeamID(Team.YELLOW, i);
-            BLUE[i]   = new TeamID(Team.BLUE, i);
-            robots.put(YELLOW[i], new Robot(Team.YELLOW, i));
-            robots.put(BLUE[i],   new Robot(Team.BLUE, i));
+            robots.get(Team.YELLOW).put(i, new Robot(Team.YELLOW, i));
+            robots.get(Team.BLUE).put(i, new Robot(Team.BLUE, i));
         }
         ball = new Ball();
     }
@@ -81,11 +53,7 @@ public class DetectionManager {
     }
 
     public Robot getRobot(Team team, int ID) {
-        if(team == Team.YELLOW) {
-            return robots.get(YELLOW[ID]);
-        } else {
-            return robots.get(BLUE[ID]);
-        }
+        return robots.get(team).get(ID);
     }
 
     public Point2D getRobotPos(Team team, int ID) {

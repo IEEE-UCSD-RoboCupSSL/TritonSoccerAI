@@ -24,11 +24,7 @@ public class App
 
         while(true) {
             vision.collectData();
-            System.out.println(vision.dm.getRobot(Team.BLUE, 1).getVel());
-            /*Point2D vel = vision.dm.getRobot(Team.BLUE, 1).getVel();
-            if(Math.abs(vel.x) > 0.00001 || Math.abs(vel.y) > 0.00001) {
-                System.out.println(vel);
-            }*/
+            System.out.println(vision.dm.getRobotPos(Team.BLUE, 1));
         }
 
 
