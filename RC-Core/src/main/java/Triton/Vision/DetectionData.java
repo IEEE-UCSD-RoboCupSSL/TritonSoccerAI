@@ -53,7 +53,8 @@ public class DetectionData extends AbstractData {
     public String toString() {
         String s = "LAST SENT TIME: " + t_sent + " | LAST CAPTURE TIME: " + t_capture + "\n";
         s += "[[ROBOTS]]=============================\n";
-        for(int i = 0; i < NUM_ROBOTS; i++) {
+    
+    for(int i = 0; i < NUM_ROBOTS; i++) {
             SSL_DetectionRobot robot = blueRobots[i];
             s += "[BLUE ROBOT " + i + "]-------------------------\n";
             if(robot != null) {

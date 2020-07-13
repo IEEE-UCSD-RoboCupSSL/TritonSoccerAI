@@ -1,4 +1,4 @@
-package Triton.Robot;
+package Triton.Detection;
 import Proto.*;
 import Proto.RemoteCommands.Data_Request;
 import Proto.RemoteCommands.Remote_Commands;

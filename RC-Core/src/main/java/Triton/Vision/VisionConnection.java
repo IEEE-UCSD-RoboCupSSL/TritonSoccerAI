@@ -1,5 +1,6 @@
 package Triton.Vision;
 import Triton.DesignPattern.*;
+import Triton.Detection.DetectionManager;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -26,6 +27,8 @@ public class VisionConnection implements Subject {
     private ArrayList<Observer> observers;
     private DetectionData detection;
     private GeometryData geometry;
+
+    public DetectionManager dm = new DetectionManager();
 
     public void addObserver(Observer observer) {
         this.observers.add(observer);
@@ -76,7 +79,9 @@ public class VisionConnection implements Subject {
             SSL_DetectionFrame df = packet.getDetection();
             SSL_GeometryData gd = packet.getGeometry();
 
-            List<SSL_DetectionRobot> yellowRobots = df.getRobotsYellowList();
+            dm.update(df);
+
+            /*List<SSL_DetectionRobot> yellowRobots = df.getRobotsYellowList();
             List<SSL_DetectionRobot> blueRobots = df.getRobotsBlueList();
             List<SSL_DetectionBall> balls = df.getBallsList();
             SSL_GeometryFieldSize fieldGeometry = gd.getField();
@@ -93,7 +98,7 @@ public class VisionConnection implements Subject {
             }
             detection.updateTime(t_sent, t_capture);
 
-            geometry.updateFieldGeometry(fieldGeometry);
+            geometry.updateFieldGeometry(fieldGeometry);*/
         } catch (Exception e) {
             logger.log(Level.WARNING, e.toString());
         }

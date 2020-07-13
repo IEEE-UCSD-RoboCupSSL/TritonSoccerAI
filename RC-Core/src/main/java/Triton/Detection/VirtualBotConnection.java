@@ -1,4 +1,4 @@
-package Triton.Robot;
+package Triton.Detection;
 
 import Proto.*;
 
