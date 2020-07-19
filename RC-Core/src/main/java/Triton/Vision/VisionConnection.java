@@ -100,7 +100,8 @@ public class VisionConnection implements Subject {
 
             geometry.updateFieldGeometry(fieldGeometry);*/
         } catch (Exception e) {
-            logger.log(Level.WARNING, e.toString());
+            e.printStackTrace();
+            //logger.log(Level.WARNING, e.toString());
         }
 
     }
@@ -125,7 +126,9 @@ public class VisionConnection implements Subject {
     public void preheating(int numIter) {
         for(int i = 0; i < numIter; i++) this.collectData(1);
     }
+    
     public void preheating() {
+        
         preheating(200); // default 200 iters
     }
 }

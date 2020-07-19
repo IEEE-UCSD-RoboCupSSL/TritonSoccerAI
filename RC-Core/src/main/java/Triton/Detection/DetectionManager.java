@@ -27,7 +27,6 @@ public class DetectionManager {
 
     public void update(SSL_DetectionFrame df) {
         double time = df.getTCapture();
-
         for (SSL_DetectionRobot r : df.getRobotsYellowList()) {
             getRobot(Team.YELLOW, r.getRobotId()).update(r, time);
         }

@@ -21,10 +21,11 @@ public class App
         //FieldGeometry fieldGeometry = new FieldGeometry();
         //vision.addObserver(fieldDetection);
         //vision.addObserver(fieldGeometry);
+        //vision.preheating();
 
         while(true) {
             vision.collectData();
-            System.out.println(vision.dm.getRobotPos(Team.BLUE, 1));
+            System.out.println(vision.dm.getBall().getVel());
         }
 
 

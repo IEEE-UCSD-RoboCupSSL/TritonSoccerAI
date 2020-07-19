@@ -1,6 +1,6 @@
 package Triton.Detection;
 
-import java.util.PriorityQueue;
+import java.util.ArrayList;
 import Triton.Geometry.Point2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 
@@ -36,19 +36,26 @@ public class Ball {
         }
     }
 
-    private PriorityQueue<SortedDetection> detections = new PriorityQueue<SortedDetection>();
+    private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
     private Point2D vel;
 
     public void update(SSL_DetectionBall detection, double time) {
-        SortedDetection secondLatest = detections.peek();
         SortedDetection latest = new SortedDetection(detection, time);
         detections.add(latest);
-        double dt = (latest.time - secondLatest.time) * 1000;
-        vel = latest.getPos().subtract(secondLatest.getPos()).multiply(1 / dt);
+        // return when there is no previous data
+        if (detections.size() == 1) {
+            vel = new Point2D(0, 0);
+            return;
+        }           
+        SortedDetection secondLatest = detections.get(detections.size() - 2); // change peek() to get(size  - 2);
+        double dt = (latest.time - secondLatest.time) * 1000; 
+        if (dt != 0) {
+            vel = latest.getPos().subtract(secondLatest.getPos()).multiply(1 / dt);
+        }
     }
 
     public Point2D getPos() {
-        return detections.peek().getPos();
+        return detections.get(detections.size() - 1).getPos();
     }
 
     public Point2D getVel() {
