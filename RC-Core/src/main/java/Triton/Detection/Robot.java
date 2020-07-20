@@ -1,8 +1,7 @@
 package Triton.Detection;
 
-import java.util.PriorityQueue;
 import java.util.ArrayList;
-import Triton.Geometry.Point2D;
+import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class Robot {
@@ -30,16 +29,17 @@ public class Robot {
             return "[" +this.time+"," + this.detection +"]";
         }
 
-        public Point2D getPos() {
-            return new Point2D(detection.getX(), detection.getY());
+        public Vec2D getPos() {
+            return new Vec2D(detection.getX(), detection.getY());
         }
     }
 
     private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
-    private Point2D vel;
+    private Vec2D vel;
     private double angVel;
     private Team team;
     private int ID;
+    private boolean ready = false;
 
     public Robot(Team team, int ID) {
         this.team = team;
@@ -59,7 +59,7 @@ public class Robot {
         detections.add(latest);
         // return when there is no previous data
         if (detections.size() == 1) {
-            vel = new Point2D(0, 0);
+            vel = new Vec2D(0, 0);
             angVel = 0.0;
             return;
         }
@@ -69,16 +69,17 @@ public class Robot {
             vel = latest.getPos().subtract(secondLatest.getPos()).multiply(1 / dt);
             angVel = (latest.detection.getOrientation() - secondLatest.detection.getOrientation()) / dt;
         }
+        ready = true;
     }
 
-    public Point2D getPos() {
+    public Vec2D getPos() {
         return detections.get(detections.size() - 1).getPos();
     }
 
     public double getOrient() {
         return detections.get(detections.size() - 1).detection.getOrientation();
     }
-    public Point2D getVel() { 
+    public Vec2D getVel() { 
         return vel;
     }
 
@@ -90,9 +91,13 @@ public class Robot {
         return detections.get(detections.size() - 1).detection.getHeight();
     }
     
-    public void commandPosition(Point2D position) {
+    public boolean getReady() {
+        return ready;
+    }
+    
+    public void commandPosition(Vec2D position) {
     }
 
-    public void commandVelocity(Point2D vel) {
+    public void commandVelocity(Vec2D vel) {
     }
 }

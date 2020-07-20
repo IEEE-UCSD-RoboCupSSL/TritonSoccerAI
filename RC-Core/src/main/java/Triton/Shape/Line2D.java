@@ -1,21 +1,21 @@
-package Triton.Geometry;
+package Triton.Shape;
 
 import java.lang.Math;
 
 public class Line2D {
     
-    public Point2D p1, p2; 
+    public Vec2D p1, p2; 
     private String name;
     private double thickness;
 
-    public Line2D(Point2D p1, Point2D p2) {
+    public Line2D(Vec2D p1, Vec2D p2) {
         this.p1 = p1;
         this.p2 = p2;
     }
 
     public Line2D(double p1x, double p1y, double p2x, double p2y) {
-        p1 = new Point2D(p1x, p1y); 
-        p2 = new Point2D(p2x, p2y);
+        p1 = new Vec2D(p1x, p1y); 
+        p2 = new Vec2D(p2x, p2y);
     }
 
     public Line2D(Line2D line) {
@@ -61,8 +61,8 @@ public class Line2D {
         }
     } 
 
-    public Point2D midpoint() {
-        return new Point2D((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    public Vec2D midpoint() {
+        return new Vec2D((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
     }
     
     public double length() {

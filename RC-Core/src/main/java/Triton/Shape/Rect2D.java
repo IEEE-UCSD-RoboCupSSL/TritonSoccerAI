@@ -1,8 +1,8 @@
-package Triton.Geometry;
+package Triton.Shape;
 
 public class Rect2D extends Shape2D {
    
-    public Point2D anchor;
+    public Vec2D anchor;
     public double width;
     public double height;
 
@@ -12,7 +12,7 @@ public class Rect2D extends Shape2D {
         this.height = left.length();
     }
 
-    public Rect2D(Point2D point, double width, double height) {
+    public Rect2D(Vec2D point, double width, double height) {
         this.anchor = point;
         this.width = width;
         this.height = height;
@@ -24,7 +24,7 @@ public class Rect2D extends Shape2D {
         return s;
     }
 
-    public boolean isInside(Point2D point) {
+    public boolean isInside(Vec2D point) {
         if (point.x < anchor.x || point.x > anchor.x + width || point.y < anchor.y || point.y > anchor.y + height)
             return false;
         return true;

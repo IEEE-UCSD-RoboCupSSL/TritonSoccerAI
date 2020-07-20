@@ -1,7 +1,7 @@
 package Triton.Detection;
 
 import java.util.ArrayList;
-import Triton.Geometry.Point2D;
+import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 
 public class Ball {
@@ -31,20 +31,20 @@ public class Ball {
             return "[" + this.time + "," + this.detection + "]";
         }
 
-        public Point2D getPos() {
-            return new Point2D(detection.getX(), detection.getY());
+        public Vec2D getPos() {
+            return new Vec2D(detection.getX(), detection.getY());
         }
     }
 
     private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
-    private Point2D vel;
+    private Vec2D vel;
 
     public void update(SSL_DetectionBall detection, double time) {
         SortedDetection latest = new SortedDetection(detection, time);
         detections.add(latest);
         // return when there is no previous data
         if (detections.size() == 1) {
-            vel = new Point2D(0, 0);
+            vel = new Vec2D(0, 0);
             return;
         }           
         SortedDetection secondLatest = detections.get(detections.size() - 2); // change peek() to get(size  - 2);
@@ -54,11 +54,11 @@ public class Ball {
         }
     }
 
-    public Point2D getPos() {
+    public Vec2D getPos() {
         return detections.get(detections.size() - 1).getPos();
     }
 
-    public Point2D getVel() {
+    public Vec2D getVel() {
         return vel;
     }
 }

@@ -3,7 +3,7 @@ package Triton.DesignPattern;
 import java.util.List;
 import java.util.ArrayList;
 
-public abstract class Observer implements Object {
+public abstract class Relayer extends Subject implements Object {
 
     protected List<Subject> subjects = new ArrayList<Subject>();
 

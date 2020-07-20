@@ -1,15 +1,17 @@
 package Triton.Detection;
 
+import Triton.DesignPattern.*;
 import java.util.HashMap;
-import Triton.Geometry.Point2D;
+import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
-public class DetectionManager {
+public class DetectionManager extends Subject {
 
     public static final int ROBOT_COUNT = 6;
 
-    public HashMap<Team, HashMap<Integer, Robot>> robots;
+    private HashMap<Team, HashMap<Integer, Robot>> robots;
+    private boolean ready = false;
     private int ballCount;
     private Ball ball;
 
@@ -37,6 +39,15 @@ public class DetectionManager {
         if (ballCount > 0) {
             ball.update(df.getBalls(0), time);
         }
+        if (!ready) {
+            ready = true;
+            for (int i = 0; i < ROBOT_COUNT; i++) {
+                ready = ready && getRobot(Team.YELLOW, i).getReady();
+                ready = ready && getRobot(Team.BLUE, i).getReady();
+            }
+        } else {
+            notifyAllObservers();
+        }
     }
 
     public int getBallCount() {
@@ -47,7 +58,7 @@ public class DetectionManager {
         return ball;
     }
 
-    public Point2D getBallPos() {
+    public Vec2D getBallPos() {
         return ball.getPos();
     }
 
@@ -55,7 +66,7 @@ public class DetectionManager {
         return robots.get(team).get(ID);
     }
 
-    public Point2D getRobotPos(Team team, int ID) {
+    public Vec2D getRobotPos(Team team, int ID) {
         return getRobot(team, ID).getPos();
     }
 

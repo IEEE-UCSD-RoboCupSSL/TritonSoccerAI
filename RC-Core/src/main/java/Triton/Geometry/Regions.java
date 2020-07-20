@@ -1,39 +1,41 @@
-package Triton.Vision;
+package Triton.Geometry;
 
-import Triton.Geometry.*;
+import Triton.Shape.*;
+import Triton.DesignPattern.*;
 import java.util.HashMap;
 
 /*
  * Regions is definded as the collections of partitions of the field. 
  * Regions includes 9 parts: A, B, C, D, E, F, G, H, and I.
  */
-public class Regions {
+public class Regions extends Subject {
+    
     private static HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
 
-    public static void createRegions(FieldGeometry fieldGeometry) {
-        HashMap<String, Line2D> lineSegments = fieldGeometry.getGeometry().field.lineSegments;
+    public static void createRegions(GeometryManager gm) {
+        HashMap<String, Line2D> lineSegments = gm.field.lineSegments;
 
         // Create the center circle in the middle of the field
-        Circle2D centerCircle = new Circle2D(new Point2D(0, 0), fieldGeometry.getGeometry().field.centerCircleRadius);
+        Circle2D centerCircle = new Circle2D(new Vec2D(0, 0), gm.field.centerCircleRadius);
         Regions.addRegion("CentreCircle", centerCircle);
 
         double fieldWidth = lineSegments.get("CenterLine").length();
         double fieldHeight = lineSegments.get("HalfwayLine").length();
 
         // Create the four quadtrants of the field
-        Point2D topLeftQuadAnchor = lineSegments.get("CenterLine").p1;
+        Vec2D topLeftQuadAnchor = lineSegments.get("CenterLine").p1;
         Rect2D topLeftQuad = new Rect2D(topLeftQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("TopLeftQuad", topLeftQuad);
 
-        Point2D topRightQuadAnchor = lineSegments.get("CenterLine").midpoint();
+        Vec2D topRightQuadAnchor = lineSegments.get("CenterLine").midpoint();
         Rect2D topRightQuad = new Rect2D(topRightQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("TopRightQuad", topRightQuad);
 
-        Point2D bottomLeftQuadAnchor = lineSegments.get("LeftGoalLine").p1;
+        Vec2D bottomLeftQuadAnchor = lineSegments.get("LeftGoalLine").p1;
         Rect2D bottomLeftQuad = new Rect2D(bottomLeftQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("BottomLeftQuad", bottomLeftQuad);
 
-        Point2D bottomRightQuadAnchor = lineSegments.get("HalfwayLine").midpoint();
+        Vec2D bottomRightQuadAnchor = lineSegments.get("HalfwayLine").midpoint();
         Rect2D bottomRightQuad = new Rect2D(bottomRightQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("BottomRightQuad", bottomRightQuad);
 
@@ -45,18 +47,18 @@ public class Regions {
         double penaltyWidth = lineSegments.get("LeftPenaltyStretch").p1.x - lineSegments.get("LeftGoalLine").p1.x;
         double penaltyHeight = lineSegments.get("LeftPenaltyStretch").length();
 
-        Point2D leftPenaltyAnchor = new Point2D(lineSegments.get("LeftGoalLine").p1.x,
+        Vec2D leftPenaltyAnchor = new Vec2D(lineSegments.get("LeftGoalLine").p1.x,
                 lineSegments.get("LeftPenaltyStretch").p1.y);
         Rect2D leftPenalty = new Rect2D(leftPenaltyAnchor, penaltyWidth, penaltyHeight);
         Regions.addRegion("LeftPenalty", leftPenalty);
 
-        Point2D rightPenaltyAnchor = lineSegments.get("RightPenaltyStretch").p1;
+        Vec2D rightPenaltyAnchor = lineSegments.get("RightPenaltyStretch").p1;
         Rect2D rightPenalty = new Rect2D(rightPenaltyAnchor, penaltyWidth, penaltyHeight);
         Regions.addRegion("RightPenalty", rightPenalty);
     }
 
     // Return the partition where the point is at.
-    public static String getPartition(Point2D point) {
+    public static String getPartition(Vec2D point) {
         if (regions.get("FullField").isInside(point)) {
             if (regions.get("CentreCircle").isInside(point)) {
                 return "A";
