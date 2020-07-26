@@ -6,5 +6,5 @@ public interface Object {
 
     public void disregard(Subject subject);
 
-    public abstract void update(Subject subject);
+    public void update(Subject subject);
 }

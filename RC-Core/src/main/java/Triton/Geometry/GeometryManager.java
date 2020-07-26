@@ -7,22 +7,19 @@ import Triton.Shape.Line2D;
 
 public class GeometryManager {
 
-    public Camera cam = new Camera();
+    public List<SSL_GeometryCameraCalibration> cameras;
     public Field field = new Field();
     public boolean isInit = false;
-
-    List<SSL_FieldCicularArc> tmp2;
-
-    public Camera getCameraCalibrationSetting() {
-        return cam;
-    }
 
     public Field getFieldStaticObjects() {
         return field;
     }
 
     public boolean init(SSL_GeometryData gd) {
-        // initCameraCalibration(gd.getCalib(0));
+        if (gd.getCalibCount() != 0) {
+            cameras = gd.getCalibList();
+        }
+
         initFieldGeometry(gd.getField());
         if(!field.isEmpty()) {
             Regions.createRegions(this);
@@ -50,7 +47,7 @@ public class GeometryManager {
         }
 
         if(fieldGeometry.getFieldArcsCount() > 0) {
-            tmp2 = fieldGeometry.getFieldArcsList();
+            field.arcList = fieldGeometry.getFieldArcsList();
             field.centerCircleRadius = fieldGeometry.getFieldArcsList().get(0).getRadius();
         }
 
@@ -61,33 +58,12 @@ public class GeometryManager {
         field.boundaryWidth = fieldGeometry.getBoundaryWidth();
     }
 
-    void initCameraCalibration(SSL_GeometryCameraCalibration camCali) {
-        this.cam.cameraID = camCali.getCameraId();
-        this.cam.focalLength = camCali.getFocalLength();
-        this.cam.principalPointX = camCali.getPrincipalPointX();
-        this.cam.principalPointY = camCali.getPrincipalPointY();
-        this.cam.distortion = camCali.getDistortion();
-        this.cam.q0 = camCali.getQ0();
-        this.cam.q1 = camCali.getQ1();
-        this.cam.q2 = camCali.getQ2();
-        this.cam.q3 = camCali.getQ3();
-        this.cam.tx = camCali.getTx();
-        this.cam.ty = camCali.getTy();
-        this.cam.tz = camCali.getTz();
+    public float getCameraQ0(int cameraID) {
+        return this.cameras.get(cameraID).getQ0();
     }
 
     @Override
     public String toString() {
-        String s = field.toString();
-        
-        for(SSL_FieldCicularArc arc : tmp2) {
-            s += arc.getName() + ": ";
-            s += "center: (" + arc.getCenter().getX() + ", " + arc.getCenter().getY()
-              + ")  radius: " + arc.getRadius() + "  start/end angles: (" 
-              + arc.getA1() + ", " + arc.getA2() + ") in radians \n";
-        }
-
-        s += "====================================================\n";
-        return s;
+        return field.toString();
     }
 }

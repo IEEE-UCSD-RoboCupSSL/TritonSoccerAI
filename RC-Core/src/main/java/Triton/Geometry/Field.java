@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Triton.Shape.Line2D;
+import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 
 public class Field {
     public int fieldLength;
@@ -15,6 +16,7 @@ public class Field {
 
     public List<String> lineNameList = new ArrayList<String>();
     public HashMap<String, Line2D> lineSegments = new HashMap<String, Line2D>();
+    public List<SSL_FieldCicularArc> arcList;
 
     public float centerCircleRadius;
 
@@ -36,13 +38,21 @@ public class Field {
 
         s += "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
 
-        
         for(String name : lineNameList) {
             Line2D line = lineSegments.get(name);
             s += line.getName() + ": " + line + " Thickness: " + line.getThickness() + "\n";
         }
 
         s += "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& \n";
+
+        for(SSL_FieldCicularArc arc : arcList) {
+            s += arc.getName() + ": ";
+            s += "center: (" + arc.getCenter().getX() + ", " + arc.getCenter().getY()
+              + ")  radius: " + arc.getRadius() + "  start/end angles: (" 
+              + arc.getA1() + ", " + arc.getA2() + ") in radians \n";
+        }
+
+        s += "====================================================\n";
 
         return s;
     }

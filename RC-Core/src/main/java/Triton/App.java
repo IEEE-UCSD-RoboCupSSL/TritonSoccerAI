@@ -13,11 +13,12 @@ public class App
 
         VisionConnection vision = new VisionConnection(VISION_MULTICAST_ADDR, VISION_PORT);
 
-        VelObserver vo = new VelObserver(vision.dm);
-        PosObserver po = new PosObserver(vision.dm);
+        //VelObserver vo = new VelObserver(vision.dm);
+        //PosObserver po = new PosObserver(vision.dm);
         
         while(true) {
             vision.collectData();
+            System.out.println(vision.gm.field.arcList);
             //if(vision.geoInit) {
             //    System.out.println(Regions.getPartition(vision.dm.getBallPos()));
             //}
