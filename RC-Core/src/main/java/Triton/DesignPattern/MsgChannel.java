@@ -2,8 +2,6 @@ package Triton.DesignPattern;
 
 import java.util.HashMap;
 
-import Triton.Detection.DetectionData;
-
 public class MsgChannel { 
     
     private static MsgChannel single_instance = null; 
@@ -23,13 +21,11 @@ public class MsgChannel {
     } 
 
     public static AbstractData get(String s) {
-        AbstractData data = null;
-        try {
-            data = getInstance().channel.get(s);
-        } catch(Exception e) {
-            e.printStackTrace();
+        AbstractData data = getInstance().channel.get(s);
+        if (data == null) {
+            throw new NullPointerException();
         }
-        return data;
+        return getInstance().channel.get(s);
     }
 
     public static void publish(String s, AbstractData data) {

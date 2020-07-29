@@ -1,24 +1,18 @@
 package Triton;
 
-import Triton.Vision.*;
 import Triton.DesignPattern.MsgChannel;
+import Triton.Vision.*;
 import Triton.Detection.*;
 
 public class App {
-    private static final String VISION_MULTICAST_ADDR = "224.5.23.3";
-    private static final int VISION_PORT = 10020;
 
     public static void main(String args[]) {
 
-        MsgChannel.getInstance();
+        MsgChannel.getInstance(); // Initailize Msg Channel
 
-        VisionConnection vision = new VisionConnection(VISION_MULTICAST_ADDR, VISION_PORT);
-
-        new Thread(new DetectionManager()).start();
-        new Thread(new PosSubscriber()).start();
-
-        while (true) {
-            vision.collectData();
-        }
+        new Thread(new VisionConnection("224.5.23.3", 10020)).start();
+        new Thread(new DetectionPublisher()).start();
+        //new Thread(new PosSubscriber()).start();
+        new Thread(new VelSubscriber()).start();
     }
 }

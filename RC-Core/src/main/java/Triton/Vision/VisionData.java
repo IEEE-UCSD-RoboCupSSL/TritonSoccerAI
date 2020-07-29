@@ -10,6 +10,8 @@ public class VisionData extends AbstractData {
     private SSL_DetectionFrame detectFrame;
     private SSL_GeometryData   geoData;
 
+    public VisionData() {}
+
     public VisionData(SSL_DetectionFrame detectFrame, SSL_GeometryData geoData) {
         lock.writeLock().lock();
         try {

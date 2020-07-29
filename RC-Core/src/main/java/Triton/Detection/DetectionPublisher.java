@@ -4,17 +4,19 @@ import Triton.Vision.VisionData;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
-public class DetectionManager implements Runnable {
+public class DetectionPublisher implements Runnable {
+
+    DetectionData detect;
+
+    public DetectionPublisher() {
+        detect = new DetectionData();
+        DetectionData.publish(detect);
+    }
 
     public void run() {
         while (true) {
             try {
-                VisionData vision = VisionData.get();
-                if (vision == null) {
-                    System.out.println("Vision Null");
-                } else {
-                    update(vision.getDetection());
-                }
+                update(VisionData.get().getDetection());
             } catch (Exception e) {
                 // Do nothing
             }
@@ -22,7 +24,6 @@ public class DetectionManager implements Runnable {
     }
 
     public void update(SSL_DetectionFrame df) {
-        DetectionData detect = new DetectionData();
         double time = df.getTCapture();
         
         for (SSL_DetectionRobot r : df.getRobotsYellowList()) {
@@ -35,6 +36,5 @@ public class DetectionManager implements Runnable {
         if (detect.getBallCount() > 0) {
             detect.updateBall(df.getBalls(0), time);
         }
-        DetectionData.publish(detect);
     }
 }

@@ -7,7 +7,7 @@ import java.net.NetworkInterface;
 import java.io.ByteArrayInputStream;
 import Proto.*;
 
-public class VisionConnection {
+public class VisionConnection implements Runnable {
 
     final static int MAX_BUFFER_SIZE = 10000000;
 
@@ -15,11 +15,14 @@ public class VisionConnection {
     private MulticastSocket socket;
     private DatagramPacket  packet;
 
-    private VisionData data;
+    private VisionData vision;
 
     public boolean geoInit = false;
 
     public VisionConnection(String ip, int port) {
+        vision = new VisionData();
+        VisionData.publish(vision);        
+
         buffer = new byte[MAX_BUFFER_SIZE];
         try {
             socket = new MulticastSocket(port);
@@ -40,15 +43,11 @@ public class VisionConnection {
             MessagesRobocupSslWrapper.SSL_WrapperPacket SSLPacket = 
                 MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
             
-            VisionData.publish(new VisionData(SSLPacket.getDetection(), 
-                                              SSLPacket.getGeometry()));
+            vision.setDetection(SSLPacket.getDetection());
+            vision.setGeometry (SSLPacket.getGeometry());
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public VisionData getVision() {
-        return data;
     }
 
     public void collectData(int numIter) {
@@ -71,6 +70,12 @@ public class VisionConnection {
         for(int i = 0; i < numIter; i++) {
             this.collectData(1);
             System.out.println("preheating " + i + "...");
+        }
+    }
+
+    public void run() {
+        while (true) {
+            this.collectData();
         }
     }
 }
