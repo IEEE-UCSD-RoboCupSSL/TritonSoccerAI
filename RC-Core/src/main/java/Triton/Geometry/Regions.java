@@ -8,7 +8,7 @@ import java.util.HashMap;
  * Regions is definded as the collections of partitions of the field. 
  * Regions includes 9 parts: A, B, C, D, E, F, G, H, and I.
  */
-public class Regions extends Subject {
+public class Regions {
     
     private static HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
 

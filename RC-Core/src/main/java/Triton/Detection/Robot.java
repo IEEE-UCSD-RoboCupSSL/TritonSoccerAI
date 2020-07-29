@@ -39,7 +39,6 @@ public class Robot {
     private double angVel;
     private Team team;
     private int ID;
-    private boolean ready = false;
 
     public Robot(Team team, int ID) {
         this.team = team;
@@ -69,7 +68,6 @@ public class Robot {
             vel = latest.getPos().subtract(secondLatest.getPos()).multiply(1 / dt);
             angVel = (latest.detection.getOrientation() - secondLatest.detection.getOrientation()) / dt;
         }
-        ready = true;
     }
 
     public Vec2D getPos() {
@@ -89,10 +87,6 @@ public class Robot {
 
     public double getHeight() {
         return detections.get(detections.size() - 1).detection.getHeight();
-    }
-    
-    public boolean getReady() {
-        return ready;
     }
     
     public void commandPosition(Vec2D position) {

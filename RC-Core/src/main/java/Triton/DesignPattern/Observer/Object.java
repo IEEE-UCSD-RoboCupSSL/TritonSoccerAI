@@ -1,4 +1,4 @@
-package Triton.DesignPattern;
+package Triton.DesignPattern.Observer;
 
 public interface Object {
     

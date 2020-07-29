@@ -1,6 +1,4 @@
 package Triton.Vision;
-import Triton.Detection.DetectionManager;
-import Triton.Geometry.GeometryManager;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -8,57 +6,54 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.io.ByteArrayInputStream;
 import Proto.*;
-import Proto.MessagesRobocupSslDetection.*;
-import Proto.MessagesRobocupSslGeometry.*;
 
 public class VisionConnection {
 
     final static int MAX_BUFFER_SIZE = 10000000;
 
     private byte[] buffer;
-    private MulticastSocket ds;
-    private DatagramPacket dp;
+    private MulticastSocket socket;
+    private DatagramPacket  packet;
 
-    public DetectionManager dm = new DetectionManager();
-    public GeometryManager gm = new GeometryManager();
+    private VisionData data;
 
     public boolean geoInit = false;
 
     public VisionConnection(String ip, int port) {
-        this.buffer = new byte[MAX_BUFFER_SIZE];
-
+        buffer = new byte[MAX_BUFFER_SIZE];
         try {
-            ds = new MulticastSocket(port);
+            socket = new MulticastSocket(port);
             InetSocketAddress group = new InetSocketAddress(ip, port);
             NetworkInterface netIf = NetworkInterface.getByName("bge0");
-            ds.joinGroup(group, netIf);
-            dp = new DatagramPacket(buffer, buffer.length);
+            socket.joinGroup(group, netIf);
+            packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void receiveOnePacket() {
+    public void update() {
         try {
-            this.ds.receive(dp);
-            MessagesRobocupSslWrapper.SSL_WrapperPacket packet;
-            ByteArrayInputStream input = new ByteArrayInputStream(dp.getData(), dp.getOffset(), dp.getLength());
-            packet = MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
-            SSL_DetectionFrame df = packet.getDetection();
-            SSL_GeometryData gd = packet.getGeometry();
-
-            dm.update(df);
-            if(!geoInit) geoInit = gm.init(gd);
-
+            this.socket.receive(packet);
+            ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(), 
+                packet.getOffset(), packet.getLength());
+            MessagesRobocupSslWrapper.SSL_WrapperPacket SSLPacket = 
+                MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
+            
+            VisionData.publish(new VisionData(SSLPacket.getDetection(), 
+                                              SSLPacket.getGeometry()));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    public VisionData getVision() {
+        return data;
     }
 
     public void collectData(int numIter) {
         for (int i = 0; i < numIter; i++) {
-            receiveOnePacket();
+            update();
         }
     }
 
@@ -77,9 +72,5 @@ public class VisionConnection {
             this.collectData(1);
             System.out.println("preheating " + i + "...");
         }
-    }
-    
-    public void preheating() {
-        preheating(200); // default 200 iters
     }
 }

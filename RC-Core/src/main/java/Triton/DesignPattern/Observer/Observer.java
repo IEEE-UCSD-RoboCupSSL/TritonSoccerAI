@@ -1,4 +1,4 @@
-package Triton.DesignPattern;
+package Triton.DesignPattern.Observer;
 
 import java.util.List;
 import java.util.ArrayList;
