@@ -6,6 +6,8 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 
 public class Ball {
 
+    public static final int MAX_SIZE = 10;
+
     public class SortedDetection implements Comparable<SortedDetection> {
 
         public SSL_DetectionBall detection;
@@ -46,7 +48,12 @@ public class Ball {
         if (detections.size() == 1) {
             vel = new Vec2D(0, 0);
             return;
-        }           
+        }
+        // if there are more than MAX_SIZE data, remove the oldest
+        else if (detections.size() > MAX_SIZE) {
+            detections.remove(0);
+        }
+
         SortedDetection secondLatest = detections.get(detections.size() - 2); // change peek() to get(size  - 2);
         double dt = (latest.time - secondLatest.time) * 1000; 
         if (dt != 0) {

@@ -1,7 +1,6 @@
 package Triton.Geometry;
 
 import Triton.Shape.*;
-import Triton.DesignPattern.*;
 import java.util.HashMap;
 
 /*
@@ -12,11 +11,12 @@ public class Regions {
     
     private static HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
 
-    public static void createRegions(GeometryManager gm) {
-        HashMap<String, Line2D> lineSegments = gm.field.lineSegments;
+    public static void createRegions() {
+        GeometryData data = GeometryData.get();
+        HashMap<String, Line2D> lineSegments = data.getField().lineSegments;
 
         // Create the center circle in the middle of the field
-        Circle2D centerCircle = new Circle2D(new Vec2D(0, 0), gm.field.centerCircleRadius);
+        Circle2D centerCircle = new Circle2D(new Vec2D(0, 0), data.getField().centerCircleRadius);
         Regions.addRegion("CentreCircle", centerCircle);
 
         double fieldWidth = lineSegments.get("CenterLine").length();

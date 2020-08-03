@@ -6,6 +6,8 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class Robot {
 
+    public static final int MAX_SIZE = 10;
+
     public class SortedDetection implements Comparable<SortedDetection> {
         public SSL_DetectionRobot detection;
         public double time; 
@@ -62,6 +64,11 @@ public class Robot {
             angVel = 0.0;
             return;
         }
+        // if there are more than MAX_SIZE data, remove the oldest
+        else if (detections.size() > MAX_SIZE) {
+            detections.remove(0);
+        }
+
         SortedDetection secondLatest = detections.get(detections.size() - 2);
         double dt = (latest.time - secondLatest.time) * 1000; 
         if (dt > 0) {
