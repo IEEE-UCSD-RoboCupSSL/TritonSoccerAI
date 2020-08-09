@@ -14,6 +14,7 @@ public class DetectionData extends AbstractData {
     private HashMap<Team, HashMap<Integer, Robot>> robots;
     private int ballCount;
     private Ball ball;
+    private double time;
 
     public DetectionData() {
         robots = new HashMap<>();
@@ -25,6 +26,24 @@ public class DetectionData extends AbstractData {
             robots.get(Team.BLUE).put(i, new Robot(Team.BLUE, i));
         }
         ball = new Ball();
+    }
+
+    public void updateTime(double time) {
+        lock.writeLock().lock();
+        try {
+            this.time = time;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public double getTime() {
+        lock.readLock().lock();
+        try {
+            return time;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public int getBallCount() {
@@ -67,6 +86,15 @@ public class DetectionData extends AbstractData {
         lock.readLock().lock();
         try {
             return ball.getPos();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public Vec2D getBallVel() {
+        lock.readLock().lock();
+        try {
+            return ball.getVel();
         } finally {
             lock.readLock().unlock();
         }

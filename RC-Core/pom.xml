@@ -52,7 +52,7 @@
 
   <properties>
     <!-- specify java version -->
-    <java.version>11</java.version>
+    <java.version>14</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 

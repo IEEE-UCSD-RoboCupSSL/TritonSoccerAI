@@ -25,16 +25,16 @@ public class DetectionPublisher implements Runnable {
 
     public void update(SSL_DetectionFrame df) {
         double time = df.getTCapture();
-        
+        detect.setBallCount(df.getBallsCount());
+        if (detect.getBallCount() > 0) {
+            detect.updateBall(df.getBalls(0), time);
+        }
+        detect.updateTime(time);
         for (SSL_DetectionRobot r : df.getRobotsYellowList()) {
             detect.updateRobot(Team.YELLOW, r.getRobotId(), r, time);
         }
         for (SSL_DetectionRobot r : df.getRobotsBlueList()) {
             detect.updateRobot(Team.BLUE,   r.getRobotId(), r, time);
-        }
-        detect.setBallCount(df.getBallsCount());
-        if (detect.getBallCount() > 0) {
-            detect.updateBall(df.getBalls(0), time);
         }
     }
 }

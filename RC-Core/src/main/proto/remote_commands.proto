@@ -3,8 +3,8 @@ syntax = "proto3";
 option java_package = "Proto";
 
 message Vec2D {
-    float x = 1;
-    float y = 2;
+    double x = 1;
+    double y = 2;
 }
 
 message Polygon { 
@@ -24,31 +24,35 @@ message Static_Data {
 // basic control packet
 message Control {
     Vec2D velocity = 1;
-    float angular_velocity = 2;
-    float dribbler_pwr = 3;
-    float kicker_pwr = 4;
-    float chippping_pwr = 5;
+    double angular_velocity = 2;
+    double dribbler_pwr = 3;
+    double kicker_pwr = 4;
+    double chippping_pwr = 5;
 }
 
 // data to be send to share info to each robot for distributed computation
 message Data_Send {
     Vec2D ball_location = 1; 
-    repeated Vec2D robot_locations = 2;
-    repeated float robot_orientations = 3;
-    repeated Vec2D robot_velocities = 4;
+    Vec2D ball_velocity = 2;
+    repeated Vec2D yellow_robot_locations = 3;
+    repeated Vec2D blue_robot_locations = 4;
+    repeated double yellow_robot_orientations = 5;
+    repeated double blue_robot_orientations = 6;
+    repeated Vec2D yellow_robot_velocities = 7;
+    repeated Vec2D blue_robot_velocities = 8;
 }
 
 // user-defined control packet 
 message Custom_Control {
     string name = 1;
-    repeated float numerical_params = 2;
+    repeated double numerical_params = 2;
 }
 
 // user-defined highlevel task to be assigned to a robot
 message Custom_Task {
     string name = 1;
     repeated Control ctrl_params = 2;
-    repeated float numerical_params = 3;
+    repeated double numerical_params = 3;
     repeated string str_params = 4;
 }
 
@@ -56,7 +60,7 @@ message Custom_Task {
 message Data_Request {
     string name = 1;
     repeated Control ctrl_data = 2;
-    repeated float numerical_data = 3;
+    repeated double numerical_data = 3;
     repeated string str_data = 4;
 }
 
