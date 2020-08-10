@@ -19,7 +19,7 @@ public class Display extends JPanel {
     private static final int ROBOT_RADIUS_PIXELS = (int) (ROBOT_RADIUS * SCALE);
     private static final double BALL_RADIUS = 50;
     private static final int BALL_RADIUS_PIXELS = (int) (BALL_RADIUS * SCALE);
-    private static final int ROBOT_OUTLINE_THICKNESS = 2;
+    private static final int ROBOT_OUTLINE_THICKNESS = 1;
     private static final int BALL_OUTLINE_THICKNESS = 1;
 
     private static final int TARGET_FPS = 120;
@@ -54,7 +54,7 @@ public class Display extends JPanel {
         frame = new JFrame("Display");
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBackground(Color.decode("#234823"));
+        setBackground(Color.decode("#153131"));
         loadImages();
         start();
     }
@@ -84,29 +84,31 @@ public class Display extends JPanel {
         yellowRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
                 (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D yellowRobotGraphics = (Graphics2D) yellowRobotImg.getGraphics();
-        yellowRobotGraphics.setColor(Color.RED);
+        yellowRobotGraphics.setColor(Color.decode("#ff8c00"));
         yellowRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        yellowRobotGraphics.setColor(Color.YELLOW);
+        yellowRobotGraphics.setColor(Color.BLACK);
         yellowRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
         yellowRobotGraphics.setColor(Color.WHITE);
         yellowRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
         yellowRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        yellowRobotGraphics.drawOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
 
         blueRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
                 (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D blueRobotGraphics = (Graphics2D) blueRobotImg.getGraphics();
-        blueRobotGraphics.setColor(Color.BLUE);
+        blueRobotGraphics.setColor(Color.decode("#004FFF"));
         blueRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        blueRobotGraphics.setColor(Color.CYAN);
+        blueRobotGraphics.setColor(Color.BLACK);
         blueRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
         blueRobotGraphics.setColor(Color.WHITE);
         blueRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
         blueRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        blueRobotGraphics.drawOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
 
         ballImg = new BufferedImage((BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2,
                 (BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D ballGraphics = (Graphics2D) ballImg.getGraphics();
-        ballGraphics.setColor(Color.MAGENTA);
+        ballGraphics.setColor(Color.decode("#FF007F"));
         ballGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
         ballGraphics.setColor(Color.WHITE);
         ballGraphics.setStroke(new BasicStroke(BALL_OUTLINE_THICKNESS));
