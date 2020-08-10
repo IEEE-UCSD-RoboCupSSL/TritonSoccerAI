@@ -88,7 +88,7 @@ public class Display extends Canvas implements Runnable {
                 int radius = (int) (ROBOT_RADIUS * SCALE);
                 g.setColor(Color.BLUE);
                 g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
-                g.setColor(Color.YELLOW);
+                g.setColor(Color.WHITE);
                 g.drawString(Integer.toString(i), pos[0], pos[1]);
             }
         } catch (Exception e) {
