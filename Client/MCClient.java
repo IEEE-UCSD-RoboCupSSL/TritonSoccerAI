@@ -23,11 +23,12 @@ public class MCClient {
         }
         
         while (true) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            DatagramPacket pkt = new DatagramPacket(buf, buf.length);
 
             try {
-                socket.receive(packet);
-                Data_Send received = Data_Send.parseFrom(buf);
+                socket.receive(pkt);
+                ByteArrayInputStream input = new ByteArrayInputStream(pkt.getData(), pkt.getOffset(), pkt.getLength());
+                Data_Send received = Data_Send.parseFrom(input);
                 System.out.println(received);
             } catch (Exception e) {
                 e.printStackTrace();

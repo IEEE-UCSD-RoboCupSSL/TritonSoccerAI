@@ -14,11 +14,11 @@ public class TCPClient {
     public static final int TCP_INIT_PORT = 8901;
  
     public static void main(String[] args) {
-        if (args.length < 3) return;
+        if (args.length < 2) return;
  
-        String team    = args[0];
-        String robotID = args[1];
-        String port    = args[2];
+        //String team    = args[0];
+        String robotID = args[0];
+        String port    = args[1];
  
         try (Socket socket = new Socket("localhost", TCP_INIT_PORT)) {
             
@@ -29,7 +29,7 @@ public class TCPClient {
             System.out.println("Connecting to server...");
 
             /*** TODO: Need to be implemented in CPP */
-            out.printf("%s,%s,%s\n", team, robotID, port);
+            out.printf("%s,%s\n", robotID, port);
             System.out.println(in.readLine()); // Receiving server binding message
             System.out.println(in.readLine()); // Receiving geometry protobuf
             /*** TODO: Need to be implemented in CPP */
