@@ -25,7 +25,6 @@ public class Display extends Canvas implements Runnable {
         setBackground(Color.decode("#234823"));
         frame = new JFrame("Display");
         frame.add(this);
-        frame.setVisible(true);
     }
 
     public void run() {
@@ -45,20 +44,11 @@ public class Display extends Canvas implements Runnable {
         setSize(windowWidth, windowHeight);
         frame.setMinimumSize(new Dimension(windowWidth, windowHeight));
         frame.setMaximumSize(new Dimension(windowWidth, windowHeight));
+        frame.setVisible(true);
 
         while (true) {
             repaint(UPDATE_DELAY);
         }
-        
-        /*
-        long last = System.currentTimeMillis();
-        while (true) {
-            if (System.currentTimeMillis() - last > UPDATE_DELAY) {
-                last = System.currentTimeMillis();
-                repaint();
-            }
-        }
-        */
     }
 
     public int[] convert(Vec2D v) {
@@ -89,6 +79,7 @@ public class Display extends Canvas implements Runnable {
                 int radius = (int) (ROBOT_RADIUS * SCALE);
                 g.setColor(Color.YELLOW);
                 g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+                g.drawString(Integer.toString(i), pos[0], pos[1]);
             }
 
             for (int i = 0; i < 6; i++) {
@@ -96,6 +87,7 @@ public class Display extends Canvas implements Runnable {
                 int radius = (int) (ROBOT_RADIUS * SCALE);
                 g.setColor(Color.BLUE);
                 g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+                g.drawString(Integer.toString(i), pos[0], pos[1]);
             }
         } catch (Exception e) {
 
