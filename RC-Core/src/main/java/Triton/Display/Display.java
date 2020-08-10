@@ -29,74 +29,76 @@ public class Display extends Canvas implements Runnable {
     }
 
     public void run() {
-        long last = System.currentTimeMillis();
         while (true) {
             try {
                 field = GeometryData.get().getField();
-                windowWidth  = (int) (field.fieldLength * SCALE);
+                windowWidth = (int) (field.fieldLength * SCALE);
                 windowHeight = (int) (field.fieldWidth * SCALE);
-                if (windowWidth == 0 || windowHeight == 0) continue;
-                paint(getGraphics());
+                if (windowWidth == 0 || windowHeight == 0)
+                    continue;
                 break;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 // Geometry not ready, do nothing
             }
         }
-                
+
         setSize(windowWidth, windowHeight);
         frame.setMinimumSize(new Dimension(windowWidth, windowHeight));
         frame.setMaximumSize(new Dimension(windowWidth, windowHeight));
 
         while (true) {
+            repaint(UPDATE_DELAY);
+        }
+        
+        /*
+        long last = System.currentTimeMillis();
+        while (true) {
             if (System.currentTimeMillis() - last > UPDATE_DELAY) {
-                update(getGraphics());
                 last = System.currentTimeMillis();
+                repaint();
             }
         }
+        */
     }
 
     public int[] convert(Vec2D v) {
-        int[] res = {(int) (  v.x * SCALE + windowWidth  / 2), 
-                     (int) (- v.y * SCALE + windowHeight / 2)};
+        int[] res = { (int) (v.x * SCALE + windowWidth / 2), (int) (-v.y * SCALE + windowHeight / 2) };
         return res;
     }
 
     @Override
     public void paint(Graphics g) {
+        try {
+            field.lineSegments.forEach((name, line) -> {
+                int[] p1 = convert(line.p1);
+                int[] p2 = convert(line.p2);
+                g.setColor(Color.WHITE);
+                g.drawLine(p1[0], p1[1], p2[0], p2[1]);
+            });
 
-        field.lineSegments.forEach((name, line) -> {
-            int[] p1 = convert(line.p1);
-            int[] p2 = convert(line.p2);
-            g.setColor(Color.WHITE);
-            g.drawLine(p1[0], p1[1], p2[0], p2[1]);
-        });
-        
-        for (SSL_FieldCicularArc arc : field.arcList) {
-            int[] center = convert(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
-            int radius = (int) (arc.getRadius() * SCALE);
+            for (SSL_FieldCicularArc arc : field.arcList) {
+                int[] center = convert(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
+                int radius = (int) (arc.getRadius() * SCALE);
 
-            g.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2, 
-                      (int) Math.toDegrees(arc.getA1()),
-                      (int) Math.toDegrees(arc.getA2()));
+                g.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2,
+                        (int) Math.toDegrees(arc.getA1()), (int) Math.toDegrees(arc.getA2()));
+            }
+
+            for (int i = 0; i < 6; i++) {
+                int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
+                int radius = (int) (ROBOT_RADIUS * SCALE);
+                g.setColor(Color.YELLOW);
+                g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+            }
+
+            for (int i = 0; i < 6; i++) {
+                int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
+                int radius = (int) (ROBOT_RADIUS * SCALE);
+                g.setColor(Color.BLUE);
+                g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+            }
+        } catch (Exception e) {
+
         }
-    }
-
-    @Override
-    public void update(Graphics g) {
-       super.update(g);
-       
-       for (int i = 0; i < 6; i++) {
-           int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
-           int radius = (int) (ROBOT_RADIUS * SCALE);
-           g.setColor(Color.YELLOW);
-           g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
-       }
-
-       for (int i = 0; i < 6; i++) {
-           int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
-           int radius = (int) (ROBOT_RADIUS * SCALE);
-           g.setColor(Color.BLUE);
-           g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
-       }
     }
 }

@@ -29,12 +29,12 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String args[]) {
-        new Thread(new VisionConnection("224.5.23.3", 10020)).start();
+        new Thread(new VisionConnection("224.5.23.2", 10020)).start();
         new Thread(new DetectionPublisher()).start();
         new Thread(new GeometryPublisher()).start();
         //new Thread(new PosSubscriber()).start();
         //new Thread(new VelSubscriber()).start();
-        //new Thread(new RegionSubscriber()).start();
+        new Thread(new RegionSubscriber()).start();
 
         //new Thread(new MCVision()).start();
 
@@ -49,6 +49,6 @@ public class App {
             e.printStackTrace();
         }*/
 
-        new Thread(new Display()).start();
+        //new Thread(new Display()).start();
     }
 }
