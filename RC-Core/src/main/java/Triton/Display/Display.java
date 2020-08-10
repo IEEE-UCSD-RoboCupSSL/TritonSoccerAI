@@ -11,7 +11,7 @@ import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 public class Display extends Canvas implements Runnable {
     private static final double ROBOT_RADIUS = 90;
     private static final double SCALE = 0.1;
-    private static final int TARGET_FPS = 60;
+    private static final int TARGET_FPS = 30;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
     private static int windowWidth;
@@ -31,8 +31,8 @@ public class Display extends Canvas implements Runnable {
         while (true) {
             try {
                 field = GeometryData.get().getField();
-                windowWidth = (int) (field.fieldLength * SCALE);
-                windowHeight = (int) (field.fieldWidth * SCALE);
+                windowWidth = (int) (field.fieldLength + (field.goalDepth * 2) * SCALE);
+                windowHeight = (int) (field.fieldWidth + (field.goalDepth * 2) * SCALE);
                 if (windowWidth == 0 || windowHeight == 0)
                     continue;
                 break;
