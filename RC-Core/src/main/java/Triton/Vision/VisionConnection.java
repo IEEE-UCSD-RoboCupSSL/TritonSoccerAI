@@ -37,14 +37,14 @@ public class VisionConnection implements Runnable {
 
     public void update() {
         try {
-            this.socket.receive(packet);
+            socket.receive(packet);
             ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(), 
                 packet.getOffset(), packet.getLength());
             MessagesRobocupSslWrapper.SSL_WrapperPacket SSLPacket = 
                 MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
             
             vision.setDetection(SSLPacket.getDetection());
-            vision.setGeometry (SSLPacket.getGeometry());
+            vision.setGeometry(SSLPacket.getGeometry());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,21 +61,9 @@ public class VisionConnection implements Runnable {
         collectData(4);
     }
 
-    /*
-     * preheating by looping numIter times 
-     * to drain out the initial problematic 
-     * data
-     */
-    public void preheating(int numIter) {
-        for(int i = 0; i < numIter; i++) {
-            this.collectData(1);
-            System.out.println("preheating " + i + "...");
-        }
-    }
-
     public void run() {
         while (true) {
-            this.collectData();
+            collectData();
         }
     }
 }

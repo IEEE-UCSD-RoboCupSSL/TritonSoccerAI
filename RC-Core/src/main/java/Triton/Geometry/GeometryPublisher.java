@@ -23,7 +23,9 @@ public class GeometryPublisher implements Runnable {
                 if (gd.getCalibCount() != 0) {
                     geometry.setCameras(gd.getCalibList());
                 }
-                initFieldGeometry(gd.getField());
+                Field field = new Field();
+                initFieldGeometry(gd.getField(), field);
+                geometry.setField(field);
                 if (!geometry.getField().isEmpty()) {
                     Regions.createRegions();
                 }
@@ -35,33 +37,33 @@ public class GeometryPublisher implements Runnable {
         }
     }
 
-    void initFieldGeometry(SSL_GeometryFieldSize fieldGeometry) {
+    void initFieldGeometry(SSL_GeometryFieldSize fieldGeometry, Field field) {
         if (fieldGeometry.getFieldLinesCount() > 0) {
             for (SSL_FieldLineSegment line : fieldGeometry.getFieldLinesList()) {
-                if (!geometry.getField().lineNameList.contains(line.getName())) {
-                    geometry.getField().lineNameList.add(line.getName());
+                if (!field.lineNameList.contains(line.getName())) {
+                    field.lineNameList.add(line.getName());
                 }
 
                 Line2D l2d = new Line2D((double) (line.getP1().getX()), (double) (line.getP1().getY()),
                         (double) (line.getP2().getX()), (double) (line.getP2().getY()));
                 l2d.setName(line.getName());
                 l2d.setThickness((double) line.getThickness());
-                if (!geometry.getField().lineSegments.containsKey(line.getName())) {
-                    geometry.getField().lineSegments.put(line.getName(), l2d);
+                if (!field.lineSegments.containsKey(line.getName())) {
+                    field.lineSegments.put(line.getName(), l2d);
                 }
             }
         }
 
         if (fieldGeometry.getFieldArcsCount() > 0) {
-            geometry.getField().arcList = fieldGeometry.getFieldArcsList();
-            geometry.getField().centerCircleRadius = fieldGeometry.getFieldArcsList().get(0).getRadius();
+            field.arcList = fieldGeometry.getFieldArcsList();
+            field.centerCircleRadius = fieldGeometry.getFieldArcsList().get(0).getRadius();
         }
 
-        geometry.getField().fieldLength = fieldGeometry.getFieldLength();
-        geometry.getField().fieldWidth = fieldGeometry.getFieldWidth();
-        geometry.getField().goalDepth = fieldGeometry.getGoalDepth();
-        geometry.getField().goalWidth = fieldGeometry.getGoalWidth();
-        geometry.getField().boundaryWidth = fieldGeometry.getBoundaryWidth();
+        field.fieldLength = fieldGeometry.getFieldLength();
+        field.fieldWidth = fieldGeometry.getFieldWidth();
+        field.goalDepth = fieldGeometry.getGoalDepth();
+        field.goalWidth = fieldGeometry.getGoalWidth();
+        field.boundaryWidth = fieldGeometry.getBoundaryWidth();
     }
 
     @Override
