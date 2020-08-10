@@ -4,7 +4,7 @@ import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.*;
-import Triton.Display.ViewerServlet;
+import Triton.Display.*;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Handler;
@@ -39,7 +39,7 @@ public class App {
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        //new Thread(new Display());
+        new Thread(new Display()).start();
 
         Server server = createServer(8980);
         try {

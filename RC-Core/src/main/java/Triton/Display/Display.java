@@ -56,7 +56,7 @@ public class Display extends JPanel implements Runnable {
         frame.setVisible(true);
 
         while (true) {
-            repaint();
+            repaint(UPDATE_DELAY);
         }
     }
 
