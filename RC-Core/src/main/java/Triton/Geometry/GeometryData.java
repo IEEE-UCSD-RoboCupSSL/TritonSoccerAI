@@ -1,8 +1,9 @@
 package Triton.Geometry;
 
-import Triton.DesignPattern.*;
 import java.util.List;
+
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryCameraCalibration;
+import Triton.DesignPattern.*;
 
 public class GeometryData extends AbstractData {
 
