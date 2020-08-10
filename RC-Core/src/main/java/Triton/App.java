@@ -4,10 +4,13 @@ import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.*;
-import Triton.Display.*;
+import Triton.Display.ViewerServlet;
 
-import java.util.HashMap;
-import java.util.concurrent.*;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.servlet.ServletHandler;
 
 public class App {
 
@@ -35,20 +38,33 @@ public class App {
         //new Thread(new PosSubscriber()).start();
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
-
         //new Thread(new MCVision()).start();
+        //new Thread(new Display());
 
-        /*FutureTask<HashMap<Boolean, HashMap<Integer, Integer>>> tcpTask = 
-            new FutureTask<>(new TCPInit());
-        new Thread(tcpTask).start();
-
+        Server server = createServer(8980);
         try {
-            HashMap<Boolean, HashMap<Integer, Integer>> map = tcpTask.get();
-            new Thread(new UDPSend(map)).start();
-        } catch(Exception e) {
+            server.start();
+            server.join();
+        } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
+    }
 
-        new Thread(new Display()).start();
+    public static Server createServer(int port)
+    {
+        Server server = new Server(port);
+        ServletHandler servletHandler = new ServletHandler();
+        servletHandler.addServletWithMapping(ViewerServlet.class, "/ViewerServlet");
+
+        ResourceHandler resource_handler = new ResourceHandler();
+        resource_handler.setDirectoriesListed(true);
+        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
+        resource_handler.setResourceBase(".");
+
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] { resource_handler, servletHandler });
+        server.setHandler(handlers);
+
+        return server;
     }
 }

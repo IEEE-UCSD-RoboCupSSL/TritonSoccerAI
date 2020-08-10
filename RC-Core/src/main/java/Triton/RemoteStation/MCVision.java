@@ -11,7 +11,7 @@ public class MCVision implements Runnable {
 
     public static final String MC_ADDR = "224.5.0.1";
     public static final int MC_PORT = 10020;
-    public static final double MIN_INTERVAL = 0.001; // 1 ms
+    public static final long INTERVAL = 5; // 5 ms
 
     private DatagramSocket socket;
     private InetAddress group;
@@ -72,28 +72,17 @@ public class MCVision implements Runnable {
 
     public void run() {
         while (true) {
-
-            double lastTime = 0.0;
-
             DetectionData data;
+            Data_Send toSend;
 
             try {
                 data = DetectionData.get();
+                toSend = toProto(data);
             }  catch (NullPointerException | IndexOutOfBoundsException e) {
                 continue;
             }
-
+            
             try {
-                // Don't update if time diff < 1ms
-                if (data.getTime() - lastTime < MIN_INTERVAL) {
-                    lastTime = data.getTime();
-                    continue;
-                }
-                lastTime = data.getTime();
-
-                Data_Send toSend = toProto(data);
-                //System.out.println(toSend);
-
                 buf = toSend.toByteArray();
 
                 DatagramPacket pkt = new DatagramPacket(buf, buf.length);
@@ -101,8 +90,8 @@ public class MCVision implements Runnable {
                 pkt.setPort(MC_PORT);
 
                 socket.send(pkt);
-
-            } catch (IOException e) {
+                Thread.sleep(INTERVAL); // sleep for 5 ms
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
