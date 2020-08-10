@@ -33,7 +33,7 @@ public class Display extends JPanel implements Runnable {
             try {
                 field = GeometryData.get().getField();
                 windowWidth = (int) ((field.fieldLength + field.goalDepth * 2.0) * SCALE);
-                windowHeight = (int) ((field.fieldWidth + field.goalDepth * 2.0) * SCALE);
+                windowHeight = (int) (field.fieldWidth * SCALE);
                 if (windowWidth == 0 || windowHeight == 0)
                     continue;
                 break;
