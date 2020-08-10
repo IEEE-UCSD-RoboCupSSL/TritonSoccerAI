@@ -11,7 +11,7 @@ import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 public class Display extends Canvas implements Runnable {
     private static final double ROBOT_RADIUS = 90;
     private static final double SCALE = 0.1;
-    private static final int TARGET_FPS = 15;
+    private static final int TARGET_FPS = 60;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
     private static int windowWidth;
@@ -79,6 +79,7 @@ public class Display extends Canvas implements Runnable {
                 int radius = (int) (ROBOT_RADIUS * SCALE);
                 g.setColor(Color.YELLOW);
                 g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+                g.setColor(Color.BLACK);
                 g.drawString(Integer.toString(i), pos[0], pos[1]);
             }
 
@@ -87,6 +88,7 @@ public class Display extends Canvas implements Runnable {
                 int radius = (int) (ROBOT_RADIUS * SCALE);
                 g.setColor(Color.BLUE);
                 g.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+                g.setColor(Color.YELLOW);
                 g.drawString(Integer.toString(i), pos[0], pos[1]);
             }
         } catch (Exception e) {
