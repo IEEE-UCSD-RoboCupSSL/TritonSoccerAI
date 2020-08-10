@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>Trajectory Viewer</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="center" style="width:1200px; height:800px;">
+    	<div id="y0" style="position:absolute">
+    		<img src="img/robot/y0.png">
+    	</div>
+    	<div id="y1" style="position:absolute">
+    		<img src="img/robot/y1.png">
+    	</div>
+    	<div id="y2" style="position:absolute">
+    		<img src="img/robot/y2.png">
+    	</div>
+    	<div id="y3" style="position:absolute">
+    		<img src="img/robot/y3.png">
+    	</div>
+    	<div id="y4" style="position:absolute">
+    		<img src="img/robot/y4.png">
+    	</div>
+    	<div id="y5" style="position:absolute">
+    		<img src="img/robot/y5.png">
+    	</div>
+    	<div id="b0" style="position:absolute">
+    		<img src="img/robot/b0.png">
+    	</div>
+    	<div id="b1" style="position:absolute">
+    		<img src="img/robot/b1.png">
+    	</div>
+    	<div id="b2" style="position:absolute">
+    		<img src="img/robot/b2.png">
+    	</div>
+    	<div id="b3" style="position:absolute">
+    		<img src="img/robot/b3.png">
+    	</div>
+    	<div id="b4" style="position:absolute">
+    		<img src="img/robot/b4.png">
+    	</div>
+    	<div id="b5" style="position:absolute">
+    		<img src="img/robot/b5.png">
+    	</div>
+    	<canvas id="canvas" width="1200" height="800"></canvas>
+	</div>
+	<div class="center">
+    	<button id="start" onclick="start()">Start</button>
+    </div>
+
+<script>
+    var eventSource = null;
+    
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const ROBOT_RADIUS = 12;
+    
+    var y0 = document.getElementById("y0");
+    var last_v = null;
+    
+    var field = new Image();
+    field.onload = function(){
+    	ctx.drawImage(this, 0, 0);
+    };
+  	field.src = "img/field.png";
+  	
+  	function update(img, robot) {
+  		img.style.left = robot.x;
+  		img.style.top  = robot.y;
+  		img.style.transform = "rotate(" + robot.o + ")";
+  	}
+
+    function start() {
+    	var evtSource = new EventSource('/ViewerServlet');
+    	
+    	evtSource.addEventListener('message', (e) => {
+		    var v = JSON.parse(e.data);
+		    update(y0, v.y0);
+		    update(y1, v.y1);
+		    update(y2, v.y2);
+		    update(y3, v.y3);
+		    update(y4, v.y4);
+		    update(y5, v.y5);
+		    update(b0, v.b0);
+		    update(b1, v.b1);
+		    update(b2, v.b2);
+		    update(b3, v.b3);
+		    update(b4, v.b4);
+		    update(b5, v.b5);
+		    
+		    if (last_v !== null) {
+		    	ctx.beginPath();
+		    	ctx.moveTo(parseInt(last_v.b1x)+ROBOT_RADIUS, parseInt(last_v.b1y)+ROBOT_RADIUS);
+		    	ctx.lineTo(parseInt(v.b1x)+ROBOT_RADIUS, parseInt(v.b1y)+ROBOT_RADIUS);
+		    	ctx.stroke();
+		    }
+		    last_v = v;
+   		});
+    }
+</script>
+
+</body>
+</html>
+
+

@@ -26,6 +26,18 @@
         <version>3.11.4</version>
     </dependency>
 
+    <!-- Jetty-->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>9.4.31.v20200723</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>9.4.31.v20200723</version>
+    </dependency>
+
     <!-- grpc -->
     <dependency>
         <groupId>io.grpc</groupId>
@@ -98,7 +110,13 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-       
+      
+      <!-- jetty plugin -->
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.31.v20200723</version>
+      </plugin>
 
       <!-- protobuff plugin -->
       <plugin>

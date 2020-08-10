@@ -3,14 +3,14 @@ package Client;
 import java.io.*;
 import java.net.*;
 import Client.RemoteCommands.*;
-
+  
 public class MCClient {
     public static final String MC_ADDR = "224.5.0.1";
     public static final int MC_PORT = 10020;
 
     protected static MulticastSocket socket = null;
     protected static byte[] buf = new byte[1024];
- 
+
     public static void main(String[] args) {
         try {
             InetAddress mcAddr = InetAddress.getByName(MC_ADDR);
@@ -21,13 +21,14 @@ public class MCClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         while (true) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            DatagramPacket pkt = new DatagramPacket(buf, buf.length);
 
             try {
-                socket.receive(packet);
-                Data_Send received = Data_Send.parseFrom(buf);
+                socket.receive(pkt);
+                ByteArrayInputStream input = new ByteArrayInputStream(pkt.getData(), pkt.getOffset(), pkt.getLength());
+                Data_Send received = Data_Send.parseFrom(input);
                 System.out.println(received);
             } catch (Exception e) {
                 e.printStackTrace();
