@@ -19,6 +19,9 @@ public class Display extends JPanel {
     private static final int ROBOT_RADIUS_PIXELS = (int) (ROBOT_RADIUS * SCALE);
     private static final double BALL_RADIUS = 45;
     private static final int BALL_RADIUS_PIXELS = (int) (BALL_RADIUS * SCALE);
+    private static final int ROBOT_OUTLINE_THICKNESS = 2;
+    private static final int BALL_OUTLINE_THICKNESS = 1;
+
     private static final int TARGET_FPS = 120;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
@@ -78,25 +81,36 @@ public class Display extends JPanel {
     }
 
     private void loadImages() {
-        yellowRobotImg = new BufferedImage(ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2,
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics yellowRobotGraphics = yellowRobotImg.getGraphics();
-        yellowRobotGraphics.setColor(Color.YELLOW);
-        yellowRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        yellowRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
+                (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D yellowRobotGraphics = (Graphics2D) yellowRobotImg.getGraphics();
         yellowRobotGraphics.setColor(Color.RED);
-        yellowRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2);
+        yellowRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        yellowRobotGraphics.setColor(Color.YELLOW);
+        yellowRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
+        yellowRobotGraphics.setColor(Color.WHITE);
+        yellowRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
+        yellowRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
 
-        blueRobotImg = new BufferedImage(ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics blueRobotGraphics = blueRobotImg.getGraphics();
+        blueRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
+                (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D blueRobotGraphics = (Graphics2D) blueRobotImg.getGraphics();
         blueRobotGraphics.setColor(Color.BLUE);
         blueRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        blueRobotGraphics.setColor(Color.MAGENTA);
-        blueRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2);
+        blueRobotGraphics.setColor(Color.CYAN);
+        blueRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS);
+        blueRobotGraphics.setColor(Color.WHITE);
+        blueRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
+        blueRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
 
-        ballImg = new BufferedImage(BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics ballGraphics = ballImg.getGraphics();
-        ballGraphics.setColor(Color.CYAN);
+        ballImg = new BufferedImage((BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2,
+                (BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D ballGraphics = (Graphics2D) ballImg.getGraphics();
+        ballGraphics.setColor(Color.MAGENTA);
         ballGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
+        ballGraphics.setColor(Color.WHITE);
+        ballGraphics.setStroke(new BasicStroke(BALL_OUTLINE_THICKNESS));
+        ballGraphics.drawOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
     }
 
     public int[] convert(Vec2D v) {
@@ -129,7 +143,8 @@ public class Display extends JPanel {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
             // double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
             // g2d.rotate(orient);
-            g2d.drawImage(yellowRobotImg, pos[0] - ROBOT_RADIUS_PIXELS, pos[1] - ROBOT_RADIUS_PIXELS, this);
+            g2d.drawImage(yellowRobotImg, pos[0] - yellowRobotImg.getWidth() / 2,
+                    pos[1] - yellowRobotImg.getHeight() / 2, this);
             // g2d.rotate(-orient);
             g2d.setColor(Color.WHITE);
             g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
@@ -139,7 +154,8 @@ public class Display extends JPanel {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
             // double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
             // g2d.rotate(orient);
-            g2d.drawImage(blueRobotImg, pos[0] - ROBOT_RADIUS_PIXELS, pos[1] - ROBOT_RADIUS_PIXELS, this);
+            g2d.drawImage(blueRobotImg, pos[0] - blueRobotImg.getWidth() / 2, pos[1] - blueRobotImg.getHeight() / 2,
+                    this);
             // g2d.rotate(-orient);
             g2d.setColor(Color.WHITE);
             g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
@@ -149,7 +165,10 @@ public class Display extends JPanel {
         g2d.drawImage(ballImg, ballPos[0], ballPos[1], this);
 
         g2d.drawString("LAST UPDATE: " + (System.currentTimeMillis() - lastPaint) + " ms", 50, windowHeight - 70);
-        g2d.drawString("FPS: " + (1000.0 / (System.currentTimeMillis() - lastPaint)), 50, windowHeight - 50);
+        g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
+                windowHeight - 70);
+        g2d.drawString(String.format("FPS: %.2f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
+                windowHeight - 50);
         lastPaint = System.currentTimeMillis();
     }
 }
