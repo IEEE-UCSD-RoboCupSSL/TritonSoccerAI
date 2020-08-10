@@ -39,7 +39,7 @@ public class App {
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        new Thread(new Display()).start();
+        Display display = new Display();
 
         Server server = createServer(8980);
         try {
