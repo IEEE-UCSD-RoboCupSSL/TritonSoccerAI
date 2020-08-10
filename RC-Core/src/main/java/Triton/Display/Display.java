@@ -17,7 +17,7 @@ public class Display extends JPanel {
     private static final double SCALE = 1.0 / 10.0;
     private static final double ROBOT_RADIUS = 90;
     private static final int ROBOT_RADIUS_PIXELS = (int) (ROBOT_RADIUS * SCALE);
-    private static final double BALL_RADIUS = 45;
+    private static final double BALL_RADIUS = 50;
     private static final int BALL_RADIUS_PIXELS = (int) (BALL_RADIUS * SCALE);
     private static final int ROBOT_OUTLINE_THICKNESS = 2;
     private static final int BALL_OUTLINE_THICKNESS = 1;
@@ -147,7 +147,7 @@ public class Display extends JPanel {
                     pos[1] - yellowRobotImg.getHeight() / 2, this);
             // g2d.rotate(-orient);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
+            g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - ROBOT_RADIUS_PIXELS * 2);
         }
 
         for (int i = 0; i < 6; i++) {
@@ -158,7 +158,7 @@ public class Display extends JPanel {
                     this);
             // g2d.rotate(-orient);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
+            g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - ROBOT_RADIUS_PIXELS * 2);
         }
 
         int[] ballPos = convert(DetectionData.get().getBallPos());
@@ -167,7 +167,7 @@ public class Display extends JPanel {
         g2d.drawString("LAST UPDATE: " + (System.currentTimeMillis() - lastPaint) + " ms", 50, windowHeight - 70);
         g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
                 windowHeight - 70);
-        g2d.drawString(String.format("FPS: %.2f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
+        g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
                 windowHeight - 50);
         lastPaint = System.currentTimeMillis();
     }
