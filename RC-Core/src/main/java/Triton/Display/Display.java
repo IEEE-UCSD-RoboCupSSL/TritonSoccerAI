@@ -5,18 +5,27 @@ import Triton.Geometry.*;
 import Triton.Shape.*;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
 import javax.swing.*;
 import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 
 public class Display extends JPanel implements Runnable {
-    private static final double ROBOT_RADIUS = 90;
     private static final double SCALE = 1.0 / 10.0;
+    private static final double ROBOT_RADIUS = 90;
+    private static final int ROBOT_RADIUS_PIXELS = (int) (ROBOT_RADIUS * SCALE);
+    private static final double BALL_RADIUS = 45;
+    private static final int BALL_RADIUS_PIXELS = (int) (BALL_RADIUS * SCALE);
     private static final int TARGET_FPS = 15;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
     private static int windowWidth;
     private static int windowHeight;
     private static Field field;
+    
+    BufferedImage yellowRobotImg;
+    BufferedImage blueRobotImg;
+    BufferedImage ballImg;
 
     JFrame frame;
 
@@ -26,6 +35,7 @@ public class Display extends JPanel implements Runnable {
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.decode("#234823"));
+        loadImages();
     }
 
     public void run() {
@@ -48,6 +58,27 @@ public class Display extends JPanel implements Runnable {
         while (true) {
             repaint();
         }
+    }
+
+    private void loadImages() {
+        yellowRobotImg = new BufferedImage(ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics yellowRobotGraphics = yellowRobotImg.getGraphics();
+        yellowRobotGraphics.setColor(Color.YELLOW);
+        yellowRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        yellowRobotGraphics.setColor(Color.RED);
+        yellowRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2);
+
+        blueRobotImg = new BufferedImage(ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics blueRobotGraphics = blueRobotImg.getGraphics();
+        blueRobotGraphics.setColor(Color.BLUE);
+        blueRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
+        blueRobotGraphics.setColor(Color.MAGENTA);
+        blueRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS / 2, 0, ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2);
+
+        ballImg = new BufferedImage(BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics ballGraphics = ballImg.getGraphics();
+        ballGraphics.setColor(Color.CYAN);
+        ballGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
     }
 
     public int[] convert(Vec2D v) {
@@ -78,23 +109,29 @@ public class Display extends JPanel implements Runnable {
 
             for (int i = 0; i < 6; i++) {
                 int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
-                int radius = (int) (ROBOT_RADIUS * SCALE);
-                g2d.setColor(Color.YELLOW);
-                g2d.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
-                g2d.setColor(Color.BLACK);
-                g2d.drawString(Integer.toString(i), pos[0], pos[1]);
+                // double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
+                //g2d.rotate(orient);
+                g2d.drawImage(yellowRobotImg, pos[0] - ROBOT_RADIUS_PIXELS, pos[1] - ROBOT_RADIUS_PIXELS, this);
+                //g2d.rotate(-orient);
+                g2d.setColor(Color.WHITE);
+                g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
             }
-
+            
             for (int i = 0; i < 6; i++) {
                 int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
-                int radius = (int) (ROBOT_RADIUS * SCALE);
-                g2d.setColor(Color.BLUE);
-                g2d.fillOval(pos[0] - radius, pos[1] - radius, radius * 2, radius * 2);
+                //double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
+                //g2d.rotate(orient);
+                g2d.drawImage(blueRobotImg, pos[0] - ROBOT_RADIUS_PIXELS, pos[1] - ROBOT_RADIUS_PIXELS, this);
+                //g2d.rotate(-orient);
                 g2d.setColor(Color.WHITE);
-                g2d.drawString(Integer.toString(i), pos[0], pos[1]);
+                g2d.drawString(Integer.toString(i), pos[0], pos[1] - ROBOT_RADIUS_PIXELS * 2);
             }
-        } catch (Exception e) {
 
+            int[] ballPos = convert(DetectionData.get().getBallPos());
+            g2d.drawImage(ballImg, ballPos[0], ballPos[1], this);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
