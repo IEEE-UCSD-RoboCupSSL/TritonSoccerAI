@@ -184,7 +184,6 @@ public class Display extends JPanel {
         imgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
         imgY = des[1] - ImgLoader.desPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.desPoint, imgX, imgY, null);
-
     }
 
     private void paintInfo(Graphics2D g2d) {
