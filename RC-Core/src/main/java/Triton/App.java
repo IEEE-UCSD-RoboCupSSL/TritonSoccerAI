@@ -41,7 +41,7 @@ public class App {
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        //Display display = new Display();
+        Display display = new Display();
 
         ViewerServlet.offline = true;
         Server server = createServer(8980);
