@@ -1,5 +1,6 @@
 package Triton.Display;
 
+import Triton.Computation.Pathing;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.Shape.*;
@@ -19,10 +20,11 @@ import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 public class Display extends JPanel {
     private static final double SCALE = 1.0 / 10.0;
 
-    private static final int TARGET_FPS = 120;
+    private static final int TARGET_FPS = 60;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
     private static Field field;
+    private ArrayList<Vec2D> points;
 
     private JFrame frame;
     private static int windowWidth;
@@ -55,6 +57,19 @@ public class Display extends JPanel {
                 des[0] = e.getX();
                 des[1] = e.getY();
             }
+
+            ArrayList<Shape2D> obstacles = new ArrayList<Shape2D>();
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.YELLOW, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.BLUE, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+            points = Pathing.computePath(convert(start), convert(des), obstacles);
         }
     }
 
@@ -106,6 +121,12 @@ public class Display extends JPanel {
         int[] res = { (int) Math.round(v.x * SCALE + windowWidth / 2),
                 (int) Math.round(-v.y * SCALE + windowHeight / 2) };
         return res;
+    }
+
+    public Vec2D convert(int[] v) {
+        double x = ((double) v[0] - windowWidth / 2) / SCALE;
+        double y = ((double) v[1] - windowHeight / 2) / -SCALE;
+        return new Vec2D(x, y);
     }
 
     @Override
@@ -183,7 +204,13 @@ public class Display extends JPanel {
 
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke(2));
-        g2d.drawLine(start[0], start[1], des[0], des[1]);
+
+        if (points != null)
+            for (int i = 0; i < points.size() - 1; i++) {
+                int[] pointA = convert(points.get(i));
+                int[] pointB = convert(points.get(i + 1));
+                g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
+            }
     }
 
     private void paintInfo(Graphics2D g2d) {
