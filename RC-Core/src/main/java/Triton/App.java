@@ -43,7 +43,7 @@ public class App {
         //new Thread(new MCVision()).start();
         //Display display = new Display();
 
-        ViewerServlet.offline = true;
+        ViewerServlet.offline = false;
         Server server = createServer(8980);
         try {
             server.start();
