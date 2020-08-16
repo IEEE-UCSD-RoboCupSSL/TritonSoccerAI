@@ -61,12 +61,12 @@ public class Display extends JPanel {
             ArrayList<Shape2D> obstacles = new ArrayList<Shape2D>();
             for (int i = 0; i < 6; i++) {
                 Vec2D pos = DetectionData.get().getRobotPos(Team.YELLOW, i);
-                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
             for (int i = 0; i < 6; i++) {
                 Vec2D pos = DetectionData.get().getRobotPos(Team.BLUE, i);
-                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
             points = Pathing.computePathVectorField(convert(start), convert(des), obstacles);
@@ -195,7 +195,7 @@ public class Display extends JPanel {
 
     private void paintPath(Graphics2D g2d) {
         g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke((int) (ObjectParams.ROBOT_RADIUS * DisplayParams.SCALE)));
+        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS * DisplayConfig.SCALE)));
 
         if (points != null) {
             for (int i = 0; i < points.size() - 1; i++) {
