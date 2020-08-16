@@ -34,9 +34,9 @@ public class Pathing {
             Vec2D force = new Vec2D(0, 0);
             for (Shape2D shape : obstacles) {
                 Circle2D circle = (Circle2D) shape;
-                force = force.add(getPushForce(pos, circle.center, 7000000));
+                force = force.add(getPushForce(pos, circle.center, PathingConfig.PUSH_STRENGTH));
             }
-            force = force.add(getPullForce(pos, des, 50));
+            force = force.add(getPullForce(pos, des, PathingConfig.PULL_STRENGTH));
             pos = pos.add(force);
             points.add(pos);
         }
