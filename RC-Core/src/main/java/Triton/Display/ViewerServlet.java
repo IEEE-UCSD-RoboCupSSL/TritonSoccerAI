@@ -2,7 +2,6 @@ package Triton.Display;
 
 import java.util.HashMap;
 
-import Triton.MoveTo.*;
 import Triton.Geometry.*;
 import Triton.Detection.*;
 import Triton.Shape.Vec2D;
@@ -86,7 +85,6 @@ public class ViewerServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         DetectionData detection;
-        MoveToData moveTo = new MoveToData(Team.BLUE, 1, new Vec2D(0, 0));
         Field field;
         PrintWriter out = null;
         String json;
@@ -95,14 +93,7 @@ public class ViewerServlet extends HttpServlet {
         while(true) {
             try {
                 json = "{";
-                if (offline) {
-                    if (MoveToData.get() == moveTo) continue;
-                    moveTo = MoveToData.get();
-                    json += "\"team\": \"" + moveTo.getTeam() + "\",";
-                    json += "\"ID\": " + moveTo.getID() + ",";
-                    json += "\"desX\": " + moveTo.getDes().x + ",";
-                    json += "\"desY\": " + moveTo.getDes().y + "}";
-                } else if (!geoSent) {
+                if (!geoSent) {
                     field = GeometryData.get().getField();
                     
                     json += "\"lines\": {";
