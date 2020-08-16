@@ -54,7 +54,6 @@
 		<button id="start" onclick="start()">Start</button>
 		<button id="stop" onclick="stop()">Stop</button>
 		<button id="clear" onclick="paint_field()">Clear</button>
-		<button id="load" onclick="load_default()">Load</button>
 	</div>
 
 	<script>
@@ -71,10 +70,10 @@
 
 		var default_detection = JSON.parse('{"y0":{"x":"828px","y":"239px","o":"3.142rad"},"b0":{"x":"428px","y":"239px","o":"-0.000rad"},"y1":{"x":"828px","y":"388px","o":"-3.142rad"},"b1":{"x":"428px","y":"388px","o":"0.000rad"},"y2":{"x":"828px","y":"537px","o":"3.142rad"},"b2":{"x":"428px","y":"537px","o":"-0.000rad"},"y3":{"x":"701px","y":"388px","o":"-3.142rad"},"b3":{"x":"555px","y":"388px","o":"0.000rad"},"y4":{"x":"961px","y":"388px","o":"-3.142rad"},"b4":{"x":"295px","y":"388px","o":"0.000rad"},"y5":{"x":"1108px","y":"388px","o":"3.142rad"},"b5":{"x":"148px","y":"388px","o":"-0.000rad"},"ball":{"x":"637px","y":"397px"}}');
 
-		function load_default() {
+		window.onload = function() {
 			handleMsg(default_geometry);
 			handleMsg(default_detection);
-		}
+		};
 
 		function update(img, robot) {
 			img.style.left = robot.x;
@@ -121,9 +120,24 @@
 		}
 
 		function handleMsg(v) {
-			if (!("y0" in v)) { // Geometry data
+			if ("lines" in v) { // Geometry data
 				geometry = v;
 				paint_field();
+				return;
+			}
+
+			if ("team" in v) { // MoveTo data
+				var robot = "";
+				if (v.team === "YELLOW") {
+					robot += "y";
+				} else {
+					robot += "b";
+				}
+				robot += v.ID;
+				console.log(robot);
+				robot = document.getElementById(robot);
+				robot.style.left = v.desX;
+				robot.style.top  = v.desY;
 				return;
 			}
 

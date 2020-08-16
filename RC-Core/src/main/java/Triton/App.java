@@ -3,6 +3,7 @@ package Triton;
 import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
+import Triton.MoveTo.MoveToPublisher;
 import Triton.RemoteStation.*;
 import Triton.Display.*;
 
@@ -35,12 +36,14 @@ public class App {
         new Thread(new VisionConnection("224.5.23.3", 10020)).start();
         new Thread(new GeometryPublisher()).start();
         new Thread(new DetectionPublisher()).start();
+        new Thread(new MoveToPublisher()).start();
         //new Thread(new PosSubscriber()).start();
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        Display display = new Display();
+        //Display display = new Display();
 
+        ViewerServlet.offline = true;
         Server server = createServer(8980);
         try {
             server.start();
