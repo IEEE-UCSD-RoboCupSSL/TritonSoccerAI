@@ -1,40 +1,38 @@
 package Triton.Display;
 
+import Triton.Computation.Pathing;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.Shape.*;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.util.*;
 import java.util.Timer;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+
 import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 
 public class Display extends JPanel {
     private static final double SCALE = 1.0 / 10.0;
-    private static final double ROBOT_RADIUS = 90;
-    private static final int ROBOT_RADIUS_PIXELS = (int) (ROBOT_RADIUS * SCALE);
-    private static final double BALL_RADIUS = 50;
-    private static final int BALL_RADIUS_PIXELS = (int) (BALL_RADIUS * SCALE);
-    private static final int ROBOT_OUTLINE_THICKNESS = 1;
-    private static final int BALL_OUTLINE_THICKNESS = 1;
 
-    private static final int TARGET_FPS = 120;
+    private static final int TARGET_FPS = 60;
     private static final long UPDATE_DELAY = 1000 / TARGET_FPS; // ms
 
-    private static int windowWidth;
-    private static int windowHeight;
     private static Field field;
+    private ArrayList<Vec2D> points;
 
     private JFrame frame;
+    private static int windowWidth;
+    private static int windowHeight;
 
-    private BufferedImage yellowRobotImg;
-    private BufferedImage blueRobotImg;
-    private BufferedImage ballImg;
     private long lastPaint;
+    private int[] start = { 0, 0 };
+    private int[] des = { 0, 0 };
 
     private class RepaintTask extends TimerTask {
         private Display display;
@@ -49,13 +47,48 @@ public class Display extends JPanel {
         }
     }
 
+    private class DisplayMouseInputAdapter extends MouseInputAdapter {
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                start[0] = e.getX();
+                start[1] = e.getY();
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                des[0] = e.getX();
+                des[1] = e.getY();
+            }
+
+            ArrayList<Shape2D> obstacles = new ArrayList<Shape2D>();
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.YELLOW, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.BLUE, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+            points = Pathing.computePathVectorField(convert(start), convert(des), obstacles);
+        }
+    }
+
     public Display() {
         super();
+        ImgLoader.loadImages();
+
+        addMouseListener(new DisplayMouseInputAdapter());
+
+        Box box = new Box(BoxLayout.Y_AXIS);
+        box.add(Box.createVerticalGlue());
+        box.add(this);
+        box.add(Box.createVerticalGlue());
+
         frame = new JFrame("Display");
-        frame.add(this);
+        frame.add(box);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         setBackground(Color.decode("#153131"));
-        loadImages();
         start();
     }
 
@@ -73,66 +106,46 @@ public class Display extends JPanel {
             }
         }
 
-        frame.setSize(windowWidth, windowHeight);
+        Dimension dimension = new Dimension(windowWidth, windowHeight);
+        setPreferredSize(dimension);
+        setMinimumSize(dimension);
+        setMaximumSize(dimension);
+        frame.pack();
         frame.setVisible(true);
 
         Timer repaintTimer = new Timer();
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, UPDATE_DELAY);
     }
 
-    private void loadImages() {
-        yellowRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
-                (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D yellowRobotGraphics = (Graphics2D) yellowRobotImg.getGraphics();
-        yellowRobotGraphics.setColor(Color.decode("#ff8c00"));
-        yellowRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        yellowRobotGraphics.setColor(Color.BLACK);
-        yellowRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2, ROBOT_RADIUS_PIXELS,
-                ROBOT_RADIUS_PIXELS);
-
-        yellowRobotGraphics.setColor(Color.WHITE);
-        yellowRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
-        yellowRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        yellowRobotGraphics.drawOval(ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2, ROBOT_RADIUS_PIXELS,
-                ROBOT_RADIUS_PIXELS);
-
-        blueRobotImg = new BufferedImage((ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2,
-                (ROBOT_RADIUS_PIXELS + ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D blueRobotGraphics = (Graphics2D) blueRobotImg.getGraphics();
-        blueRobotGraphics.setColor(Color.decode("#004FFF"));
-        blueRobotGraphics.fillOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        blueRobotGraphics.setColor(Color.BLACK);
-        blueRobotGraphics.fillOval(ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2, ROBOT_RADIUS_PIXELS,
-                ROBOT_RADIUS_PIXELS);
-
-        blueRobotGraphics.setColor(Color.WHITE);
-        blueRobotGraphics.setStroke(new BasicStroke(ROBOT_OUTLINE_THICKNESS));
-        blueRobotGraphics.drawOval(0, 0, ROBOT_RADIUS_PIXELS * 2, ROBOT_RADIUS_PIXELS * 2);
-        blueRobotGraphics.drawOval(ROBOT_RADIUS_PIXELS, ROBOT_RADIUS_PIXELS / 2, ROBOT_RADIUS_PIXELS,
-                ROBOT_RADIUS_PIXELS);
-
-        ballImg = new BufferedImage((BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2,
-                (BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D ballGraphics = (Graphics2D) ballImg.getGraphics();
-        ballGraphics.setColor(Color.decode("#FF007F"));
-        ballGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
-
-        ballGraphics.setColor(Color.WHITE);
-        ballGraphics.setStroke(new BasicStroke(BALL_OUTLINE_THICKNESS));
-        ballGraphics.drawOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
-    }
-
     public int[] convert(Vec2D v) {
-        int[] res = { (int) (v.x * SCALE + windowWidth / 2), (int) (-v.y * SCALE + windowHeight / 2) };
+        int[] res = { (int) Math.round(v.x * SCALE + windowWidth / 2),
+                (int) Math.round(-v.y * SCALE + windowHeight / 2) };
         return res;
     }
 
+    public Vec2D convert(int[] v) {
+        double x = ((double) v[0] - windowWidth / 2) / SCALE;
+        double y = ((double) v[1] - windowHeight / 2) / -SCALE;
+        return new Vec2D(x, y);
+    }
+
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void paint(Graphics g) {
+        super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        paintGeo(g2d);
+        paintObjects(g2d);
+        paintPath(g2d);
+        paintInfo(g2d);
+
+        lastPaint = System.currentTimeMillis();
+    }
+
+    private void paintGeo(Graphics2D g2d) {
         field.lineSegments.forEach((name, line) -> {
+            if (name.equals("CenterLine"))
+                return;
             int[] p1 = convert(line.p1);
             int[] p2 = convert(line.p2);
             g2d.setColor(Color.WHITE);
@@ -147,43 +160,70 @@ public class Display extends JPanel {
             g2d.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2,
                     (int) Math.toDegrees(arc.getA1()), (int) Math.toDegrees(arc.getA2()));
         }
+    }
 
+    private void paintObjects(Graphics2D g2d) {
         for (int i = 0; i < 6; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
-            int imgX = pos[0] - yellowRobotImg.getWidth() / 2;
-            int imgY = pos[1] - yellowRobotImg.getHeight() / 2;
             double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
-            AffineTransform backup = g2d.getTransform();
-            AffineTransform a = AffineTransform.getRotateInstance(orient, pos[0], pos[1]);
-            g2d.setTransform(a);
-            g2d.drawImage(yellowRobotImg, imgX, imgY, null);
-            g2d.setTransform(backup);
+            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
+                    ImgLoader.yellowRobot.getWidth() / 2);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+            int imgX = pos[0] - ImgLoader.yellowRobot.getWidth() / 2;
+            int imgY = pos[1] - ImgLoader.yellowRobot.getHeight() / 2;
+            g2d.drawImage(op.filter(ImgLoader.yellowRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
             g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - 25);
         }
 
         for (int i = 0; i < 6; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
-            int imgX = pos[0] - blueRobotImg.getWidth() / 2;
-            int imgY = pos[1] - blueRobotImg.getHeight() / 2;
             double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
-            AffineTransform backup = g2d.getTransform();
-            AffineTransform a = AffineTransform.getRotateInstance(orient, pos[0], pos[1]);
-            g2d.setTransform(a);
-            g2d.drawImage(blueRobotImg, imgX, imgY, null);
-            g2d.setTransform(backup);
+            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
+                    ImgLoader.blueRobot.getWidth() / 2);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+            int imgX = pos[0] - ImgLoader.blueRobot.getWidth() / 2;
+            int imgY = pos[1] - ImgLoader.blueRobot.getHeight() / 2;
+            g2d.drawImage(op.filter(ImgLoader.blueRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
             g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - 25);
         }
 
         int[] ballPos = convert(DetectionData.get().getBallPos());
-        g2d.drawImage(ballImg, ballPos[0], ballPos[1], null);
+        g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
+    }
 
-        g2d.drawString("LAST UPDATE: " + (System.currentTimeMillis() - lastPaint) + " ms", 50, windowHeight - 70);
+    private void paintPath(Graphics2D g2d) {
+        g2d.setColor(Color.YELLOW);
+        g2d.setStroke(new BasicStroke((int) (ObjectParams.ROBOT_RADIUS * DisplayParams.SCALE)));
+
+        if (points != null) {
+            for (int i = 0; i < points.size() - 1; i++) {
+                int[] pointA = convert(points.get(i));
+                int[] pointB = convert(points.get(i + 1));
+                g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
+            }
+        }
+
+        int startImgX = start[0] - ImgLoader.startPoint.getWidth() / 2;
+        int startImgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
+        g2d.drawImage(ImgLoader.startPoint, startImgX, startImgY, null);
+
+        int desImgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
+        int desImgY= des[1] - ImgLoader.desPoint.getHeight() / 2;
+        g2d.drawImage(ImgLoader.desPoint, desImgX, desImgY, null);
+    }
+
+    private void paintInfo(Graphics2D g2d) {
+        g2d.setColor(Color.WHITE);
+
+        g2d.drawString(String.format("START POS: (%d, %d)", start[0], start[1]), 50, 50);
+        g2d.drawString(String.format("DES POS: (%d, %d)", des[0], des[1]), 50, 70);
+
         g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
                 windowHeight - 70);
         g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
                 windowHeight - 50);
-        lastPaint = System.currentTimeMillis();
     }
+
 }
