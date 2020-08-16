@@ -194,16 +194,8 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
-        int imgX = start[0] - ImgLoader.startPoint.getWidth() / 2;
-        int imgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
-        g2d.drawImage(ImgLoader.startPoint, imgX, imgY, null);
-
-        imgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
-        imgY = des[1] - ImgLoader.desPoint.getHeight() / 2;
-        g2d.drawImage(ImgLoader.desPoint, imgX, imgY, null);
-
         g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke(2));
+        g2d.setStroke(new BasicStroke((int) (ObjectParams.ROBOT_RADIUS * DisplayParams.SCALE)));
 
         if (points != null) {
             for (int i = 0; i < points.size() - 1; i++) {
@@ -212,6 +204,14 @@ public class Display extends JPanel {
                 g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
             }
         }
+
+        int startImgX = start[0] - ImgLoader.startPoint.getWidth() / 2;
+        int startImgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
+        g2d.drawImage(ImgLoader.startPoint, startImgX, startImgY, null);
+
+        int desImgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
+        int desImgY= des[1] - ImgLoader.desPoint.getHeight() / 2;
+        g2d.drawImage(ImgLoader.desPoint, desImgX, desImgY, null);
     }
 
     private void paintInfo(Graphics2D g2d) {
