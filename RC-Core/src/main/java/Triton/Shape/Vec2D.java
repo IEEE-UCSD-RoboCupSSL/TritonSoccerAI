@@ -26,12 +26,22 @@ public class Vec2D {
         return new Vec2D(this.x * z, this.y * z);
     }
 
-    void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    String getName() {
+    public String getName() {
         return this.name;
+    }
+
+    public double getAngle() {
+        return Math.atan(this.y / this.x);
+    }
+
+    public Vec2D rotate(double angle) {
+        double newX = Math.cos(angle) * x + -Math.sin(angle) * y;
+        double newY = Math.sin(angle) * x + Math.cos(angle) * y;
+        return new Vec2D(newX, newY);
     }
 
     public double mag() {
@@ -47,6 +57,12 @@ public class Vec2D {
         double diffX2 = Math.pow((v2.x - v1.x), 2);
         double diffY2 = Math.pow((v2.y - v1.y), 2);
         return Math.pow(diffX2 + diffY2, 0.5);
+    }
+
+    public static double dist2(Vec2D v1, Vec2D v2) {
+        double diffX2 = Math.pow((v2.x - v1.x), 2);
+        double diffY2 = Math.pow((v2.y - v1.y), 2);
+        return diffX2 + diffY2;
     }
 
     @Override

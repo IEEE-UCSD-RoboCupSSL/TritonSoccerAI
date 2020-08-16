@@ -69,7 +69,7 @@ public class Display extends JPanel {
                 Circle2D obstacle = new Circle2D(pos, ObjectParams.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
-            points = Pathing.computePath(convert(start), convert(des), obstacles);
+            points = Pathing.computePathVectorField(convert(start), convert(des), obstacles);
         }
     }
 
@@ -205,12 +205,13 @@ public class Display extends JPanel {
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke(2));
 
-        if (points != null)
+        if (points != null) {
             for (int i = 0; i < points.size() - 1; i++) {
                 int[] pointA = convert(points.get(i));
                 int[] pointB = convert(points.get(i + 1));
                 g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
             }
+        }
     }
 
     private void paintInfo(Graphics2D g2d) {
