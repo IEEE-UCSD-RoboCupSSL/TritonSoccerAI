@@ -123,7 +123,7 @@ public class Display extends JPanel {
     }
 
     public int[] convert(Vec2D v) {
-        int[] res = { (int) (v.x * SCALE + windowWidth / 2), (int) (-v.y * SCALE + windowHeight / 2) };
+        int[] res = { (int) Math.round(v.x * SCALE + windowWidth / 2), (int) Math.round(-v.y * SCALE + windowHeight / 2) };
         return res;
     }
 
@@ -150,12 +150,12 @@ public class Display extends JPanel {
 
         for (int i = 0; i < 6; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
-            int imgX = pos[0] - yellowRobotImg.getWidth() / 2;
-            int imgY = pos[1] - yellowRobotImg.getHeight() / 2;
             double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
             AffineTransform backup = g2d.getTransform();
             AffineTransform a = AffineTransform.getRotateInstance(orient, pos[0], pos[1]);
             g2d.setTransform(a);
+            int imgX = pos[0] - yellowRobotImg.getWidth() / 2;
+            int imgY = pos[1] - yellowRobotImg.getHeight() / 2;
             g2d.drawImage(yellowRobotImg, imgX, imgY, null);
             g2d.setTransform(backup);
             g2d.setColor(Color.WHITE);
@@ -164,12 +164,12 @@ public class Display extends JPanel {
 
         for (int i = 0; i < 6; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
-            int imgX = pos[0] - blueRobotImg.getWidth() / 2;
-            int imgY = pos[1] - blueRobotImg.getHeight() / 2;
             double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
             AffineTransform backup = g2d.getTransform();
             AffineTransform a = AffineTransform.getRotateInstance(orient, pos[0], pos[1]);
             g2d.setTransform(a);
+            int imgX = pos[0] - blueRobotImg.getWidth() / 2;
+            int imgY = pos[1] - blueRobotImg.getHeight() / 2;
             g2d.drawImage(blueRobotImg, imgX, imgY, null);
             g2d.setTransform(backup);
             g2d.setColor(Color.WHITE);
