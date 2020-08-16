@@ -182,7 +182,7 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.desPoint, imgX, imgY, null);
 
         g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(2));
         g2d.drawLine(start[0], start[1], des[0], des[1]);
     }
 

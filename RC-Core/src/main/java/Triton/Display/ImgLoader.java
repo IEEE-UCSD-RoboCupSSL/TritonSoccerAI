@@ -62,7 +62,7 @@ public class ImgLoader {
         startPoint = new BufferedImage((BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2,
                 (BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D startPointGraphics = (Graphics2D) startPoint.getGraphics();
-        startPointGraphics.setColor(Color.RED);
+        startPointGraphics.setColor(Color.GRAY);
         startPointGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
 
         startPointGraphics.setColor(Color.WHITE);
@@ -72,7 +72,7 @@ public class ImgLoader {
         desPoint = new BufferedImage((BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2,
                 (BALL_RADIUS_PIXELS + BALL_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D desPointGraphics = (Graphics2D) desPoint.getGraphics();
-        desPointGraphics.setColor(Color.GREEN);
+        desPointGraphics.setColor(Color.RED);
         desPointGraphics.fillOval(0, 0, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
 
         desPointGraphics.setColor(Color.WHITE);
