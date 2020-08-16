@@ -57,4 +57,17 @@ public class MoveToData extends AbstractData {
         MsgChannel.publish("MoveTo", data);
     }
 
+    @Override
+    public boolean equals(Object o) { 
+        if (o == this) { 
+            return true; 
+        } 
+        if (!(o instanceof MoveToData)) { 
+            return false; 
+        } 
+        MoveToData m = (MoveToData) o; 
+        return this.team == m.team && this.ID == m.ID && 
+               this.des.x == m.des.x && this.des.y == m.des.y;
+    } 
+
 }

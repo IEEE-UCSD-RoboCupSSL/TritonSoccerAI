@@ -72,7 +72,7 @@ public class Robot {
         SortedDetection secondLatest = detections.get(detections.size() - 2);
         double dt = (latest.time - secondLatest.time) * 1000; 
         if (dt > 0) {
-            vel = latest.getPos().subtract(secondLatest.getPos()).multiply(1 / dt);
+            vel = latest.getPos().sub(secondLatest.getPos()).mult(1 / dt);
             angVel = (latest.detection.getOrientation() - secondLatest.detection.getOrientation()) / dt;
         }
     }
