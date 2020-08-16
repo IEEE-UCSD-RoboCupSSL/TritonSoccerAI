@@ -2,10 +2,9 @@ package Triton.Display;
 
 import java.util.HashMap;
 
-import Triton.Geometry.Field;
-import Triton.Geometry.GeometryData;
-import Triton.Detection.DetectionData;
-import Triton.Detection.Team;
+import Triton.MoveTo.*;
+import Triton.Geometry.*;
+import Triton.Detection.*;
 import Triton.Shape.Vec2D;
 import Triton.Shape.Line2D;
 
@@ -28,7 +27,8 @@ public class ViewerServlet extends HttpServlet {
     public static final int ROBOT_RADIUS = 12;
     public static final int BALL_RADIUS = 3;
     public static final int ROBOT_COUNT = 6;
-    
+    public static boolean offline;
+
 	private static double convert_x(double x) {
 		return x * SCALE + WINDOW_WIDTH / 2;
 	}
@@ -86,6 +86,7 @@ public class ViewerServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         DetectionData detection;
+        MoveToData moveTo;
         Field field;
         PrintWriter out = null;
         String json;
@@ -94,7 +95,13 @@ public class ViewerServlet extends HttpServlet {
         while(true) {
             try {
                 json = "{";
-                if (!geoSent) {
+                if (offline) {
+                    moveTo = MoveToData.get();
+                    json += "\"team\": " + moveTo.getTeam() + ",";
+                    json += "\"id\": " + moveTo.getID() + ",";
+                    json += "\"desX\"" + moveTo.getDes().x + ",";
+                    json += "\"desY\"" + moveTo.getDes().y + "}";
+                } else if (!geoSent) {
                     field = GeometryData.get().getField();
                     
                     json += "\"lines\": {";

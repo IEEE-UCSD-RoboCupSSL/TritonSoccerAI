@@ -1,140 +1,147 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Trajectory Viewer</title>
-    <link rel="stylesheet" href="./style.css">
+	<meta charset="UTF-8">
+	<title>Trajectory Viewer</title>
+	<link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
-    <div class="center" style="width:1280px; height:800px;">
-    	<div id="y0" style="position:absolute">
-    		<img src="img/robot/y0.png">
-    	</div>
-    	<div id="y1" style="position:absolute">
-    		<img src="img/robot/y1.png">
-    	</div>
-    	<div id="y2" style="position:absolute">
-    		<img src="img/robot/y2.png">
-    	</div>
-    	<div id="y3" style="position:absolute">
-    		<img src="img/robot/y3.png">
-    	</div>
-    	<div id="y4" style="position:absolute">
-    		<img src="img/robot/y4.png">
-    	</div>
-    	<div id="y5" style="position:absolute">
-    		<img src="img/robot/y5.png">
-    	</div>
-    	<div id="b0" style="position:absolute">
-    		<img src="img/robot/b0.png">
-    	</div>
-    	<div id="b1" style="position:absolute">
-    		<img src="img/robot/b1.png">
-    	</div>
-    	<div id="b2" style="position:absolute">
-    		<img src="img/robot/b2.png">
-    	</div>
-    	<div id="b3" style="position:absolute">
-    		<img src="img/robot/b3.png">
-    	</div>
-    	<div id="b4" style="position:absolute">
-    		<img src="img/robot/b4.png">
-    	</div>
-    	<div id="b5" style="position:absolute">
-    		<img src="img/robot/b5.png">
-    	</div>
+	<div class="center" style="width:1280px; height:800px;">
+		<div id="y0" style="position:absolute">
+			<img src="img/robot/y0.png">
+		</div>
+		<div id="y1" style="position:absolute">
+			<img src="img/robot/y1.png">
+		</div>
+		<div id="y2" style="position:absolute">
+			<img src="img/robot/y2.png">
+		</div>
+		<div id="y3" style="position:absolute">
+			<img src="img/robot/y3.png">
+		</div>
+		<div id="y4" style="position:absolute">
+			<img src="img/robot/y4.png">
+		</div>
+		<div id="y5" style="position:absolute">
+			<img src="img/robot/y5.png">
+		</div>
+		<div id="b0" style="position:absolute">
+			<img src="img/robot/b0.png">
+		</div>
+		<div id="b1" style="position:absolute">
+			<img src="img/robot/b1.png">
+		</div>
+		<div id="b2" style="position:absolute">
+			<img src="img/robot/b2.png">
+		</div>
+		<div id="b3" style="position:absolute">
+			<img src="img/robot/b3.png">
+		</div>
+		<div id="b4" style="position:absolute">
+			<img src="img/robot/b4.png">
+		</div>
+		<div id="b5" style="position:absolute">
+			<img src="img/robot/b5.png">
+		</div>
 		<div id="ball" style="position:absolute">
-    		<img src="img/ball.png">
-    	</div>
-    	<canvas id="canvas" width="1280" height="800"></canvas>
+			<img src="img/ball.png">
+		</div>
+		<canvas id="canvas" width="1280" height="800"></canvas>
 	</div>
 	<div class="center">
-    	<button id="start" onclick="start()">Start</button>
+		<button id="start" onclick="start()">Start</button>
 		<button id="stop" onclick="stop()">Stop</button>
 		<button id="clear" onclick="paint_field()">Clear</button>
-    </div>
+		<button id="load" onclick="load_default()">Load</button>
+	</div>
 
-<script>
-    var eventSource = null;
-    
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const ROBOT_RADIUS = 12;
-    
-	var geometry = null;
-    var last_v = null;
-    
-  	function update(img, robot) {
-  		img.style.left = robot.x;
-  		img.style.top  = robot.y;
-  		img.style.transform = "rotate(" + robot.o + ")";
-  	}
+	<script>
+		var eventSource = null;
 
-	function paint_ball(img, ball) {
-  		img.style.left = ball.x;
-  		img.style.top  = ball.y;
-	}
+		const canvas = document.getElementById("canvas");
+		const ctx = canvas.getContext("2d");
+		const ROBOT_RADIUS = 12;
 
-	function paint_field() {
-		ctx.clearRect(0, 0, 1280, 800);
-		ctx.fillStyle = "rgb(35, 72, 35)";
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		Object.keys(geometry.lines).forEach(function(key) {
+		var geometry = null;
+		var last_v = null;
+
+		var default_geometry = JSON.parse('{"lines": {"RightGoalDepthLine":{"x1":1265,"x2":1265,"y1":467,"y2":333},"LeftGoalTopLine":{"x1":41,"x2":15,"y1":333,"y2":333},"HalfwayLine":{"x1":640,"x2":640,"y1":799,"y2":1},"RightFieldLeftPenaltyStretch":{"x1":1239,"x2":1105,"y1":533,"y2":533},"LeftGoalDepthLine":{"x1":15,"x2":15,"y1":467,"y2":333},"TopTouchLine":{"x1":41,"x2":1239,"y1":1,"y2":1},"BottomTouchLine":{"x1":41,"x2":1239,"y1":799,"y2":799},"LeftGoalLine":{"x1":41,"x2":41,"y1":799,"y2":1},"RightFieldRightPenaltyStretch":{"x1":1239,"x2":1105,"y1":267,"y2":267},"LeftFieldRightPenaltyStretch":{"x1":41,"x2":175,"y1":533,"y2":533},"LeftPenaltyStretch":{"x1":174,"x2":174,"y1":533,"y2":267},"RightGoalLine":{"x1":1239,"x2":1239,"y1":799,"y2":1},"LeftFieldLeftPenaltyStretch":{"x1":41,"x2":175,"y1":267,"y2":267},"RightGoalTopLine":{"x1":1239,"x2":1265,"y1":333,"y2":333},"LeftGoalBottomLine":{"x1":41,"x2":15,"y1":467,"y2":467},"RightGoalBottomLine":{"x1":1239,"x2":1265,"y1":467,"y2":467},"RightPenaltyStretch":{"x1":1106,"x2":1106,"y1":533,"y2":267}}, "arcs": {"CenterCircle":{"x":640,"y":400,"r":66,"a1":0.000,"a2":6.283}}}');
+
+		var default_detection = JSON.parse('{"y0":{"x":"828px","y":"239px","o":"3.142rad"},"b0":{"x":"428px","y":"239px","o":"-0.000rad"},"y1":{"x":"828px","y":"388px","o":"-3.142rad"},"b1":{"x":"428px","y":"388px","o":"0.000rad"},"y2":{"x":"828px","y":"537px","o":"3.142rad"},"b2":{"x":"428px","y":"537px","o":"-0.000rad"},"y3":{"x":"701px","y":"388px","o":"-3.142rad"},"b3":{"x":"555px","y":"388px","o":"0.000rad"},"y4":{"x":"961px","y":"388px","o":"-3.142rad"},"b4":{"x":"295px","y":"388px","o":"0.000rad"},"y5":{"x":"1108px","y":"388px","o":"3.142rad"},"b5":{"x":"148px","y":"388px","o":"-0.000rad"},"ball":{"x":"637px","y":"397px"}}');
+
+		function load_default() {
+			handleMsg(default_geometry);
+			handleMsg(default_detection);
+		}
+
+		function update(img, robot) {
+			img.style.left = robot.x;
+			img.style.top = robot.y;
+			img.style.transform = "rotate(" + robot.o + ")";
+		}
+
+		function paint_ball(img, ball) {
+			img.style.left = ball.x;
+			img.style.top = ball.y;
+		}
+
+		function paint_field() {
+			ctx.clearRect(0, 0, 1280, 800);
+			ctx.fillStyle = "rgb(35, 72, 35)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			Object.keys(geometry.lines).forEach(function (key) {
+				ctx.beginPath();
+				ctx.strokeStyle = "white";
+				line = geometry.lines[key];
+				ctx.moveTo(line.x1, line.y1);
+				ctx.lineTo(line.x2, line.y2);
+				ctx.stroke();
+			});
+			Object.keys(geometry.arcs).forEach(function (key) {
+				ctx.beginPath();
+				ctx.strokeStyle = "white";
+				arc = geometry.arcs[key]
+				ctx.arc(arc.x, arc.y, arc.r, arc.a1, arc.a2);
+				ctx.stroke();
+			});
+		}
+
+		function draw_line(start, end, color) {
 			ctx.beginPath();
-			ctx.strokeStyle = "white";
-			line = geometry.lines[key];
-			ctx.moveTo(line.x1, line.y1);
-			ctx.lineTo(line.x2, line.y2);
+			ctx.strokeStyle = color;
+			ctx.moveTo(parseInt(start.x) + ROBOT_RADIUS, parseInt(start.y) + ROBOT_RADIUS);
+			ctx.lineTo(parseInt(end.x) + ROBOT_RADIUS, parseInt(end.y) + ROBOT_RADIUS);
 			ctx.stroke();
-		});
-		Object.keys(geometry.arcs).forEach(function(key) {
-			ctx.beginPath();
-			ctx.strokeStyle = "white";
-			arc = geometry.arcs[key]
-			ctx.arc(arc.x, arc.y, arc.r, arc.a1, arc.a2);
-			ctx.stroke();
-		});
-	}
+		}
 
-	function draw_line(start, end, color) {
-		ctx.beginPath();
-		ctx.strokeStyle = color;
-		ctx.moveTo(parseInt(start.x)+ROBOT_RADIUS, parseInt(start.y)+ROBOT_RADIUS);
-		ctx.lineTo(parseInt(end.x)+ROBOT_RADIUS, parseInt(end.y)+ROBOT_RADIUS);
-		ctx.stroke();
-	}
+		function stop() {
+			evtSource.close();
+		}
 
-	function stop() {
-		evtSource.close();
-	}
-
-    function start() {
-    	evtSource = new EventSource('/ViewerServlet');
-
-    	evtSource.addEventListener('message', (e) => {
-		    var v = JSON.parse(e.data);
-
+		function handleMsg(v) {
 			if (!("y0" in v)) { // Geometry data
 				geometry = v;
 				paint_field();
 				return;
 			}
 
-		    update(y0, v.y0);
-		    update(y1, v.y1);
-		    update(y2, v.y2);
-		    update(y3, v.y3);
-		    update(y4, v.y4);
-		    update(y5, v.y5);
-		    update(b0, v.b0);
-		    update(b1, v.b1);
-		    update(b2, v.b2);
-		    update(b3, v.b3);
-		    update(b4, v.b4);
-		    update(b5, v.b5);
+			update(y0, v.y0);
+			update(y1, v.y1);
+			update(y2, v.y2);
+			update(y3, v.y3);
+			update(y4, v.y4);
+			update(y5, v.y5);
+			update(b0, v.b0);
+			update(b1, v.b1);
+			update(b2, v.b2);
+			update(b3, v.b3);
+			update(b4, v.b4);
+			update(b5, v.b5);
 			paint_ball(ball, v.ball);
-		    
-		    if (last_v !== null) {
+
+			if (last_v !== null) {
 				draw_line(last_v.y0, v.y0, "yellow");
 				draw_line(last_v.y1, v.y1, "yellow");
 				draw_line(last_v.y2, v.y2, "yellow");
@@ -147,13 +154,20 @@
 				draw_line(last_v.b3, v.b3, "blue");
 				draw_line(last_v.b4, v.b4, "blue");
 				draw_line(last_v.b5, v.b5, "blue");
-		    }
-		    last_v = v;
-   		});
-    }
-</script>
+			}
+			last_v = v;
+		}
+
+
+		function start() {
+			evtSource = new EventSource('/ViewerServlet');
+			evtSource.onmessage = function(e) {
+				var v = JSON.parse(e.data);
+				handleMsg(v);
+			}
+		}
+	</script>
 
 </body>
+
 </html>
-
-
