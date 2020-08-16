@@ -173,10 +173,6 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
-        g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke(3));
-        g2d.drawLine(start[0], start[1], des[0], des[1]);
-
         int imgX = start[0] - ImgLoader.startPoint.getWidth() / 2;
         int imgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.startPoint, imgX, imgY, null);
@@ -184,6 +180,10 @@ public class Display extends JPanel {
         imgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
         imgY = des[1] - ImgLoader.desPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.desPoint, imgX, imgY, null);
+
+        g2d.setColor(Color.YELLOW);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawLine(start[0], start[1], des[0], des[1]);
     }
 
     private void paintInfo(Graphics2D g2d) {
