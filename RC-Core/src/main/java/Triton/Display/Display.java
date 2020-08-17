@@ -1,5 +1,7 @@
 package Triton.Display;
 
+import Triton.Config.ObjectConfig;
+import Triton.Config.DisplayConfig;
 import Triton.Computation.Pathing;
 import Triton.Detection.*;
 import Triton.Geometry.*;
@@ -32,7 +34,7 @@ public class Display extends JPanel {
 
     private long lastPaint;
     private int[] start = { 0, 0 };
-    private int[] des = { 0, 0 };
+    private int[] dest = { 0, 0 };
 
     private class RepaintTask extends TimerTask {
         private Display display;
@@ -54,8 +56,8 @@ public class Display extends JPanel {
                 start[0] = e.getX();
                 start[1] = e.getY();
             } else if (e.getButton() == MouseEvent.BUTTON3) {
-                des[0] = e.getX();
-                des[1] = e.getY();
+                dest[0] = e.getX();
+                dest[1] = e.getY();
             }
 
             ArrayList<Shape2D> obstacles = new ArrayList<Shape2D>();
@@ -69,7 +71,7 @@ public class Display extends JPanel {
                 Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
-            points = Pathing.computePathVectorField(convert(start), convert(des), obstacles);
+            points = Pathing.computePathVectorField(convert(start), convert(dest), obstacles);
         }
     }
 
@@ -209,8 +211,8 @@ public class Display extends JPanel {
         int startImgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.startPoint, startImgX, startImgY, null);
 
-        int desImgX = des[0] - ImgLoader.desPoint.getWidth() / 2;
-        int desImgY= des[1] - ImgLoader.desPoint.getHeight() / 2;
+        int desImgX = dest[0] - ImgLoader.desPoint.getWidth() / 2;
+        int desImgY= dest[1] - ImgLoader.desPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.desPoint, desImgX, desImgY, null);
     }
 
@@ -218,7 +220,7 @@ public class Display extends JPanel {
         g2d.setColor(Color.WHITE);
 
         g2d.drawString(String.format("START POS: (%d, %d)", start[0], start[1]), 50, 50);
-        g2d.drawString(String.format("DES POS: (%d, %d)", des[0], des[1]), 50, 70);
+        g2d.drawString(String.format("DES POS: (%d, %d)", dest[0], dest[1]), 50, 70);
 
         g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
                 windowHeight - 70);

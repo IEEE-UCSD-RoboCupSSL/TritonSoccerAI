@@ -1,5 +1,7 @@
 package Triton.Shape;
 
+import Proto.RemoteCommands;
+
 public class Vec2D {
     public double x, y;
     private String name;
@@ -10,8 +12,7 @@ public class Vec2D {
     }
 
     public Vec2D(Vec2D target) {
-        this.x = target.x;
-        this.y = target.y;
+        this(target.x, target.y);
     }
 
     public Vec2D add(Vec2D toAdd) {
@@ -70,5 +71,12 @@ public class Vec2D {
         String s = "";
         s += "<" + x + ", " + y + ">";
         return s;
+    }
+
+    public RemoteCommands.Vec2D toProto() {
+        RemoteCommands.Vec2D.Builder builder = RemoteCommands.Vec2D.newBuilder();
+        builder.setX(x);
+        builder.setY(y);
+        return builder.build();
     }
 }

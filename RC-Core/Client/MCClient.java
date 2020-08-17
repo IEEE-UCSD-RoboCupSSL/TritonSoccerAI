@@ -2,7 +2,7 @@ package Client;
 
 import java.io.*;
 import java.net.*;
-import Client.RemoteCommands.*;
+import Client.RemoteCommands.Remote_Detection;
   
 public class MCClient {
     public static final String MC_ADDR = "224.5.0.1";
@@ -28,7 +28,7 @@ public class MCClient {
             try {
                 socket.receive(pkt);
                 ByteArrayInputStream input = new ByteArrayInputStream(pkt.getData(), pkt.getOffset(), pkt.getLength());
-                Data_Send received = Data_Send.parseFrom(input);
+                Remote_Detection received = Remote_Detection.parseFrom(input);
                 System.out.println(received);
             } catch (Exception e) {
                 e.printStackTrace();

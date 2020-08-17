@@ -10,9 +10,12 @@ public class VisionData extends AbstractData {
     private SSL_DetectionFrame detectFrame;
     private SSL_GeometryData   geoData;
 
-    public VisionData() {}
+    public VisionData() {
+        super("Vision");
+    }
 
     public VisionData(SSL_DetectionFrame detectFrame, SSL_GeometryData geoData) {
+        super("Vision");
         lock.writeLock().lock();
         try {
             this.detectFrame = detectFrame;
@@ -60,9 +63,5 @@ public class VisionData extends AbstractData {
 
     public static VisionData get() {
         return (VisionData) MsgChannel.get("Vision");
-    }
-
-    public static void publish(VisionData data) {
-        MsgChannel.publish("Vision", data);
     }
 }

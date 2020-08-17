@@ -7,9 +7,13 @@ import Triton.DesignPattern.*;
 
 public class GeometryData extends AbstractData {
 
-    public List<SSL_GeometryCameraCalibration> cameras;
-    public Field field = new Field();
+    private List<SSL_GeometryCameraCalibration> cameras;
+    private Field field = new Field();
 
+    public GeometryData() {
+        super("Geometry");
+    }
+    
     public float getCameraQ0(int cameraID) {
         lock.readLock().lock();
         try {
@@ -57,9 +61,5 @@ public class GeometryData extends AbstractData {
     
     public static GeometryData get() {
         return (GeometryData) MsgChannel.get("Geometry");
-    }
-
-    public static void publish(GeometryData data) {
-        MsgChannel.publish("Geometry", data);
     }
 }

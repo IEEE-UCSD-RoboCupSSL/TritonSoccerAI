@@ -2,6 +2,7 @@ package Triton.Display;
 
 import java.util.HashMap;
 
+import Triton.Config.ObjectConfig;
 import Triton.Geometry.*;
 import Triton.Detection.*;
 import Triton.Shape.Vec2D;
@@ -25,8 +26,6 @@ public class ViewerServlet extends HttpServlet {
     public static final int WINDOW_HEIGHT = 800;
     public static final int ROBOT_RADIUS = 12;
     public static final int BALL_RADIUS = 3;
-    public static final int ROBOT_COUNT = 6;
-    public static boolean offline;
 
 	private static double convert_x(double x) {
 		return x * SCALE + WINDOW_WIDTH / 2;
@@ -115,7 +114,7 @@ public class ViewerServlet extends HttpServlet {
                     Vec2D  loc;
                     double ori;
     
-                    for(int i = 0; i < ROBOT_COUNT; i++) {
+                    for(int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
                         loc = detection.getRobotPos(Team.YELLOW, i);
                         ori = detection.getRobotOrient(Team.YELLOW, i);
                         json += "\"y" + i + "\":" + robotJson(loc, ori) + ",";

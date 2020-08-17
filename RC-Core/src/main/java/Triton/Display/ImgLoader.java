@@ -1,5 +1,7 @@
 package Triton.Display;
 
+import Triton.Config.DisplayConfig;
+
 import java.awt.*;
 import java.awt.image.*;
 

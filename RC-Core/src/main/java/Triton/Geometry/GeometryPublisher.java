@@ -7,12 +7,7 @@ import Triton.Vision.VisionData;
 
 public class GeometryPublisher implements Runnable {
 
-    GeometryData geometry;
-
-    public GeometryPublisher() {
-        geometry = new GeometryData();
-        GeometryData.publish(geometry);
-    }
+    GeometryData geometry = new GeometryData();
 
     public void run() {
         boolean isInit = false;
@@ -31,6 +26,7 @@ public class GeometryPublisher implements Runnable {
                 }
 
                 isInit = !geometry.getField().isEmpty();
+                geometry.publish();
             } catch (Exception e) {
                 // Do nothing
             }

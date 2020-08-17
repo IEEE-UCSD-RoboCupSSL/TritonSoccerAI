@@ -1,18 +1,28 @@
 package Triton.RemoteStation;
 
+import Triton.Shape.Vec2D;
+
 import java.util.Scanner;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashMap;
+
+import Proto.RemoteCommands.Move_To;
 
 public class UDPSend implements Runnable {
 
-    public HashMap<Boolean, HashMap<Integer, Integer>> ports; // Team: is YELLOW
+    private StationData data;
     private DatagramSocket socket;
 
-    public UDPSend(HashMap<Boolean, HashMap<Integer, Integer>> ports) {
-        this.ports = ports;
+    public UDPSend() {
+        while (true) {
+            try {
+                data = StationData.get();
+                break;
+            } catch (NullPointerException e) {
+                // do nothing 
+            }
+        }
         try {
             socket = new DatagramSocket();
         } catch (Exception e) {
@@ -23,34 +33,29 @@ public class UDPSend implements Runnable {
     public void run() {
         Scanner s = new Scanner(System.in);
         while (true) {
-            System.out.println("Enter a MoveTo Command: (format: TEAM ID CURR_LOC DEST_LOC DEST_VEL)");
-            boolean team = s.next().equals("YELLOW") ? true : false;
+            System.out.println("Enter a MoveTo Command: (format: ID DEST_LOC DEST_VEL)");
             int id = s.nextInt();
-            double posX = s.nextDouble();
-            double posY = s.nextDouble();
             double desX = s.nextDouble();
             double desY = s.nextDouble();
             double velX = s.nextDouble();
             double velY = s.nextDouble();
-            send(team, id, posX, posY, desX, desY, velX, velY);
+            send(id, desX, desY, velX, velY);
         }
     }
 
-    public void send(boolean team, int id, double posX, double posY, 
-                     double desX, double desY, double velX, double velY) {
-        int port = ports.get(team).get(id);
-
-        String msg = String.format("%s %d %f %f %f %f %f %f", team ? "YELLOW" : "BLUE", 
-            id, posX, posY, desX, desY, velX, velY);
-             
-        byte[] buf = msg.getBytes();
+    public void send(int id, double desX, double desY, double velX, double velY) {
+        int port = data.getPort(id);
+        
+        Move_To.Builder toSend = Move_To.newBuilder();
+        toSend.setDest(new Vec2D(desX, desY).toProto());
+        toSend.setVel(new Vec2D(velX, velY).toProto());
+        byte[] buf = toSend.build().toByteArray();
         
         try {
             DatagramPacket packet = new DatagramPacket(buf, buf.length, 
                 InetAddress.getByName("localhost"), port);
-
             socket.send(packet);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

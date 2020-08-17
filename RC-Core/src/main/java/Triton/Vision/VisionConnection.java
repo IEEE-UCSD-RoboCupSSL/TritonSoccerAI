@@ -1,5 +1,7 @@
 package Triton.Vision;
 
+import Triton.Config.ConnectionConfig;
+
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -9,20 +11,21 @@ import Proto.*;
 
 public class VisionConnection implements Runnable {
 
-    final static int MAX_BUFFER_SIZE = 10000000;
+    final static int MAX_BUFFER_SIZE = 67108864;
 
     private byte[] buffer;
     private MulticastSocket socket;
     private DatagramPacket  packet;
 
-    private VisionData vision;
+    private VisionData vision = new VisionData();;
 
     public boolean geoInit = false;
 
-    public VisionConnection(String ip, int port) {
-        vision = new VisionData();
-        VisionData.publish(vision);        
+    public VisionConnection() {
+        this(ConnectionConfig.GRSIM_MC_ADDR, ConnectionConfig.GRSIM_MC_PORT);
+    }
 
+    public VisionConnection(String ip, int port) {
         buffer = new byte[MAX_BUFFER_SIZE];
         try {
             socket = new MulticastSocket(port);
@@ -45,6 +48,7 @@ public class VisionConnection implements Runnable {
             
             vision.setDetection(SSLPacket.getDetection());
             vision.setGeometry(SSLPacket.getGeometry());
+            vision.publish();
         } catch (Exception e) {
             e.printStackTrace();
         }

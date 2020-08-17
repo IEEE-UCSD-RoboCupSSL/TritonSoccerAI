@@ -6,17 +6,13 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class DetectionPublisher implements Runnable {
 
-    DetectionData detect;
-
-    public DetectionPublisher() {
-        detect = new DetectionData();
-        DetectionData.publish(detect);
-    }
+    DetectionData detect = new DetectionData();
 
     public void run() {
         while (true) {
             try {
                 update(VisionData.get().getDetection());
+                detect.publish();
             } catch (Exception e) {
                 // Do nothing
             }

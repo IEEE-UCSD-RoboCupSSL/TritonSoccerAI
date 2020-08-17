@@ -1,61 +1,79 @@
 package Triton.RemoteStation;
 
+import Triton.Geometry.*;
+import Triton.Shape.*;
+import Triton.Config.ObjectConfig;
+import Triton.Config.ConnectionConfig;
+
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.Callable;
+
 import java.util.HashMap;
+import Proto.RemoteCommands.Remote_Geometry;
 
-public class TCPInit implements Callable<HashMap<Integer, Integer>> {
+public class TCPInit {
+    
+    private static byte[] geometry;
+    private static StationData data = new StationData();
 
-    public static HashMap<Integer, Integer> ports; // Team: is YELLOW
+    private static class TCPConnection implements Runnable {
+        
+        private int ID;
 
-    public static final int ROBOT_COUNT = 6;
-    public static final int TCP_INIT_PORT = 8901;
-
-    public TCPInit() {
-        ports = new HashMap<Integer, Integer>();
-
-        //ports.put(false, new HashMap<Integer, Integer>());
-        //ports.put(true,  new HashMap<Integer, Integer>());
-    }
-
-    public HashMap<Integer, Integer> call() {
-
-        try (ServerSocket serverSocket = new ServerSocket(TCP_INIT_PORT)) {
-            System.out.println("Server is listening on port " + TCP_INIT_PORT);
- 
-            while (ports.size() != ROBOT_COUNT) {
-                Socket socket = serverSocket.accept();
-
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-
-                /* Parsing incoming robot connection info */
-                String line = in.readLine();
-                String[] splitLine = line.split(",");
-                
-                int ID = Integer.parseInt(splitLine[0]);
-                int port = Integer.parseInt(splitLine[1]);
-
-                ports.put(ID, port);
-
-                System.out.printf("Robot %d listening to UDP commands on port: %d\n", 
-                    ID, port);
-                out.printf("Server will be sending UDP commands to robot %d on port: %d\n", 
-                    ID, port);
-                out.printf("GEOMETRY PROTOBUF\n");
-
-                out.close();
-                in.close();
-                socket.close();
-            }
-
-        } catch (IOException ex) {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();
+        public TCPConnection(int ID) {
+            this.ID = ID;
         }
 
-        return ports;
+        public void run() {
+            try {
+                System.out.println("Connecting to Robot " + this.ID + " ...");
+                Socket socket = new Socket("localhost", ConnectionConfig.TCP_PORTS[ID]);
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+
+                int ID = in.readInt();
+                int port = in.readInt();
+                data.putPort(ID, port);
+
+                System.out.println("Robot " + ID + " listening to UDP commands on TCP port: " + port);
+                out.writeChars("Station will be sending UDP commands to robot " + ID + " on port: " + port + "\n");
+                out.writeInt(geometry.length);
+                out.write(geometry);
+                
+                /* Retain active connection */
+                while (true) {
+                    in.read();
+                    out.writeChars("SERVER IS ACTIVE\n");
+                }
+            } catch (UnknownHostException ex) {
+                System.out.println("Server not found: " + ex.getMessage());
+            } catch (IOException ex) {
+                System.out.println("I/O error: " + ex.getMessage());
+            }
+        }
+    }
+
+    public static void init() {
+        Remote_Geometry.Builder toSend = Remote_Geometry.newBuilder();
+        while (true) {
+            try {
+                Field field = GeometryData.get().getField();
+                for (HashMap.Entry<String, Line2D> entry : field.lineSegments.entrySet()) {
+                    toSend.putLines(entry.getKey(), entry.getValue().toProto());
+                }
+                toSend.setCenterCircleRadius(field.arcList.get(0).getRadius());
+                break;
+            } catch (Exception e) {
+                // Geometry not ready, do nothing
+            }
+        }
+        geometry = toSend.build().toByteArray();
+
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            new Thread(new TCPConnection(i)).start();
+        }
+
+        while(data.getNumRobot() != ObjectConfig.ROBOT_COUNT);
+        data.publish();
     }
 }

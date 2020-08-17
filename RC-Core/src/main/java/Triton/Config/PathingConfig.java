@@ -1,4 +1,4 @@
-package Triton.Computation;
+package Triton.Config;
 
 public class PathingConfig {
     public static final double PUSH_STRENGTH = 4000000;

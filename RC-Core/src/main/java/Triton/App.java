@@ -1,5 +1,8 @@
 package Triton;
 
+import java.util.concurrent.*;
+import java.util.HashMap;
+
 import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
@@ -32,14 +35,31 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String args[]) {
-        new Thread(new VisionConnection("224.5.23.3", 10020)).start();
+        new Thread(new VisionConnection()).start();
         new Thread(new GeometryPublisher()).start();
         new Thread(new DetectionPublisher()).start();
+        TCPInit.init();
+        new Thread(new UDPSend()).start();
+        new Thread(new MCVision()).start();
+
+        while(true) {
+            try {
+                StationData data = StationData.get();
+                for(int i = 0; i < 6; i++) {
+                    System.out.println(i + ": " + data.getPort(i));
+                }
+                break;
+            } catch(NullPointerException e) {
+                // Do nothing 
+            }
+        }
+
+        //new Thread(new MCVision()).start();
         //new Thread(new PosSubscriber()).start();
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        Display display = new Display();
+        //Display display = new Display();
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
