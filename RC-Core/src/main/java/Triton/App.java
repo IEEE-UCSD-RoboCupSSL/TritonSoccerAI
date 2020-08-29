@@ -38,10 +38,10 @@ public class App {
         new Thread(new VisionConnection()).start();
         new Thread(new GeometryPublisher()).start();
         new Thread(new DetectionPublisher()).start();
-        TCPInit.init();
-        new Thread(new UDPSend()).start();
-        new Thread(new MCVision()).start();
-
+        //TCPInit.init();
+        //new Thread(new UDPSend()).start();
+        //new Thread(new MCVision()).start();
+        /*
         while(true) {
             try {
                 StationData data = StationData.get();
@@ -53,13 +53,14 @@ public class App {
                 // Do nothing 
             }
         }
+        */
 
         //new Thread(new MCVision()).start();
         //new Thread(new PosSubscriber()).start();
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        //Display display = new Display();
+        Display display = new Display();
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);

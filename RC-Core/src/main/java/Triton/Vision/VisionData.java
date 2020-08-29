@@ -37,7 +37,7 @@ public class VisionData extends AbstractData {
     public SSL_DetectionFrame getDetection() {
         lock.readLock().lock();
         try {
-            return this.detectFrame;
+            return detectFrame;
         } finally {
             lock.readLock().unlock();
         }

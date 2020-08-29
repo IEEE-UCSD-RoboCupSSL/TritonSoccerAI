@@ -4,6 +4,9 @@ import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.*;
 import Triton.Shape.Vec2D;
 import java.util.HashMap;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import java.util.ArrayList;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
@@ -115,7 +118,8 @@ public class DetectionData extends AbstractData {
     public void updateRobot(Team team, int ID, SSL_DetectionRobot detection, double time) {
         lock.writeLock().lock();
         try {
-            getRobot(team, ID).update(detection, time);
+            if (ID < ObjectConfig.ROBOT_COUNT)
+                getRobot(team, ID).update(detection, time);
         } finally {
             lock.writeLock().unlock();
         }
