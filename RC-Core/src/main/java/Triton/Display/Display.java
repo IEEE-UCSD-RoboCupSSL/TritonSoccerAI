@@ -165,7 +165,7 @@ public class Display extends JPanel {
     }
 
     private void paintObjects(Graphics2D g2d) {
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.YELLOW, i));
             double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
@@ -178,7 +178,7 @@ public class Display extends JPanel {
             g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - 25);
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             int[] pos = convert(DetectionData.get().getRobotPos(Team.BLUE, i));
             double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,

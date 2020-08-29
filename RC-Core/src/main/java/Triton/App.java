@@ -38,6 +38,8 @@ public class App {
         new Thread(new VisionConnection()).start();
         new Thread(new GeometryPublisher()).start();
         new Thread(new DetectionPublisher()).start();
+        Display display = new Display();
+
         //TCPInit.init();
         //new Thread(new UDPSend()).start();
         //new Thread(new MCVision()).start();
@@ -60,7 +62,6 @@ public class App {
         //new Thread(new VelSubscriber()).start();
         //new Thread(new RegionSubscriber()).start();
         //new Thread(new MCVision()).start();
-        Display display = new Display();
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);

@@ -27,8 +27,6 @@ public class DetectionPublisher implements Runnable {
             detect.updateBall(df.getBalls(0), time);
         }
         detect.updateTime(time);
-        System.out.println(df.getRobotsYellowList().size());
-        System.out.println(df.getRobotsBlueList().size());
         for (SSL_DetectionRobot r : df.getRobotsYellowList()) {
             detect.updateRobot(Team.YELLOW, r.getRobotId(), r, time);
         }

@@ -19,6 +19,18 @@ public class Line2D {
         p2 = new Vec2D(p2x, p2y);
     }
 
+    public double[] toEqn() {
+        double A = p1.y - p2.y;
+        double B = p2.x - p1.x;
+        double C = p1.x * p2.y - p2.x * p1.y;
+        return new double[] {A, B, C};
+    }
+
+    public double perpDist(Vec2D point) {
+        double[] eqn = toEqn();
+        return Math.abs((eqn[0] * point.x + eqn[1] * point.y + eqn[2]) / Math.sqrt(eqn[0] * eqn[0] + eqn[1] * eqn[1]));
+    }
+
     public Line2D(Line2D line) {
         p1 = line.p1;
         p2 = line.p2;
