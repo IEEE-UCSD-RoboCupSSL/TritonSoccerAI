@@ -201,7 +201,6 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
-        /*
         Grid grid = pathfinder.getGrid();
         Node[][] nodes = grid.getNodes();
         for (int row = 0; row < grid.getNumRows(); row++) {
@@ -216,10 +215,9 @@ public class Display extends JPanel {
                 }
             }
         }
-        */
 
         g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS * DisplayConfig.SCALE)));
+        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));
 
         if (path != null && !path.isEmpty()) {
             for (int i = 0; i < path.size() - 1; i++) {
