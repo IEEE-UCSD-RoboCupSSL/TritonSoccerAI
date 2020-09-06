@@ -2,6 +2,8 @@ package Triton.Computation.AStar;
 
 import java.util.ArrayList;
 
+import javax.lang.model.util.ElementScanner14;
+
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
@@ -26,7 +28,7 @@ public class Grid {
                 -row * PathfinderConfig.NODE_DIAMETER - PathfinderConfig.NODE_RADIUS + worldSizeY / 2);
     }
 
-    private int[] wordPosToGridPos(Vec2D worldPos) {
+    private int[] worldPosToGridPos(Vec2D worldPos) {
         int[] res = { (int) Math.round((worldSizeY / 2 - worldPos.y) / PathfinderConfig.NODE_DIAMETER - 0.5),
                 (int) Math.round((worldPos.x + worldSizeX / 2 - PathfinderConfig.NODE_RADIUS)
                         / PathfinderConfig.NODE_DIAMETER), };
@@ -34,7 +36,7 @@ public class Grid {
     }
 
     public Node nodeFromWorldPos(Vec2D worldPos) {
-        int[] gridPos = wordPosToGridPos(worldPos);
+        int[] gridPos = worldPosToGridPos(worldPos);
         return nodes[gridPos[0]][gridPos[1]];
     }
 
@@ -51,35 +53,56 @@ public class Grid {
     public void updateGrid(ArrayList<Circle2D> obstacles) {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                Vec2D nodeWorldPos = nodes[row][col].getWorldPos();
-                nodes[row][col].setWalkable(true);
-                if (nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
-                        + PathfinderConfig.SAFETY_DIST
-                        || nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.NODE_RADIUS - ObjectConfig.ROBOT_RADIUS
-                                - PathfinderConfig.SAFETY_DIST
-                        || nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
-                                + PathfinderConfig.SAFETY_DIST
-                        || nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.NODE_RADIUS - ObjectConfig.ROBOT_RADIUS
-                                - PathfinderConfig.SAFETY_DIST) {
-                    nodes[row][col].setWalkable(false);
+                Node node = nodes[row][col];
+                Vec2D nodeWorldPos = node.getWorldPos();
+                if (nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.SAFE_DIST
+                        || nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.SAFE_DIST
+                        || nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.SAFE_DIST
+                        || nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.SAFE_DIST) {
+                    node.setWalkable(false);
                 } else {
-                    for (Circle2D obstacle : obstacles) {
-                        Vec2D center = obstacle.center;
-                        double radius = (PathfinderConfig.NODE_RADIUS + obstacle.radius + ObjectConfig.ROBOT_RADIUS);
-                        if (Vec2D.dist(nodeWorldPos, center) < radius) {
-                            nodes[row][col].setWalkable(false);
-                            break;
-                        }
-                    }
+                    node.setWalkable(true);
                 }
+            }
+        }
+
+        for (Circle2D obstacle : obstacles) {
+            ArrayList<Node> toCheck = getNodesToCheck(obstacle);
+            for (Node node : toCheck) {
+                if (node.getWalkable() && !checkWalkable(node, obstacle))
+                    node.setWalkable(false);
             }
         }
     }
 
+    public ArrayList<Node> getNodesToCheck(Circle2D obstacle) {
+        Vec2D center = obstacle.center;
+        double radius = obstacle.radius + PathfinderConfig.SAFE_DIST;
+
+        Vec2D topLeft = new Vec2D(center.x - radius, center.y + radius);
+        Vec2D botRight = new Vec2D(center.x + radius, center.y - radius);
+
+        int[] topLeftGridPos = worldPosToGridPos(topLeft);
+        int[] botRightGridPos = worldPosToGridPos(botRight);
+
+        ArrayList<Node> toCheck = new ArrayList<Node>();
+        for (int row = topLeftGridPos[0]; row <= botRightGridPos[0]; row++)
+            for (int col = topLeftGridPos[1]; col <= botRightGridPos[1]; col++)
+                toCheck.add(nodes[row][col]);
+        return toCheck;
+    }
+
+    public boolean checkWalkable(Node node, Circle2D obstacle) {
+        double unwalkableDist = obstacle.radius + PathfinderConfig.SAFE_DIST;
+        if (Vec2D.dist(node.getWorldPos(), obstacle.center) <= unwalkableDist)
+            return false;
+        return true;
+    }
+
     public ArrayList<Node> getNeighbors(Node node) {
         ArrayList<Node> neighbors = new ArrayList<Node>();
-        for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
-            for (int colOffset = -1; colOffset <= 1; colOffset++) {
+        for (int rowOffset = -PathfinderConfig.NEIGHBOR_DIST; rowOffset <= PathfinderConfig.NEIGHBOR_DIST; rowOffset++) {
+            for (int colOffset = -PathfinderConfig.NEIGHBOR_DIST; colOffset <= PathfinderConfig.NEIGHBOR_DIST; colOffset++) {
                 if (rowOffset == 0 && colOffset == 0)
                     continue;
 

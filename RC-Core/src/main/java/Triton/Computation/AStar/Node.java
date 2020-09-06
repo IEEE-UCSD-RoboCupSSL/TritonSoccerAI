@@ -6,7 +6,7 @@ public class Node {
     private Vec2D worldPos;
     private int row, col;
     private boolean walkable = true;
-    private int gCost, hCost, fCost;
+    private double gCost, hCost, fCost;
     private Node parent;
 
     public Node(Vec2D worldPos, int row, int col) {
@@ -35,23 +35,23 @@ public class Node {
         return walkable;
     }
 
-    public int getGCost() {
+    public double getGCost() {
         return gCost;
     }
 
-    public void setGCost(int gCost) {
+    public void setGCost(double gCost) {
         this.gCost = gCost;
     }
 
-    public int getHCost() {
+    public double getHCost() {
         return hCost;
     }
 
-    public void setHCost(int hCost) {
+    public void setHCost(double hCost) {
         this.hCost = hCost;
     }
 
-    public int getFCost() {
+    public double getFCost() {
         fCost = gCost + hCost;
         return fCost;
     }

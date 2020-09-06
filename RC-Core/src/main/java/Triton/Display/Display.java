@@ -201,6 +201,7 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
+        /*
         Grid grid = pathfinder.getGrid();
         Node[][] nodes = grid.getNodes();
         for (int row = 0; row < grid.getNumRows(); row++) {
@@ -208,19 +209,19 @@ public class Display extends JPanel {
                 Node node = nodes[row][col];
                 Vec2D worldPos = node.getWorldPos();
                 int[] displayPos = worldPosToDisplayPos(worldPos);
-                if (node.getWalkable())
-                    g2d.setColor(Color.DARK_GRAY);
-                else
+                if (!node.getWalkable()) {
                     g2d.setColor(Color.RED);
-                g2d.setStroke(new BasicStroke(5));
-                g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
+                    g2d.setStroke(new BasicStroke(5));
+                    g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
+                }
             }
         }
+        */
 
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS * DisplayConfig.SCALE)));
 
-        if (path != null) {
+        if (path != null && !path.isEmpty()) {
             for (int i = 0; i < path.size() - 1; i++) {
                 int[] pointA = worldPosToDisplayPos(path.get(i));
                 int[] pointB = worldPosToDisplayPos(path.get(i + 1));

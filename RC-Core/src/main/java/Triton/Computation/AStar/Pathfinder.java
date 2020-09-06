@@ -10,9 +10,9 @@ public class Pathfinder {
     public class NodeComparator implements Comparator<Node> {
         public int compare(Node a, Node b) {
             if (a.getFCost() == b.getFCost()) {
-                return a.getHCost() - b.getHCost();
+                return (int) (a.getHCost() - b.getHCost());
             } else {
-                return a.getFCost() - b.getFCost();
+                return (int) (a.getFCost() - b.getFCost());
             }
         }
     }
@@ -35,8 +35,6 @@ public class Pathfinder {
 
         while (openSet.size() > 0) {
             Node currentNode = openSet.poll();
-
-            openSet.remove(currentNode);
             closedSet.add(currentNode);
 
             if (currentNode == targetNode)
@@ -46,14 +44,12 @@ public class Pathfinder {
                 if (!neighbor.getWalkable() || closedSet.contains(neighbor))
                     continue;
 
-                int newMovementCostToNeighbor = currentNode.getGCost() + getDist(currentNode, neighbor);
+                double newMovementCostToNeighbor = currentNode.getGCost() + getDist(currentNode, neighbor);
                 if (newMovementCostToNeighbor < neighbor.getGCost() || !openSet.contains(neighbor)) {
                     neighbor.setGCost(newMovementCostToNeighbor);
                     neighbor.setHCost(getDist(neighbor, targetNode));
                     neighbor.setParent(currentNode);
-
-                    if (!openSet.contains(neighbor))
-                        openSet.add(neighbor);
+                    openSet.add(neighbor);
                 }
             }
         }
@@ -68,17 +64,22 @@ public class Pathfinder {
             worldPath.add(currentNode.getWorldPos());
             currentNode = currentNode.getParent();
         }
+        worldPath.add(currentNode.getWorldPos());
         Collections.reverse(worldPath);
         return worldPath;
     }
 
-    private int getDist(Node nodeA, Node nodeB) {
+    private double getDist(Node nodeA, Node nodeB) {
+        return Vec2D.dist(nodeA.getWorldPos(), nodeB.getWorldPos());
+
+        /*
         int distRow = Math.abs(nodeA.getRow() - nodeB.getRow());
         int distCol = Math.abs(nodeA.getCol() - nodeB.getCol());
 
         if (distRow > distCol)
             return DIAG_DIST * distCol + PERP_DIST * (distRow - distCol);
         return DIAG_DIST * distRow + PERP_DIST * (distCol - distRow);
+        */
     }
 
     public void updateGrid(ArrayList<Circle2D> obstacles) {
