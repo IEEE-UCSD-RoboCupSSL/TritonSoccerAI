@@ -86,7 +86,7 @@ public class MinHeap {
     } 
   
     // Function to insert a node into the heap 
-    public void insert(Node element) 
+    public void add(Node element) 
     { 
         if (size >= maxsize) { 
             return; 

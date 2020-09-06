@@ -1,6 +1,6 @@
 package Triton.Computation;
 
-import Triton.Config.PathingConfig;
+import Triton.Config.PathfinderConfig;
 import Triton.Shape.*;
 import java.util.*;
 
@@ -69,9 +69,9 @@ public class Pathing {
         while (Vec2D.dist(pos, dest) > END_THRESHOLD && points.size() < MAX_POINTS) {
             Vec2D force = new Vec2D(0, 0);
             for (Circle2D circle : obstacles) {
-                force = force.add(getPushForce(pos, circle.center, PathingConfig.PUSH_STRENGTH));
+                force = force.add(getPushForce(pos, circle.center, PathfinderConfig.PUSH_STRENGTH));
             }
-            force = force.add(getPullForce(pos, dest, PathingConfig.PULL_STRENGTH));
+            force = force.add(getPullForce(pos, dest, PathfinderConfig.PULL_STRENGTH));
             pos = pos.add(force);
             points.add(pos);
         }

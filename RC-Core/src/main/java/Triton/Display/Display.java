@@ -119,7 +119,7 @@ public class Display extends JPanel {
 
         double worldSizeX = field.fieldLength;
         double worldSizeY = field.fieldWidth;
-        pathfinder = new Pathfinder(worldSizeX, worldSizeY, 40);
+        pathfinder = new Pathfinder(worldSizeX, worldSizeY);
     }
 
     public int[] worldPosToDisplayPos(Vec2D v) {

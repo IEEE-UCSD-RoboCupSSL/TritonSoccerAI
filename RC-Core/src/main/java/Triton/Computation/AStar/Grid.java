@@ -3,6 +3,7 @@ package Triton.Computation.AStar;
 import java.util.ArrayList;
 
 import Triton.Config.ObjectConfig;
+import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
 
@@ -10,28 +11,25 @@ public class Grid {
     private double worldSizeX;
     private double worldSizeY;
     private Node[][] nodes;
-    private double nodeRadius;
-    private double nodeDiameter;
     private int numRows, numCols;
 
-    public Grid(double worldSizeX, double worldSizeY, double nodeRadius) {
+    public Grid(double worldSizeX, double worldSizeY) {
         this.worldSizeX = worldSizeX;
         this.worldSizeY = worldSizeY;
-        this.nodeRadius = nodeRadius;
-        nodeDiameter = nodeRadius * 2;
-        numCols = (int) Math.round(worldSizeX / nodeDiameter);
-        numRows = (int) Math.round(worldSizeY / nodeDiameter);
+        numCols = (int) Math.round(worldSizeX / PathfinderConfig.NODE_DIAMETER);
+        numRows = (int) Math.round(worldSizeY / PathfinderConfig.NODE_DIAMETER);
         createGrid();
     }
 
     private Vec2D gridPosToWorldPos(int row, int col) {
-        return new Vec2D(col * nodeDiameter + nodeRadius - worldSizeX / 2,
-                -row * nodeDiameter - nodeRadius + worldSizeY / 2);
+        return new Vec2D(col * PathfinderConfig.NODE_DIAMETER + PathfinderConfig.NODE_RADIUS - worldSizeX / 2,
+                -row * PathfinderConfig.NODE_DIAMETER - PathfinderConfig.NODE_RADIUS + worldSizeY / 2);
     }
 
     private int[] wordPosToGridPos(Vec2D worldPos) {
-        int[] res = { (int) Math.round((worldSizeY / 2 - worldPos.y) / nodeDiameter - 0.5),
-                (int) Math.round((worldPos.x + worldSizeX / 2 - nodeRadius) / nodeDiameter), };
+        int[] res = { (int) Math.round((worldSizeY / 2 - worldPos.y) / PathfinderConfig.NODE_DIAMETER - 0.5),
+                (int) Math.round((worldPos.x + worldSizeX / 2 - PathfinderConfig.NODE_RADIUS)
+                        / PathfinderConfig.NODE_DIAMETER), };
         return res;
     }
 
@@ -55,15 +53,19 @@ public class Grid {
             for (int col = 0; col < numCols; col++) {
                 Vec2D nodeWorldPos = nodes[row][col].getWorldPos();
                 nodes[row][col].setWalkable(true);
-                if (nodeWorldPos.x < -worldSizeX / 2 + nodeRadius + ObjectConfig.ROBOT_RADIUS
-                        || nodeWorldPos.x > worldSizeX / 2 - nodeRadius - ObjectConfig.ROBOT_RADIUS
-                        || nodeWorldPos.y < -worldSizeY / 2 + nodeRadius + ObjectConfig.ROBOT_RADIUS
-                        || nodeWorldPos.y > worldSizeY / 2 - nodeRadius - ObjectConfig.ROBOT_RADIUS)
+                if (nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
+                        + PathfinderConfig.SAFETY_DIST
+                        || nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.NODE_RADIUS - ObjectConfig.ROBOT_RADIUS
+                                - PathfinderConfig.SAFETY_DIST
+                        || nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
+                                + PathfinderConfig.SAFETY_DIST
+                        || nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.NODE_RADIUS - ObjectConfig.ROBOT_RADIUS
+                                - PathfinderConfig.SAFETY_DIST) {
                     nodes[row][col].setWalkable(false);
-                else {
+                } else {
                     for (Circle2D obstacle : obstacles) {
                         Vec2D center = obstacle.center;
-                        double radius = (nodeRadius + obstacle.radius + ObjectConfig.ROBOT_RADIUS);
+                        double radius = (PathfinderConfig.NODE_RADIUS + obstacle.radius + ObjectConfig.ROBOT_RADIUS);
                         if (Vec2D.dist(nodeWorldPos, center) < radius) {
                             nodes[row][col].setWalkable(false);
                             break;
