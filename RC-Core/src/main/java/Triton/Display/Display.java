@@ -2,7 +2,7 @@ package Triton.Display;
 
 import Triton.Config.ObjectConfig;
 import Triton.Config.DisplayConfig;
-import Triton.Computation.Pathing;
+import Triton.Computation.AStar.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.Shape.*;
@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
+import java.io.ObjectInputFilter.Config;
 import java.util.*;
 import java.util.Timer;
 
@@ -71,7 +72,7 @@ public class Display extends JPanel {
                 Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
-            points = Pathing.computePathVectorField(convert(start), convert(dest), obstacles);
+            //points = Pathing.computePathVectorField(convert(start), convert(dest), obstacles);
         }
     }
 
@@ -196,6 +197,7 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
+        /*
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS * DisplayConfig.SCALE)));
 
@@ -214,6 +216,42 @@ public class Display extends JPanel {
         int desImgX = dest[0] - ImgLoader.desPoint.getWidth() / 2;
         int desImgY= dest[1] - ImgLoader.desPoint.getHeight() / 2;
         g2d.drawImage(ImgLoader.desPoint, desImgX, desImgY, null);
+        */
+
+        double worldSizeX = GeometryData.get().getField().fieldLength;
+        double worldSizeY = GeometryData.get().getField().fieldWidth;
+        
+        ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.YELLOW, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+            for (int i = 0; i < 6; i++) {
+                Vec2D pos = DetectionData.get().getRobotPos(Team.BLUE, i);
+                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
+                obstacles.add(obstacle);
+            }
+
+        Grid grid = new Grid(worldSizeX, worldSizeY, 40);
+        grid.updateGrid(obstacles);
+
+        Node[][] nodes = grid.getNodes();
+
+        for (int row = 0; row < grid.getNumRows(); row++) {
+            for (int col = 0; col < grid.getNumCols(); col++) {
+                Node node = nodes[row][col];
+                Vec2D worldPos = node.getWorldPos();
+                int[] displayPos = convert(worldPos);
+                if (node.getWalkable())
+                    g2d.setColor(Color.DARK_GRAY);
+                else
+                    g2d.setColor(Color.RED);
+                g2d.setStroke(new BasicStroke(5));
+                g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
+                //g2d.drawString(String.format("(%f,%f)[%d,%d]", worldPos.x, worldPos.y, row, col), displayPos[0], displayPos[1]);
+            }
+        }
     }
 
     private void paintInfo(Graphics2D g2d) {

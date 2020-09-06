@@ -18,6 +18,10 @@ public class Vec2D {
     public Vec2D add(Vec2D toAdd) {
         return new Vec2D(this.x + toAdd.x, this.y + toAdd.y);
     }
+    
+    public Vec2D add(double x, double y) {
+        return new Vec2D(this.x + x, this.y + y);
+    }
 
     public Vec2D sub(Vec2D toSubtract) {
         return new Vec2D(this.x - toSubtract.x, this.y - toSubtract.y);
