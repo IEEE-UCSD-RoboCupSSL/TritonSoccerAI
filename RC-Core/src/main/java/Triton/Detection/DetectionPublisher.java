@@ -15,7 +15,7 @@ public class DetectionPublisher implements Runnable {
                 update(VisionData.get().getDetection());
                 detect.publish();
             } catch (Exception e) {
-                e.printStackTrace();
+                //Do nothing
             }
         }
     }

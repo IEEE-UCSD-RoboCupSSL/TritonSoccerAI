@@ -17,8 +17,6 @@ public class Pathfinder {
         }
     }
 
-    private static int PERP_DIST = 10;
-    private static int DIAG_DIST = 14;
     public Grid grid;
 
     public Pathfinder(double worldSizeX, double worldSizeY) {
@@ -44,15 +42,20 @@ public class Pathfinder {
                 if (!neighbor.getWalkable() || closedSet.contains(neighbor))
                     continue;
 
-                double newMovementCostToNeighbor = currentNode.getGCost() + getDist(currentNode, neighbor);
+                Node parentNode = currentNode;
+                if (currentNode != startNode && grid.checkLineOfSight(currentNode.getParent(), neighbor))
+                    parentNode = currentNode.getParent();
+
+                double newMovementCostToNeighbor = parentNode.getGCost() + getDist(parentNode, neighbor);
                 if (newMovementCostToNeighbor < neighbor.getGCost() || !openSet.contains(neighbor)) {
                     neighbor.setGCost(newMovementCostToNeighbor);
                     neighbor.setHCost(getDist(neighbor, targetNode));
-                    neighbor.setParent(currentNode);
+                    neighbor.setParent(parentNode);
                     openSet.add(neighbor);
                 }
             }
         }
+
         return null;
     }
 
@@ -71,15 +74,6 @@ public class Pathfinder {
 
     private double getDist(Node nodeA, Node nodeB) {
         return Vec2D.dist(nodeA.getWorldPos(), nodeB.getWorldPos());
-
-        /*
-        int distRow = Math.abs(nodeA.getRow() - nodeB.getRow());
-        int distCol = Math.abs(nodeA.getCol() - nodeB.getCol());
-
-        if (distRow > distCol)
-            return DIAG_DIST * distCol + PERP_DIST * (distRow - distCol);
-        return DIAG_DIST * distRow + PERP_DIST * (distCol - distRow);
-        */
     }
 
     public void updateGrid(ArrayList<Circle2D> obstacles) {

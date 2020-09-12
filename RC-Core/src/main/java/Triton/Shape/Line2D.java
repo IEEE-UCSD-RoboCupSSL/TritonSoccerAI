@@ -26,6 +26,10 @@ public class Line2D {
         return new double[] {A, B, C};
     }
 
+    public Vec2D getDir() {
+        return p2.sub(p1).norm();
+    }
+
     public double perpDist(Vec2D point) {
         double[] eqn = toEqn();
         return Math.abs((eqn[0] * point.x + eqn[1] * point.y + eqn[2]) / Math.sqrt(eqn[0] * eqn[0] + eqn[1] * eqn[1]));

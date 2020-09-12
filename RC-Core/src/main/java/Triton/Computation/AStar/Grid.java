@@ -2,11 +2,9 @@ package Triton.Computation.AStar;
 
 import java.util.ArrayList;
 
-import javax.lang.model.util.ElementScanner14;
-
-import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
+import Triton.Shape.Line2D;
 import Triton.Shape.Vec2D;
 
 public class Grid {
@@ -101,8 +99,8 @@ public class Grid {
 
     public ArrayList<Node> getNeighbors(Node node) {
         ArrayList<Node> neighbors = new ArrayList<Node>();
-        for (int rowOffset = -PathfinderConfig.NEIGHBOR_DIST; rowOffset <= PathfinderConfig.NEIGHBOR_DIST; rowOffset++) {
-            for (int colOffset = -PathfinderConfig.NEIGHBOR_DIST; colOffset <= PathfinderConfig.NEIGHBOR_DIST; colOffset++) {
+        for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+            for (int colOffset = -1; colOffset <= 1; colOffset++) {
                 if (rowOffset == 0 && colOffset == 0)
                     continue;
 
@@ -115,6 +113,25 @@ public class Grid {
             }
         }
         return neighbors;
+    }
+
+    public boolean checkLineOfSight(Node nodeA, Node nodeB) {
+        Vec2D pointA = nodeA.getWorldPos();
+        Vec2D pointB = nodeB.getWorldPos();
+        Line2D line = new Line2D(pointA, pointB);
+        double totalDist = line.length();
+        int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
+        Vec2D dir = line.getDir();
+        Vec2D moveAdd = dir.mult(PathfinderConfig.NODE_RADIUS);
+        
+        Vec2D currentPos = new Vec2D(pointA);
+        for (int i = 0; i < moveCount; i++) {
+            currentPos = currentPos.add(moveAdd);
+            Node currentNode = nodeFromWorldPos(currentPos);
+            if (!currentNode.getWalkable())
+                return false;
+        }
+        return true;
     }
 
     public Node[][] getNodes() {
