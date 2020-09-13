@@ -5,8 +5,6 @@ import Triton.DesignPattern.*;
 import Triton.Shape.Vec2D;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 import java.util.ArrayList;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
@@ -20,6 +18,7 @@ public class DetectionData extends AbstractData {
     private int ballCount;
     private Ball ball;
     private double time;
+    private double deltaT;
 
     public DetectionData() {
         super("Detection");
@@ -38,6 +37,7 @@ public class DetectionData extends AbstractData {
         lock.writeLock().lock();
         try {
             this.time = time;
+            this.deltaT = System.currentTimeMillis() / 1000.0 - time;
         } finally {
             lock.writeLock().unlock();
         }
@@ -47,6 +47,15 @@ public class DetectionData extends AbstractData {
         lock.readLock().lock();
         try {
             return time;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public double getDeltaT() {
+        lock.readLock().lock();
+        try {
+            return deltaT;
         } finally {
             lock.readLock().unlock();
         }

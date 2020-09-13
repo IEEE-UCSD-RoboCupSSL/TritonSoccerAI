@@ -1,18 +1,19 @@
 package Triton.Command;
 
-import Triton.Config.SimConfig;
+import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Triton.Detection.DetectionData;
 import Triton.Detection.Team;
 import Triton.Shape.Vec2D;
-import Triton.WorldSim.RobotSim;
+import Triton.Config.SimConfig;
 
 public class MoveToCommand extends Command {
 
     private Team   team;
     private int    ID;
     private Vec2D  dest;
-    private int    speed; // raw unit per ms
+    private double speed; // raw unit per ms
 
-    public MoveToCommand(Team team, int ID, double x, double y, int speed) {
+    public MoveToCommand(Team team, int ID, double x, double y, double speed) {
         this.team = team;
         this.ID = ID; 
         this.dest = new Vec2D(x, y);
@@ -20,17 +21,29 @@ public class MoveToCommand extends Command {
     }
 
     public void execute() {
-        RobotSim robot = world.getRobot(team, ID);
         if (!executed) {
-            if (Vec2D.dist(robot.getPos(), dest) < SimConfig.DEST_THRESH) {
-                robot.setVel(new Vec2D(0, 0));
+            DetectionData detect = DetectionData.get();
+            double time = System.currentTimeMillis() / 1000.0 - detect.getDeltaT();
+
+            Vec2D start = detect.getRobotPos(team, ID);
+            Vec2D dist = dest.sub(start);
+            Vec2D next = start.add(dist.norm().mult(speed * SimConfig.EXEC_INTERVAL));
+
+            if (speed * 5 >= dist.mag()) {
+                next = dest;
                 executed = true;
-                return;
             }
 
-            Vec2D dir = dest.sub(robot.getPos()).norm();
-            Vec2D vel = dir.mult(speed);
-            robot.setVel(vel);
+            SSL_DetectionRobot.Builder rb = SSL_DetectionRobot.newBuilder();
+            rb.setX((float) next.x);
+            rb.setY((float) next.y);
+            rb.setPixelX((float) next.x);
+            rb.setPixelY((float) next.y);
+            rb.setConfidence(0);
+            rb.setRobotId(ID);
+
+            detect.updateTime(time);
+            detect.updateRobot(team, ID, rb.build(), time);
         }
     }
 
@@ -46,7 +59,7 @@ public class MoveToCommand extends Command {
         return dest;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 }

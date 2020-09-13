@@ -7,7 +7,6 @@ import Triton.DesignPattern.*;
 
 public class CommandData extends AbstractData {
 
-    private SwitchCommand switchCommand;
     private HashMap<Team, HashMap<Integer, MoveToCommand>> moveToCommands;
 
     public CommandData() {
@@ -24,7 +23,7 @@ public class CommandData extends AbstractData {
                 MoveToCommand moveToCommand = (MoveToCommand) command;
                 moveToCommands.get(moveToCommand.getTeam()).put(moveToCommand.getID(), moveToCommand);
             } else if (command instanceof SwitchCommand) {
-                switchCommand = (SwitchCommand) command;
+                ((SwitchCommand) command).execute();
             }
         } finally {
             lock.writeLock().unlock();
@@ -34,10 +33,11 @@ public class CommandData extends AbstractData {
     public void executeAll() {
         lock.readLock().lock();
         try {
-            switchCommand.execute();
             for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                moveToCommands.get(Team.BLUE).get(i).execute();
-                moveToCommands.get(Team.YELLOW).get(i).execute();
+                MoveToCommand m = moveToCommands.get(Team.BLUE).get(i);
+                if (m != null) m.execute();
+                m = moveToCommands.get(Team.YELLOW).get(i);
+                if (m != null) m.execute();
             }
         } finally {
             lock.readLock().unlock();

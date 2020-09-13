@@ -1,16 +1,27 @@
 package Triton.Detection;
 
 import Triton.Vision.VisionData;
+
+import java.util.concurrent.locks.Lock;
+
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class DetectionPublisher implements Runnable {
 
     DetectionData detect = new DetectionData();
+    Lock detectionLock;
+    public static boolean toggle;
+
+    public DetectionPublisher(Lock detectionLock) {
+        this.detectionLock = detectionLock;
+    }
 
     public void run() {
+        detectionLock.lock();
         while (true) {
             try {
+                toggle();
                 update(VisionData.get().getDetection());
                 detect.publish();
             } catch (Exception e) {
@@ -31,6 +42,13 @@ public class DetectionPublisher implements Runnable {
         }
         for (SSL_DetectionRobot r : df.getRobotsBlueList()) {
             detect.updateRobot(Team.BLUE, r.getRobotId(), r, time);
+        }
+    }
+
+    public void toggle() {
+        if (toggle) {
+            detectionLock.unlock();
+            detectionLock.lock();
         }
     }
 }
