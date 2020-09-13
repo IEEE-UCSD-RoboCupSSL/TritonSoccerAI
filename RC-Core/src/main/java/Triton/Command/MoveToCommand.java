@@ -29,7 +29,7 @@ public class MoveToCommand extends Command {
             Vec2D dist = dest.sub(start);
             Vec2D next = start.add(dist.norm().mult(speed * SimConfig.EXEC_INTERVAL));
 
-            if (speed * 5 >= dist.mag()) {
+            if (speed * SimConfig.EXEC_INTERVAL >= dist.mag()) {
                 next = dest;
                 executed = true;
             }
