@@ -115,6 +115,15 @@ public class DetectionData extends AbstractData {
         }
     }
 
+    public HashMap<Team, HashMap<Integer, Robot>> getRobots() {
+        lock.readLock().lock();
+        try {
+            return robots;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     public void updateRobot(Team team, int ID, SSL_DetectionRobot detection, double time) {
         lock.writeLock().lock();
         try {
@@ -173,7 +182,7 @@ public class DetectionData extends AbstractData {
     public static DetectionData get() {
         return (DetectionData) MsgChannel.get("Detection");
     }
-    
+
     public Remote_Detection toProto() {
         Remote_Detection.Builder toSend = Remote_Detection.newBuilder();
 

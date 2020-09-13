@@ -55,6 +55,7 @@ public class Robot {
         return this.ID;
     }
 
+
     public void update(SSL_DetectionRobot detection, double time) {
         SortedDetection latest = new SortedDetection(detection, time);
         detections.add(latest);

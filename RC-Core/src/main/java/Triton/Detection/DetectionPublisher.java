@@ -1,6 +1,5 @@
 package Triton.Detection;
 
-import Triton.DesignPattern.MsgChannel;
 import Triton.Vision.VisionData;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
