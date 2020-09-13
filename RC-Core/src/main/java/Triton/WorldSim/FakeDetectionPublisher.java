@@ -15,20 +15,35 @@ public class FakeDetectionPublisher extends DetectionPublisher implements Runnab
     WorldSim world;
 
     public FakeDetectionPublisher() {
-        while (true) {
-            try {
-                detect = DetectionData.get();
-                command = CommandData.get();
-                break;
-            } catch (NullPointerException e) {
-                // do nothing
-            }
-        }
-        world = new WorldSim();
-        Command.setWorld(world);
     }
 
     public void run() {
+        while (detect == null || command == null) {
+            if (detect == null)
+                try {
+                    detect = DetectionData.get();
+                } catch (NullPointerException e) {
+                    // do nothing
+                }
+
+            if (command == null)
+                try {
+                    command = CommandData.get();
+                } catch (NullPointerException e) {
+                    // do nothing
+                }
+        }
+
+        while (true) {
+            try {
+                world = new WorldSim();
+                Command.setWorld(world);
+                break;
+            } catch (Exception e) {
+                // 
+            }
+        }
+
         while (true) {
             try {
                 update();

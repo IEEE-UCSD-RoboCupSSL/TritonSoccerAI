@@ -1,22 +1,24 @@
 package Triton.Command;
 
 import Triton.Detection.DetectionData;
+import Triton.ThreadManager.ThreadManager;
 
 public class SwitchCommand extends Command {
 
     private Thread realThread;
     private Thread fakeThread;
 
-    public SwitchCommand(Thread realThread, Thread fakeThread) {
-        this.realThread = realThread;
-        this.fakeThread = fakeThread;
+    public SwitchCommand() {
+        ThreadManager threadManager = ThreadManager.getManager();
+        realThread = threadManager.getThread("Detection");
+        fakeThread = threadManager.getThread("FakeDetection");
     }
 
     public void execute() {
         if (!executed) {
+            System.out.println("!!!");
             if (realThread.getState() == Thread.State.TIMED_WAITING) {
                 SwitchCommand.world.transfer(DetectionData.get());
-
                 try {
                     realThread.wait();
                     fakeThread.notify();

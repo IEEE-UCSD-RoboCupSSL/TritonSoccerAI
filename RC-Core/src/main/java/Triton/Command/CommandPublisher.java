@@ -1,10 +1,18 @@
 package Triton.Command;
 
+import Triton.Detection.*;
 import java.util.Scanner;
+
+import Triton.ThreadManager.*;
 
 public class CommandPublisher implements Runnable {
 
-    CommandData commands = new CommandData();
+    private CommandData commands = new CommandData();
+    ThreadManager threadManager;
+
+    public CommandPublisher() {
+        commands.publish();
+    }
 
     // taking in commands
     public void run() {
@@ -19,11 +27,25 @@ public class CommandPublisher implements Runnable {
 
             switch (commandString[0]) {
                 case "S":
-                    commands.add(new SwitchCommand());
+                    commands.add(new SwitchCommand()); 
                     break;
                 case "M":
-                    String robot = commandString[1];
-                    break;
+                    String robot = commandString[1]; //"B1"
+                    Team team;
+                    if (robot.substring(0, 1).equals("B")) {
+                        team = Team.BLUE;
+                    }
+                    else {
+                        team = Team.YELLOW;
+                    }
+                    int num = (int) commandString[1].charAt(1);
+
+                    String[] pos = commandString[2].split(",");
+                    double posX = Double.parseDouble(pos[0]);
+                    double posY = Double.parseDouble(pos[1]);
+
+                    int speed = Integer.parseInt(commandString[3]);
+                    commands.add(new MoveToCommand(team, num, posX, posY, speed));
                 default:
                     break;
             }

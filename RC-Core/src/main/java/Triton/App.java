@@ -4,9 +4,12 @@ import java.util.concurrent.*;
 import java.util.HashMap;
 
 import Triton.Vision.*;
+import Triton.WorldSim.FakeDetectionPublisher;
+import Triton.Command.CommandPublisher;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.*;
+import Triton.ThreadManager.*;
 import Triton.Display.*;
 
 import org.eclipse.jetty.server.Server;
@@ -35,9 +38,21 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String args[]) {
-        new Thread(new VisionConnection()).start();
-        new Thread(new GeometryPublisher()).start();
-        new Thread(new DetectionPublisher()).start();
+        ThreadManager threadManager = new ThreadManager();
+
+        threadManager.addThread(new Thread(new VisionConnection()), "Vision");
+        threadManager.addThread(new Thread(new GeometryPublisher()), "Geometry");
+        threadManager.addThread(new Thread(new DetectionPublisher()), "Detection");
+        threadManager.addThread(new Thread(new FakeDetectionPublisher()), "FakeDetection");
+        threadManager.addThread(new Thread(new CommandPublisher()), "Command");
+
+
+        threadManager.startThread("Vision");
+        threadManager.startThread("Geometry");
+        threadManager.startThread("Detection");
+        threadManager.startThread("FakeDetection");
+        threadManager.startThread("Command");
+
         Display display = new Display();
 
         //TCPInit.init();
