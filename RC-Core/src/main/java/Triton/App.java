@@ -59,7 +59,6 @@ public class App {
         });
         subThread.start();
 
-        /*
         ThreadManager threadManager = new ThreadManager();
 
         threadManager.addThread(new Thread(new VisionConnection()), "Vision");
@@ -108,7 +107,6 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
-        */
     }
 
     public static Server createServer(int port)
