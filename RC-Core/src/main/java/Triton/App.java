@@ -38,20 +38,42 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String args[]) {
+        Thread pubThread = new Thread(() -> {
+            Publisher<Integer> pub = new Publisher<Integer>("Test", "int");
+
+            for(int i = 0; i < 100; i++) {
+                    pub.publish(i);
+            }
+
+        });
+        pubThread.start();
+
+        Thread subThread = new Thread(() -> {
+            Subscriber<Integer> sub = new Subscriber<Integer>("Test", "int");
+            while(!sub.subscribe());
+             
+            while(true) {
+                System.out.println(sub.getLatestMsg());
+            }
+
+        });
+        subThread.start();
+
+        /*
         ThreadManager threadManager = new ThreadManager();
 
         threadManager.addThread(new Thread(new VisionConnection()), "Vision");
         threadManager.addThread(new Thread(new GeometryPublisher()), "Geometry");
         threadManager.addThread(new Thread(new DetectionPublisher()), "Detection");
-        threadManager.addThread(new Thread(new FakeDetectionPublisher()), "FakeDetection");
-        threadManager.addThread(new Thread(new CommandPublisher()), "Command");
+        // threadManager.addThread(new Thread(new FakeDetectionPublisher()), "FakeDetection");
+        // threadManager.addThread(new Thread(new CommandPublisher()), "Command");
 
 
         threadManager.startThread("Vision");
         threadManager.startThread("Geometry");
         threadManager.startThread("Detection");
-        threadManager.startThread("FakeDetection");
-        threadManager.startThread("Command");
+        // threadManager.startThread("FakeDetection");
+        // threadManager.startThread("Command");
 
         Display display = new Display();
 
@@ -86,6 +108,7 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
+        */
     }
 
     public static Server createServer(int port)
