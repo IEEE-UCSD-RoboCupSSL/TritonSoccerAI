@@ -1,6 +1,9 @@
-package Triton.DesignPattern;
+//package Triton.DesignPattern;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -10,6 +13,7 @@ public class MsgChannel<T> {
     private ReadWriteLock lock;
     private String channelName;
     private T msg;
+    private ArrayList<BlockingQueue<T>> queues;
 
     static {
         channels = new HashMap<String, MsgChannel>();
@@ -23,6 +27,7 @@ public class MsgChannel<T> {
         }
 
         lock = new ReentrantReadWriteLock();
+        queues = new ArrayList<BlockingQueue<T>>();
         channels.put(channelName, this);
     }
 
@@ -34,10 +39,26 @@ public class MsgChannel<T> {
         return channels.get(channelName);
     }
 
+    public void addMsgQueue(BlockingQueue<T> queue) {
+        lock.writeLock().lock();
+        try {
+            queues.add(queue);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public void addMsg(T msg) {
         lock.writeLock().lock();
         try {
             this.msg = msg;
+            for (BlockingQueue<T> queue : queues) {
+                try {
+                    queue.put(msg);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         } finally {
             lock.writeLock().unlock();
         }
@@ -57,18 +78,18 @@ public class MsgChannel<T> {
             Publisher<Integer> pub = new Publisher<Integer>("Test", "int");
 
             for(int i = 0; i < 100; i++) {
-                    pub.publish(i);
+                pub.publish(i);
             }
 
         });
         pubThread.start();
 
         Thread subThread = new Thread(() -> {
-            Subscriber<Integer> sub = new Subscriber<Integer>("Test", "int");
+            Subscriber<Integer> sub = new Subscriber<Integer>("Test", "int", 10);
             while(!sub.subscribe());
              
-            while(true) {
-                System.out.println(sub.getLatestMsg());
+            for(int i = 0; i < 100; i++) {
+                System.out.println(sub.pollMsg());
             }
 
         });

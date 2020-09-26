@@ -6,6 +6,7 @@ import java.util.HashMap;
 import Triton.Vision.*;
 import Triton.WorldSim.FakeDetectionPublisher;
 import Triton.Command.CommandPublisher;
+import Triton.DesignPattern.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.*;
@@ -38,27 +39,6 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String args[]) {
-        Thread pubThread = new Thread(() -> {
-            Publisher<Integer> pub = new Publisher<Integer>("Test", "int");
-
-            for(int i = 0; i < 100; i++) {
-                    pub.publish(i);
-            }
-
-        });
-        pubThread.start();
-
-        Thread subThread = new Thread(() -> {
-            Subscriber<Integer> sub = new Subscriber<Integer>("Test", "int");
-            while(!sub.subscribe());
-             
-            while(true) {
-                System.out.println(sub.getLatestMsg());
-            }
-
-        });
-        subThread.start();
-
         ThreadManager threadManager = new ThreadManager();
 
         threadManager.addThread(new Thread(new VisionConnection()), "Vision");
