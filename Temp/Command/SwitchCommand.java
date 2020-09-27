@@ -1,6 +1,5 @@
 package Triton.Command;
 
-import Triton.Detection.DetectionData;
 import Triton.ThreadManager.ThreadManager;
 
 public class SwitchCommand extends Command {

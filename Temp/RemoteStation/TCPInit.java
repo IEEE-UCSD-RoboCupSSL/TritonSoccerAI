@@ -10,18 +10,26 @@ import java.net.*;
 
 import java.util.HashMap;
 import Proto.RemoteCommands.Remote_Geometry;
+import Triton.DesignPattern.PubSubSystem.Publisher;
+import Triton.DesignPattern.PubSubSystem.Module;
 
 public class TCPInit {
     
     private static byte[] geometry;
-    private static StationData data = new StationData();
+    private static HashMap<Integer, Integer> ports;
 
-    private static class TCPConnection implements Runnable {
+    static {
+        ports = new HashMap<Integer, Integer>();
+    }
+    
+    private class TCPConnection implements Module {
         
         private int ID;
+        private Publisher<HashMap<Integer, Integer>> portsPub;
 
         public TCPConnection(int ID) {
             this.ID = ID;
+            portsPub = new Publisher<HashMap<Integer, Integer>>("station", "ports");
         }
 
         public void run() {
@@ -33,7 +41,7 @@ public class TCPInit {
 
                 int ID = in.readInt();
                 int port = in.readInt();
-                data.putPort(ID, port);
+                .putPort(ID, port);
 
                 System.out.println("Robot " + ID + " listening to UDP commands on TCP port: " + port);
                 out.writeChars("Station will be sending UDP commands to robot " + ID + " on port: " + port + "\n");

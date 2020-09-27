@@ -1,4 +1,4 @@
-//package Triton.DesignPattern;
+package Triton.DesignPattern.PubSubSystem;
 
 public class Publisher<T> {
     private MsgChannel<T> channel;
@@ -13,5 +13,9 @@ public class Publisher<T> {
 
     public void publish(T msg) {
         channel.addMsg(msg);
+    }
+
+    public void publish(T msg, long ms) {
+        channel.addMsg(msg, ms);
     }
 }

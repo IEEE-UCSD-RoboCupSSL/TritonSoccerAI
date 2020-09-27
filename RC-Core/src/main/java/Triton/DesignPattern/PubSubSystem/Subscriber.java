@@ -1,8 +1,8 @@
+package Triton.DesignPattern.PubSubSystem;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-//package Triton.DesignPattern;
 
 public class Subscriber<T> {
     private String topicName, msgName;

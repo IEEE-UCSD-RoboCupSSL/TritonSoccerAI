@@ -1,6 +1,8 @@
 package Triton.Vision;
 
 import Triton.Config.ConnectionConfig;
+import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.*;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -8,8 +10,10 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.io.ByteArrayInputStream;
 import Proto.*;
+import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
 
-public class VisionConnection implements Runnable {
+public class VisionModule implements Module {
 
     final static int MAX_BUFFER_SIZE = 67108864;
 
@@ -17,15 +21,19 @@ public class VisionConnection implements Runnable {
     private MulticastSocket socket;
     private DatagramPacket  packet;
 
-    private VisionData vision = new VisionData();;
-
     public boolean geoInit = false;
 
-    public VisionConnection() {
+    private Publisher<SSL_DetectionFrame> detectPub;
+    private Publisher<SSL_GeometryData> geoPub;
+
+    public VisionModule() {
         this(ConnectionConfig.GRSIM_MC_ADDR, ConnectionConfig.GRSIM_MC_PORT);
     }
 
-    public VisionConnection(String ip, int port) {
+    public VisionModule(String ip, int port) {
+        detectPub = new Publisher<SSL_DetectionFrame>("vision", "detection");
+        geoPub = new Publisher<SSL_GeometryData>("vision", "geometry");
+
         buffer = new byte[MAX_BUFFER_SIZE];
         try {
             socket = new MulticastSocket(port);
@@ -38,6 +46,12 @@ public class VisionConnection implements Runnable {
         }
     }
 
+    public void run() {
+        while (true) {
+            collectData();
+        }
+    }
+
     public void update() {
         try {
             socket.receive(packet);
@@ -46,9 +60,13 @@ public class VisionConnection implements Runnable {
             MessagesRobocupSslWrapper.SSL_WrapperPacket SSLPacket = 
                 MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
             
-            vision.setDetection(SSLPacket.getDetection());
-            vision.setGeometry(SSLPacket.getGeometry());
-            vision.publish();
+            if (SSLPacket.hasDetection()) {
+                detectPub.publish(SSLPacket.getDetection());
+            }
+
+            if (SSLPacket.hasGeometry()) {
+                geoPub.publish(SSLPacket.getGeometry());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,11 +81,5 @@ public class VisionConnection implements Runnable {
     public void collectData() {
         // default configuration with 2x6 robots need 4 packets 
         collectData(4);
-    }
-
-    public void run() {
-        while (true) {
-            collectData();
-        }
     }
 }

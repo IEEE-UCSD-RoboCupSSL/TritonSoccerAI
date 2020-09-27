@@ -1,9 +1,10 @@
-//package Triton.DesignPattern;
+package Triton.DesignPattern.PubSubSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -55,6 +56,22 @@ public class MsgChannel<T> {
             for (BlockingQueue<T> queue : queues) {
                 try {
                     queue.put(msg);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public void addMsg(T msg, long timeout_ms) {
+        lock.writeLock().lock();
+        try {
+            this.msg = msg;
+            for (BlockingQueue<T> queue : queues) {
+                try {
+                    queue.offer(msg, timeout_ms, TimeUnit.MILLISECONDS); 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
