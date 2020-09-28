@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
-public class Robot {
+public class RobotData {
 
     public static final int MAX_SIZE = 10;
 
@@ -42,7 +42,7 @@ public class Robot {
     private Team team;
     private int ID;
 
-    public Robot(Team team, int ID) {
+    public RobotData(Team team, int ID) {
         this.team = team;
         this.ID = ID;
     }
@@ -54,7 +54,6 @@ public class Robot {
     public int getID() {
         return this.ID;
     }
-
 
     public void update(SSL_DetectionRobot detection, double time) {
         SortedDetection latest = new SortedDetection(detection, time);

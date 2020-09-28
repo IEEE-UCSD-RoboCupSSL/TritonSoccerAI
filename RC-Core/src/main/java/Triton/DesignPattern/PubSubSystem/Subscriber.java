@@ -22,6 +22,10 @@ public class Subscriber<T> {
         queue = new LinkedBlockingQueue<T>(queueSize);
     }
 
+    public void resetLatestMsg(T msg) {
+        channel.resetMsg(msg);
+    }
+
     public boolean subscribe() {
         try {
             channel = MsgChannel.getChannel(topicName, msgName);

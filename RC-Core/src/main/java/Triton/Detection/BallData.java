@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 
-public class Ball {
+public class BallData {
 
     public static final int MAX_SIZE = 10;
 

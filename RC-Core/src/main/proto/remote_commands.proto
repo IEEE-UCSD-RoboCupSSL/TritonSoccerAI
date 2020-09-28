@@ -51,16 +51,22 @@ message Remote_Detection {
 
 
 message Line2D {
-    Vec2D p1 = 2; 
-    Vec2D p2 = 3;
+    Vec2D p1 = 1; 
+    Vec2D p2 = 2;
 }
 
 
 message Remote_Geometry {
-    map<string, Line2D> lines = 1;
-    double center_circle_radius = 2;
+    int32 field_length = 1;
+    int32 field_width = 2;
+    int32 goal_width = 3;
+    int32 goal_depth = 4;
 }
 
+message Vision_Data {
+    Vec2D pos = 1;
+    Vec2D vel = 2;
+}
 
 // user-defined control packet 
 message Custom_Control {

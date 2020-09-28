@@ -4,7 +4,7 @@ import Triton.Config.ObjectConfig;
 import Triton.Config.DisplayConfig;
 import Triton.Computation.AStar.*;
 import Triton.Detection.*;
-import Triton.Detection.Robot;
+import Triton.Detection.RobotData;
 import Triton.Geometry.*;
 import Triton.Shape.*;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
@@ -29,8 +29,8 @@ public class Display extends JPanel {
 
     private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-    private Subscriber<HashMap<Team, HashMap<Integer, Robot>>> robotSub;
-    private Subscriber<Ball> ballSub;
+    private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
+    private Subscriber<BallData> ballSub;
 
     private SSL_GeometryFieldSize fieldSize;
     private HashMap<String, Line2D> fieldLines;
@@ -59,10 +59,10 @@ public class Display extends JPanel {
     }
 
     private class DisplayMouseInputAdapter extends MouseInputAdapter {
-        private Subscriber<HashMap<Team, HashMap<Integer, Robot>>> robotSub;
+        private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
         
         public DisplayMouseInputAdapter() {
-            robotSub = new Subscriber<HashMap<Team, HashMap<Integer, Robot>>>("detection", "robot");
+            robotSub = new Subscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             while (!robotSub.subscribe());
         }
 
@@ -78,15 +78,15 @@ public class Display extends JPanel {
             }
 
             ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
-            HashMap<Team, HashMap<Integer, Robot>> robots = robotSub.getLatestMsg();
+            HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getLatestMsg();
             for (int i = 0; i < 6; i++) {
-                Robot robot = robots.get(Team.YELLOW).get(i);
+                RobotData robot = robots.get(Team.YELLOW).get(i);
                 Vec2D pos = robot.getPos();
                 Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
             }
             for (int i = 0; i < 6; i++) {
-                Robot robot = robots.get(Team.BLUE).get(i);
+                RobotData robot = robots.get(Team.BLUE).get(i);
                 Vec2D pos = robot.getPos();
                 Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
                 obstacles.add(obstacle);
@@ -102,8 +102,8 @@ public class Display extends JPanel {
 
         fieldSizeSub = new Subscriber<SSL_GeometryFieldSize>("geometry", "fieldSize", 1);
         fieldLinesSub = new Subscriber<HashMap<String, Line2D>>("geometry", "fieldLines", 1);
-        robotSub = new Subscriber<HashMap<Team, HashMap<Integer, Robot>>>("detection", "robot");
-        ballSub = new Subscriber<Ball>("detection", "ball");
+        robotSub = new Subscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+        ballSub = new Subscriber<BallData>("detection", "ball");
 
         ImgLoader.loadImages();
 
@@ -203,9 +203,9 @@ public class Display extends JPanel {
         if (!robotSub.subscribe() || !ballSub.subscribe())
             return;
 
-        HashMap<Team, HashMap<Integer, Robot>> robots = robotSub.getLatestMsg();
+        HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getLatestMsg();
 
-        for (Robot robot : robots.get(Team.YELLOW).values()) {
+        for (RobotData robot : robots.get(Team.YELLOW).values()) {
             int[] pos = worldPosToDisplayPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
@@ -219,7 +219,7 @@ public class Display extends JPanel {
             g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
-        for (Robot robot : robots.get(Team.BLUE).values()) {
+        for (RobotData robot : robots.get(Team.BLUE).values()) {
             int[] pos = worldPosToDisplayPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
@@ -233,7 +233,7 @@ public class Display extends JPanel {
             g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
-        Ball ball = ballSub.getLatestMsg();
+        BallData ball = ballSub.getLatestMsg();
         int[] ballPos = worldPosToDisplayPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }

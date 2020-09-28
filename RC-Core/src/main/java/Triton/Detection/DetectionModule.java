@@ -10,28 +10,28 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class DetectionModule implements Module {
 
-    private HashMap<Team, HashMap<Integer, Robot>> robotMap;
-    private Ball ball;
+    private HashMap<Team, HashMap<Integer, RobotData>> robotMap;
+    private BallData ball;
 
     private Subscriber<SSL_DetectionFrame> detectSub;
-    private Publisher<HashMap<Team, HashMap<Integer, Robot>>> robotPub;
-    private Publisher<Ball> ballPub;
+    private Publisher<HashMap<Team, HashMap<Integer, RobotData>>> robotPub;
+    private Publisher<BallData> ballPub;
 
     public DetectionModule() {
         detectSub = new Subscriber<SSL_DetectionFrame>("vision", "detection", 10);
-        robotPub = new Publisher<HashMap<Team, HashMap<Integer, Robot>>>("detection", "robot");
-        ballPub = new Publisher<Ball>("detection", "ball");
+        robotPub = new Publisher<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+        ballPub = new Publisher<BallData>("detection", "ball");
 
-        ball = new Ball();
+        ball = new BallData();
 
-        robotMap = new HashMap<Team, HashMap<Integer, Robot>>();
-        HashMap<Integer, Robot> yellowRobots = new HashMap<Integer, Robot>();
-        HashMap<Integer, Robot> blueRobots = new HashMap<Integer, Robot>();
+        robotMap = new HashMap<Team, HashMap<Integer, RobotData>>();
+        HashMap<Integer, RobotData> yellowRobots = new HashMap<Integer, RobotData>();
+        HashMap<Integer, RobotData> blueRobots = new HashMap<Integer, RobotData>();
         robotMap.put(Team.YELLOW, yellowRobots);
         robotMap.put(Team.BLUE, blueRobots);
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            robotMap.get(Team.YELLOW).put(i, new Robot(Team.YELLOW, i));
-            robotMap.get(Team.BLUE).put(i, new Robot(Team.BLUE, i));
+            robotMap.get(Team.YELLOW).put(i, new RobotData(Team.YELLOW, i));
+            robotMap.get(Team.BLUE).put(i, new RobotData(Team.BLUE, i));
         }
     }
 

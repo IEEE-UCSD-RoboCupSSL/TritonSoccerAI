@@ -9,27 +9,25 @@ import java.io.*;
 import java.net.*;
 
 import java.util.HashMap;
+
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Proto.RemoteCommands.Remote_Geometry;
 import Triton.DesignPattern.PubSubSystem.Publisher;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 import Triton.DesignPattern.PubSubSystem.Module;
 
 public class TCPInit {
-    
-    private static byte[] geometry;
-    private static HashMap<Integer, Integer> ports;
 
-    static {
-        ports = new HashMap<Integer, Integer>();
-    }
-    
+    private static byte[] geometry;
+    private static Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+
     private class TCPConnection implements Module {
-        
+
         private int ID;
-        private Publisher<HashMap<Integer, Integer>> portsPub;
 
         public TCPConnection(int ID) {
             this.ID = ID;
-            portsPub = new Publisher<HashMap<Integer, Integer>>("station", "ports");
+            fieldSizeSub = new Subscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
         }
 
         public void run() {
@@ -39,15 +37,9 @@ public class TCPInit {
                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                 DataInputStream in = new DataInputStream(socket.getInputStream());
 
-                int ID = in.readInt();
-                int port = in.readInt();
-                .putPort(ID, port);
-
-                System.out.println("Robot " + ID + " listening to UDP commands on TCP port: " + port);
-                out.writeChars("Station will be sending UDP commands to robot " + ID + " on port: " + port + "\n");
                 out.writeInt(geometry.length);
                 out.write(geometry);
-                
+
                 /* Retain active connection */
                 while (true) {
                     in.read();
@@ -63,25 +55,13 @@ public class TCPInit {
 
     public static void init() {
         Remote_Geometry.Builder toSend = Remote_Geometry.newBuilder();
-        while (true) {
-            try {
-                Field field = GeometryData.get().getField();
-                for (HashMap.Entry<String, Line2D> entry : field.lineSegments.entrySet()) {
-                    toSend.putLines(entry.getKey(), entry.getValue().toProto());
-                }
-                toSend.setCenterCircleRadius(field.arcList.get(0).getRadius());
-                break;
-            } catch (Exception e) {
-                // Geometry not ready, do nothing
-            }
-        }
+        while (!fieldSizeSub.subscribe());
+
+        SSL_GeometryFieldSize fieldSize = fieldSizeSub.pollMsg();
+        toSend.setFieldLength(fieldSize.getFieldLength());
+        toSend.setFieldWidth(fieldSize.getFieldWidth());
+        toSend.setGoalDepth(fieldSize.getGoalDepth());
+        toSend.setGoalWidth(fieldSize.getGoalWidth());
         geometry = toSend.build().toByteArray();
-
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            new Thread(new TCPConnection(i)).start();
-        }
-
-        while(data.getNumRobot() != ObjectConfig.ROBOT_COUNT);
-        data.publish();
     }
 }
