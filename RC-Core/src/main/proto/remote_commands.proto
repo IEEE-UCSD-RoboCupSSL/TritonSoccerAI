@@ -64,8 +64,23 @@ message Remote_Geometry {
 }
 
 message Vision_Data {
-    Vec2D pos = 1;
-    Vec2D vel = 2;
+    Vec2D botPos = 1;
+    Vec2D botVel = 2;
+    double botAng = 3;
+    double botAngVel = 4;
+    Vec2D ballPos = 5;
+    Vec2D ballVel = 6;
+}
+
+message Command {
+
+}
+
+message EKF_Data {
+    Vec2D vel = 1;
+    Vec2D disp = 2;
+    double angVel = 3;
+    double angDisp = 4;
 }
 
 // user-defined control packet 

@@ -1,7 +1,6 @@
 package Triton;
 
 import java.util.concurrent.*;
-import java.util.HashMap;
 
 import Triton.Vision.*;
 import Triton.Detection.*;
@@ -54,28 +53,9 @@ public class App {
 
         Display display = new Display();
 
-        RobotConnetion robotConnect = new RobotConnetion(pool);
-        robotConnect.connect("localhost", 8888);
-        System.out.println(robotConnect.sendGeometry());
-
-        //TCPInit.init();
-        //new Thread(new UDPSend()).start();
-        //new Thread(new MCVision()).start();
-        /*
-        while(true) {
-            try {
-                StationData data = StationData.get();
-                for(int i = 0; i < 6; i++) {
-                    System.out.println(i + ": " + data.getPort(i));
-                }
-                break;
-            } catch(NullPointerException e) {
-                // Do nothing 
-            }
-        }
-        */
-
-        //new Thread(new MCVision()).start();
+        RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
+        robotConnect.buildTcpConnection("localhost", 8888);
+        //System.out.println(robotConnect.sendGeometry());
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
