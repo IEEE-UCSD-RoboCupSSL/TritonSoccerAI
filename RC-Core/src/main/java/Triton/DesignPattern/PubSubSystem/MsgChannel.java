@@ -4,20 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 
 public class MsgChannel<T> {
-    private static HashMap<String, MsgChannel> channels;
+    private static HashMap<String, MsgChannel> channels = new HashMap<String, MsgChannel>();
 
     private ReadWriteLock lock;
     private String channelName;
     private T msg;
     private ArrayList<BlockingQueue<T>> queues;
-
-    static {
-        channels = new HashMap<String, MsgChannel>();
-    }
 
     public MsgChannel(String topicName, String msgName) {
         channelName = topicName + msgName;
@@ -96,28 +91,5 @@ public class MsgChannel<T> {
         } finally {
             lock.writeLock().unlock();
         }
-    }
-
-    public static void main(String[] args) {
-        Thread pubThread = new Thread(() -> {
-            Publisher<Integer> pub = new Publisher<Integer>("Test", "int");
-
-            for(int i = 0; i < 100; i++) {
-                pub.publish(i);
-            }
-
-        });
-        pubThread.start();
-
-        Thread subThread = new Thread(() -> {
-            Subscriber<Integer> sub = new Subscriber<Integer>("Test", "int", 10);
-            while(!sub.subscribe());
-             
-            for(int i = 0; i < 100; i++) {
-                System.out.println(sub.pollMsg());
-            }
-
-        });
-        subThread.start();
     }
 }
