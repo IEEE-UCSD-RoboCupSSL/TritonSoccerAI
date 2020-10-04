@@ -2,7 +2,7 @@ package Triton.RemoteStation;
 
 import java.util.*;
 
-import Proto.RemoteCommands.Vision_Data;
+import Proto.RemoteAPI.VisionData;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Detection.BallData;
 import Triton.Detection.RobotData;
@@ -27,7 +27,7 @@ public class RobotVisionUDPStream extends RobotUDPStream {
         BallData ballData = ballSub.pollMsg();
         RobotData botData = robotDataMap.get(team).get(ID);
 
-        Vision_Data.Builder toSend = Vision_Data.newBuilder();
+        VisionData.Builder toSend = VisionData.newBuilder();
         toSend.setBotPos(botData.getPos().toProto());
         toSend.setBotVel(botData.getVel().toProto());
         toSend.setBotAng(botData.getOrient());

@@ -55,7 +55,7 @@ public class App {
 
         RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
         robotConnect.buildTcpConnection("localhost", 8888);
-        //System.out.println(robotConnect.sendGeometry());
+        System.out.println(robotConnect.getRobotTCPConnection().sendGeometry());
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);

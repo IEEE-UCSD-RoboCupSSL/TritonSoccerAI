@@ -1,14 +1,12 @@
 package Triton.Display;
 
 import Triton.Config.ObjectConfig;
+import Triton.Computation.ThetaStar.*;
 import Triton.Config.DisplayConfig;
-import Triton.Computation.AStar.*;
 import Triton.Detection.*;
 import Triton.Detection.RobotData;
-import Triton.Geometry.*;
 import Triton.Shape.*;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
-import Triton.DesignPattern.PubSubSystem.Publisher;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -17,12 +15,10 @@ import java.awt.image.*;
 
 import java.util.*;
 import java.util.Timer;
-import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import Proto.MessagesRobocupSslDetection.*;
 import Proto.MessagesRobocupSslGeometry.*;
 
 public class Display extends JPanel {

@@ -3,7 +3,7 @@ package Triton.RemoteStation;
 import java.net.*;
 
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Proto.RemoteCommands.Remote_Geometry;
+import Proto.RemoteAPI.RemoteGeometry;
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 
@@ -49,7 +49,7 @@ public class RobotTCPConnection implements Module {
         while (!fieldSizeSub.subscribe());
 
         SSL_GeometryFieldSize fieldSize = fieldSizeSub.pollMsg();
-        Remote_Geometry.Builder toSend = Remote_Geometry.newBuilder();
+        RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
         toSend.setFieldLength(fieldSize.getFieldLength());
         toSend.setFieldWidth(fieldSize.getFieldWidth());
         toSend.setGoalDepth(fieldSize.getGoalDepth());

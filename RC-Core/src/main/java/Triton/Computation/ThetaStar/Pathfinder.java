@@ -1,4 +1,4 @@
-package Triton.Computation.AStar;
+package Triton.Computation.ThetaStar;
 
 import java.util.*;
 
@@ -42,15 +42,15 @@ public class Pathfinder {
                 if (!neighbor.getWalkable() || closedSet.contains(neighbor))
                     continue;
 
-                Node parentNode = currentNode;
+                Node previousNode = currentNode;
                 if (currentNode != startNode && grid.checkLineOfSight(currentNode.getParent(), neighbor))
-                    parentNode = currentNode.getParent();
+                    previousNode = currentNode.getParent();
 
-                double newMovementCostToNeighbor = parentNode.getGCost() + getDist(parentNode, neighbor);
+                double newMovementCostToNeighbor = previousNode .getGCost() + getDist(previousNode, neighbor);
                 if (newMovementCostToNeighbor < neighbor.getGCost() || !openSet.contains(neighbor)) {
                     neighbor.setGCost(newMovementCostToNeighbor);
                     neighbor.setHCost(getDist(neighbor, targetNode));
-                    neighbor.setParent(parentNode);
+                    neighbor.setParent(previousNode);
                     openSet.add(neighbor);
                 }
             }

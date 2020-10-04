@@ -1,4 +1,4 @@
-package Triton.Computation.AStar;
+package Triton.Computation.ThetaStar;
 
 import java.util.ArrayList;
 

@@ -11,9 +11,9 @@ public class RobotConnetion {
     private int ID;
 
     private RobotTCPConnection tcpConnect;
-    private RobotUDPStream commandStream;
-    private RobotUDPStream visionStream;
-    private RobotUDPStream dataStream;
+    private RobotCommandUDPStream commandStream;
+    private RobotVisionUDPStream visionStream;
+    private RobotInternalUDPStream dataStream;
 
     public RobotConnetion(Team team, int ID, ExecutorService pool) {
         this.team = team;
@@ -21,19 +21,35 @@ public class RobotConnetion {
         this.pool = pool;
     }
 
+    public RobotTCPConnection getRobotTCPConnection() {
+        return tcpConnect;
+    }
+
+    public RobotCommandUDPStream getCommandStream() {
+        return commandStream;
+    }
+
+    public RobotVisionUDPStream getVisionStream() {
+        return visionStream;
+    }
+
+    public RobotInternalUDPStream getDataStream() {
+        return dataStream;
+    }
+    
     public void buildTcpConnection(String ip, int port) {
         tcpConnect = new RobotTCPConnection(ip, port);
     }
 
     public void buildCommandUDP(String ip, int port) {
-        commandStream = new RobotUDPStream(ip, port, team, ID);
+        commandStream = new RobotCommandUDPStream(ip, port, team, ID);
     }
 
     public void buildVisionStream(String ip, int port) {
-        visionStream = new RobotUDPStream(ip, port, team, ID);
+        visionStream = new RobotVisionUDPStream(ip, port, team, ID);
     }
 
     public void buildDataStream(String ip, int port) {
-        dataStream = new RobotUDPStream(ip, port, team, ID);
+        dataStream = new RobotInternalUDPStream(ip, port, team, ID);
     }
 }
