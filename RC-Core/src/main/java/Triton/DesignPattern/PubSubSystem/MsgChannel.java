@@ -29,8 +29,6 @@ public class MsgChannel<T> {
     public static MsgChannel getChannel(String topicName, String msgName) {
         String channelName = topicName + msgName;
         MsgChannel channel = channels.get(channelName);
-        if (channel == null)
-            throw new NullPointerException();
         return channels.get(channelName);
     }
 
@@ -43,10 +41,27 @@ public class MsgChannel<T> {
         }
     }
 
-    public void addMsg(T msg) {
+    public void setMsg(T msg) {
         lock.writeLock().lock();
         try {
             this.msg = msg;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public T getMsg() {
+        lock.readLock().lock();
+        try {
+            return msg;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+    
+    public void addMsg(T msg) {
+        lock.writeLock().lock();
+        try {
             for (BlockingQueue<T> queue : queues) {
                 try {
                     queue.put(msg);
@@ -62,7 +77,6 @@ public class MsgChannel<T> {
     public void addMsg(T msg, long timeout_ms) {
         lock.writeLock().lock();
         try {
-            this.msg = msg;
             for (BlockingQueue<T> queue : queues) {
                 try {
                     queue.offer(msg, timeout_ms, TimeUnit.MILLISECONDS); 
@@ -70,24 +84,6 @@ public class MsgChannel<T> {
                     e.printStackTrace();
                 }
             }
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
-    public T getMsg() {
-        lock.readLock().lock();
-        try {
-            return msg;
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    public void resetMsg(T msg) {
-        lock.writeLock().lock();
-        try {
-            this.msg = msg;
         } finally {
             lock.writeLock().unlock();
         }

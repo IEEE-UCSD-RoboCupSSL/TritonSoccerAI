@@ -1,6 +1,9 @@
 package Triton.Detection;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
@@ -19,11 +22,7 @@ public class RobotData {
 
         @Override
         public int compareTo(SortedDetection other) {
-            if(this.time == other.time) {
-                return 0;
-            } else if(this.time < other.time) { // this older -> (1) greater -> lower in min-heap
-                return 1;
-            } else return -1;
+            return (int) (other.time - time);
         }
         
         @Override
@@ -58,6 +57,8 @@ public class RobotData {
     public void update(SSL_DetectionRobot detection, double time) {
         SortedDetection latest = new SortedDetection(detection, time);
         detections.add(latest);
+        Collections.sort(detections);
+
         // return when there is no previous data
         if (detections.size() == 1) {
             vel = new Vec2D(0, 0);

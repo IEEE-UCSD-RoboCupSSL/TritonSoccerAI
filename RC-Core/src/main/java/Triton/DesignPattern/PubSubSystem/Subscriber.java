@@ -1,68 +1,33 @@
 package Triton.DesignPattern.PubSubSystem;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-public class Subscriber<T> {
-    private String topicName, msgName;
-    private MsgChannel<T> channel;
-    private BlockingQueue<T> queue;
-    private boolean useMsgQueue;
+public abstract class Subscriber<T> {
+    protected String topicName, msgName;
+    protected MsgChannel<T> channel;
 
     public Subscriber(String topicName, String msgName) {
         this.topicName = topicName;
         this.msgName = msgName;
     }
 
-    public Subscriber(String topicName, String msgName, int queueSize) {
-        this.topicName = topicName;
-        this.msgName = msgName;
-        useMsgQueue = true;
-        queue = new LinkedBlockingQueue<T>(queueSize);
-    }
-
-    public void resetLatestMsg(T msg) {
-        channel.resetMsg(msg);
-    }
-
     public boolean subscribe() {
-        try {
+        do {
             channel = MsgChannel.getChannel(topicName, msgName);
-        } catch (NullPointerException e) {
-            return false;
-        }
-
-        if (useMsgQueue) {
-            channel.addMsgQueue(queue);
-        }
+        } while (channel == null);
         return true;
     }
 
-    public T getLatestMsg() {
-        return channel.getMsg();
+    public boolean subscribe(long timeout) throws TimeoutException {
+        long curr = System.currentTimeMillis();
+        do {
+            if (System.currentTimeMillis() - curr > timeout) {
+                throw new TimeoutException();
+            }
+            channel = MsgChannel.getChannel(topicName, msgName);
+        } while (channel == null);
+        return true;
     }
 
-    public T pollMsg() {
-        T rtn = null;
-        try {
-            rtn = queue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return rtn;
-    }
-
-    public T pollMsg(long ms, T defaultReturn) {
-        T rtn = null;
-        try {
-            rtn = queue.poll(ms, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        if (rtn == null)
-            return defaultReturn;
-        return rtn;
-    }
+    public abstract T getMsg();
 }

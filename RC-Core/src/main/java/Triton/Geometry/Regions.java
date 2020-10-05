@@ -1,6 +1,7 @@
 package Triton.Geometry;
 
 import Triton.Shape.*;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 import java.util.*;
 
@@ -16,12 +17,12 @@ public class Regions {
     private static Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 
     public static void createRegions() {
-        fieldSizeSub = new Subscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
-        fieldLinesSub = new Subscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
+        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
         while (!fieldSizeSub.subscribe() || !fieldLinesSub.subscribe());
          
-        SSL_GeometryFieldSize fieldSize = fieldSizeSub.getLatestMsg();
-        HashMap<String, Line2D> fieldLines = fieldLinesSub.getLatestMsg();
+        SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+        HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
 
         // Create the center circle in the middle of the field
         double centerCircleRadius = fieldSize.getFieldArcs(0).getRadius();

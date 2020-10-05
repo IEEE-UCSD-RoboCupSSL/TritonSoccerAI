@@ -1,6 +1,7 @@
 package Triton.Detection;
 
 import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.DesignPattern.PubSubSystem.Publisher;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
@@ -18,9 +19,9 @@ public class DetectionModule implements Module {
     private Publisher<BallData> ballPub;
 
     public DetectionModule() {
-        detectSub = new Subscriber<SSL_DetectionFrame>("vision", "detection", 10);
-        robotPub = new Publisher<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
-        ballPub = new Publisher<BallData>("detection", "ball");
+        detectSub = new MQSubscriber<SSL_DetectionFrame>("vision", "detection", 10);
+        robotPub = new FieldPublisher<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot", null);
+        ballPub = new FieldPublisher<BallData>("detection", "ball", null);
 
         ball = new BallData();
 
@@ -36,11 +37,11 @@ public class DetectionModule implements Module {
     }
 
     public void run() {
-        while (!detectSub.subscribe());
+        detectSub.subscribe();
 
         while (true) {
             try {
-                update(detectSub.pollMsg());
+                update(detectSub.getMsg());
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,8 +1,7 @@
 package Triton.Geometry;
 
 import Triton.Shape.*;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
-import Triton.DesignPattern.PubSubSystem.Publisher;
+import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Module;
 import java.util.*;
 import Proto.MessagesRobocupSslGeometry.*;
@@ -13,16 +12,16 @@ public class GeometryModule implements Module {
     private Publisher<HashMap<String, Line2D>> fieldLinesPub;
 
     public GeometryModule() {
-        geoSub = new Subscriber<SSL_GeometryData>("vision", "geometry", 1);
-        fieldSizePub = new Publisher<SSL_GeometryFieldSize>("geometry", "fieldSize");
-        fieldLinesPub = new Publisher<HashMap<String, Line2D>>("geometry", "fieldLines");
+        geoSub = new MQSubscriber<SSL_GeometryData>("vision", "geometry");
+        fieldSizePub = new FieldPublisher<SSL_GeometryFieldSize>("geometry", "fieldSize", null);
+        fieldLinesPub = new FieldPublisher<HashMap<String, Line2D>>("geometry", "fieldLines", null);
     }
 
     public void run() {
-        while (!geoSub.subscribe());
+        geoSub.subscribe();
 
         while (true) {
-            SSL_GeometryData geoData = geoSub.pollMsg();
+            SSL_GeometryData geoData = geoSub.getMsg();
             fieldSizePub.publish(geoData.getField());
 
             List<SSL_FieldLineSegment> lineList = geoData.getField().getFieldLinesList();

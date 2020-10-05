@@ -1,7 +1,7 @@
 package Triton.RemoteStation;
 
 import Proto.RemoteAPI.Commands;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
+import Triton.DesignPattern.PubSubSystem.*;
 import Triton.Detection.Team;
 
 public class RobotCommandUDPStream extends RobotUDPStream {
@@ -11,11 +11,11 @@ public class RobotCommandUDPStream extends RobotUDPStream {
     public RobotCommandUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, team, ID);
 
-        commandSub = new Subscriber<Commands>("command", team.name() + ID, 1);
+        commandSub = new MQSubscriber<Commands>("command", team.name() + ID, 1);
     }
 
     private void sendCommand() {
-        Commands command = commandSub.pollMsg();
+        Commands command = commandSub.getMsg();
         byte[] bytes = command.toByteArray();
         send(bytes);
     }

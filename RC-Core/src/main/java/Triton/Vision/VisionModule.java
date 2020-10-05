@@ -31,8 +31,8 @@ public class VisionModule implements Module {
     }
 
     public VisionModule(String ip, int port) {
-        detectPub = new Publisher<SSL_DetectionFrame>("vision", "detection");
-        geoPub = new Publisher<SSL_GeometryData>("vision", "geometry");
+        detectPub = new MQPublisher<SSL_DetectionFrame>("vision", "detection");
+        geoPub = new MQPublisher<SSL_GeometryData>("vision", "geometry");
 
         buffer = new byte[MAX_BUFFER_SIZE];
         try {

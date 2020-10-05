@@ -1,21 +1,11 @@
 package Triton.DesignPattern.PubSubSystem;
 
-public class Publisher<T> {
-    private MsgChannel<T> channel;
+public abstract class Publisher<T> {
+    protected MsgChannel<T> channel;
 
     public Publisher (String topicName, String msgName) {   
         channel = new MsgChannel<T>(topicName, msgName);
     }
 
-    public Publisher () {   
-        channel = null;
-    }
-
-    public void publish(T msg) {
-        channel.addMsg(msg);
-    }
-
-    public void publish(T msg, long ms) {
-        channel.addMsg(msg, ms);
-    }
+    public abstract void publish(T msg);
 }

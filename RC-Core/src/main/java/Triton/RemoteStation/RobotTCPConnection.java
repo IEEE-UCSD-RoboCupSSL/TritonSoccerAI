@@ -5,7 +5,7 @@ import java.net.*;
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Proto.RemoteAPI.RemoteGeometry;
 import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
+import Triton.DesignPattern.PubSubSystem.*;
 
 import java.io.*;
 
@@ -21,7 +21,7 @@ public class RobotTCPConnection implements Module {
     private boolean isConnected;
 
     public RobotTCPConnection(String ip, int port) {
-        fieldSizeSub = new Subscriber<SSL_GeometryFieldSize>("geometry", "fieldSize", 1);
+        fieldSizeSub = new MQSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize", 1);
     }
 
     public boolean connect() {
@@ -48,7 +48,7 @@ public class RobotTCPConnection implements Module {
     public boolean sendGeometry() {
         while (!fieldSizeSub.subscribe());
 
-        SSL_GeometryFieldSize fieldSize = fieldSizeSub.pollMsg();
+        SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
         RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
         toSend.setFieldLength(fieldSize.getFieldLength());
         toSend.setFieldWidth(fieldSize.getFieldWidth());
