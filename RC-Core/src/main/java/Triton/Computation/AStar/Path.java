@@ -27,7 +27,7 @@
 /*
  * @Author: Neil Min, Cecilia Hong
  * @Date: 2020-10-10 15:44:31
- * @LastEditTime: 2020-10-10 23:37:39
+ * @LastEditTime: 2020-10-10 08:37:41
  * @Description: Path record for a particular robot
  * @FilePath: /SimuBot/RC-Core/src/main/java/Triton/Computation/AStar/Path.java
  */
