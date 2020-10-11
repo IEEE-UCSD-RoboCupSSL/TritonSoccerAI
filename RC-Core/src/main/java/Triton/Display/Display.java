@@ -92,7 +92,7 @@ public class Display extends JPanel {
             for (int i = 0; i < 6; i++) {
                 RobotData robot = robots.get(Team.BLUE).get(i);
                 Vec2D robotPos = robot.getPos();
-                double dist = Vec2D.dist(ballPos, robotPos);
+                double dist = Vec2D.dist2(ballPos, robotPos);
                 if (dist < minDist) {
                     closestRobot = robot;
                     minDist = dist;
@@ -131,8 +131,6 @@ public class Display extends JPanel {
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
 
         ImgLoader.loadImages();
-
-        //addMouseListener(new DisplayMouseInputAdapter());
 
         Box box = new Box(BoxLayout.Y_AXIS);
         box.add(Box.createVerticalGlue());
