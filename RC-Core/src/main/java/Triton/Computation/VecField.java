@@ -4,7 +4,7 @@ import Triton.Config.PathfinderConfig;
 import Triton.Shape.*;
 import java.util.*;
 
-public class Pathing {
+public class VecField {
 
     private static double END_THRESHOLD = 100;
     private static double MOVE_DIST = 100;
@@ -49,7 +49,7 @@ public class Pathing {
                 inRange.add(obstacle);
         }
 
-        Circle2D closestObsacle;
+        /* Circle2D closestObsacle;
         double min = Double.MAX_VALUE;
         for (Circle2D obstacle : inRange) {
             double dist2 = Vec2D.dist2(start, obstacle.center);
@@ -58,7 +58,7 @@ public class Pathing {
                 min = dist2;
             }
         }
-        // TODO: decide which side to go around the closestObsacle
+        TODO: decide which side to go around the closestObsacle */
         return points;
     }
 

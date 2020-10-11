@@ -1,7 +1,9 @@
 package Triton.Computation.ThetaStar;
 
 import java.util.ArrayList;
+import com.google.common.primitives.Ints;
 
+import Triton.Computation.Gridify;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Line2D;
@@ -13,36 +15,40 @@ public class Grid {
     private Node[][] nodes;
     private int numRows, numCols;
 
+    private Gridify convert;
+
     public Grid(double worldSizeX, double worldSizeY) {
         this.worldSizeX = worldSizeX;
         this.worldSizeY = worldSizeY;
-        numCols = (int) Math.round(worldSizeX / PathfinderConfig.NODE_DIAMETER);
-        numRows = (int) Math.round(worldSizeY / PathfinderConfig.NODE_DIAMETER);
+
+        convert = new Gridify(
+            new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
+            new Vec2D(PathfinderConfig.NODE_RADIUS - worldSizeX / 2, 
+                      PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
+            false, true);
+
+        numCols = convert.numCols(worldSizeX);
+        numRows = convert.numRows(worldSizeY);
         createGrid();
     }
 
-    private Vec2D gridPosToWorldPos(int row, int col) {
-        return new Vec2D(col * PathfinderConfig.NODE_DIAMETER + PathfinderConfig.NODE_RADIUS - worldSizeX / 2,
-                -row * PathfinderConfig.NODE_DIAMETER - PathfinderConfig.NODE_RADIUS + worldSizeY / 2);
-    }
-
-    private int[] worldPosToGridPos(Vec2D worldPos) {
-        int[] res = { (int) Math.round((worldSizeY / 2 - worldPos.y) / PathfinderConfig.NODE_DIAMETER - 0.5),
-                (int) Math.round((worldPos.x + worldSizeX / 2 - PathfinderConfig.NODE_RADIUS)
-                        / PathfinderConfig.NODE_DIAMETER), };
-        return res;
-    }
-
     public Node nodeFromWorldPos(Vec2D worldPos) {
-        int[] gridPos = worldPosToGridPos(worldPos);
-        return nodes[gridPos[0]][gridPos[1]];
+        int[] gridPos = convert.fromPos(worldPos);
+        try {
+            return nodes[gridPos[1]][gridPos[0]];
+        } catch (IndexOutOfBoundsException e) {
+            int col = Ints.constrainToRange(gridPos[0], 0, numCols - 1);
+            int row = Ints.constrainToRange(gridPos[1], 0, numRows - 1);
+            System.err.println(String.format("POS %s is out of bound", worldPos));
+            return nodes[row][col];
+        }
     }
 
     private void createGrid() {
         nodes = new Node[numRows][numCols];
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                Vec2D worldPos = gridPosToWorldPos(row, col);
+                Vec2D worldPos = convert.fromInd(col, row);
                 nodes[row][col] = new Node(worldPos, row, col);
             }
         }
@@ -80,12 +86,12 @@ public class Grid {
         Vec2D topLeft = new Vec2D(center.x - radius, center.y + radius);
         Vec2D botRight = new Vec2D(center.x + radius, center.y - radius);
 
-        int[] topLeftGridPos = worldPosToGridPos(topLeft);
-        int[] botRightGridPos = worldPosToGridPos(botRight);
+        int[] topLeftGridPos  = convert.fromPos(topLeft);
+        int[] botRightGridPos = convert.fromPos(botRight);
 
         ArrayList<Node> toCheck = new ArrayList<Node>();
-        for (int row = topLeftGridPos[0]; row <= botRightGridPos[0]; row++)
-            for (int col = topLeftGridPos[1]; col <= botRightGridPos[1]; col++)
+        for (int row = topLeftGridPos[1]; row <= botRightGridPos[1]; row++)
+            for (int col = topLeftGridPos[0]; col <= botRightGridPos[0]; col++)
                 toCheck.add(nodes[row][col]);
         return toCheck;
     }

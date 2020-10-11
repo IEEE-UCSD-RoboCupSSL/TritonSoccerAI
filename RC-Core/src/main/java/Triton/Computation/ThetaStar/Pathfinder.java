@@ -27,6 +27,9 @@ public class Pathfinder {
         Node startNode = grid.nodeFromWorldPos(startPos);
         Node targetNode = grid.nodeFromWorldPos(targetPos);
 
+        System.out.println("Finding path from " + startNode.getWorldPos() 
+                                       + " to " + targetNode.getWorldPos());
+
         PriorityQueue<Node> openSet = new PriorityQueue<Node>(1, new NodeComparator());
         HashSet<Node> closedSet = new HashSet<Node>();
         openSet.add(startNode);
