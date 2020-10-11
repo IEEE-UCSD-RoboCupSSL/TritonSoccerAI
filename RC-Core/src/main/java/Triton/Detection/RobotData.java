@@ -1,7 +1,6 @@
 package Triton.Detection;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import Triton.Shape.Vec2D;
@@ -33,10 +32,16 @@ public class RobotData {
         public Vec2D getPos() {
             return new Vec2D(detection.getX(), detection.getY());
         }
+
+        public double getAngle() {
+            return detection.getOrientation();
+        }
     }
 
     private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
+    private Vec2D pos;
     private Vec2D vel;
+    private double angle;
     private double angVel;
     private Team team;
     private int ID;
@@ -59,6 +64,10 @@ public class RobotData {
         detections.add(latest);
         Collections.sort(detections);
 
+        SortedDetection newest = detections.get(0);
+        pos = newest.getPos();
+        angle = newest.getAngle();
+
         // return when there is no previous data
         if (detections.size() == 1) {
             vel = new Vec2D(0, 0);
@@ -79,11 +88,11 @@ public class RobotData {
     }
 
     public Vec2D getPos() {
-        return detections.get(detections.size() - 1).getPos();
+        return pos;
     }
 
     public double getOrient() {
-        return detections.get(detections.size() - 1).detection.getOrientation();
+        return angle;
     }
     public Vec2D getVel() { 
         return vel;
