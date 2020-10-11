@@ -27,7 +27,7 @@
 /*
  * @Author: Neil Min, Cecilia Hong
  * @Date: 2020-10-10 15:44:31
- * @LastEditTime: 2020-10-10 08:37:41
+ * @LastEditTime: 2020-10-11 11:31:21
  * @Description: Path record for a particular robot
  * @FilePath: /SimuBot/RC-Core/src/main/java/Triton/Computation/AStar/Path.java
  */
@@ -42,10 +42,15 @@ import Triton.Shape.Vec2D;
 public class Path {
 	private Grid grid;
 	private ArrayList<Node> markedNodes;
+	private Robot robot;
 
-	public Path(double worldSizeX, double worldSizeY) {
-		grid = new Grid(worldSizeX, worldSizeY);
-		markedNodes = new ArrayList<>();
+	public Path(Grid grid, Robot robot) {
+		this.grid = gird;
+		this.robot = robot;
+	}
+
+	public Robot getRobot() {
+		return robot;
 	}
 
 	// Add a path into the path records of a robot
@@ -54,14 +59,14 @@ public class Path {
 			if (!markedNodes.contains(n)) {
 				markedNodes.add(n);
 			}
-			n.setWalkable(false); // mark the node along the path
+			n.setWalkable(robot, false); // mark the node along the path
 		}
 	}
 
 	// Clear the path records
 	public void reset() {
 		for (Node n : markedNodes) {
-			n.setWalkable(true);
+			n.setWalkable(robot, true);
 		}
 		markedNodes.clear();
 	}
