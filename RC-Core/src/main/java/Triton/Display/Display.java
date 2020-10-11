@@ -1,6 +1,7 @@
 package Triton.Display;
 
 import Triton.Config.ObjectConfig;
+import Triton.Computation.Gridify;
 import Triton.Computation.ThetaStar.*;
 import Triton.Config.DisplayConfig;
 import Triton.Detection.*;
@@ -20,6 +21,7 @@ import javax.swing.*;
 
 import Proto.MessagesRobocupSslGeometry.*;
 
+@SuppressWarnings("serial")
 public class Display extends JPanel {
 
     private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
@@ -37,6 +39,7 @@ public class Display extends JPanel {
 
     private ArrayList<Vec2D> path;
     private Pathfinder pathfinder;
+    private Gridify convert;
 
     private class RepaintTask extends TimerTask {
         private Display display;
@@ -153,8 +156,16 @@ public class Display extends JPanel {
             if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0 || fieldSize.getGoalDepth() == 0)
                 continue;
 
-            windowWidth = (int) ((fieldSize.getFieldLength() + fieldSize.getGoalDepth() * 2.0) * DisplayConfig.SCALE);
-            windowHeight = (int) (fieldSize.getFieldWidth() * DisplayConfig.SCALE);
+            double fullLength = fieldSize.getFieldLength() + fieldSize.getGoalDepth() * 2.0;
+
+            convert = new Gridify(
+                new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
+                new Vec2D(- fullLength / 2, 
+                          - fieldSize.getFieldWidth() / 2),
+                false, true);
+
+            windowWidth = convert.numCols(fullLength);
+            windowHeight = convert.numRows(fieldSize.getFieldWidth());
             break;
         }
 
@@ -181,18 +192,6 @@ public class Display extends JPanel {
         findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
     }
 
-    public int[] worldPosToDisplayPos(Vec2D v) {
-        int[] res = { (int) Math.round(v.x * DisplayConfig.SCALE + windowWidth / 2),
-                (int) Math.round(-v.y * DisplayConfig.SCALE + windowHeight / 2) };
-        return res;
-    }
-
-    public Vec2D displayPosToWorldPos(int[] v) {
-        double x = ((double) v[0] - windowWidth / 2) / DisplayConfig.SCALE;
-        double y = -((double) v[1] - windowHeight / 2) / DisplayConfig.SCALE;
-        return new Vec2D(x, y);
-    }
-
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -210,15 +209,19 @@ public class Display extends JPanel {
         fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
                 return;
-            int[] p1 = worldPosToDisplayPos(line.p1);
-            int[] p2 = worldPosToDisplayPos(line.p2);
+            int[] p1 = convert.fromPos(line.p1);
+            // System.out.println("res: " + p1[0] + ", " + p1[1]);
+            // int[] res2 = convert.fromPos(line.p1);
+            // System.out.println("res2: " + res2[0] + ", " + res2[1]);
+
+            int[] p2 = convert.fromPos(line.p2);
             g2d.setColor(Color.WHITE);
             g2d.setStroke(new BasicStroke(2));
             g2d.drawLine(p1[0], p1[1], p2[0], p2[1]);
         });
 
         for (SSL_FieldCicularArc arc : fieldSize.getFieldArcsList()) {
-            int[] center = worldPosToDisplayPos(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
+            int[] center = convert.fromPos(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
             int radius = (int) (arc.getRadius() * DisplayConfig.SCALE);
 
             g2d.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2,
@@ -233,7 +236,7 @@ public class Display extends JPanel {
         HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
 
         for (RobotData robot : robots.get(Team.YELLOW).values()) {
-            int[] pos = worldPosToDisplayPos(robot.getPos());
+            int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
                     ImgLoader.yellowRobot.getWidth() / 2);
@@ -247,7 +250,7 @@ public class Display extends JPanel {
         }
 
         for (RobotData robot : robots.get(Team.BLUE).values()) {
-            int[] pos = worldPosToDisplayPos(robot.getPos());
+            int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
                     ImgLoader.blueRobot.getWidth() / 2);
@@ -261,18 +264,35 @@ public class Display extends JPanel {
         }
 
         BallData ball = ballSub.getMsg();
-        int[] ballPos = worldPosToDisplayPos(ball.getPos());
+        int[] ballPos = convert.fromPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
 
     private void paintPath(Graphics2D g2d) {
+        /*
+        Grid grid = pathfinder.getGrid();
+        Node[][] nodes = grid.getNodes();
+        for (int row = 0; row < grid.getNumRows(); row++) {
+            for (int col = 0; col < grid.getNumCols(); col++) {
+                Node node = nodes[row][col];
+                Vec2D worldPos = node.getWorldPos();
+                int[] displayPos = convert.fromPos(worldPos);
+                if (!node.getWalkable()) {
+                    g2d.setColor(Color.RED);
+                    g2d.setStroke(new BasicStroke(5));
+                    g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
+                }
+            }
+        }
+        */
+
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));
 
         if (path != null && !path.isEmpty()) {
             for (int i = 0; i < path.size() - 1; i++) {
-                int[] pointA = worldPosToDisplayPos(path.get(i));
-                int[] pointB = worldPosToDisplayPos(path.get(i + 1));
+                int[] pointA = convert.fromPos(path.get(i));
+                int[] pointB = convert.fromPos(path.get(i + 1));
                 g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
             }
         }
