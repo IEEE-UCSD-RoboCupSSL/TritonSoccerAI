@@ -54,15 +54,19 @@ public class RobotTCPConnection implements Module {
     }
 
     public boolean sendGeometry() {
-        // fieldSizeSub.subscribe();
-        // System.out.println("???");
+        fieldSizeSub.subscribe();
 
-        // SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
-        // RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
-        // toSend.setFieldLength(fieldSize.getFieldLength());
-        // toSend.setFieldWidth(fieldSize.getFieldWidth());
-        // toSend.setGoalDepth(fieldSize.getGoalDepth());
-        // toSend.setGoalWidth(fieldSize.getGoalWidth());
+        SSL_GeometryFieldSize fieldSize = null;
+        do {
+            fieldSize = fieldSizeSub.getMsg();
+        }
+        while (fieldSize == null);
+
+        RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
+        toSend.setFieldLength(fieldSize.getFieldLength());
+        toSend.setFieldWidth(fieldSize.getFieldWidth());
+        toSend.setGoalDepth(fieldSize.getGoalDepth());
+        toSend.setGoalWidth(fieldSize.getGoalWidth());
 
         // byte[] geoByteArray = toSend.build().toByteArray();
 

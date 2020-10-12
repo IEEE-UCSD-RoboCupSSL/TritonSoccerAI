@@ -50,9 +50,9 @@ public class App {
 
         pool.execute(visionRunnable);
         pool.execute(geoRunnable);
-        // pool.execute(detectRunnable);
+        pool.execute(detectRunnable);
 
-        // Display display = new Display();
+        Display display = new Display();
 
         RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
         robotConnect.buildTcpConnection("localhost", 6666);
