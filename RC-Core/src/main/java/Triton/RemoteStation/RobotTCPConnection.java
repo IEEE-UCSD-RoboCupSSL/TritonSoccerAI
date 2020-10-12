@@ -29,9 +29,13 @@ public class RobotTCPConnection implements Module {
             clientSocket = new Socket(ip, port);
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out.writeBytes("HELLO WORLD");
-            isConnected = true;
-            return true;
+            
+            String line = in.readLine();
+            if (line.equals("CONNECTION ESTABLISHED")){    
+                isConnected = true;
+                return true;
+            }
+            return false;
         } catch (UnknownHostException e) {
             isConnected = false;
             return false;

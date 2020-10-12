@@ -6,6 +6,7 @@ import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.RobotConnetion;
+import Triton.RemoteStation.RobotTCPConnection;
 import Triton.Display.*;
 
 /*import org.eclipse.jetty.server.Server;
@@ -54,8 +55,10 @@ public class App {
         Display display = new Display();
 
         RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
-        robotConnect.buildTcpConnection("localhost", 8888);
-        System.out.println(robotConnect.getRobotTCPConnection().sendGeometry());
+        robotConnect.buildTcpConnection("localhost", 6666);
+        RobotTCPConnection tcpConn = robotConnect.getRobotTCPConnection();
+        tcpConn.connect();
+        System.out.println(tcpConn.sendGeometry());
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
