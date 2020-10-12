@@ -1,11 +1,13 @@
 package Triton.Computation.ThetaStar;
 
+import java.util.HashMap;
+import Triton.Detection.Robot;
 import Triton.Shape.Vec2D;
 
 public class Node {
     private Vec2D worldPos;
     private int row, col;
-    private boolean walkable = true;
+    private HashMap<Robot, Boolean> walkable;
     private double gCost, hCost, fCost;
     private Node parent;
 
@@ -13,6 +15,11 @@ public class Node {
         this.row = row;
         this.col = col;
         this.worldPos = worldPos;
+        walkable = new HashMap<>();
+    }
+
+    public void clearWalkable() {
+        walkable.clear();
     }
 
     public Vec2D getWorldPos() {
@@ -27,12 +34,18 @@ public class Node {
         return col;
     }
     
-    public void setWalkable(boolean walkable) {
-        this.walkable = walkable;
+    public void setWalkable(Robot robot, boolean walkable) {
+        this.walkable.put(robot, walkable);
     }
 
-    public boolean getWalkable() {
-        return walkable;
+    public boolean getWalkable(Robot robot) {
+        if (walkable.get(robot) == null) {
+            walkable.put(robot, true);
+            return true;
+        }
+        else {
+            return walkable.get(robot);
+        }
     }
 
     public double getGCost() {

@@ -5,8 +5,7 @@ import java.util.concurrent.*;
 import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
-import Triton.RemoteStation.RobotConnetion;
-import Triton.RemoteStation.RobotTCPConnection;
+import Triton.RemoteStation.*;
 import Triton.Display.*;
 
 /*import org.eclipse.jetty.server.Server;
