@@ -50,14 +50,16 @@ public class App {
 
         pool.execute(visionRunnable);
         pool.execute(geoRunnable);
-        pool.execute(detectRunnable);
+        // pool.execute(detectRunnable);
 
-        Display display = new Display();
+        // Display display = new Display();
 
         RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
         robotConnect.buildTcpConnection("localhost", 6666);
         RobotTCPConnection tcpConn = robotConnect.getRobotTCPConnection();
-        tcpConn.connect();
+        if(tcpConn.connect()) {
+            System.out.println("Connected");
+        }
         System.out.println(tcpConn.sendGeometry());
 
         /*ViewerServlet.offline = true;

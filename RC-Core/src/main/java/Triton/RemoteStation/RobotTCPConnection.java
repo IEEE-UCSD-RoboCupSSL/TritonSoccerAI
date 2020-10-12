@@ -21,7 +21,9 @@ public class RobotTCPConnection implements Module {
     private boolean isConnected;
 
     public RobotTCPConnection(String ip, int port) {
-        fieldSizeSub = new MQSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize", 1);
+        this.ip = ip;
+        this.port = port;
+        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
     }
 
     public boolean connect() {
@@ -30,6 +32,8 @@ public class RobotTCPConnection implements Module {
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             
+
+
             String line = in.readLine();
             if (line.equals("CONNECTION ESTABLISHED")){    
                 isConnected = true;
@@ -50,18 +54,21 @@ public class RobotTCPConnection implements Module {
     }
 
     public boolean sendGeometry() {
-        while (!fieldSizeSub.subscribe());
+        // fieldSizeSub.subscribe();
+        // System.out.println("???");
 
-        SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
-        RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
-        toSend.setFieldLength(fieldSize.getFieldLength());
-        toSend.setFieldWidth(fieldSize.getFieldWidth());
-        toSend.setGoalDepth(fieldSize.getGoalDepth());
-        toSend.setGoalWidth(fieldSize.getGoalWidth());
+        // SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+        // RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
+        // toSend.setFieldLength(fieldSize.getFieldLength());
+        // toSend.setFieldWidth(fieldSize.getFieldWidth());
+        // toSend.setGoalDepth(fieldSize.getGoalDepth());
+        // toSend.setGoalWidth(fieldSize.getGoalWidth());
 
-        byte[] geoByteArray = toSend.build().toByteArray();
+        // byte[] geoByteArray = toSend.build().toByteArray();
+
         try {
-            out.write(geoByteArray);
+            /// out.write(geoByteArray);
+            out.writeChars("fhneowhfoiweho\n");
             String line = in.readLine();
             if (line.equals("GEOMETRY RECEIVED"))
                 return true;
