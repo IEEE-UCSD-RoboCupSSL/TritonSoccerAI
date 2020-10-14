@@ -12,12 +12,14 @@ import Triton.DesignPattern.PubSubSystem.Subscriber;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.event.MouseEvent;
 import java.awt.image.*;
 
 import java.util.*;
 import java.util.Timer;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 
 import Proto.MessagesRobocupSslGeometry.*;
 
@@ -54,17 +56,26 @@ public class Display extends JPanel {
         }
     }
 
-    private class FindPathTask extends TimerTask {
+    private static class FindPathTask extends TimerTask {
         private Display display;
         private Pathfinder pathfinder;
         private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
         private Subscriber<BallData> ballSub;
+
+        /* If unspecified, find path from the closest robot to ball */
+        private Vec2D start;
+        private Vec2D dest;
 
         public FindPathTask(Display display, Pathfinder pathfinder) {
             this.display = display;
             this.pathfinder = pathfinder;
             robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             ballSub = new FieldSubscriber<BallData>("detection", "ball");
+        }
+
+        public void setEnds(Vec2D start, Vec2D dest) {
+            this.start = start;
+            this.dest  = dest;
         }
 
         @Override
@@ -74,21 +85,12 @@ public class Display extends JPanel {
             
             HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
             BallData ball = ballSub.getMsg();
+            boolean customPath = start != null && dest != null;
 
+            /* Calculate the closest blue robot to the ball */
             RobotData closestRobot = null;
             Vec2D ballPos = ball.getPos();
             double minDist = Double.MAX_VALUE;
-            /*
-            for (int i = 0; i < 6; i++) {
-                RobotData robot = robots.get(Team.YELLOW).get(i);
-                Vec2D robotPos = robot.getPos();
-                double dist = Vec2D.dist(ballPos, robotPos);
-                if (dist < minDist) {
-                    closestRobot = robot;
-                    minDist = dist;
-                }
-            }
-            */
             for (int i = 0; i < 6; i++) {
                 RobotData robot = robots.get(Team.BLUE).get(i);
                 Vec2D robotPos = robot.getPos();
@@ -98,27 +100,55 @@ public class Display extends JPanel {
                     minDist = dist;
                 }
             }
-
             Vec2D closestRobotPos = closestRobot.getPos();
 
+            /* Add all (other) robots as obstacles */
             ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
             for (int i = 0; i < 6; i++) {
                 RobotData robot = robots.get(Team.YELLOW).get(i);
-                if (robot == closestRobot) {
+                if (!customPath && robot == closestRobot) {
                     continue;
                 }
                 obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
             }
             for (int i = 0; i < 6; i++) {
                 RobotData robot = robots.get(Team.BLUE).get(i);
-                if (robot == closestRobot) {
+                if (!customPath && robot == closestRobot) {
                     continue;
                 }
                 obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
             }
 
             pathfinder.updateGrid(obstacles);
-            display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
+            if (customPath) {
+                display.setPath(pathfinder.findPath(start, dest));
+            } else {
+                display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
+            }
+        }
+    }
+
+    private class DisplayMouseInputAdapter extends MouseInputAdapter {
+        private FindPathTask findPathTask;
+        private int[] start = { 0, 0 };
+        private int[] dest = { 0, 0 };
+        
+        public DisplayMouseInputAdapter(FindPathTask findPathTask) {
+            this.findPathTask = findPathTask;
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                start[0] = e.getX();
+                start[1] = e.getY();
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                dest[0] = e.getX();
+                dest[1] = e.getY();
+            }
+
+            findPathTask.setEnds(convert.fromInd(start), convert.fromInd(dest));
+            findPathTask.run();
         }
     }
 
@@ -182,12 +212,13 @@ public class Display extends JPanel {
         Timer repaintTimer = new Timer();
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
 
-        Timer findPathTimer = new Timer();
+        //Timer findPathTimer = new Timer();
         double worldSizeX = fieldSize.getFieldLength();
         double worldSizeY = fieldSize.getFieldWidth();
         pathfinder = new Pathfinder(worldSizeX, worldSizeY);
         FindPathTask findPathTask = new FindPathTask(this, pathfinder);
-        findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
+        //findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
+        addMouseListener(new DisplayMouseInputAdapter(findPathTask));
     }
 
     @Override
@@ -208,10 +239,6 @@ public class Display extends JPanel {
             if (name.equals("CenterLine"))
                 return;
             int[] p1 = convert.fromPos(line.p1);
-            // System.out.println("res: " + p1[0] + ", " + p1[1]);
-            // int[] res2 = convert.fromPos(line.p1);
-            // System.out.println("res2: " + res2[0] + ", " + res2[1]);
-
             int[] p2 = convert.fromPos(line.p2);
             g2d.setColor(Color.WHITE);
             g2d.setStroke(new BasicStroke(2));
@@ -265,6 +292,12 @@ public class Display extends JPanel {
         int[] ballPos = convert.fromPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
+
+
+    private void paintObstacles(Graphics2D g2d) {
+
+    }
+
 
     private void paintPath(Graphics2D g2d) {
         /*

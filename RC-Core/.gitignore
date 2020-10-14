@@ -9,3 +9,6 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 .vscode
+.idea/
+RC-Core.iml
+*.proto
