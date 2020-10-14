@@ -1,5 +1,7 @@
 package Triton.Display;
 
+import Triton.Computation.JPS.Node;
+import Triton.Computation.JPS.PathFinder;
 import Triton.Config.ObjectConfig;
 import Triton.Computation.Gridify;
 import Triton.Computation.ThetaStar.*;
@@ -16,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.*;
 
 import java.util.*;
+import java.util.List;
 import java.util.Timer;
 
 import javax.swing.*;
@@ -41,6 +44,7 @@ public class Display extends JPanel {
 
     private ArrayList<Vec2D> path;
     private Pathfinder pathfinder;
+    private PathFinder pathfinder2;
     private Gridify convert;
 
     private class RepaintTask extends TimerTask {
@@ -59,6 +63,7 @@ public class Display extends JPanel {
     private static class FindPathTask extends TimerTask {
         private Display display;
         private Pathfinder pathfinder;
+        private PathFinder pathfinder2;
         private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
         private Subscriber<BallData> ballSub;
 
@@ -66,9 +71,10 @@ public class Display extends JPanel {
         private Vec2D start;
         private Vec2D dest;
 
-        public FindPathTask(Display display, Pathfinder pathfinder) {
+        public FindPathTask(Display display, Pathfinder pathfinder, PathFinder pathfinder2) {
             this.display = display;
             this.pathfinder = pathfinder;
+            this.pathfinder2 = pathfinder2;
             robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             ballSub = new FieldSubscriber<BallData>("detection", "ball");
         }
@@ -120,10 +126,21 @@ public class Display extends JPanel {
             }
 
             pathfinder.updateGrid(obstacles);
+            pathfinder2.setObstacles(obstacles);
             if (customPath) {
-                display.setPath(pathfinder.findPath(start, dest));
+                long t0 = System.nanoTime();
+                ArrayList<Vec2D> path1 = pathfinder.findPath(start, dest);
+                long t1 = System.nanoTime();
+                ArrayList<Vec2D> path2 = pathfinder2.findPath(start, dest);
+                long t2 = System.nanoTime();
+
+                System.out.println("----------");
+                System.out.println("θ*  takes " + (t1 - t0) + " ns");
+                System.out.println("JPS takes " + (t2 - t1) + " ns");
+
+                display.setPath(pathfinder2.findPath(start, dest));
             } else {
-                display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
+                display.setPath(pathfinder2.findPath(closestRobotPos, ballPos));
             }
         }
     }
@@ -216,7 +233,8 @@ public class Display extends JPanel {
         double worldSizeX = fieldSize.getFieldLength();
         double worldSizeY = fieldSize.getFieldWidth();
         pathfinder = new Pathfinder(worldSizeX, worldSizeY);
-        FindPathTask findPathTask = new FindPathTask(this, pathfinder);
+        pathfinder2 = new PathFinder(worldSizeX, worldSizeY);
+        FindPathTask findPathTask = new FindPathTask(this, pathfinder, pathfinder2);
         //findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
         addMouseListener(new DisplayMouseInputAdapter(findPathTask));
     }
@@ -228,6 +246,7 @@ public class Display extends JPanel {
 
         paintGeo(g2d);
         paintObjects(g2d);
+        //pathfinder2.paintObstacles(g2d, convert);
         paintPath(g2d);
         paintInfo(g2d);
 
@@ -291,11 +310,6 @@ public class Display extends JPanel {
         BallData ball = ballSub.getMsg();
         int[] ballPos = convert.fromPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
-    }
-
-
-    private void paintObstacles(Graphics2D g2d) {
-
     }
 
 
