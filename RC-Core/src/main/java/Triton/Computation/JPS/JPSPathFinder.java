@@ -1,26 +1,28 @@
 package Triton.Computation.JPS;
 
 import Triton.Computation.Gridify;
+import Triton.Computation.PathFinder;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
+import Triton.Shape.Line2D;
 import Triton.Shape.Vec2D;
 
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 
-public class PathFinder {
+public class JPSPathFinder extends PathFinder {
 
-    private JPS<Node> jps;
-    private List<List<Node>> nodeList = new ArrayList<>();
+    private final JPS<Node> jps;
+    private final List<List<Node>> nodeList = new ArrayList<>();
     public Gridify convert;
-    private int numRows, numCols;
-    private double worldSizeX, worldSizeY;
+    private final int numRows, numCols;
+    private final double worldSizeX, worldSizeY;
 
-    public PathFinder(double worldSizeX, double worldSizeY) {
+    public JPSPathFinder(double worldSizeX, double worldSizeY) {
+        super("JPS");
         this.worldSizeX = worldSizeX;
         this.worldSizeY = worldSizeY;
 
@@ -132,14 +134,47 @@ public class PathFinder {
     }
 
     private ArrayList<Vec2D> toVec2DPath(Queue<Node> path) {
-        if (path == null) return null;
+        if (path == null || path.isEmpty()) return null;
 
         ArrayList<Vec2D> vec_path = new ArrayList<>();
-        while (!path.isEmpty()) {
-            Node node = path.poll();
+        Node start = path.peek(); // start of the any-angle segment
+        Node end = path.peek();   // end of the any-angle segment
+        Node node; // current node
+        vec_path.add(convert.fromInd(start.getX(), start.getY()));
+
+        do {
+            node = path.poll();
+            if (!checkLineOfSight(start, node)) {
+                vec_path.add(convert.fromInd(end.getX(), end.getY()));
+                start = end;
+            }
+            end = node;
+        } while (!path.isEmpty());
+
+        if (node != start) {
             vec_path.add(convert.fromInd(node.getX(), node.getY()));
         }
         return vec_path;
+    }
+
+    public boolean checkLineOfSight(Node nodeA, Node nodeB) {
+        Vec2D pointA = convert.fromInd(nodeA.getX(), nodeA.getY());
+        Vec2D pointB = convert.fromInd(nodeB.getX(), nodeB.getY());
+        Line2D line = new Line2D(pointA, pointB);
+        double totalDist = line.length();
+        int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
+        Vec2D dir = line.getDir();
+        Vec2D moveAdd = dir.mult(PathfinderConfig.NODE_RADIUS);
+
+        Vec2D currentPos = new Vec2D(pointA);
+        for (int i = 0; i < moveCount; i++) {
+            currentPos = currentPos.add(moveAdd);
+            int[] idx = convert.fromPos(currentPos);
+            Node currentNode = nodeList.get(idx[1]).get(idx[0]);
+            if (!currentNode.isWalkable())
+                return false;
+        }
+        return true;
     }
 
     public int getNumRows() { return numRows; }

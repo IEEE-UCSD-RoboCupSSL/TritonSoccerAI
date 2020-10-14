@@ -1,7 +1,7 @@
 package Triton.Display;
 
-import Triton.Computation.JPS.Node;
-import Triton.Computation.JPS.PathFinder;
+import Triton.Computation.JPS.JPSPathFinder;
+import Triton.Computation.PathFinder;
 import Triton.Config.ObjectConfig;
 import Triton.Computation.Gridify;
 import Triton.Computation.ThetaStar.*;
@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.*;
 
 import java.util.*;
-import java.util.List;
 import java.util.Timer;
 
 import javax.swing.*;
@@ -39,16 +38,15 @@ public class Display extends JPanel {
     private int windowWidth;
     private int windowHeight;
 
+    private JPSPathFinder JPS;
     private JFrame frame;
     private long lastPaint;
 
     private ArrayList<Vec2D> path;
-    private Pathfinder pathfinder;
-    private PathFinder pathfinder2;
     private Gridify convert;
 
-    private class RepaintTask extends TimerTask {
-        private Display display;
+    private static class RepaintTask extends TimerTask {
+        private final Display display;
 
         public RepaintTask(Display display) {
             this.display = display;
@@ -62,8 +60,7 @@ public class Display extends JPanel {
 
     private static class FindPathTask extends TimerTask {
         private Display display;
-        private Pathfinder pathfinder;
-        private PathFinder pathfinder2;
+        private PathFinder pathfinder;
         private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
         private Subscriber<BallData> ballSub;
 
@@ -71,10 +68,9 @@ public class Display extends JPanel {
         private Vec2D start;
         private Vec2D dest;
 
-        public FindPathTask(Display display, Pathfinder pathfinder, PathFinder pathfinder2) {
+        public FindPathTask(Display display, PathFinder pathfinder) {
             this.display = display;
             this.pathfinder = pathfinder;
-            this.pathfinder2 = pathfinder2;
             robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             ballSub = new FieldSubscriber<BallData>("detection", "ball");
         }
@@ -125,30 +121,24 @@ public class Display extends JPanel {
                 obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
             }
 
-            pathfinder.updateGrid(obstacles);
-            pathfinder2.setObstacles(obstacles);
+            pathfinder.setObstacles(obstacles);
             if (customPath) {
                 long t0 = System.nanoTime();
-                ArrayList<Vec2D> path1 = pathfinder.findPath(start, dest);
+                ArrayList<Vec2D> path = pathfinder.findPath(start, dest);
                 long t1 = System.nanoTime();
-                ArrayList<Vec2D> path2 = pathfinder2.findPath(start, dest);
-                long t2 = System.nanoTime();
+                System.out.println(pathfinder.getName() + " takes " + (t1 - t0) + " ns");
 
-                System.out.println("----------");
-                System.out.println("θ*  takes " + (t1 - t0) + " ns");
-                System.out.println("JPS takes " + (t2 - t1) + " ns");
-
-                display.setPath(pathfinder2.findPath(start, dest));
+                display.setPath(path);
             } else {
-                display.setPath(pathfinder2.findPath(closestRobotPos, ballPos));
+                display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
             }
         }
     }
 
     private class DisplayMouseInputAdapter extends MouseInputAdapter {
-        private FindPathTask findPathTask;
-        private int[] start = { 0, 0 };
-        private int[] dest = { 0, 0 };
+        private final FindPathTask findPathTask;
+        private final int[] start = { 0, 0 };
+        private final int[] dest = { 0, 0 };
         
         public DisplayMouseInputAdapter(FindPathTask findPathTask) {
             this.findPathTask = findPathTask;
@@ -206,7 +196,7 @@ public class Display extends JPanel {
             convert = new Gridify(
                 new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
                 new Vec2D(- fullLength / 2, 
-                          - fieldSize.getFieldWidth() / 2),
+                          - fieldSize.getFieldWidth() / 2.0),
                 false, true);
 
             windowWidth = convert.numCols(fullLength);
@@ -232,11 +222,13 @@ public class Display extends JPanel {
         //Timer findPathTimer = new Timer();
         double worldSizeX = fieldSize.getFieldLength();
         double worldSizeY = fieldSize.getFieldWidth();
-        pathfinder = new Pathfinder(worldSizeX, worldSizeY);
-        pathfinder2 = new PathFinder(worldSizeX, worldSizeY);
-        FindPathTask findPathTask = new FindPathTask(this, pathfinder, pathfinder2);
+        JPS = new JPSPathFinder(worldSizeX, worldSizeY);
+        FindPathTask JPSTask = new FindPathTask(this, JPS);
+        PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
+        FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
         //findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
-        addMouseListener(new DisplayMouseInputAdapter(findPathTask));
+        addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
+        addMouseListener(new DisplayMouseInputAdapter(JPSTask));
     }
 
     @Override
@@ -246,7 +238,9 @@ public class Display extends JPanel {
 
         paintGeo(g2d);
         paintObjects(g2d);
-        //pathfinder2.paintObstacles(g2d, convert);
+        if (JPS != null) {
+            JPS.paintObstacles(g2d, convert);
+        }
         paintPath(g2d);
         paintInfo(g2d);
 
@@ -283,7 +277,7 @@ public class Display extends JPanel {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
-                    ImgLoader.yellowRobot.getWidth() / 2);
+                    ImgLoader.yellowRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
             int imgX = pos[0] - ImgLoader.yellowRobot.getWidth() / 2;
@@ -296,8 +290,8 @@ public class Display extends JPanel {
         for (RobotData robot : robots.get(Team.BLUE).values()) {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
-                    ImgLoader.blueRobot.getWidth() / 2);
+            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2.0,
+                    ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
             int imgX = pos[0] - ImgLoader.blueRobot.getWidth() / 2;
