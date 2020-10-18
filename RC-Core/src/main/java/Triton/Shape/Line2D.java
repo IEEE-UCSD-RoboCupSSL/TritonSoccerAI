@@ -1,7 +1,6 @@
 package Triton.Shape;
 
 import java.lang.Math;
-import Proto.RemoteCommands;
 
 public class Line2D {
     
@@ -85,12 +84,4 @@ public class Line2D {
     public double length() {
         return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
     }
-
-    public RemoteCommands.Line2D toProto() {
-        RemoteCommands.Line2D.Builder toSend = RemoteCommands.Line2D.newBuilder();
-        toSend.setP1(p1.toProto());
-        toSend.setP2(p2.toProto());
-        return toSend.build();
-    }
-
 }

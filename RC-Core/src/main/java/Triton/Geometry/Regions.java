@@ -1,41 +1,51 @@
 package Triton.Geometry;
 
 import Triton.Shape.*;
-import java.util.HashMap;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
+import java.util.*;
+
+import Proto.MessagesRobocupSslGeometry.*;
 
 /*
  * Regions is definded as the collections of partitions of the field. 
  * Regions includes 9 parts: A, B, C, D, E, F, G, H, and I.
  */
 public class Regions {
-    
     private static HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
+    private static Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private static Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 
     public static void createRegions() {
-        GeometryData data = GeometryData.get();
-        HashMap<String, Line2D> lineSegments = data.getField().lineSegments;
+        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
+        while (!fieldSizeSub.subscribe() || !fieldLinesSub.subscribe());
+         
+        SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+        HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
 
         // Create the center circle in the middle of the field
-        Circle2D centerCircle = new Circle2D(new Vec2D(0, 0), data.getField().centerCircleRadius);
+        double centerCircleRadius = fieldSize.getFieldArcs(0).getRadius();
+        Circle2D centerCircle = new Circle2D(new Vec2D(0, 0), centerCircleRadius);
         Regions.addRegion("CentreCircle", centerCircle);
 
-        double fieldWidth = lineSegments.get("CenterLine").length();
-        double fieldHeight = lineSegments.get("HalfwayLine").length();
+        double fieldWidth = fieldSize.getFieldLength();
+        double fieldHeight = fieldSize.getFieldWidth();
 
         // Create the four quadtrants of the field
-        Vec2D topLeftQuadAnchor = lineSegments.get("CenterLine").p1;
+        Vec2D topLeftQuadAnchor = fieldLines.get("CenterLine").p1;
         Rect2D topLeftQuad = new Rect2D(topLeftQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("TopLeftQuad", topLeftQuad);
 
-        Vec2D topRightQuadAnchor = lineSegments.get("CenterLine").midpoint();
+        Vec2D topRightQuadAnchor = fieldLines.get("CenterLine").midpoint();
         Rect2D topRightQuad = new Rect2D(topRightQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("TopRightQuad", topRightQuad);
 
-        Vec2D bottomLeftQuadAnchor = lineSegments.get("LeftGoalLine").p1;
+        Vec2D bottomLeftQuadAnchor = fieldLines.get("LeftGoalLine").p1;
         Rect2D bottomLeftQuad = new Rect2D(bottomLeftQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("BottomLeftQuad", bottomLeftQuad);
 
-        Vec2D bottomRightQuadAnchor = lineSegments.get("HalfwayLine").midpoint();
+        Vec2D bottomRightQuadAnchor = fieldLines.get("HalfwayLine").midpoint();
         Rect2D bottomRightQuad = new Rect2D(bottomRightQuadAnchor, fieldWidth / 2, fieldHeight / 2);
         Regions.addRegion("BottomRightQuad", bottomRightQuad);
 
@@ -44,15 +54,15 @@ public class Regions {
         Regions.addRegion("FullField", fullField);
 
         // Create two penalty rects
-        double penaltyWidth = lineSegments.get("LeftPenaltyStretch").p1.x - lineSegments.get("LeftGoalLine").p1.x;
-        double penaltyHeight = lineSegments.get("LeftPenaltyStretch").length();
+        double penaltyWidth = fieldLines.get("LeftPenaltyStretch").p1.x - fieldLines.get("LeftGoalLine").p1.x;
+        double penaltyHeight = fieldLines.get("LeftPenaltyStretch").length();
 
-        Vec2D leftPenaltyAnchor = new Vec2D(lineSegments.get("LeftGoalLine").p1.x,
-                lineSegments.get("LeftPenaltyStretch").p1.y);
+        Vec2D leftPenaltyAnchor = new Vec2D(fieldLines.get("LeftGoalLine").p1.x,
+                fieldLines.get("LeftPenaltyStretch").p1.y);
         Rect2D leftPenalty = new Rect2D(leftPenaltyAnchor, penaltyWidth, penaltyHeight);
         Regions.addRegion("LeftPenalty", leftPenalty);
 
-        Vec2D rightPenaltyAnchor = lineSegments.get("RightPenaltyStretch").p1;
+        Vec2D rightPenaltyAnchor = fieldLines.get("RightPenaltyStretch").p1;
         Rect2D rightPenalty = new Rect2D(rightPenaltyAnchor, penaltyWidth, penaltyHeight);
         Regions.addRegion("RightPenalty", rightPenalty);
     }

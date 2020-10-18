@@ -1,22 +1,30 @@
 package Triton;
 
 import java.util.concurrent.*;
+<<<<<<< HEAD
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.HashMap;
+=======
+>>>>>>> origin/pubsubsystem
 
 import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
+<<<<<<< HEAD
 import Triton.RemoteStation.*;
+=======
+import Triton.RemoteStation.RobotConnetion;
+import Triton.RemoteStation.RobotTCPConnection;
+>>>>>>> origin/pubsubsystem
 import Triton.Display.*;
 import Triton.Command.*;
 
-import org.eclipse.jetty.server.Server;
+/*import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHandler;*/
 
 public class App {
 
@@ -42,6 +50,7 @@ public class App {
     // listener)
     // + 1(server tcp connection listener)
 
+<<<<<<< HEAD
     public static void main(String args[]) {
         new Thread(new VisionConnection()).start();
         new Thread(new GeometryPublisher()).start();
@@ -52,8 +61,18 @@ public class App {
         Lock detectionLock = new ReentrantLock();
         new Thread(new DetectionPublisher(detectionLock)).start();
         new Thread(new FakeDetectionPublisher(detectionLock)).start();
+=======
+    private static int MAX_THREADS = 100;
 
+    public static void main(String args[]) {
+        ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
+>>>>>>> origin/pubsubsystem
 
+        Runnable visionRunnable = new VisionModule();
+        Runnable geoRunnable = new GeometryModule();
+        Runnable detectRunnable = new DetectionModule();
+
+<<<<<<< HEAD
 
 
 
@@ -70,31 +89,21 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
+=======
+        pool.execute(visionRunnable);
+        pool.execute(geoRunnable);
+        pool.execute(detectRunnable);
+>>>>>>> origin/pubsubsystem
 
         Display display = new Display();
 
-        //TCPInit.init();
-        //new Thread(new UDPSend()).start();
-        //new Thread(new MCVision()).start();
-        /*
-        while(true) {
-            try {
-                StationData data = StationData.get();
-                for(int i = 0; i < 6; i++) {
-                    System.out.println(i + ": " + data.getPort(i));
-                }
-                break;
-            } catch(NullPointerException e) {
-                // Do nothing 
-            }
+        RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
+        robotConnect.buildTcpConnection("localhost", 6666);
+        RobotTCPConnection tcpConn = robotConnect.getRobotTCPConnection();
+        if(tcpConn.connect()) {
+            System.out.println("Connected");
         }
-        */
-
-        //new Thread(new MCVision()).start();
-        //new Thread(new PosSubscriber()).start();
-        //new Thread(new VelSubscriber()).start();
-        //new Thread(new RegionSubscriber()).start();
-        //new Thread(new MCVision()).start();
+        System.out.println(tcpConn.sendGeometry());
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
@@ -106,6 +115,7 @@ public class App {
         }*/
     }
 
+    /*
     public static Server createServer(int port)
     {
         Server server = new Server(port);
@@ -123,4 +133,5 @@ public class App {
 
         return server;
     }
+    */
 }

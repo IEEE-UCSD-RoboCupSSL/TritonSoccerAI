@@ -1,40 +1,52 @@
 package Triton.Display;
 
+import Triton.Computation.JPS.JPSPathFinder;
+import Triton.Computation.PathFinder;
 import Triton.Config.ObjectConfig;
+import Triton.Computation.Gridify;
+import Triton.Computation.ThetaStar.*;
 import Triton.Config.DisplayConfig;
-import Triton.Computation.AStar.*;
 import Triton.Detection.*;
-import Triton.Geometry.*;
+import Triton.Detection.RobotData;
 import Triton.Shape.*;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.event.MouseEvent;
 import java.awt.image.*;
+
 import java.util.*;
 import java.util.Timer;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
-import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
+import Proto.MessagesRobocupSslGeometry.*;
 
+@SuppressWarnings("serial")
 public class Display extends JPanel {
-    
-    private static Field field;
+
+    private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private Subscriber<HashMap<String, Line2D>> fieldLinesSub;
+    private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
+    private Subscriber<BallData> ballSub;
+
+    private SSL_GeometryFieldSize fieldSize;
+    private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
 
+    private JPSPathFinder JPS;
     private JFrame frame;
     private long lastPaint;
 
-    private int[] start = { 0, 0 };
-    private int[] dest = { 0, 0 };
     private ArrayList<Vec2D> path;
-    private Pathfinder pathfinder;
+    private Gridify convert;
 
-    private class RepaintTask extends TimerTask {
-        private Display display;
+    private static class RepaintTask extends TimerTask {
+        private final Display display;
 
         public RepaintTask(Display display) {
             this.display = display;
@@ -46,7 +58,92 @@ public class Display extends JPanel {
         }
     }
 
+    private static class FindPathTask extends TimerTask {
+        private Display display;
+        private PathFinder pathfinder;
+        private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
+        private Subscriber<BallData> ballSub;
+
+        /* If unspecified, find path from the closest robot to ball */
+        private Vec2D start;
+        private Vec2D dest;
+
+        public FindPathTask(Display display, PathFinder pathfinder) {
+            this.display = display;
+            this.pathfinder = pathfinder;
+            robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+            ballSub = new FieldSubscriber<BallData>("detection", "ball");
+        }
+
+        public void setEnds(Vec2D start, Vec2D dest) {
+            this.start = start;
+            this.dest  = dest;
+        }
+
+        @Override
+        public void run() {
+            robotSub.subscribe();
+            ballSub.subscribe();
+            
+            HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
+            BallData ball = ballSub.getMsg();
+            boolean customPath = start != null && dest != null;
+
+            /* Calculate the closest blue robot to the ball */
+            RobotData closestRobot = null;
+            Vec2D ballPos = ball.getPos();
+            double minDist = Double.MAX_VALUE;
+            for (int i = 0; i < 6; i++) {
+                RobotData robot = robots.get(Team.BLUE).get(i);
+                Vec2D robotPos = robot.getPos();
+                double dist = Vec2D.dist2(ballPos, robotPos);
+                if (dist < minDist) {
+                    closestRobot = robot;
+                    minDist = dist;
+                }
+            }
+            Vec2D closestRobotPos = closestRobot.getPos();
+
+            /* Add all (other) robots as obstacles */
+            ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
+            for (int i = 0; i < 6; i++) {
+                RobotData robot = robots.get(Team.YELLOW).get(i);
+                if (!customPath && robot == closestRobot) {
+                    continue;
+                }
+                obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+            }
+            for (int i = 0; i < 6; i++) {
+                RobotData robot = robots.get(Team.BLUE).get(i);
+                if (!customPath && robot == closestRobot) {
+                    continue;
+                }
+                obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+            }
+
+            pathfinder.setObstacles(obstacles);
+            if (customPath) {
+                long t0 = System.nanoTime();
+                ArrayList<Vec2D> path = pathfinder.findPath(start, dest);
+                long t1 = System.nanoTime();
+                System.out.println(pathfinder.getName() + " takes " + (t1 - t0) + " ns");
+
+                display.setPath(path);
+            } else {
+                display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
+            }
+        }
+    }
+
     private class DisplayMouseInputAdapter extends MouseInputAdapter {
+        private final FindPathTask findPathTask;
+        private final int[] start = { 0, 0 };
+        private final int[] dest = { 0, 0 };
+        
+        public DisplayMouseInputAdapter(FindPathTask findPathTask) {
+            this.findPathTask = findPathTask;
+        }
+
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
@@ -57,28 +154,20 @@ public class Display extends JPanel {
                 dest[1] = e.getY();
             }
 
-            ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
-            for (int i = 0; i < 6; i++) {
-                Vec2D pos = DetectionData.get().getRobotPos(Team.YELLOW, i);
-                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
-                obstacles.add(obstacle);
-            }
-            for (int i = 0; i < 6; i++) {
-                Vec2D pos = DetectionData.get().getRobotPos(Team.BLUE, i);
-                Circle2D obstacle = new Circle2D(pos, ObjectConfig.ROBOT_RADIUS);
-                obstacles.add(obstacle);
-            }
-            pathfinder.updateGrid(obstacles);
-            
-            path = pathfinder.findPath(displayPosToWorldPos(start), displayPosToWorldPos(dest));
+            findPathTask.setEnds(convert.fromInd(start), convert.fromInd(dest));
+            findPathTask.run();
         }
     }
 
     public Display() {
         super();
-        ImgLoader.loadImages();
 
-        addMouseListener(new DisplayMouseInputAdapter());
+        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
+        robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+        ballSub = new FieldSubscriber<BallData>("detection", "ball");
+
+        ImgLoader.loadImages();
 
         Box box = new Box(BoxLayout.Y_AXIS);
         box.add(Box.createVerticalGlue());
@@ -94,18 +183,31 @@ public class Display extends JPanel {
     }
 
     public void start() {
+        fieldSizeSub.subscribe();
+
         while (true) {
-            try {
-                field = GeometryData.get().getField();
-                if (field.fieldLength == 0 || field.fieldWidth == 0 || field.goalDepth == 0)
-                    continue;
-                windowWidth = (int) ((field.fieldLength + field.goalDepth * 2.0) * DisplayConfig.SCALE);
-                windowHeight = (int) (field.fieldWidth * DisplayConfig.SCALE);
-                break;
-            } catch (Exception e) {
-                // Geometry not ready, do nothing
-            }
+            fieldSize = fieldSizeSub.getMsg();
+
+            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0 || fieldSize.getGoalDepth() == 0)
+                continue;
+
+            double fullLength = fieldSize.getFieldLength() + fieldSize.getGoalDepth() * 2.0;
+
+            convert = new Gridify(
+                new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
+                new Vec2D(- fullLength / 2, 
+                          - fieldSize.getFieldWidth() / 2.0),
+                false, true);
+
+            windowWidth = convert.numCols(fullLength);
+            windowHeight = convert.numRows(fieldSize.getFieldWidth());
+            break;
         }
+
+        fieldLinesSub.subscribe();
+        do {
+            fieldLines = fieldLinesSub.getMsg();
+        } while (fieldLines == null);
 
         Dimension dimension = new Dimension(windowWidth, windowHeight);
         setPreferredSize(dimension);
@@ -117,21 +219,16 @@ public class Display extends JPanel {
         Timer repaintTimer = new Timer();
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
 
-        double worldSizeX = field.fieldLength;
-        double worldSizeY = field.fieldWidth;
-        pathfinder = new Pathfinder(worldSizeX, worldSizeY);
-    }
-
-    public int[] worldPosToDisplayPos(Vec2D v) {
-        int[] res = { (int) Math.round(v.x * DisplayConfig.SCALE + windowWidth / 2),
-                (int) Math.round(-v.y * DisplayConfig.SCALE + windowHeight / 2) };
-        return res;
-    }
-
-    public Vec2D displayPosToWorldPos(int[] v) {
-        double x = ((double) v[0] - windowWidth / 2) / DisplayConfig.SCALE;
-        double y = -((double) v[1] - windowHeight / 2) / DisplayConfig.SCALE;
-        return new Vec2D(x, y);
+        //Timer findPathTimer = new Timer();
+        double worldSizeX = fieldSize.getFieldLength();
+        double worldSizeY = fieldSize.getFieldWidth();
+        JPS = new JPSPathFinder(worldSizeX, worldSizeY);
+        FindPathTask JPSTask = new FindPathTask(this, JPS);
+        PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
+        FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
+        //findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
+        addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
+        addMouseListener(new DisplayMouseInputAdapter(JPSTask));
     }
 
     @Override
@@ -141,6 +238,9 @@ public class Display extends JPanel {
 
         paintGeo(g2d);
         paintObjects(g2d);
+        if (JPS != null) {
+            JPS.paintObstacles(g2d, convert);
+        }
         paintPath(g2d);
         paintInfo(g2d);
 
@@ -148,18 +248,18 @@ public class Display extends JPanel {
     }
 
     private void paintGeo(Graphics2D g2d) {
-        field.lineSegments.forEach((name, line) -> {
+        fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
                 return;
-            int[] p1 = worldPosToDisplayPos(line.p1);
-            int[] p2 = worldPosToDisplayPos(line.p2);
+            int[] p1 = convert.fromPos(line.p1);
+            int[] p2 = convert.fromPos(line.p2);
             g2d.setColor(Color.WHITE);
             g2d.setStroke(new BasicStroke(2));
             g2d.drawLine(p1[0], p1[1], p2[0], p2[1]);
         });
 
-        for (SSL_FieldCicularArc arc : field.arcList) {
-            int[] center = worldPosToDisplayPos(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
+        for (SSL_FieldCicularArc arc : fieldSize.getFieldArcsList()) {
+            int[] center = convert.fromPos(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
             int radius = (int) (arc.getRadius() * DisplayConfig.SCALE);
 
             g2d.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2,
@@ -168,46 +268,54 @@ public class Display extends JPanel {
     }
 
     private void paintObjects(Graphics2D g2d) {
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            int[] pos = worldPosToDisplayPos(DetectionData.get().getRobotPos(Team.YELLOW, i));
-            double orient = DetectionData.get().getRobotOrient(Team.YELLOW, i);
+        if (!robotSub.subscribe() || !ballSub.subscribe())
+            return;
+
+        HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
+
+        for (RobotData robot : robots.get(Team.YELLOW).values()) {
+            int[] pos = convert.fromPos(robot.getPos());
+            double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
-                    ImgLoader.yellowRobot.getWidth() / 2);
+                    ImgLoader.yellowRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
             int imgX = pos[0] - ImgLoader.yellowRobot.getWidth() / 2;
             int imgY = pos[1] - ImgLoader.yellowRobot.getHeight() / 2;
             g2d.drawImage(op.filter(ImgLoader.yellowRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - 25);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            int[] pos = worldPosToDisplayPos(DetectionData.get().getRobotPos(Team.BLUE, i));
-            double orient = DetectionData.get().getRobotOrient(Team.BLUE, i);
-            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
-                    ImgLoader.blueRobot.getWidth() / 2);
+        for (RobotData robot : robots.get(Team.BLUE).values()) {
+            int[] pos = convert.fromPos(robot.getPos());
+            double orient = robot.getOrient();
+            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2.0,
+                    ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
             int imgX = pos[0] - ImgLoader.blueRobot.getWidth() / 2;
             int imgY = pos[1] - ImgLoader.blueRobot.getHeight() / 2;
             g2d.drawImage(op.filter(ImgLoader.blueRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(i), pos[0] - 5, pos[1] - 25);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
-        int[] ballPos = worldPosToDisplayPos(DetectionData.get().getBallPos());
+        BallData ball = ballSub.getMsg();
+        int[] ballPos = convert.fromPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
 
+
     private void paintPath(Graphics2D g2d) {
+        /*
         Grid grid = pathfinder.getGrid();
         Node[][] nodes = grid.getNodes();
         for (int row = 0; row < grid.getNumRows(); row++) {
             for (int col = 0; col < grid.getNumCols(); col++) {
                 Node node = nodes[row][col];
                 Vec2D worldPos = node.getWorldPos();
-                int[] displayPos = worldPosToDisplayPos(worldPos);
+                int[] displayPos = convert.fromPos(worldPos);
                 if (!node.getWalkable()) {
                     g2d.setColor(Color.RED);
                     g2d.setStroke(new BasicStroke(5));
@@ -215,32 +323,22 @@ public class Display extends JPanel {
                 }
             }
         }
+        */
 
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));
 
         if (path != null && !path.isEmpty()) {
             for (int i = 0; i < path.size() - 1; i++) {
-                int[] pointA = worldPosToDisplayPos(path.get(i));
-                int[] pointB = worldPosToDisplayPos(path.get(i + 1));
+                int[] pointA = convert.fromPos(path.get(i));
+                int[] pointB = convert.fromPos(path.get(i + 1));
                 g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
             }
         }
-
-        int startImgX = start[0] - ImgLoader.startPoint.getWidth() / 2;
-        int startImgY = start[1] - ImgLoader.startPoint.getHeight() / 2;
-        g2d.drawImage(ImgLoader.startPoint, startImgX, startImgY, null);
-
-        int desImgX = dest[0] - ImgLoader.desPoint.getWidth() / 2;
-        int desImgY= dest[1] - ImgLoader.desPoint.getHeight() / 2;
-        g2d.drawImage(ImgLoader.desPoint, desImgX, desImgY, null);
     }
 
     private void paintInfo(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
-
-        g2d.drawString(String.format("START POS: (%d, %d)", start[0], start[1]), 50, 50);
-        g2d.drawString(String.format("DES POS: (%d, %d)", dest[0], dest[1]), 50, 70);
 
         g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
                 windowHeight - 70);
@@ -248,4 +346,7 @@ public class Display extends JPanel {
                 windowHeight - 50);
     }
 
+    public void setPath(ArrayList<Vec2D> path) {
+        this.path = path;
+    }
 }

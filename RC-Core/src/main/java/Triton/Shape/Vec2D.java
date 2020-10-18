@@ -1,6 +1,8 @@
 package Triton.Shape;
 
-import Proto.RemoteCommands;
+import Proto.RemoteAPI;
+
+//import Proto.RemoteCommands;
 
 public class Vec2D {
     public double x, y;
@@ -77,8 +79,8 @@ public class Vec2D {
         return s;
     }
 
-    public RemoteCommands.Vec2D toProto() {
-        RemoteCommands.Vec2D.Builder builder = RemoteCommands.Vec2D.newBuilder();
+    public RemoteAPI.Vec2D toProto() {
+        RemoteAPI.Vec2D.Builder builder = RemoteAPI.Vec2D.newBuilder();
         builder.setX(x);
         builder.setY(y);
         return builder.build();
