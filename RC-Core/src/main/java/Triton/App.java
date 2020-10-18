@@ -1,22 +1,12 @@
 package Triton;
 
 import java.util.concurrent.*;
-<<<<<<< HEAD
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.HashMap;
-=======
->>>>>>> origin/pubsubsystem
 
 import Triton.Vision.*;
 import Triton.Detection.*;
 import Triton.Geometry.*;
-<<<<<<< HEAD
-import Triton.RemoteStation.*;
-=======
 import Triton.RemoteStation.RobotConnetion;
 import Triton.RemoteStation.RobotTCPConnection;
->>>>>>> origin/pubsubsystem
 import Triton.Display.*;
 import Triton.Command.*;
 
@@ -50,50 +40,18 @@ public class App {
     // listener)
     // + 1(server tcp connection listener)
 
-<<<<<<< HEAD
-    public static void main(String args[]) {
-        new Thread(new VisionConnection()).start();
-        new Thread(new GeometryPublisher()).start();
-        new Thread(new CommandPublisher()).start();
-
-        //SwitchCommand.realThread = new Thread(new DetectionPublisher());
-        //SwitchCommand.realThread.start();
-        Lock detectionLock = new ReentrantLock();
-        new Thread(new DetectionPublisher(detectionLock)).start();
-        new Thread(new FakeDetectionPublisher(detectionLock)).start();
-=======
     private static int MAX_THREADS = 100;
 
     public static void main(String args[]) {
         ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
->>>>>>> origin/pubsubsystem
 
         Runnable visionRunnable = new VisionModule();
         Runnable geoRunnable = new GeometryModule();
         Runnable detectRunnable = new DetectionModule();
 
-<<<<<<< HEAD
-
-
-
-        /*SwitchCommand.fakeThread = new Thread(new FakeDetectionPublisher());
-        SwitchCommand.fakeThread.start();
-        try {
-            SwitchCommand.fakeThread.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-        /*try {
-            SwitchCommand.fakeThread.wait();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-=======
         pool.execute(visionRunnable);
         pool.execute(geoRunnable);
         pool.execute(detectRunnable);
->>>>>>> origin/pubsubsystem
 
         Display display = new Display();
 
