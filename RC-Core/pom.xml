@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>Triton</groupId>
   <artifactId>RC-Core</artifactId>
@@ -8,8 +7,8 @@
   <name>RC-Core</name>
   <url>http://maven.apache.org</url>
 
-
   <dependencies>
+
     <!-- Junit -->
     <dependency>
       <groupId>junit</groupId>
@@ -21,9 +20,9 @@
     <!-- protoc 3.11.4 -->
     <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
     <dependency>
-        <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>3.11.4</version>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.11.4</version>
     </dependency>
 
     <!-- Jetty-->
@@ -62,25 +61,26 @@
 
     <!-- grpc -->
     <dependency>
-        <groupId>io.grpc</groupId>
-        <artifactId>grpc-netty-shaded</artifactId>
-        <version>1.29.0</version>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-netty-shaded</artifactId>
+      <version>1.29.0</version>
     </dependency>
     <dependency>
-        <groupId>io.grpc</groupId>
-        <artifactId>grpc-protobuf</artifactId>
-        <version>1.29.0</version>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>1.29.0</version>
     </dependency>
     <dependency>
-        <groupId>io.grpc</groupId>
-        <artifactId>grpc-stub</artifactId>
-        <version>1.29.0</version>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>1.29.0</version>
     </dependency>
-    <dependency> <!-- necessary for Java 9+ -->
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>annotations-api</artifactId>
-        <version>6.0.53</version>
-        <scope>provided</scope>
+    <dependency>
+      <!-- necessary for Java 9+ -->
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>annotations-api</artifactId>
+      <version>6.0.53</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -105,9 +105,8 @@
     </extensions>
 
 
-
     <plugins>
-    
+
       <!-- maven exec plugin -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -132,7 +131,7 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      
+
       <!-- jetty plugin -->
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
