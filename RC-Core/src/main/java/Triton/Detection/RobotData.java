@@ -38,25 +38,22 @@ public class RobotData {
         }
     }
 
-    private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
+    private Team team;
+    private int ID;
+    private ArrayList<SortedDetection> detections;
     private Vec2D pos;
     private Vec2D vel;
     private double angle;
     private double angVel;
-    private Team team;
-    private int ID;
 
     public RobotData(Team team, int ID) {
         this.team = team;
         this.ID = ID;
-    }
-
-    public Team getTeam() {
-        return this.team;
-    }
-
-    public int getID() {
-        return this.ID;
+        detections = new ArrayList<SortedDetection>();
+        pos = new Vec2D(0, 0);
+        vel = new Vec2D(0, 0);
+        angle = 0;
+        angVel = 0;
     }
 
     public void update(SSL_DetectionRobot detection, double time) {
@@ -85,6 +82,14 @@ public class RobotData {
             vel = latest.getPos().sub(secondLatest.getPos()).mult(1 / dt);
             angVel = (latest.detection.getOrientation() - secondLatest.detection.getOrientation()) / dt;
         }
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public int getID() {
+        return ID;
     }
 
     public Vec2D getPos() {

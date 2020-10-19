@@ -1,8 +1,10 @@
 package Triton;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import Triton.Vision.*;
+import Triton.Config.ObjectConfig;
 import Triton.Detection.*;
 import Triton.Geometry.*;
 import Triton.RemoteStation.*;
@@ -51,15 +53,21 @@ public class App {
         pool.execute(geoRunnable);
         pool.execute(detectRunnable);
 
-        Display display = new Display();
-
-        RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
-        robotConnect.buildTcpConnection("localhost", 6666);
-        RobotTCPConnection tcpConn = robotConnect.getRobotTCPConnection();
-        if(tcpConn.connect()) {
-            System.out.println("Connected");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        System.out.println(tcpConn.sendGeometry());
+
+        ArrayList<Robot> robots = new ArrayList<Robot>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            robots.add(new Robot(Team.YELLOW, i, pool));
+        }
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            robots.add(new Robot(Team.BLUE, i, pool));
+        }
+
+        Display display = new Display();
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);

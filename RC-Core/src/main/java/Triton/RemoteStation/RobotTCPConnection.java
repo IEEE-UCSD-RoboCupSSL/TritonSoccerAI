@@ -31,8 +31,6 @@ public class RobotTCPConnection implements Module {
             clientSocket = new Socket(ip, port);
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            
-
 
             String line = in.readLine();
             if (line.equals("CONNECTION ESTABLISHED")){    

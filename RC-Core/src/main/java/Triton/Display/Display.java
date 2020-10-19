@@ -30,7 +30,8 @@ public class Display extends JPanel {
 
     private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-    private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
+    private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    private ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private Subscriber<BallData> ballSub;
 
     private SSL_GeometryFieldSize fieldSize;
@@ -61,7 +62,8 @@ public class Display extends JPanel {
     private static class FindPathTask extends TimerTask {
         private Display display;
         private PathFinder pathfinder;
-        private Subscriber<HashMap<Team, HashMap<Integer, RobotData>>> robotSub;
+        private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+        private ArrayList<Subscriber<RobotData>> blueRobotSubs;
         private Subscriber<BallData> ballSub;
 
         /* If unspecified, find path from the closest robot to ball */
@@ -71,21 +73,43 @@ public class Display extends JPanel {
         public FindPathTask(Display display, PathFinder pathfinder) {
             this.display = display;
             this.pathfinder = pathfinder;
-            robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+
+            yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
+            blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+                yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
+                blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+            }
+
+            new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             ballSub = new FieldSubscriber<BallData>("detection", "ball");
         }
 
         public void setEnds(Vec2D start, Vec2D dest) {
             this.start = start;
-            this.dest  = dest;
+            this.dest = dest;
         }
 
         @Override
         public void run() {
-            robotSub.subscribe();
+            for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
+                robotSub.subscribe();
+            }
+            for (Subscriber<RobotData> robotSub : blueRobotSubs) {
+                robotSub.subscribe();
+            }
             ballSub.subscribe();
-            
-            HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
+
+            ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
+            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+                blueRobots.add(blueRobotSubs.get(i).getMsg());
+            }
+
+            ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
+            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+                yellowRobots.add(yellowRobotSubs.get(i).getMsg());
+            }
+
             BallData ball = ballSub.getMsg();
             boolean customPath = start != null && dest != null;
 
@@ -94,7 +118,7 @@ public class Display extends JPanel {
             Vec2D ballPos = ball.getPos();
             double minDist = Double.MAX_VALUE;
             for (int i = 0; i < 6; i++) {
-                RobotData robot = robots.get(Team.BLUE).get(i);
+                RobotData robot = blueRobots.get(i);
                 Vec2D robotPos = robot.getPos();
                 double dist = Vec2D.dist2(ballPos, robotPos);
                 if (dist < minDist) {
@@ -107,14 +131,14 @@ public class Display extends JPanel {
             /* Add all (other) robots as obstacles */
             ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
             for (int i = 0; i < 6; i++) {
-                RobotData robot = robots.get(Team.YELLOW).get(i);
+                RobotData robot = yellowRobots.get(i);
                 if (!customPath && robot == closestRobot) {
                     continue;
                 }
                 obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
             }
             for (int i = 0; i < 6; i++) {
-                RobotData robot = robots.get(Team.BLUE).get(i);
+                RobotData robot = blueRobots.get(i);
                 if (!customPath && robot == closestRobot) {
                     continue;
                 }
@@ -139,7 +163,7 @@ public class Display extends JPanel {
         private final FindPathTask findPathTask;
         private final int[] start = { 0, 0 };
         private final int[] dest = { 0, 0 };
-        
+
         public DisplayMouseInputAdapter(FindPathTask findPathTask) {
             this.findPathTask = findPathTask;
         }
@@ -164,7 +188,16 @@ public class Display extends JPanel {
 
         fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
         fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
-        robotSub = new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+
+        yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+        }
+
+        new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
+
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
 
         ImgLoader.loadImages();
@@ -188,16 +221,14 @@ public class Display extends JPanel {
         while (true) {
             fieldSize = fieldSizeSub.getMsg();
 
-            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0 || fieldSize.getGoalDepth() == 0)
+            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
+                    || fieldSize.getGoalDepth() == 0)
                 continue;
 
             double fullLength = fieldSize.getFieldLength() + fieldSize.getGoalDepth() * 2.0;
 
-            convert = new Gridify(
-                new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
-                new Vec2D(- fullLength / 2, 
-                          - fieldSize.getFieldWidth() / 2.0),
-                false, true);
+            convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
+                    new Vec2D(-fullLength / 2, -fieldSize.getFieldWidth() / 2.0), false, true);
 
             windowWidth = convert.numCols(fullLength);
             windowHeight = convert.numRows(fieldSize.getFieldWidth());
@@ -219,14 +250,18 @@ public class Display extends JPanel {
         Timer repaintTimer = new Timer();
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
 
-        //Timer findPathTimer = new Timer();
+        // Timer findPathTimer = new Timer();
         double worldSizeX = fieldSize.getFieldLength();
         double worldSizeY = fieldSize.getFieldWidth();
+
         JPS = new JPSPathFinder(worldSizeX, worldSizeY);
         FindPathTask JPSTask = new FindPathTask(this, JPS);
+
         PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
         FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
-        //findPathTimer.scheduleAtFixedRate(findPathTask, 0, DisplayConfig.UPDATE_DELAY);
+
+        // findPathTimer.scheduleAtFixedRate(findPathTask, 0,
+        // DisplayConfig.UPDATE_DELAY);
         addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
         addMouseListener(new DisplayMouseInputAdapter(JPSTask));
     }
@@ -268,12 +303,25 @@ public class Display extends JPanel {
     }
 
     private void paintObjects(Graphics2D g2d) {
-        if (!robotSub.subscribe() || !ballSub.subscribe())
-            return;
+        for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
+            robotSub.subscribe();
+        }
+        for (Subscriber<RobotData> robotSub : blueRobotSubs) {
+            robotSub.subscribe();
+        }
+        ballSub.subscribe();
 
-        HashMap<Team, HashMap<Integer, RobotData>> robots = robotSub.getMsg();
+        ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
+        }
 
-        for (RobotData robot : robots.get(Team.YELLOW).values()) {
+        ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            blueRobots.add(blueRobotSubs.get(i).getMsg());
+        }
+
+        for (RobotData robot : yellowRobots) {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
             AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
@@ -287,10 +335,10 @@ public class Display extends JPanel {
             g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
-        for (RobotData robot : robots.get(Team.BLUE).values()) {
+        for (RobotData robot : blueRobots) {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2.0,
+            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
                     ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
@@ -306,24 +354,16 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
 
-
     private void paintPath(Graphics2D g2d) {
         /*
-        Grid grid = pathfinder.getGrid();
-        Node[][] nodes = grid.getNodes();
-        for (int row = 0; row < grid.getNumRows(); row++) {
-            for (int col = 0; col < grid.getNumCols(); col++) {
-                Node node = nodes[row][col];
-                Vec2D worldPos = node.getWorldPos();
-                int[] displayPos = convert.fromPos(worldPos);
-                if (!node.getWalkable()) {
-                    g2d.setColor(Color.RED);
-                    g2d.setStroke(new BasicStroke(5));
-                    g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
-                }
-            }
-        }
-        */
+         * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
+         * row = 0; row < grid.getNumRows(); row++) { for (int col = 0; col <
+         * grid.getNumCols(); col++) { Node node = nodes[row][col]; Vec2D worldPos =
+         * node.getWorldPos(); int[] displayPos = convert.fromPos(worldPos); if
+         * (!node.getWalkable()) { g2d.setColor(Color.RED); g2d.setStroke(new
+         * BasicStroke(5)); g2d.drawLine(displayPos[0], displayPos[1], displayPos[0],
+         * displayPos[1]); } } }
+         */
 
         g2d.setColor(Color.YELLOW);
         g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));

@@ -8,6 +8,12 @@
   <url>http://maven.apache.org</url>
 
   <dependencies>
+    <!-- Java Tuples -->
+    <dependency>
+      <groupId>org.javatuples</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>1.2</version>
+    </dependency>
 
     <!-- Junit -->
     <dependency>
