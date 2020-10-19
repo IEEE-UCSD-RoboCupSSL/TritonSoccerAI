@@ -2,12 +2,13 @@ package Triton.Computation.ThetaStar;
 
 import java.util.*;
 
+import Triton.Computation.PathFinder;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
 
-public class Pathfinder {
+public class ThetaStarPathFinder extends PathFinder {
 
-    public class NodeComparator implements Comparator<Node> {
+    public static class NodeComparator implements Comparator<Node> {
         public int compare(Node a, Node b) {
             if (a.getFCost() == b.getFCost()) {
                 return (int) (a.getHCost() - b.getHCost());
@@ -19,16 +20,14 @@ public class Pathfinder {
 
     public Grid grid;
 
-    public Pathfinder(double worldSizeX, double worldSizeY) {
+    public ThetaStarPathFinder(double worldSizeX, double worldSizeY) {
+        super("θ* ");
         grid = new Grid(worldSizeX, worldSizeY);
     }
 
     public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
         Node startNode = grid.nodeFromWorldPos(startPos);
         Node targetNode = grid.nodeFromWorldPos(targetPos);
-
-        System.out.println("Finding path from " + startNode.getWorldPos() 
-                                       + " to " + targetNode.getWorldPos());
 
         PriorityQueue<Node> openSet = new PriorityQueue<Node>(1, new NodeComparator());
         HashSet<Node> closedSet = new HashSet<Node>();
@@ -79,7 +78,7 @@ public class Pathfinder {
         return Vec2D.dist(nodeA.getWorldPos(), nodeB.getWorldPos());
     }
 
-    public void updateGrid(ArrayList<Circle2D> obstacles) {
+    public void setObstacles(ArrayList<Circle2D> obstacles) {
         grid.updateGrid(obstacles);
     }
 

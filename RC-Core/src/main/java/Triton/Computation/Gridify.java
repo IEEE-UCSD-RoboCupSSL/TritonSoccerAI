@@ -6,10 +6,10 @@ public class Gridify {
 
     // pos = ±(ind * grid_size + offset)
     // ind = (±pos - offset) / grid_size  
-    private Vec2D grid_size;
-    private Vec2D offset;
-    private boolean flipX; 
-    private boolean flipY;
+    private final Vec2D grid_size;
+    private final Vec2D offset;
+    private final boolean flipX;
+    private final boolean flipY;
 
     public Gridify(Vec2D grid_size, Vec2D offset, boolean flipX, boolean flipY) {
         this.grid_size = grid_size;
@@ -29,8 +29,7 @@ public class Gridify {
     public int[] fromPos(Vec2D vec) {
         int col = (int) Math.round(((flipX ? -1 : 1) * vec.x - offset.x) / grid_size.x);
         int row = (int) Math.round(((flipY ? -1 : 1) * vec.y - offset.y) / grid_size.y);
-        int[] res = {col, row};
-        return res;
+        return new int[]{col, row};
     }
 
     public Vec2D fromInd(int[] ind) {
