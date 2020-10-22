@@ -18,8 +18,8 @@ public class DetectionModule implements Module {
 
     // Publishers
     private Subscriber<SSL_DetectionFrame> detectSub;
-    private ArrayList<Publisher<RobotData>> yellowRobotsPub;
-    private ArrayList<Publisher<RobotData>> blueRobotsPub;
+    private ArrayList<Publisher<RobotData>> yellowRobotPubs;
+    private ArrayList<Publisher<RobotData>> blueRobotPubs;
     private Publisher<BallData> ballPub;
 
     public DetectionModule() {
@@ -32,11 +32,11 @@ public class DetectionModule implements Module {
             blueRobotsData.add(new RobotData(Team.BLUE, i));
         }
         
-        yellowRobotsPub = new ArrayList<Publisher<RobotData>>();
-        blueRobotsPub = new ArrayList<Publisher<RobotData>>();
+        yellowRobotPubs = new ArrayList<Publisher<RobotData>>();
+        blueRobotPubs = new ArrayList<Publisher<RobotData>>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotsPub.add(new FieldPublisher<RobotData>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
-            blueRobotsPub.add(new FieldPublisher<RobotData>("detection", "blue robot data" + i, blueRobotsData.get(i)));
+            yellowRobotPubs.add(new FieldPublisher<RobotData>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
+            blueRobotPubs.add(new FieldPublisher<RobotData>("detection", "blue robot data" + i, blueRobotsData.get(i)));
         }
 
         ball = new BallData();
@@ -62,7 +62,7 @@ public class DetectionModule implements Module {
             if (robotFrame.getRobotId() < ObjectConfig.ROBOT_COUNT) {
                 int id = robotFrame.getRobotId();
                 yellowRobotsData.get(id).update(robotFrame, time);
-                yellowRobotsPub.get(id).publish(yellowRobotsData.get(id));
+                yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
             }
         }
 
@@ -70,7 +70,7 @@ public class DetectionModule implements Module {
             if (robotFrame.getRobotId() < ObjectConfig.ROBOT_COUNT) {
                 int id = robotFrame.getRobotId();
                 blueRobotsData.get(id).update(robotFrame, time);
-                blueRobotsPub.get(id).publish(blueRobotsData.get(id));
+                blueRobotPubs.get(id).publish(blueRobotsData.get(id));
             }
         }
 

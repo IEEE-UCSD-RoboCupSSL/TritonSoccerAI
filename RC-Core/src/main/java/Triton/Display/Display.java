@@ -81,7 +81,6 @@ public class Display extends JPanel {
                 blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
             }
 
-            new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
             ballSub = new FieldSubscriber<BallData>("detection", "ball");
         }
 
@@ -257,12 +256,12 @@ public class Display extends JPanel {
         JPS = new JPSPathFinder(worldSizeX, worldSizeY);
         FindPathTask JPSTask = new FindPathTask(this, JPS);
 
-        PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
-        FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
+        //PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
+        //FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
 
         // findPathTimer.scheduleAtFixedRate(findPathTask, 0,
         // DisplayConfig.UPDATE_DELAY);
-        addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
+        //addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
         addMouseListener(new DisplayMouseInputAdapter(JPSTask));
     }
 

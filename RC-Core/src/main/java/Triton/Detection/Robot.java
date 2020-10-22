@@ -1,11 +1,19 @@
 package Triton.Detection;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
+import Proto.RemoteAPI.Commands;
+import Triton.Computation.PathFinder;
+import Triton.Computation.JPS.JPSPathFinder;
 import Triton.Config.ConnectionConfig;
+import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.RemoteStation.RobotConnection;
+import Triton.Shape.Circle2D;
+import Triton.Shape.Vec2D;
 
 public class Robot implements Module {
     private Team team;
@@ -15,7 +23,14 @@ public class Robot implements Module {
     private RobotData data;
     private RobotConnection conn;
 
+    private PathFinder pathFinder;
+
     private Subscriber<RobotData> robotDataSub;
+    private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    private ArrayList<Subscriber<RobotData>> blueRobotSubs;
+
+    private Publisher<ArrayList<Vec2D>> pathPub;
 
     public Robot(Team team, int ID, ExecutorService pool) {
         this.team = team;
@@ -63,6 +78,16 @@ public class Robot implements Module {
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+
+        yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+        }
+
+        pathPub = new MQPublisher<ArrayList<Vec2D>>("path commands", team.name() + ID);
     }
 
     public Team getTeam() {
@@ -81,6 +106,64 @@ public class Robot implements Module {
         return conn;
     }
 
+    public void setEndPoint(Vec2D endPoint) {
+        if (pathFinder == null) {
+            fieldSizeSub.subscribe();
+            while (true) {
+                SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+
+                if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
+                        || fieldSize.getGoalDepth() == 0)
+                    continue;
+
+                double worldSizeX = fieldSize.getFieldLength();
+                double worldSizeY = fieldSize.getFieldWidth();
+
+                pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
+            }
+        }
+
+        pathFinder.setObstacles(getObstacles());
+
+        ArrayList<Vec2D> path = pathFinder.findPath(data.getPos(), endPoint);
+        pathPub.publish(path);
+    }
+
+    private ArrayList<Circle2D> getObstacles() {
+        for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
+            robotSub.subscribe();
+        }
+        for (Subscriber<RobotData> robotSub : blueRobotSubs) {
+            robotSub.subscribe();
+        }
+
+        ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            blueRobots.add(blueRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.YELLOW && ID == i)
+                continue;
+            RobotData robot = yellowRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.BLUE && ID == i)
+                continue;
+            RobotData robot = blueRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+
+        return obstacles;
+    }
+
     @Override
     public void run() {
         robotDataSub.subscribe();
@@ -89,9 +172,13 @@ public class Robot implements Module {
         pool.execute(conn.getCommandStream());
         pool.execute(conn.getVisionStream());
         pool.execute(conn.getDataStream());
-        
-        while(true) {
-            data = robotDataSub.getMsg();
-        }   
+
+        while (true) {
+            setData(robotDataSub.getMsg());
+        }
+    }
+
+    public void setData(RobotData data) {
+        this.data = data;
     }
 }
