@@ -3,6 +3,8 @@ package Triton.Detection;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
+import org.javatuples.Pair;
+
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Proto.RemoteAPI.Commands;
 import Triton.Computation.PathFinder;
@@ -30,7 +32,7 @@ public class Robot implements Module {
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
 
-    private Publisher<ArrayList<Vec2D>> pathPub;
+    private Publisher<Pair<ArrayList<Vec2D>, Double>> pathPub;
 
     public Robot(Team team, int ID, ExecutorService pool) {
         this.team = team;
@@ -87,7 +89,7 @@ public class Robot implements Module {
             blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
         }
 
-        pathPub = new MQPublisher<ArrayList<Vec2D>>("path commands", team.name() + ID);
+        pathPub = new MQPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID);
     }
 
     public Team getTeam() {
@@ -106,7 +108,7 @@ public class Robot implements Module {
         return conn;
     }
 
-    public void setEndPoint(Vec2D endPoint) {
+    public void setEndPoint(Vec2D endPoint, double angle) {
         if (pathFinder == null) {
             fieldSizeSub.subscribe();
             while (true) {
@@ -126,7 +128,8 @@ public class Robot implements Module {
         pathFinder.setObstacles(getObstacles());
 
         ArrayList<Vec2D> path = pathFinder.findPath(data.getPos(), endPoint);
-        pathPub.publish(path);
+        Pair<ArrayList<Vec2D>, Double> pathWithEndDir = new Pair<ArrayList<Vec2D>, Double>(path, angle);
+        pathPub.publish(pathWithEndDir);
     }
 
     private ArrayList<Circle2D> getObstacles() {

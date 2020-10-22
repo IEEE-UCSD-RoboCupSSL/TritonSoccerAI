@@ -2,6 +2,8 @@ package Triton.RemoteStation;
 
 import java.util.ArrayList;
 
+import org.javatuples.Pair;
+
 import Proto.RemoteAPI.Commands;
 import Proto.RemoteAPI.Vec3D;
 import Triton.Config.PathfinderConfig;
@@ -11,9 +13,9 @@ import Triton.Detection.Team;
 import Triton.Shape.Vec2D;
 
 public class RobotCommandUDPStream extends RobotUDPStream {
- 
+
     private Subscriber<RobotData> robotDataSub;
-    private Subscriber<ArrayList<Vec2D>> pathSub;
+    private Subscriber<Pair<ArrayList<Vec2D>, Double>> pathSub;
 
     public RobotCommandUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, team, ID);
@@ -21,7 +23,7 @@ public class RobotCommandUDPStream extends RobotUDPStream {
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
 
-        pathSub = new MQSubscriber<ArrayList<Vec2D>>("path commands", team.name() + ID, 1);
+        pathSub = new MQSubscriber<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID, 1);
     }
 
     private void sendCommand(Commands command) {
@@ -34,28 +36,31 @@ public class RobotCommandUDPStream extends RobotUDPStream {
         pathSub.subscribe();
 
         while (true) {
-            ArrayList<Vec2D> path = pathSub.getMsg();
+            Pair<ArrayList<Vec2D>, Double> pairWithDir = pathSub.getMsg();
+            ArrayList<Vec2D> path = pairWithDir.getValue0();
+            double angle = pairWithDir.getValue1();
             
             double distToOvershootPoint = 0;
-            for (Vec2D point : path) {
+
+            for (int i = 0; i < path.size(); i++) {
+                Vec2D node = path.get(i);
                 do {
                     RobotData robotData = robotDataSub.getMsg();
                     Vec2D currPos = robotData.getPos();
 
                     Commands.Builder command = Commands.newBuilder();
                     command.setMode(0);
-                    Vec2D overshoot =  point.sub(currPos).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
-                    Vec2D overshootPoint = point.add(overshoot);
+                    Vec2D overshoot =  node.sub(currPos).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
+                    Vec2D overshootPoint = node.add(overshoot);
                     Vec3D.Builder dest = Vec3D.newBuilder();
                     dest.setX(overshootPoint.x);
                     dest.setY(overshootPoint.y);
-                    dest.setZ(0);
+                    dest.setZ(0 /*FIGURE OUT ANGLE STUFF */);
                     command.setMotionSetPoint(dest);
                     sendCommand(command.build());
 
                     distToOvershootPoint = Vec2D.dist(overshootPoint, currPos);
                 } while (distToOvershootPoint > PathfinderConfig.OVERSHOOT_DIST);
             }
-        }
     }
 }
