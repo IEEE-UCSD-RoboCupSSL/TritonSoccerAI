@@ -66,6 +66,7 @@ public class RobotCommandUDPStream extends RobotUDPStream {
                     // produces a constant shift in angle per node between angle a and angle b
                     // at i = 0, z = a
                     // at i = k, z = b
+                    // NOTE: SHOULD ANGLE SHIFT BE BASED ON NODE DIST INSTEAD OF NODE INDEX?
                     dest.setZ(((angle - currAngle)  * i) / (path.size() - 1) + currAngle);
                     command.setMotionSetPoint(dest);
                     sendCommand(command.build());
