@@ -39,7 +39,7 @@ public class RobotCommandUDPStream extends RobotUDPStream {
             Pair<ArrayList<Vec2D>, Double> pairWithDir = pathSub.getMsg();
             ArrayList<Vec2D> path = pairWithDir.getValue0();
             double angle = pairWithDir.getValue1();
-            
+
             double distToOvershootPoint = 0;
 
             for (int i = 0; i < path.size(); i++) {
@@ -47,20 +47,32 @@ public class RobotCommandUDPStream extends RobotUDPStream {
                 do {
                     RobotData robotData = robotDataSub.getMsg();
                     Vec2D currPos = robotData.getPos();
+                    double currAngle = robotData.getOrient();
 
                     Commands.Builder command = Commands.newBuilder();
                     command.setMode(0);
-                    Vec2D overshoot =  node.sub(currPos).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
+                    Vec2D overshoot = node.sub(currPos).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
                     Vec2D overshootPoint = node.add(overshoot);
                     Vec3D.Builder dest = Vec3D.newBuilder();
                     dest.setX(overshootPoint.x);
                     dest.setY(overshootPoint.y);
-                    dest.setZ(0 /*FIGURE OUT ANGLE STUFF */);
+
+                    // z = [(b - a) i] / k + a
+                    // z is angle at node
+                    // i is current index of node
+                    // k is total number of nodes
+                    // a is start angle
+                    // b is end angle
+                    // produces a constant shift in angle per node between angle a and angle b
+                    // at i = 0, z = a
+                    // at i = k, z = b
+                    dest.setZ(((angle - currAngle)  * i) / (path.size() - 1) + currAngle);
                     command.setMotionSetPoint(dest);
                     sendCommand(command.build());
 
                     distToOvershootPoint = Vec2D.dist(overshootPoint, currPos);
                 } while (distToOvershootPoint > PathfinderConfig.OVERSHOOT_DIST);
             }
+        }
     }
 }
