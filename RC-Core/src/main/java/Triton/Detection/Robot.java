@@ -1,13 +1,13 @@
 package Triton.Detection;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.javatuples.Pair;
 
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Proto.RemoteAPI.Commands;
 import Triton.Computation.PathFinder;
+import Triton.Computation.PathRelayer;
 import Triton.Computation.JPS.JPSPathFinder;
 import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
@@ -20,7 +20,7 @@ import Triton.Shape.Vec2D;
 public class Robot implements Module {
     private Team team;
     private int ID;
-    private ExecutorService pool;
+    private ThreadPoolExecutor pool;
 
     private RobotData data;
     private RobotConnection conn;
@@ -33,8 +33,9 @@ public class Robot implements Module {
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
 
     private Publisher<Pair<ArrayList<Vec2D>, Double>> pathPub;
+    private PathRelayer pathRelayer;
 
-    public Robot(Team team, int ID, ExecutorService pool) {
+    public Robot(Team team, int ID, ThreadPoolExecutor pool) {
         this.team = team;
         this.ID = ID;
         this.pool = pool;
@@ -90,6 +91,7 @@ public class Robot implements Module {
         }
 
         pathPub = new MQPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID);
+        pathRelayer = new PathRelayer(team, ID, pool);
     }
 
     public Team getTeam() {

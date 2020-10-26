@@ -43,15 +43,15 @@ public class App {
     private static int MAX_THREADS = 100;
 
     public static void main(String args[]) {
-        ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
 
         Runnable visionRunnable = new VisionModule();
         Runnable geoRunnable = new GeometryModule();
         Runnable detectRunnable = new DetectionModule();
 
-        pool.execute(visionRunnable);
-        pool.execute(geoRunnable);
-        pool.execute(detectRunnable);
+        pool.submit(visionRunnable);
+        pool.submit(geoRunnable);
+        pool.submit(detectRunnable);
 
         try {
             Thread.sleep(1000);

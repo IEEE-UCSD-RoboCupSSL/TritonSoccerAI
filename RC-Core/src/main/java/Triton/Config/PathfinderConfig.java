@@ -1,7 +1,7 @@
 package Triton.Config;
 
 public class PathfinderConfig {
-    // Theta*
+    // Theta* / JPS
     public static final int NODE_RADIUS = 20;
     public static final int NODE_DIAMETER = NODE_RADIUS * 2;
     public static final double ADD_DIST = 20;

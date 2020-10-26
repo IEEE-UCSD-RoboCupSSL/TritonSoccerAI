@@ -20,6 +20,7 @@ public class JPSPathFinder extends PathFinder {
     public Gridify convert;
     private final int numRows, numCols;
     private final double worldSizeX, worldSizeY;
+    private final List<Node> lastObstacles = new ArrayList<>();
 
     public JPSPathFinder(double worldSizeX, double worldSizeY) {
         super("JPS");
@@ -73,7 +74,12 @@ public class JPSPathFinder extends PathFinder {
     public void setObstacles(ArrayList<Circle2D> obstacles) {
         setBoundary();
 
-        // Set the obstacles as not walkable
+        // Free last obstacles
+        for (Node node : lastObstacles) {
+            node.setWalkable(true);
+        }
+        lastObstacles.clear();
+        
         for (Circle2D obstacle : obstacles) {
             double x = obstacle.center.x;
             double y = obstacle.center.y;
@@ -91,6 +97,7 @@ public class JPSPathFinder extends PathFinder {
                     double dist = Math.sqrt(Math.pow((col - ce[0]), 2) + Math.pow((row - ce[1]), 2));
                     if (dist * PathfinderConfig.NODE_DIAMETER < r) {
                         nodeList.get(row).get(col).setWalkable(false);
+                        lastObstacles.add(nodeList.get(row).get(col));
                     }
                 }
             }

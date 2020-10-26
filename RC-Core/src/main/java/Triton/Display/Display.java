@@ -146,10 +146,10 @@ public class Display extends JPanel {
 
             pathfinder.setObstacles(obstacles);
             if (customPath) {
-                long t0 = System.nanoTime();
+                long t0 = System.currentTimeMillis();
                 ArrayList<Vec2D> path = pathfinder.findPath(start, dest);
-                long t1 = System.nanoTime();
-                System.out.println(pathfinder.getName() + " takes " + (t1 - t0) + " ns");
+                long t1 = System.currentTimeMillis();
+                System.out.println(pathfinder.getName() + " takes " + (t1 - t0) + " ms");
 
                 display.setPath(path);
             } else {

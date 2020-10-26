@@ -33,7 +33,7 @@ public class RobotTCPConnection implements Module {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             String line = in.readLine();
-            if (line.equals("CONNECTION ESTABLISHED")){    
+            if (line.equals("CONNECTION ESTABLISHED")) {    
                 isConnected = true;
                 return true;
             }

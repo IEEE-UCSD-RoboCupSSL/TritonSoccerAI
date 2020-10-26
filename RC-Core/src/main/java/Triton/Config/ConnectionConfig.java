@@ -1,6 +1,5 @@
 package Triton.Config;
 
-import java.util.ArrayList;
 import org.javatuples.Pair;
 
 public class ConnectionConfig {
