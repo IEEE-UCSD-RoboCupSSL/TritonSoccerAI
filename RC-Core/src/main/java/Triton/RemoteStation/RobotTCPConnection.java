@@ -31,11 +31,9 @@ public class RobotTCPConnection implements Module {
             clientSocket = new Socket(ip, port);
             out = new DataOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            
-
 
             String line = in.readLine();
-            if (line.equals("CONNECTION ESTABLISHED")){    
+            if (line.equals("CONNECTION ESTABLISHED")) {    
                 isConnected = true;
                 return true;
             }
@@ -68,11 +66,10 @@ public class RobotTCPConnection implements Module {
         toSend.setGoalDepth(fieldSize.getGoalDepth());
         toSend.setGoalWidth(fieldSize.getGoalWidth());
 
-        // byte[] geoByteArray = toSend.build().toByteArray();
+        byte[] geoByteArray = toSend.build().toByteArray();
 
         try {
-            /// out.write(geoByteArray);
-            out.writeChars("fhneowhfoiweho\n");
+            out.write(geoByteArray);
             String line = in.readLine();
             if (line.equals("GEOMETRY RECEIVED"))
                 return true;

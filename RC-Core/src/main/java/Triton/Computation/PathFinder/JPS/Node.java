@@ -1,4 +1,4 @@
-package Triton.Computation.JPS;
+package Triton.Computation.PathFinder.JPS;
 
 /**
  * @author Kevin

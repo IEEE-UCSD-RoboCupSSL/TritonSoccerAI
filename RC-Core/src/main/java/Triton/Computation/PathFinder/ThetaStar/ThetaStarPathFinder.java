@@ -1,8 +1,8 @@
-package Triton.Computation.ThetaStar;
+package Triton.Computation.PathFinder.ThetaStar;
 
 import java.util.*;
 
-import Triton.Computation.PathFinder;
+import Triton.Computation.PathFinder.PathFinder;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
 

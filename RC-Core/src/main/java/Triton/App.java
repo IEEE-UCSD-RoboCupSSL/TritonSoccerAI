@@ -1,14 +1,14 @@
 package Triton;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import Triton.Vision.*;
+import Triton.Config.ObjectConfig;
 import Triton.Detection.*;
 import Triton.Geometry.*;
-import Triton.RemoteStation.RobotConnetion;
-import Triton.RemoteStation.RobotTCPConnection;
+import Triton.RemoteStation.*;
 import Triton.Display.*;
-import Triton.Command.*;
 
 /*import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Handler;
@@ -43,25 +43,31 @@ public class App {
     private static int MAX_THREADS = 100;
 
     public static void main(String args[]) {
-        ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
 
         Runnable visionRunnable = new VisionModule();
         Runnable geoRunnable = new GeometryModule();
         Runnable detectRunnable = new DetectionModule();
 
-        pool.execute(visionRunnable);
-        pool.execute(geoRunnable);
-        pool.execute(detectRunnable);
+        pool.submit(visionRunnable);
+        pool.submit(geoRunnable);
+        pool.submit(detectRunnable);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<Robot> robots = new ArrayList<Robot>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            robots.add(new Robot(Team.YELLOW, i, pool));
+        }
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            robots.add(new Robot(Team.BLUE, i, pool));
+        }
 
         Display display = new Display();
-
-        RobotConnetion robotConnect = new RobotConnetion(Team.YELLOW, 1, pool);
-        robotConnect.buildTcpConnection("localhost", 6666);
-        RobotTCPConnection tcpConn = robotConnect.getRobotTCPConnection();
-        if(tcpConn.connect()) {
-            System.out.println("Connected");
-        }
-        System.out.println(tcpConn.sendGeometry());
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);

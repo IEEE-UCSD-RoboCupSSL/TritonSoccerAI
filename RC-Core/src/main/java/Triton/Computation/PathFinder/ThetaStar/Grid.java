@@ -1,4 +1,4 @@
-package Triton.Computation.ThetaStar;
+package Triton.Computation.PathFinder.ThetaStar;
 
 import java.util.ArrayList;
 import com.google.common.primitives.Ints;

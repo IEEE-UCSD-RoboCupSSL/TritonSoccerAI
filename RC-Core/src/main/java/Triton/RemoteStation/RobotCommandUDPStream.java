@@ -6,25 +6,21 @@ import Triton.Detection.Team;
 
 public class RobotCommandUDPStream extends RobotUDPStream {
 
-    private Subscriber<Commands> commandSub;
+    private Subscriber<Commands> commandsSub;
 
     public RobotCommandUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, team, ID);
 
-        commandSub = new MQSubscriber<Commands>("command", team.name() + ID, 1);
-    }
-
-    private void sendCommand() {
-        Commands command = commandSub.getMsg();
-        byte[] bytes = command.toByteArray();
-        send(bytes);
+        commandsSub = new MQSubscriber<Commands>("commands", team.name() + ID, 1);
     }
 
     public void run() {
-        while (!commandSub.subscribe());
+        commandsSub.subscribe();
 
         while (true) {
-            sendCommand();
+            Commands command = commandsSub.getMsg();
+            byte[] bytes = command.toByteArray();
+            send(bytes);
         }
     }
 }
