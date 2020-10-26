@@ -2,9 +2,9 @@ package Triton.RemoteStation;
 
 import java.net.*;
 
-import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Proto.RemoteAPI.RemoteGeometry;
 import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.Detection.RobotData;
+import Triton.Detection.Team;
 import Triton.DesignPattern.PubSubSystem.*;
 
 import java.io.*;
@@ -12,28 +12,33 @@ import java.io.*;
 public class RobotTCPConnection implements Module {
     private String ip;
     private int port;
+    private Team team;
+    private int ID;
 
     private Socket clientSocket;
-    private DataOutputStream out;
+    private PrintWriter out;
     private BufferedReader in;
 
-    private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private Subscriber<RobotData> robotDataSub;
     private boolean isConnected;
 
-    public RobotTCPConnection(String ip, int port) {
+    public RobotTCPConnection(String ip, int port, Team team, int ID) {
         this.ip = ip;
         this.port = port;
-        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+        this.team = team;
+        this.ID = ID;
+        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
+        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
     }
 
     public boolean connect() {
         try {
             clientSocket = new Socket(ip, port);
-            out = new DataOutputStream(clientSocket.getOutputStream());
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             String line = in.readLine();
-            if (line.equals("CONNECTION ESTABLISHED")) {    
+            if (line.equals("CONNECTION ESTABLISHED")) {
                 isConnected = true;
                 return true;
             }
@@ -47,37 +52,22 @@ public class RobotTCPConnection implements Module {
         }
     }
 
-    public boolean isConnected() {
-        return isConnected;
+    public void sendInit(double x, double y) {
+        out.format("init %f %f", x, y);
     }
 
-    public boolean sendGeometry() {
-        fieldSizeSub.subscribe();
-
-        SSL_GeometryFieldSize fieldSize = null;
-        do {
-            fieldSize = fieldSizeSub.getMsg();
-        }
-        while (fieldSize == null);
-
-        RemoteGeometry.Builder toSend = RemoteGeometry.newBuilder();
-        toSend.setFieldLength(fieldSize.getFieldLength());
-        toSend.setFieldWidth(fieldSize.getFieldWidth());
-        toSend.setGoalDepth(fieldSize.getGoalDepth());
-        toSend.setGoalWidth(fieldSize.getGoalWidth());
-
-        byte[] geoByteArray = toSend.build().toByteArray();
-
+    public boolean requestDribblerStatus() {
+        out.format("");
         try {
-            out.write(geoByteArray);
-            String line = in.readLine();
-            if (line.equals("GEOMETRY RECEIVED"))
-                return true;
+            return Boolean.parseBoolean(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
-        return false;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 
     @Override

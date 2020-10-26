@@ -19,7 +19,7 @@ public class RobotConnection {
     }
 
     public void buildTcpConnection(String ip, int port) {
-        tcpConnect = new RobotTCPConnection(ip, port);
+        tcpConnect = new RobotTCPConnection(ip, port, team, ID);
     }
 
     public void buildCommandUDP(String ip, int port) {
