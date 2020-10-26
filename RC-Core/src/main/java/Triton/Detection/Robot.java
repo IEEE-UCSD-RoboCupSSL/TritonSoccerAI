@@ -6,9 +6,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.javatuples.Pair;
 
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Triton.Computation.PathFinder;
-import Triton.Computation.PathRelayer;
-import Triton.Computation.JPS.JPSPathFinder;
+import Triton.Computation.PathFinder.PathFinder;
+import Triton.Computation.PathFinder.PathRelayer;
+import Triton.Computation.PathFinder.JPS.JPSPathFinder;
 import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.PubSubSystem.*;

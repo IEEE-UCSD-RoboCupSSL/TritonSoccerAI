@@ -1,10 +1,9 @@
 package Triton.Display;
 
-import Triton.Computation.JPS.JPSPathFinder;
-import Triton.Computation.PathFinder;
+import Triton.Computation.PathFinder.JPS.JPSPathFinder;
+import Triton.Computation.PathFinder.PathFinder;
 import Triton.Config.ObjectConfig;
 import Triton.Computation.Gridify;
-import Triton.Computation.ThetaStar.*;
 import Triton.Config.DisplayConfig;
 import Triton.Detection.*;
 import Triton.Detection.RobotData;

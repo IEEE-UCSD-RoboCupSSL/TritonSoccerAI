@@ -1,4 +1,4 @@
-package Triton.Computation;
+package Triton.Computation.PathFinder;
 
 import java.util.ArrayList;
 

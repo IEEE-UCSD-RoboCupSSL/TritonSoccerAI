@@ -1,7 +1,5 @@
-package Triton.Computation.ThetaStar;
+package Triton.Computation.PathFinder.ThetaStar;
 
-import java.util.HashMap;
-import Triton.Detection.RobotData;
 import Triton.Shape.Vec2D;
 
 public class Node {

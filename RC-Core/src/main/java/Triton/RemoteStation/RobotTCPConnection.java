@@ -66,11 +66,10 @@ public class RobotTCPConnection implements Module {
         toSend.setGoalDepth(fieldSize.getGoalDepth());
         toSend.setGoalWidth(fieldSize.getGoalWidth());
 
-        // byte[] geoByteArray = toSend.build().toByteArray();
+        byte[] geoByteArray = toSend.build().toByteArray();
 
         try {
-            /// out.write(geoByteArray);
-            out.writeChars("fhneowhfoiweho\n");
+            out.write(geoByteArray);
             String line = in.readLine();
             if (line.equals("GEOMETRY RECEIVED"))
                 return true;

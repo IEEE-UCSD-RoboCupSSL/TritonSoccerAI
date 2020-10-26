@@ -1,4 +1,4 @@
-package Triton.Computation;
+package Triton.Computation.PathFinder;
 
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
