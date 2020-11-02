@@ -74,10 +74,10 @@ public class Robot implements Module {
                 System.out.println("Invalid Robot ID");
         }
 
-        conn.buildTcpConnection(ip, port);
-        conn.buildCommandUDP(ip, port);
-        conn.buildDataStream(port);
-        conn.buildVisionStream(ip, port);
+        conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
+        //conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
+        //conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
+        //conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
@@ -173,10 +173,12 @@ public class Robot implements Module {
     public void run() {
         robotDataSub.subscribe();
 
-        pool.execute(conn.getTCPConnection());
-        pool.execute(conn.getCommandStream());
-        pool.execute(conn.getVisionStream());
-        pool.execute(conn.getDataStream());
+        if (team == ObjectConfig.MY_TEAM) {
+            pool.execute(conn.getTCPConnection());
+            //pool.execute(conn.getCommandStream());
+            //pool.execute(conn.getVisionStream());
+            //pool.execute(conn.getDataStream());
+        }
 
         while (true) {
             setData(robotDataSub.getMsg());

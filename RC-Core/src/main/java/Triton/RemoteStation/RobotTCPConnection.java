@@ -36,6 +36,7 @@ public class RobotTCPConnection implements Module {
             String line = in.readLine();
             if (line.equals("CONNECTION ESTABLISHED")) {
                 isConnected = true;
+                System.out.println(ID + " " + line);
                 return true;
             }
             return false;
@@ -68,5 +69,6 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
+        connect();
     }
 }

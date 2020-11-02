@@ -15,6 +15,10 @@ public class ConnectionConfig {
     public static final Pair<String, Integer> ROBOT_4_IP = new Pair<String, Integer>("localhost", 8400);
     public static final Pair<String, Integer> ROBOT_5_IP = new Pair<String, Integer>("localhost", 8500);
 
+    public static final int TCP_OFFSET = 0;
+    public static final int COMMAND_UDP_OFFSET = 1;
+    public static final int DATA_UDP_OFFSET = 2;
+    public static final int VISION_UDP_OFFSET = 3;
     
 
     // Multicast
