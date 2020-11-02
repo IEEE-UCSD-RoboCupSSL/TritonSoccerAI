@@ -2,6 +2,7 @@ package Triton.Computation.PathFinder;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeoutException;
 
 import org.javatuples.Pair;
 
@@ -28,7 +29,12 @@ public class PathRelayer implements Module {
     }
 
     public void run() {
-        pathSub.subscribe();
+        try {
+            pathSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         while (true) {
             Pair<ArrayList<Vec2D>, Double> pathWithDir = pathSub.getMsg();

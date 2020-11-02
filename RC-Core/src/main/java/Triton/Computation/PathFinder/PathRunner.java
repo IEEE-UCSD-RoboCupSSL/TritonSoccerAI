@@ -1,6 +1,7 @@
 package Triton.Computation.PathFinder;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 import Proto.RemoteAPI.Commands;
 import Proto.RemoteAPI.Vec3D;
@@ -29,7 +30,12 @@ public class PathRunner implements Runnable {
 
     @Override
     public void run() {
-        robotDataSub.subscribe();
+        try {
+            robotDataSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         RobotData robotData = robotDataSub.getMsg();
         double startDistToEndPoint = Vec2D.dist(robotData.getPos(), path.get(path.size() - 1));

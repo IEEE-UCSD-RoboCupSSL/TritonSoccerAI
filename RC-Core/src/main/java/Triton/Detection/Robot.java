@@ -2,6 +2,7 @@ package Triton.Detection;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeoutException;
 
 import org.javatuples.Pair;
 
@@ -75,9 +76,9 @@ public class Robot implements Module {
         }
 
         conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
-        //conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
-        //conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-        //conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+        conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
+        // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
+        // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
@@ -112,7 +113,12 @@ public class Robot implements Module {
 
     public void setEndPoint(Vec2D endPoint, double angle) {
         if (pathFinder == null) {
-            fieldSizeSub.subscribe();
+            try {
+                fieldSizeSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             while (true) {
                 SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
 
@@ -136,10 +142,20 @@ public class Robot implements Module {
 
     private ArrayList<Circle2D> getObstacles() {
         for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-            robotSub.subscribe();
+            try {
+                robotSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-            robotSub.subscribe();
+            try {
+                robotSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
         ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
@@ -171,11 +187,16 @@ public class Robot implements Module {
 
     @Override
     public void run() {
-        robotDataSub.subscribe();
+        try {
+            robotDataSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         if (team == ObjectConfig.MY_TEAM) {
             pool.execute(conn.getTCPConnection());
-            //pool.execute(conn.getCommandStream());
+            pool.execute(conn.getCommandStream());
             //pool.execute(conn.getVisionStream());
             //pool.execute(conn.getDataStream());
         }

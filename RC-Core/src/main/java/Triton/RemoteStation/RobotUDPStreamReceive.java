@@ -6,6 +6,11 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 public class RobotUDPStreamReceive extends RobotUDPStream {
+
+    private static final int MAX_BUFFER_SIZE = 67108864;
+
+    private byte[] buf;
+
     public RobotUDPStreamReceive(int port, int ID) {
         super(port, ID);
         try {
@@ -13,6 +18,7 @@ public class RobotUDPStreamReceive extends RobotUDPStream {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+		buf = new byte[MAX_BUFFER_SIZE];
     }
 
     protected byte[] receive() {

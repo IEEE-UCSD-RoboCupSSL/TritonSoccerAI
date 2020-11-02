@@ -4,6 +4,7 @@ import Triton.Shape.*;
 import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 import Proto.MessagesRobocupSslGeometry.*;
 
@@ -19,7 +20,13 @@ public class Regions {
     public static void createRegions() {
         fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
         fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
-        while (!fieldSizeSub.subscribe() || !fieldLinesSub.subscribe());
+        try {
+            while (!fieldSizeSub.subscribe(1000) || !fieldLinesSub.subscribe(1000))
+                ;
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
          
         SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
         HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();

@@ -23,8 +23,8 @@ public class MQSubscriber<T> extends Subscriber<T> {
     }
 
     @Override
-    public boolean subscribe(long timeout) {
-        boolean rtn = super.subscribe();
+    public boolean subscribe(long timeout) throws TimeoutException {
+        boolean rtn = super.subscribe(timeout);
         channel.addMsgQueue(queue);
         return rtn;
     }

@@ -4,6 +4,8 @@ import Triton.Shape.*;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Module;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
+
 import Proto.MessagesRobocupSslGeometry.*;
 
 public class GeometryModule implements Module {
@@ -18,7 +20,12 @@ public class GeometryModule implements Module {
     }
 
     public void run() {
-        geoSub.subscribe();
+        try {
+            geoSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         while (true) {
             SSL_GeometryData geoData = geoSub.getMsg();

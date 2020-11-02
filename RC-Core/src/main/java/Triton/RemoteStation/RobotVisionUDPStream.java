@@ -1,6 +1,7 @@
 package Triton.RemoteStation;
 
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 import Proto.RemoteAPI.VisionData;
 import Triton.DesignPattern.PubSubSystem.*;
@@ -20,7 +21,12 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     }
 
     private void sendVision() {
-        while (!robotSub.subscribe() || !ballSub.subscribe());
+        try {
+            while (!robotSub.subscribe(1000) || !ballSub.subscribe(1000));
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         RobotData robotData = robotSub.getMsg();
         BallData ballData = ballSub.getMsg();

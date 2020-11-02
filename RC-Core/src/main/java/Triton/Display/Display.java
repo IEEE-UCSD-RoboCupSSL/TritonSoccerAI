@@ -18,6 +18,7 @@ import java.awt.image.*;
 
 import java.util.*;
 import java.util.Timer;
+import java.util.concurrent.TimeoutException;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -91,12 +92,27 @@ public class Display extends JPanel {
         @Override
         public void run() {
             for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-                robotSub.subscribe();
+                try {
+                    robotSub.subscribe(1000);
+                } catch (TimeoutException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-                robotSub.subscribe();
+                try {
+                    robotSub.subscribe(1000);
+                } catch (TimeoutException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
-            ballSub.subscribe();
+            try {
+                ballSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
             ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
             for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
@@ -214,7 +230,12 @@ public class Display extends JPanel {
     }
 
     public void start() {
-        fieldSizeSub.subscribe();
+        try {
+            fieldSizeSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         while (true) {
             fieldSize = fieldSizeSub.getMsg();
@@ -233,7 +254,12 @@ public class Display extends JPanel {
             break;
         }
 
-        fieldLinesSub.subscribe();
+        try {
+            fieldLinesSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         do {
             fieldLines = fieldLinesSub.getMsg();
         } while (fieldLines == null);
@@ -302,12 +328,27 @@ public class Display extends JPanel {
 
     private void paintObjects(Graphics2D g2d) {
         for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-            robotSub.subscribe();
+            try {
+                robotSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-            robotSub.subscribe();
+            try {
+                robotSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        ballSub.subscribe();
+        try {
+            ballSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {

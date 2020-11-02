@@ -20,7 +20,7 @@ public class RobotUDPStreamSend extends RobotUDPStream {
         }
     }
     protected void send(byte[] msg) {
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
+		DatagramPacket packet = new DatagramPacket(msg, msg.length, address, port);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {

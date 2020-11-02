@@ -7,6 +7,8 @@ import Triton.DesignPattern.PubSubSystem.Publisher;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 
 import java.util.*;
+import java.util.concurrent.TimeoutException;
+
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
@@ -31,11 +33,12 @@ public class DetectionModule implements Module {
             yellowRobotsData.add(new RobotData(Team.YELLOW, i));
             blueRobotsData.add(new RobotData(Team.BLUE, i));
         }
-        
+
         yellowRobotPubs = new ArrayList<Publisher<RobotData>>();
         blueRobotPubs = new ArrayList<Publisher<RobotData>>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotPubs.add(new FieldPublisher<RobotData>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
+            yellowRobotPubs
+                    .add(new FieldPublisher<RobotData>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
             blueRobotPubs.add(new FieldPublisher<RobotData>("detection", "blue robot data" + i, blueRobotsData.get(i)));
         }
 
@@ -44,7 +47,12 @@ public class DetectionModule implements Module {
     }
 
     public void run() {
-        detectSub.subscribe();
+        try {
+            detectSub.subscribe(1000);
+        } catch (TimeoutException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
         while (true) {
             try {

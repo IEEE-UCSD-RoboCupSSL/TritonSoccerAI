@@ -1,9 +1,12 @@
 package Triton.RemoteStation;
 
 import java.net.*;
+import java.util.concurrent.TimeoutException;
 
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.Detection.RobotData;
+import Triton.Detection.Team;
+import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.PubSubSystem.*;
 
 import java.io.*;
@@ -24,7 +27,16 @@ public class RobotTCPConnection implements Module {
         this.ip = ip;
         this.port = port;
         this.ID = ID;
-        robotDataSub = new FieldSubscriber<RobotData>("detection", "" + ID);
+
+        String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
+        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+
+        try {
+            robotDataSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public boolean connect() {
@@ -49,12 +61,14 @@ public class RobotTCPConnection implements Module {
         }
     }
 
-    public void sendInit(double x, double y) {
-        out.format("init %f %f", x, y);
+    public void sendInit() {
+        RobotData data = robotDataSub.getMsg();
+
+        out.format("init %f %f\n", data.getPos().x, data.getPos().y);
     }
 
     public boolean requestDribblerStatus() {
-        out.format("");
+        out.format("\n");
         try {
             return Boolean.parseBoolean(in.readLine());
         } catch (IOException e) {
@@ -69,6 +83,5 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
-        connect();
     }
 }

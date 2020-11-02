@@ -73,6 +73,9 @@ public class App {
 
         Display display = new Display();
 
+        //robots.get(6).getRobotConnection().getTCPConnection().connect();
+        //robots.get(6).getRobotConnection().getTCPConnection().sendInit();
+
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
         try {
