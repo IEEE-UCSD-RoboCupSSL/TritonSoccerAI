@@ -23,7 +23,7 @@ public class PathRunner implements Runnable {
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
-        commandsPub = new MQPublisher<Commands>("commands", team.name() + ID);
+        commandsPub = new MQPublisher<Commands>("commands", "" + ID);
 
     }
 
