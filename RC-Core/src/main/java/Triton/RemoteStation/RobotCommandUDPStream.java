@@ -4,14 +4,13 @@ import Proto.RemoteAPI.Commands;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.Detection.Team;
 
-public class RobotCommandUDPStream extends RobotUDPStream {
+public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
     private Subscriber<Commands> commandsSub;
 
-    public RobotCommandUDPStream(String ip, int port, Team team, int ID) {
-        super(ip, port, team, ID);
-
-        commandsSub = new MQSubscriber<Commands>("commands", team.name() + ID, 1);
+    public RobotCommandUDPStream(String ip, int port, int ID) {
+        super(ip, port, ID);
+        commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 1);
     }
 
     public void run() {

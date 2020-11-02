@@ -4,14 +4,13 @@ import Proto.RemoteAPI.RobotInternalData;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.Detection.Team;
 
-public class RobotInternalUDPStream extends RobotUDPStream {
+public class RobotDataUDPStream extends RobotUDPStreamReceive {
 
     private Publisher<RobotInternalData> internalPub;
 
-    public RobotInternalUDPStream(String ip, int port, Team team, int ID) {
-        super(ip, port, team, ID);
-
-        internalPub = new MQPublisher<RobotInternalData>("robot", "internal" + team.name() + ID);
+    public RobotDataUDPStream(int port, int ID) {
+        super(port, ID);
+        internalPub = new MQPublisher<RobotInternalData>("robot", "internal" + ID);
     }
 
     private void receiveEKF() {

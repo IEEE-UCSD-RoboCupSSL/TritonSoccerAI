@@ -4,7 +4,6 @@ import java.net.*;
 
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.Detection.RobotData;
-import Triton.Detection.Team;
 import Triton.DesignPattern.PubSubSystem.*;
 
 import java.io.*;
@@ -12,7 +11,6 @@ import java.io.*;
 public class RobotTCPConnection implements Module {
     private String ip;
     private int port;
-    private Team team;
     private int ID;
 
     private Socket clientSocket;
@@ -22,13 +20,11 @@ public class RobotTCPConnection implements Module {
     private Subscriber<RobotData> robotDataSub;
     private boolean isConnected;
 
-    public RobotTCPConnection(String ip, int port, Team team, int ID) {
+    public RobotTCPConnection(String ip, int port, int ID) {
         this.ip = ip;
         this.port = port;
-        this.team = team;
         this.ID = ID;
-        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+        robotDataSub = new FieldSubscriber<RobotData>("detection", "" + ID);
     }
 
     public boolean connect() {

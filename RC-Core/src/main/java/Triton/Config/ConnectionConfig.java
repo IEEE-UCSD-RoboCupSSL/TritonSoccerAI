@@ -15,6 +15,8 @@ public class ConnectionConfig {
     public static final Pair<String, Integer> ROBOT_4_IP = new Pair<String, Integer>("localhost", 8400);
     public static final Pair<String, Integer> ROBOT_5_IP = new Pair<String, Integer>("localhost", 8500);
 
+    
+
     // Multicast
     public static final String MC_ADDR = "224.5.0.1";
     public static final int MC_PORT = 10020;

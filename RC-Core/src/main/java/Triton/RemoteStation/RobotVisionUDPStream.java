@@ -8,16 +8,14 @@ import Triton.Detection.BallData;
 import Triton.Detection.RobotData;
 import Triton.Detection.Team;
 
-public class RobotVisionUDPStream extends RobotUDPStream {
+public class RobotVisionUDPStream extends RobotUDPStreamSend {
 
     private Subscriber<RobotData> robotSub;
     private Subscriber<BallData> ballSub;
 
-    public RobotVisionUDPStream(String ip, int port, Team team, int ID) {
-        super(ip, port, team, ID);
-
-        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotSub = new FieldSubscriber<RobotData>("detection", name);
+    public RobotVisionUDPStream(String ip, int port, int ID) {
+        super(ip, port, ID);
+        robotSub = new FieldSubscriber<RobotData>("detection", "" + ID);
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
     }
 

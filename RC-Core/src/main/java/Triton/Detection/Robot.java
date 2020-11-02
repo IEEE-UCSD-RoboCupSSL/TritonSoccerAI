@@ -40,7 +40,7 @@ public class Robot implements Module {
         this.ID = ID;
         this.pool = pool;
 
-        conn = new RobotConnection(team, ID);
+        conn = new RobotConnection(ID);
 
         String ip = "";
         int port = 0;
@@ -76,7 +76,7 @@ public class Robot implements Module {
 
         conn.buildTcpConnection(ip, port);
         conn.buildCommandUDP(ip, port);
-        conn.buildDataStream(ip, port);
+        conn.buildDataStream(port);
         conn.buildVisionStream(ip, port);
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
