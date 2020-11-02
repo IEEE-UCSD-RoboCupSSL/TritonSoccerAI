@@ -61,10 +61,14 @@ public class App {
 
         ArrayList<Robot> robots = new ArrayList<Robot>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            robots.add(new Robot(Team.YELLOW, i, pool));
+            Robot robot = new Robot(Team.YELLOW, i, pool);
+            robots.add(robot);
+            pool.execute(robot);
         }
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            robots.add(new Robot(Team.BLUE, i, pool));
+            Robot robot = new Robot(Team.BLUE, i, pool);
+            robots.add(robot);
+            pool.execute(robot);
         }
 
         Display display = new Display();
