@@ -3,8 +3,8 @@ package Triton.Detection;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Triton.Shape.Vec2D;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Triton.Shape.Vec2D;
 
 public class BallData {
 
