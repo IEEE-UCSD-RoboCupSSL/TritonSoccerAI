@@ -97,7 +97,10 @@ public class PathRunner implements Runnable {
                     targetSide = overshoot.x < node.x;
                 } else {
                     // y = (-1 / m)(x - x1) + y1
-                    // equation draws line perpedicular to slope m and on point (x1, y1)
+                    // equation is a line perpedicular to slope m that contains point (x1, y1)
+                    // m = target slope
+                    // x1 = target pos x
+                    // y1 = target pos y
                     double m = overshoot.y / overshoot.x;
                     double x1 = node.x;
                     double y1 = node.y;
