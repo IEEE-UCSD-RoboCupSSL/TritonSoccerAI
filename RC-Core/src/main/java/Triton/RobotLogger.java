@@ -1,7 +1,7 @@
 /*
  * @Author: Neil Min, Cecilia Hong
  * @Date: 2020-10-19 00:58:53
- * @LastEditTime: 2020-11-08 20:50:10
+ * @LastEditTime: 2020-11-09 14:06:49
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SimuBot/RC-Core/src/main/java/Triton/RobotLogger.java
@@ -25,10 +25,24 @@ public class RobotLogger{
     public Logger logger = LogManager.getLogger(RobotLogger.class);
 
     public RobotLogger(){
+        PropertyConfigurator.configure("log4j.properties");
         //f.setFile(filename);
     }
     public void info(String info) {
         logger.info(info);
     }
+
+    public void debug(String debug) {
+        logger.debug(debug);
+    }
+
+    public void warning(String warning) {
+        logger.warn(warning);
+    }
+
+    public void error(String error) {
+        logger.error(error);
+    }
+
 
 }

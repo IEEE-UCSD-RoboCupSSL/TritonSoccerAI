@@ -1,7 +1,7 @@
 ###
  # @Author: Neil
  # @Date: 2020-11-08 21:32:49
- # @LastEditTime: 2020-11-09 13:46:37
+ # @LastEditTime: 2020-11-09 15:26:32
  # @LastEditors: Please set LastEditors
  # @Description: In User Settings Edit
  # @FilePath: /SimuBot/run.sh
@@ -30,3 +30,6 @@ end tell'
 
 # open new terminals for new processes
 echo Staring CPP group code: not found!
+#vifirm.exe port id(0-5) team(boolean:1 blue 0 yellow)   * 6
+#TritionBot.exe -v port(6000-6100-6200-6300...) vf-port                          * 6
+#java (look at ports in config file)

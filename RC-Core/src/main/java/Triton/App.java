@@ -93,7 +93,7 @@ public class App {
 		// logger.info("information");
         // logger.error("error");
         RobotLogger logger = new RobotLogger();
-        logger.info("information");
+        logger.debug("debug");
 
     }
 
