@@ -108,6 +108,7 @@ public class PathRunner implements Runnable {
                     currSide = (currPos.y < (-1 / m) * (currPos.x - x1) + y1);
                     targetSide = (overshoot.y < (-1 / m) * (overshoot.x - x1) + y1);
                 }
+                // continue when current pos and overshoot point on same side of divider line
             } while (currSide != targetSide);
         }
     }
