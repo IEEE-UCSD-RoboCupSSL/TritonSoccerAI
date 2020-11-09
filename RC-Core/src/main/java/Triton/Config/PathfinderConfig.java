@@ -9,4 +9,5 @@ public class PathfinderConfig {
                                 + PathfinderConfig.ADD_DIST;
 
     public static final double OVERSHOOT_DIST = 10;
+    public static final double BALL_CATCH_DIST = 10;
 }

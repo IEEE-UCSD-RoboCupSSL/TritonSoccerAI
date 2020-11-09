@@ -21,6 +21,7 @@ public class RobotTCPConnection implements Module {
     private BufferedReader in;
 
     private Subscriber<RobotData> robotDataSub;
+    private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
 
     public RobotTCPConnection(String ip, int port, int ID) {
@@ -30,6 +31,7 @@ public class RobotTCPConnection implements Module {
 
         String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+        tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
 
         try {
             robotDataSub.subscribe(1000);
@@ -83,5 +85,18 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
+        try {
+            tcpCommandSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        String msg = tcpCommandSub.getMsg();
+        switch (msg) {
+            case "request dribbler status":
+                requestDribblerStatus();
+                break;
+        }
     }
 }

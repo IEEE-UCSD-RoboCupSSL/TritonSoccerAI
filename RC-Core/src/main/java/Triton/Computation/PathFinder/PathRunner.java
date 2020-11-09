@@ -7,8 +7,10 @@ import Proto.RemoteAPI.Commands;
 import Proto.RemoteAPI.Vec3D;
 import Triton.Config.PathfinderConfig;
 import Triton.DesignPattern.PubSubSystem.*;
+import Triton.Detection.BallData;
 import Triton.Detection.RobotData;
 import Triton.Detection.Team;
+import Triton.Shape.Line2D;
 import Triton.Shape.Vec2D;
 
 public class PathRunner implements Runnable {
@@ -16,7 +18,9 @@ public class PathRunner implements Runnable {
     double angle;
 
     private Subscriber<RobotData> robotDataSub;
+    private Subscriber<BallData> ballSub;
     private Publisher<Commands> commandsPub;
+    private Publisher<String> tcpCommandPub;
 
     public PathRunner(Team team, int ID, ArrayList<Vec2D> path, double angle) {
         this.path = path;
@@ -24,40 +28,54 @@ public class PathRunner implements Runnable {
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+        ballSub = new FieldSubscriber<BallData>("detection", "ball");
         commandsPub = new MQPublisher<Commands>("commands", "" + ID);
-
+        tcpCommandPub = new MQPublisher<String>("tcpCommand", name);
     }
 
     @Override
     public void run() {
         try {
             robotDataSub.subscribe(1000);
+            ballSub.subscribe(1000);
         } catch (TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         RobotData robotData = robotDataSub.getMsg();
+        BallData ballData = ballSub.getMsg();
         double startDistToEndPoint = Vec2D.dist(robotData.getPos(), path.get(path.size() - 1));
 
-        double distToOvershootPoint = 0;
-
-        for (int i = 0; i < path.size(); i++) {
+        for (int i = 1; i < path.size(); i++) {
+            double distToNode = 0;
             Vec2D node = path.get(i);
+
+            Vec2D overshoot = node.sub(path.get(i - 1)).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
+            Vec2D overshootPoint = node.add(overshoot);
+            Vec3D.Builder dest = Vec3D.newBuilder();
+            dest.setX(overshootPoint.x);
+            dest.setY(overshootPoint.y);
+
+            boolean currSide;
+            boolean targetSide;
             do {
-                robotData = robotDataSub.getMsg();
+                Commands.Builder command = Commands.newBuilder();
+
                 Vec2D currPos = robotData.getPos();
+                Vec2D ballPos = ballData.getPos();
+
+                if (Vec2D.dist(currPos, ballPos) < PathfinderConfig.BALL_CATCH_DIST) {
+                    command.setEnableBallAutoCapture(true);
+                    tcpCommandPub.publish("request dribbler status");
+                }
+
+                robotData = robotDataSub.getMsg();
                 double currAngle = robotData.getOrient();
 
                 double distToEndPoint = Vec2D.dist(robotData.getPos(), path.get(path.size() - 1));
 
-                Commands.Builder command = Commands.newBuilder();
                 command.setMode(0);
-                Vec2D overshoot = node.sub(currPos).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
-                Vec2D overshootPoint = node.add(overshoot);
-                Vec3D.Builder dest = Vec3D.newBuilder();
-                dest.setX(overshootPoint.x);
-                dest.setY(overshootPoint.y);
 
                 // z = [(b - a) i] / k + a
                 // z is angle at node
@@ -72,8 +90,22 @@ public class PathRunner implements Runnable {
                 command.setMotionSetPoint(dest);
                 commandsPub.publish(command.build());
 
-                distToOvershootPoint = Vec2D.dist(overshootPoint, currPos);
-            } while (distToOvershootPoint > PathfinderConfig.OVERSHOOT_DIST);
+                distToNode = Vec2D.dist(node, currPos);
+
+                if (overshoot.y == 0) {
+                    currSide = currPos.x < node.x;
+                    targetSide = overshoot.x < node.x;
+                } else {
+                    // y = (-1 / m)(x - x1) + y1
+                    // equation draws line perpedicular to slope m and on point (x1, y1)
+                    double m = overshoot.y / overshoot.x;
+                    double x1 = node.x;
+                    double y1 = node.y;
+
+                    currSide = (currPos.y < (-1 / m) * (currPos.x - x1) + y1);
+                    targetSide = (overshoot.y < (-1 / m) * (overshoot.x - x1) + y1);
+                }
+            } while (currSide != targetSide);
         }
     }
 }
