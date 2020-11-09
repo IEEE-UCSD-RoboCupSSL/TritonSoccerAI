@@ -10,6 +10,11 @@ import Triton.Geometry.*;
 import Triton.RemoteStation.*;
 import Triton.Display.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.LoggerNameAwareMessage;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 /*import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -67,7 +72,10 @@ public class App {
             robots.add(new Robot(Team.BLUE, i, pool));
         }
 
-        Display display = new Display();
+        //Display display = new Display();
+        
+        loggerTest();
+
 
         /*ViewerServlet.offline = true;
         Server server = createServer(8980);
@@ -77,6 +85,16 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
+    }
+
+    public static void loggerTest() {
+        // Logger logger = LogManager.getLogger(App.class);
+        // System.out.println("\n      Start logger testing:   \n");
+		// logger.info("information");
+        // logger.error("error");
+        RobotLogger logger = new RobotLogger();
+        logger.info("information");
+
     }
 
     /*
