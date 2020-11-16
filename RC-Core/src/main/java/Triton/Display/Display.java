@@ -8,7 +8,7 @@ import Triton.Config.DisplayConfig;
 import Triton.Detection.*;
 import Triton.Detection.RobotData;
 import Triton.Shape.*;
-import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
+import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 
 import java.awt.*;
@@ -23,6 +23,8 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
+import org.javatuples.Pair;
+
 import Proto.MessagesRobocupSslGeometry.*;
 
 @SuppressWarnings("serial")
@@ -33,6 +35,7 @@ public class Display extends JPanel {
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private Subscriber<BallData> ballSub;
+    private Subscriber<Pair<ArrayList<Vec2D>, Double>> newestPathSub;
 
     private SSL_GeometryFieldSize fieldSize;
     private HashMap<String, Line2D> fieldLines;
@@ -91,26 +94,13 @@ public class Display extends JPanel {
 
         @Override
         public void run() {
-            for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-                try {
-                    robotSub.subscribe(1000);
-                } catch (TimeoutException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-                try {
-                    robotSub.subscribe(1000);
-                } catch (TimeoutException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
             try {
+                for (Subscriber<RobotData> robotSub : yellowRobotSubs)
+                    robotSub.subscribe(1000);
+                for (Subscriber<RobotData> robotSub : blueRobotSubs)
+                    robotSub.subscribe(1000);
                 ballSub.subscribe(1000);
             } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -213,6 +203,7 @@ public class Display extends JPanel {
         new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
 
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
+        newestPathSub = new FieldSubscriber<Pair<ArrayList<Vec2D>, Double>>("path commands", ObjectConfig.MY_TEAM.name() + 0);
 
         ImgLoader.loadImages();
 
@@ -275,11 +266,13 @@ public class Display extends JPanel {
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
 
         // Timer findPathTimer = new Timer();
+        /*
         double worldSizeX = fieldSize.getFieldLength();
         double worldSizeY = fieldSize.getFieldWidth();
 
         JPS = new JPSPathFinder(worldSizeX, worldSizeY);
         FindPathTask JPSTask = new FindPathTask(this, JPS);
+        */
 
         //PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
         //FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
@@ -287,7 +280,10 @@ public class Display extends JPanel {
         // findPathTimer.scheduleAtFixedRate(findPathTask, 0,
         // DisplayConfig.UPDATE_DELAY);
         //addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
+        /*
         addMouseListener(new DisplayMouseInputAdapter(JPSTask));
+        */
+
     }
 
     @Override
@@ -394,6 +390,14 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
+        try {
+            newestPathSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        
+        path = newestPathSub.getMsg().getValue0();
+
         /*
          * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
          * row = 0; row < grid.getNumRows(); row++) { for (int col = 0; col <

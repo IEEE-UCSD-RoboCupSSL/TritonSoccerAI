@@ -17,7 +17,7 @@ public class MsgChannel<T> {
     public MsgChannel(String topicName, String msgName) {
         channelName = topicName + msgName;
         if (channels.containsKey(channelName)) {
-            System.out.println("ERROR");
+            System.out.println(channelName);
             return;
         }
 

@@ -22,60 +22,63 @@ public class PathRunner implements Runnable {
     private Publisher<Commands> commandsPub;
     private Publisher<String> tcpCommandPub;
 
-    public PathRunner(Team team, int ID, ArrayList<Vec2D> path, double angle) {
+    volatile boolean shutdown;
+
+    public PathRunner(ArrayList<Vec2D> path, double angle, Subscriber<RobotData> robotDataSub,
+            Subscriber<BallData> ballSub, Publisher<Commands> commandsPub, Publisher<String> tcpCommandPub) {
         this.path = path;
         this.angle = angle;
-
-        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
-        ballSub = new FieldSubscriber<BallData>("detection", "ball");
-        commandsPub = new MQPublisher<Commands>("commands", "" + ID);
-        tcpCommandPub = new MQPublisher<String>("tcpCommand", name);
+        this.robotDataSub = robotDataSub;
+        this.ballSub = ballSub;
+        this.commandsPub = commandsPub;
+        this.tcpCommandPub = tcpCommandPub;
     }
 
     @Override
     public void run() {
-        try {
-            robotDataSub.subscribe(1000);
-            ballSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         RobotData robotData = robotDataSub.getMsg();
         BallData ballData = ballSub.getMsg();
         double startDistToEndPoint = Vec2D.dist(robotData.getPos(), path.get(path.size() - 1));
 
+        // Whole loop can be ended inside PathRelayer
         for (int i = 1; i < path.size(); i++) {
-            double distToNode = 0;
-            Vec2D node = path.get(i);
+            if (shutdown)
+                return;
 
+            Vec2D node = path.get(i);
             Vec2D overshoot = node.sub(path.get(i - 1)).norm().mult(PathfinderConfig.OVERSHOOT_DIST);
             Vec2D overshootPoint = node.add(overshoot);
             Vec3D.Builder dest = Vec3D.newBuilder();
-            dest.setX(overshootPoint.x);
-            dest.setY(overshootPoint.y);
+            dest.setX(-overshootPoint.y);
+            dest.setY(overshootPoint.x);
 
             boolean currSide;
             boolean targetSide;
+            double distToNode;
             do {
+                if (shutdown) {
+                    return;
+                }
+
                 Commands.Builder command = Commands.newBuilder();
 
+                robotData = robotDataSub.getMsg();
                 Vec2D currPos = robotData.getPos();
                 Vec2D ballPos = ballData.getPos();
 
                 if (Vec2D.dist(currPos, ballPos) < PathfinderConfig.BALL_CATCH_DIST) {
+                    /*
                     command.setEnableBallAutoCapture(true);
-                    tcpCommandPub.publish("request dribbler status");
+                    tcpCommandPub.publish("request dribbler status"); 
+                    */
+                    return;
                 }
 
-                robotData = robotDataSub.getMsg();
                 double currAngle = robotData.getOrient();
-
                 double distToEndPoint = Vec2D.dist(robotData.getPos(), path.get(path.size() - 1));
 
                 command.setMode(0);
+                command.setIsWorldFrame(true);
 
                 // z = [(b - a) i] / k + a
                 // z is angle at node
@@ -90,9 +93,10 @@ public class PathRunner implements Runnable {
                 command.setMotionSetPoint(dest);
                 commandsPub.publish(command.build());
 
-                distToNode = Vec2D.dist(node, currPos);
-
-                if (overshoot.y == 0) {
+                if (overshoot.x == 0) {
+                    currSide = currPos.y < node.y;
+                    targetSide = overshoot.y < node.y;
+                } else if (overshoot.y == 0) {
                     currSide = currPos.x < node.x;
                     targetSide = overshoot.x < node.x;
                 } else {
@@ -108,8 +112,15 @@ public class PathRunner implements Runnable {
                     currSide = (currPos.y < (-1 / m) * (currPos.x - x1) + y1);
                     targetSide = (overshoot.y < (-1 / m) * (overshoot.x - x1) + y1);
                 }
+                
+                distToNode = Vec2D.dist(robotData.getPos(), node);
+
                 // continue when current pos and overshoot point on same side of divider line
-            } while (currSide != targetSide);
+            } while (currSide != targetSide && distToNode > PathfinderConfig.OVERSHOOT_DIST);
         }
+    }
+
+    public void shutdown() {
+        shutdown = true;
     }
 }

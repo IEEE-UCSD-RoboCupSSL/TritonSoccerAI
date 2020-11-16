@@ -24,25 +24,21 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
             e.printStackTrace();
         }
 
+        /*
         while (true) {
             Commands.Builder command = Commands.newBuilder();
-            command.setMode(0);
-            command.setIsWorldFrame(true);
             Vec3D.Builder dest = Vec3D.newBuilder();
             dest.setX(1000);
-            dest.setY(0);
-            dest.setZ(0);
-            command.setMotionSetPoint(dest);
+            command.setMotionSetPoint(dest.build());
             byte[] bytes = command.build().toByteArray();
             send(bytes);
         }
+        */
 
-        /*
         while (true) {
             Commands command = commandsSub.getMsg();
             byte[] bytes = command.toByteArray();
             send(bytes);
         }
-        */
     }
 }

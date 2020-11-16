@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import Triton.Vision.*;
+import Triton.Computation.PathFinder.MoveTowardBall;
 import Triton.Config.ObjectConfig;
 import Triton.Detection.*;
 import Triton.Geometry.*;
@@ -63,13 +64,16 @@ public class App {
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             Robot robot = new Robot(Team.YELLOW, i, pool);
             robots.add(robot);
-            pool.execute(robot);
+            pool.submit(robot);
         }
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             Robot robot = new Robot(Team.BLUE, i, pool);
             robots.add(robot);
-            pool.execute(robot);
+            pool.submit(robot);
         }
+
+        Runnable moveTowardBallRunnable = new MoveTowardBall(robots.get(6));
+        pool.submit(moveTowardBallRunnable);
 
         Display display = new Display();
 

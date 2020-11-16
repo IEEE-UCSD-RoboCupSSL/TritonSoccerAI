@@ -66,11 +66,19 @@ public class RobotTCPConnection implements Module {
     public void sendInit() {
         RobotData data = robotDataSub.getMsg();
 
-        out.format("init %f %f\n", data.getPos().x, data.getPos().y);
+        String str = String.format("init %d %d", (int) -data.getPos().y, (int) data.getPos().x);
+        out.println(str);
+        
+        try {
+            String line = in.readLine();
+            System.out.println(ID + " " + line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean requestDribblerStatus() {
-        out.format("\n");
+        out.println("");
         try {
             return Boolean.parseBoolean(in.readLine());
         } catch (IOException e) {

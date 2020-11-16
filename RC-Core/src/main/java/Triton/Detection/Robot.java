@@ -34,6 +34,7 @@ public class Robot implements Module {
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
 
     private Publisher<Pair<ArrayList<Vec2D>, Double>> pathPub;
+    private Publisher<Pair<ArrayList<Vec2D>, Double>> newestPathPub;
     private PathRelayer pathRelayer;
 
     public Robot(Team team, int ID, ThreadPoolExecutor pool) {
@@ -75,10 +76,12 @@ public class Robot implements Module {
                 System.out.println("Invalid Robot ID");
         }
 
-        conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
-        conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
-        // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-        // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+        if (team == ObjectConfig.MY_TEAM && ID == 0) {
+            conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
+            conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
+            // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+            // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
+        }
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
@@ -92,7 +95,10 @@ public class Robot implements Module {
         }
 
         pathPub = new MQPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID);
-        pathRelayer = new PathRelayer(team, ID, pool);
+        newestPathPub = new FieldPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID, null);
+
+        if (team == ObjectConfig.MY_TEAM)
+            pathRelayer = new PathRelayer(team, ID, pool);
     }
 
     public Team getTeam() {
@@ -116,7 +122,6 @@ public class Robot implements Module {
             try {
                 fieldSizeSub.subscribe(1000);
             } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             while (true) {
@@ -130,14 +135,16 @@ public class Robot implements Module {
                 double worldSizeY = fieldSize.getFieldWidth();
 
                 pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
+                break;
             }
         }
-
+        
         pathFinder.setObstacles(getObstacles());
 
         ArrayList<Vec2D> path = pathFinder.findPath(data.getPos(), endPoint);
         Pair<ArrayList<Vec2D>, Double> pathWithEndDir = new Pair<ArrayList<Vec2D>, Double>(path, angle);
         pathPub.publish(pathWithEndDir);
+        newestPathPub.publish(pathWithEndDir);
     }
 
     private ArrayList<Circle2D> getObstacles() {
@@ -194,11 +201,16 @@ public class Robot implements Module {
             e.printStackTrace();
         }
 
-        if (team == ObjectConfig.MY_TEAM) {
+
+        if (team == ObjectConfig.MY_TEAM && ID == 0) {
+            conn.getTCPConnection().connect();
+            conn.getTCPConnection().sendInit();
+
+            pool.execute(pathRelayer);
             pool.execute(conn.getTCPConnection());
             pool.execute(conn.getCommandStream());
-            //pool.execute(conn.getVisionStream());
-            //pool.execute(conn.getDataStream());
+            // pool.execute(conn.getVisionStream());
+            // pool.execute(conn.getDataStream());
         }
 
         while (true) {
