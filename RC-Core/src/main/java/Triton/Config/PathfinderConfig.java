@@ -8,6 +8,6 @@ public class PathfinderConfig {
     public static final double SAFE_DIST = PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
                                 + PathfinderConfig.ADD_DIST;
 
-    public static final double OVERSHOOT_DIST = 1000;
+    public static final double OVERSHOOT_DIST = 3000;
     public static final double BALL_CATCH_DIST = 500;
 }
