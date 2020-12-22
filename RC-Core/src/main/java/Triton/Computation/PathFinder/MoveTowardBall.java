@@ -59,7 +59,7 @@ public class MoveTowardBall implements Module {
             BallData ballData = ballSub.getMsg();
 
             Pair<Vec2D, Double> endPointPair = new Pair<Vec2D, Double>(ballData.getPos(), 0.0);
-            //System.out.println(endPointPair);
+            //System.out.println("in MoveTowardBall: " + endPointPair);
             
             for (Publisher<Pair<Vec2D, Double>> endPointPub: endPointPubs) {
                 endPointPub.publish(endPointPair);

@@ -45,11 +45,8 @@ public class Robot implements Module {
         this.ID = ID;
         this.pool = pool;
 
-        conn = new RobotConnection(ID);
-
         String ip = "";
         int port = 0;
-
         switch (ID) {
             case 0:
                 ip = ConnectionConfig.ROBOT_0_IP.getValue0();
@@ -79,13 +76,7 @@ public class Robot implements Module {
                 System.out.println("Invalid Robot ID");
         }
 
-        if (team == ObjectConfig.MY_TEAM && ID == 0) {
-            conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
-            conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
-            // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
-            // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-            commandsPub = new MQPublisher<Commands>("commands", "" + ID);
-        }
+        conn = new RobotConnection(ID);
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
@@ -99,6 +90,35 @@ public class Robot implements Module {
         }
 
         endPointSub = new FieldSubscriber<Pair<Vec2D, Double>>("endPoint", "" + ID);
+
+        if (team == ObjectConfig.MY_TEAM && ID == 0) {
+            conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
+            conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
+            // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+            // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
+            commandsPub = new MQPublisher<Commands>("commands", "" + ID);
+            initPathfinder();
+        }
+    }
+
+    private void initPathfinder() {
+        try {
+            fieldSizeSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        while (pathFinder == null) {
+            SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+
+            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
+                    || fieldSize.getGoalDepth() == 0)
+                continue;
+
+            double worldSizeX = fieldSize.getFieldLength();
+            double worldSizeY = fieldSize.getFieldWidth();
+
+            pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
+        }
     }
 
     public Team getTeam() {
@@ -121,37 +141,15 @@ public class Robot implements Module {
         try {
             endPointSub.subscribe(1000);
         } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
+        //System.out.println("in updatePath: " + endPointPair);
         Vec2D endPoint = endPointPair.getValue0();
         angle = endPointPair.getValue1();
 
-        if (pathFinder == null) {
-            try {
-                fieldSizeSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-            while (true) {
-                SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
-
-                if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
-                        || fieldSize.getGoalDepth() == 0)
-                    continue;
-
-                double worldSizeX = fieldSize.getFieldLength();
-                double worldSizeY = fieldSize.getFieldWidth();
-
-                pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
-                break;
-            }
-        }
-
         pathFinder.setObstacles(getObstacles());
-
         path = pathFinder.findPath(data.getPos(), endPoint);
     }
 
@@ -160,7 +158,6 @@ public class Robot implements Module {
             try {
                 robotSub.subscribe(1000);
             } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -168,7 +165,6 @@ public class Robot implements Module {
             try {
                 robotSub.subscribe(1000);
             } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
