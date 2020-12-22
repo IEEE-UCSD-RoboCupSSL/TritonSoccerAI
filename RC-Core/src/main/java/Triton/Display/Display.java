@@ -6,7 +6,7 @@ import Triton.Config.ObjectConfig;
 import Triton.Computation.Gridify;
 import Triton.Config.DisplayConfig;
 import Triton.Detection.*;
-import Triton.Detection.RobotData;
+import Triton.Detection.Robot;
 import Triton.Shape.*;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
@@ -390,14 +390,6 @@ public class Display extends JPanel {
     }
 
     private void paintPath(Graphics2D g2d) {
-        try {
-            newestPathSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        
-        path = newestPathSub.getMsg().getValue0();
-
         /*
          * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
          * row = 0; row < grid.getNumRows(); row++) { for (int col = 0; col <

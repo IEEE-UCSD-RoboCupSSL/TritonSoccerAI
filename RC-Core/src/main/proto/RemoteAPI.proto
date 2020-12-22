@@ -14,6 +14,15 @@ message Vec3D {
     double z = 3;
 }
 
+// message RemoteGeometry {
+//     int32 field_length = 1;
+//     int32 field_width = 2;
+//     int32 goal_width = 3;
+//     int32 goal_depth = 4;
+// }
+
+
+
 message Commands {
     bool enable_ball_auto_capture = 1; // if true, motion cmds are disabled, robot will 
                                        // automatically perform delicate moves to capture ball 
@@ -22,7 +31,11 @@ message Commands {
     int32 mode = 2; /* enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement & rotational displacement (at the same time)
                                        TDRV = 1, //TDRV: translational displacement & rotational velocity (at the same time)
                                        TVRD = 2, //TVRD: translational velocity & rotational displacement (at the same time)
-                                       TVRV = 3}; //TVRV: translational velocity & rotational velocity (at the same time)  */
+                                       TVRV = 3, //TVRV: translational velocity & rotational velocity (at the same time)  
+                                       NSTDRD = 4, // No slowdown TDRD 
+                                       NSTDRV = 5  // No slowdown TDRV
+                                       }
+                                       */
 
     bool is_world_frame = 3; // True WorldFrame | False BodyFrame for motion setpoint
 

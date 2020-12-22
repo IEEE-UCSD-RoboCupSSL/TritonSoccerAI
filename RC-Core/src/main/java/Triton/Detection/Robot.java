@@ -7,8 +7,9 @@ import java.util.concurrent.TimeoutException;
 import org.javatuples.Pair;
 
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
+import Proto.RemoteAPI.Commands;
+import Proto.RemoteAPI.Vec3D;
 import Triton.Computation.PathFinder.PathFinder;
-import Triton.Computation.PathFinder.PathRelayer;
 import Triton.Computation.PathFinder.JPS.JPSPathFinder;
 import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
@@ -33,9 +34,11 @@ public class Robot implements Module {
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
 
-    private Publisher<Pair<ArrayList<Vec2D>, Double>> pathPub;
-    private Publisher<Pair<ArrayList<Vec2D>, Double>> newestPathPub;
-    private PathRelayer pathRelayer;
+    private Subscriber<Pair<Vec2D, Double>> endPointSub;
+    private Publisher<Commands> commandsPub;
+
+    private ArrayList<Vec2D> path;
+    private double angle;
 
     public Robot(Team team, int ID, ThreadPoolExecutor pool) {
         this.team = team;
@@ -81,6 +84,7 @@ public class Robot implements Module {
             conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
             // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
             // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
+            commandsPub = new MQPublisher<Commands>("commands", "" + ID);
         }
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
@@ -94,11 +98,7 @@ public class Robot implements Module {
             blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
         }
 
-        pathPub = new MQPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID);
-        newestPathPub = new FieldPublisher<Pair<ArrayList<Vec2D>, Double>>("path commands", team.name() + ID, null);
-
-        if (team == ObjectConfig.MY_TEAM)
-            pathRelayer = new PathRelayer(team, ID, pool);
+        endPointSub = new FieldSubscriber<Pair<Vec2D, Double>>("endPoint", "" + ID);
     }
 
     public Team getTeam() {
@@ -117,7 +117,18 @@ public class Robot implements Module {
         return conn;
     }
 
-    public void setEndPoint(Vec2D endPoint, double angle) {
+    public void updatePath() {
+        try {
+            endPointSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
+        Vec2D endPoint = endPointPair.getValue0();
+        angle = endPointPair.getValue1();
+
         if (pathFinder == null) {
             try {
                 fieldSizeSub.subscribe(1000);
@@ -138,13 +149,10 @@ public class Robot implements Module {
                 break;
             }
         }
-        
+
         pathFinder.setObstacles(getObstacles());
 
-        ArrayList<Vec2D> path = pathFinder.findPath(data.getPos(), endPoint);
-        Pair<ArrayList<Vec2D>, Double> pathWithEndDir = new Pair<ArrayList<Vec2D>, Double>(path, angle);
-        pathPub.publish(pathWithEndDir);
-        newestPathPub.publish(pathWithEndDir);
+        path = pathFinder.findPath(data.getPos(), endPoint);
     }
 
     private ArrayList<Circle2D> getObstacles() {
@@ -196,17 +204,14 @@ public class Robot implements Module {
     public void run() {
         try {
             robotDataSub.subscribe(1000);
+            fieldSizeSub.subscribe(1000);
         } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
         if (team == ObjectConfig.MY_TEAM && ID == 0) {
             conn.getTCPConnection().connect();
             conn.getTCPConnection().sendInit();
 
-            pool.execute(pathRelayer);
             pool.execute(conn.getTCPConnection());
             pool.execute(conn.getCommandStream());
             // pool.execute(conn.getVisionStream());
@@ -215,10 +220,36 @@ public class Robot implements Module {
 
         while (true) {
             setData(robotDataSub.getMsg());
+            if (team == ObjectConfig.MY_TEAM && ID == 0) {
+                updatePath();
+                publishCTN();
+            }
         }
+    }
+
+    // CTN = current target node
+    private void publishCTN() {
+        Vec2D ctn = path.get(1);
+        Commands.Builder command = Commands.newBuilder();
+        command.setMode(0);
+        command.setIsWorldFrame(true);
+        Vec3D.Builder dest = Vec3D.newBuilder();
+        dest.setX(-ctn.y);
+        dest.setY(ctn.x);
+        dest.setZ(angle);
+        command.setMotionSetPoint(dest);
+        commandsPub.publish(command.build());
     }
 
     public void setData(RobotData data) {
         this.data = data;
+    }
+
+    public void setPath(ArrayList<Vec2D> path) {
+        this.path = path;
+    }
+
+    public ArrayList<Vec2D> getPath() {
+        return path;
     }
 }

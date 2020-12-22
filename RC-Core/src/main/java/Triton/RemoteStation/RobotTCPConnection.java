@@ -31,7 +31,7 @@ public class RobotTCPConnection implements Module {
 
         String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
-        tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
+        //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
 
         try {
             robotDataSub.subscribe(1000);
@@ -93,6 +93,7 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
+        /*
         try {
             tcpCommandSub.subscribe(1000);
         } catch (TimeoutException e) {
@@ -106,5 +107,6 @@ public class RobotTCPConnection implements Module {
                 requestDribblerStatus();
                 break;
         }
+        */
     }
 }

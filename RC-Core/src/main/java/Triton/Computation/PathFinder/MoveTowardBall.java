@@ -3,19 +3,26 @@ package Triton.Computation.PathFinder;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
+import org.javatuples.Pair;
+
 import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.FieldPublisher;
 import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.Publisher;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Detection.BallData;
 import Triton.Detection.Robot;
 import Triton.Detection.RobotData;
+import Triton.Shape.Vec2D;
 
 public class MoveTowardBall implements Module {
 
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private Subscriber<BallData> ballSub;
+
+    private ArrayList<Publisher<Pair<Vec2D, Double>>> endPointPubs;
 
     private Robot robot;
 
@@ -29,6 +36,11 @@ public class MoveTowardBall implements Module {
             blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
         }
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
+
+        endPointPubs = new ArrayList<Publisher<Pair<Vec2D, Double>>>();
+        for (int i = 0; i < 6; i++) {
+            endPointPubs.add(new FieldPublisher<Pair<Vec2D, Double>>("endPoint", "" + i, null));
+        }
     }
 
     @Override
@@ -45,7 +57,14 @@ public class MoveTowardBall implements Module {
 
         while (true) {
             BallData ballData = ballSub.getMsg();
-            robot.setEndPoint(ballData.getPos(), 0);
+
+            Pair<Vec2D, Double> endPointPair = new Pair<Vec2D, Double>(ballData.getPos(), 0.0);
+            //System.out.println(endPointPair);
+            
+            for (Publisher<Pair<Vec2D, Double>> endPointPub: endPointPubs) {
+                endPointPub.publish(endPointPair);
+            }
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

@@ -3,9 +3,7 @@ package Triton.RemoteStation;
 import java.util.concurrent.TimeoutException;
 
 import Proto.RemoteAPI.Commands;
-import Proto.RemoteAPI.Vec3D;
 import Triton.DesignPattern.PubSubSystem.*;
-import Triton.Detection.Team;
 
 public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
@@ -13,7 +11,7 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
     public RobotCommandUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);
-        commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 1);
+        commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 10);
     }
 
     public void run() {
