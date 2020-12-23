@@ -24,11 +24,7 @@ public class MoveTowardBall implements Module {
 
     private ArrayList<Publisher<Pair<Vec2D, Double>>> endPointPubs;
 
-    private Robot robot;
-
     public MoveTowardBall(Robot robot) {
-        this.robot = robot;
-
         yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
         blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
