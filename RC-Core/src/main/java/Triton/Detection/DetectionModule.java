@@ -46,21 +46,28 @@ public class DetectionModule implements Module {
         ballPub = new FieldPublisher<BallData>("detection", "ball", ball);
     }
 
-    public void run() {
+    private void subscribe() {
         try {
             detectSub.subscribe(1000);
-        } catch (TimeoutException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        while (true) {
-            try {
-                update(detectSub.getMsg());
-            } catch (Exception e) {
-                e.printStackTrace();
+    public void run() {
+        try {
+            subscribe();
+
+            while (true) {
+                try {
+                    update(detectSub.getMsg());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
     }
 
     public void update(SSL_DetectionFrame frame) {

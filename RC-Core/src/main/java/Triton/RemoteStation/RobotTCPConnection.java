@@ -32,16 +32,11 @@ public class RobotTCPConnection implements Module {
         String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         robotDataSub = new FieldSubscriber<RobotData>("detection", name);
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
-
-        try {
-            robotDataSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public boolean connect() {
+        subscribe();
+
         try {
             clientSocket = new Socket(ip, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -89,6 +84,14 @@ public class RobotTCPConnection implements Module {
 
     public boolean isConnected() {
         return isConnected;
+    }
+
+    private void subscribe() {
+        try {
+            robotDataSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

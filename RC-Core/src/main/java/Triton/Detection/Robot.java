@@ -33,7 +33,6 @@ public class Robot implements Module {
     private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
-
     private Subscriber<Pair<Vec2D, Double>> endPointSub;
     private Publisher<Commands> commandsPub;
 
@@ -101,6 +100,20 @@ public class Robot implements Module {
         }
     }
 
+    private void subscribe() {
+        try {
+            robotDataSub.subscribe(1000);
+            fieldSizeSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : yellowRobotSubs)
+                robotSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : blueRobotSubs)
+                robotSub.subscribe(1000);
+            endPointSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void initPathfinder() {
         try {
             fieldSizeSub.subscribe(1000);
@@ -138,37 +151,20 @@ public class Robot implements Module {
     }
 
     public void updatePath() {
-        try {
-            endPointSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-
         Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
-        //System.out.println("in updatePath: " + endPointPair);
+        if (endPointPair == null)
+            return;
+
         Vec2D endPoint = endPointPair.getValue0();
         angle = endPointPair.getValue1();
 
         pathFinder.setObstacles(getObstacles());
-        path = pathFinder.findPath(data.getPos(), endPoint);
+        ArrayList<Vec2D> newPath = pathFinder.findPath(data.getPos(), endPoint);
+        if (newPath != null)
+            path = newPath;
     }
 
     private ArrayList<Circle2D> getObstacles() {
-        for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-        }
-        for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-        }
-
         ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             blueRobots.add(blueRobotSubs.get(i).getMsg());
@@ -195,43 +191,43 @@ public class Robot implements Module {
 
         return obstacles;
     }
-
-    @Override
     public void run() {
         try {
-            robotDataSub.subscribe(1000);
-            fieldSizeSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        if (team == ObjectConfig.MY_TEAM && ID == 0) {
-            conn.getTCPConnection().connect();
-            conn.getTCPConnection().sendInit();
+            subscribe();
 
-            pool.execute(conn.getTCPConnection());
-            pool.execute(conn.getCommandStream());
-            // pool.execute(conn.getVisionStream());
-            // pool.execute(conn.getDataStream());
-        }
-
-        while (true) {
-            setData(robotDataSub.getMsg());
             if (team == ObjectConfig.MY_TEAM && ID == 0) {
-                updatePath();
-                publishCTN();
+                conn.getTCPConnection().connect();
+                conn.getTCPConnection().sendInit();
+
+                pool.execute(conn.getTCPConnection());
+                pool.execute(conn.getCommandStream());
+                // pool.execute(conn.getVisionStream());
+                // pool.execute(conn.getDataStream());
             }
+
+            while (true) {
+                setData(robotDataSub.getMsg());
+                if (team == ObjectConfig.MY_TEAM && ID == 0) {
+                    updatePath();
+                    publishNextNode();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    // CTN = current target node
-    private void publishCTN() {
-        Vec2D ctn = path.get(1);
+    private void publishNextNode() {
+        if (path == null || path.size() <= 1)
+            return;
+
+        Vec2D nextNode = path.get(1);
         Commands.Builder command = Commands.newBuilder();
         command.setMode(0);
         command.setIsWorldFrame(true);
         Vec3D.Builder dest = Vec3D.newBuilder();
-        dest.setX(-ctn.y);
-        dest.setY(ctn.x);
+        dest.setX(-nextNode.y);
+        dest.setY(nextNode.x);
         dest.setZ(angle);
         command.setMotionSetPoint(dest);
         commandsPub.publish(command.build());

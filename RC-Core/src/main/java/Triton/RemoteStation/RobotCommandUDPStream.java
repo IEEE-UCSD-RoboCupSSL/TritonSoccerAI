@@ -14,24 +14,16 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
         commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 10);
     }
 
-    public void run() {
+    private void subscribe() {
         try {
             commandsSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-        /*
-        while (true) {
-            Commands.Builder command = Commands.newBuilder();
-            Vec3D.Builder dest = Vec3D.newBuilder();
-            dest.setX(1000);
-            command.setMotionSetPoint(dest.build());
-            byte[] bytes = command.build().toByteArray();
-            send(bytes);
-        }
-        */
+    public void run() {
+        subscribe();
 
         while (true) {
             Commands command = commandsSub.getMsg();

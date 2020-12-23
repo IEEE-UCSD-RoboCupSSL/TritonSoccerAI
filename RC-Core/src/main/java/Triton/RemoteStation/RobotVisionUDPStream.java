@@ -20,14 +20,16 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         ballSub = new FieldSubscriber<BallData>("detection", "ball");
     }
 
-    private void sendVision() {
+    private void subscribe() {
         try {
-            while (!robotSub.subscribe(1000) || !ballSub.subscribe(1000));
+            robotSub.subscribe(1000);
+            ballSub.subscribe(1000);
         } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
 
+    private void sendVision() {
         RobotData robotData = robotSub.getMsg();
         BallData ballData = ballSub.getMsg();
 
@@ -41,4 +43,9 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         byte[] bytes = toSend.build().toByteArray();
         send(bytes);
     }
+
+    @Override
+	public void run() {
+        subscribe();
+	}
 }

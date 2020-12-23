@@ -47,8 +47,12 @@ public class VisionModule implements Module {
     }
 
     public void run() {
-        while (true) {
-            collectData();
+        try {
+            while (true) {
+                collectData();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

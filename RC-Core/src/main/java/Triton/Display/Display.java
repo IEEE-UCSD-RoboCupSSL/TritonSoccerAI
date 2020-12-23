@@ -221,12 +221,7 @@ public class Display extends JPanel {
     }
 
     public void start() {
-        try {
-            fieldSizeSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        subscribe();
 
         while (true) {
             fieldSize = fieldSizeSub.getMsg();
@@ -245,12 +240,6 @@ public class Display extends JPanel {
             break;
         }
 
-        try {
-            fieldLinesSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         do {
             fieldLines = fieldLinesSub.getMsg();
         } while (fieldLines == null);
@@ -284,6 +273,20 @@ public class Display extends JPanel {
         addMouseListener(new DisplayMouseInputAdapter(JPSTask));
         */
 
+    }
+
+    private void subscribe() {
+        try {
+            fieldSizeSub.subscribe(1000);
+            fieldLinesSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : yellowRobotSubs)
+                robotSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : blueRobotSubs)
+                robotSub.subscribe(1000);
+            ballSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -323,29 +326,6 @@ public class Display extends JPanel {
     }
 
     private void paintObjects(Graphics2D g2d) {
-        for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        try {
-            ballSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             yellowRobots.add(yellowRobotSubs.get(i).getMsg());
