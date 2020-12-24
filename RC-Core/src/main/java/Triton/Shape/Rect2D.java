@@ -25,9 +25,7 @@ public class Rect2D extends Shape2D {
     }
 
     public boolean isInside(Vec2D point) {
-        if (point.x < anchor.x || point.x > anchor.x + width || point.y < anchor.y || point.y > anchor.y + height)
-            return false;
-        return true;
+        return !(point.x < anchor.x) && !(point.x > anchor.x + width) && !(point.y < anchor.y) && !(point.y > anchor.y + height);
     }
 }
         

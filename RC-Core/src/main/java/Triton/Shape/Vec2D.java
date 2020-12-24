@@ -15,6 +15,7 @@ public class Vec2D {
 
     public Vec2D(Vec2D target) {
         this(target.x, target.y);
+        name = target.name;
     }
 
     public Vec2D add(Vec2D toAdd) {

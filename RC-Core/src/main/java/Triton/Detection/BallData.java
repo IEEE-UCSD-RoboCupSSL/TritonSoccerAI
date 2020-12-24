@@ -1,10 +1,10 @@
 package Triton.Detection;
 
+import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Triton.Shape.Vec2D;
+
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Triton.Shape.Vec2D;
-import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 
 public class BallData {
 
@@ -34,7 +34,7 @@ public class BallData {
         }
     }
 
-    private ArrayList<SortedDetection> detections = new ArrayList<SortedDetection>();
+    private final ArrayList<SortedDetection> detections = new ArrayList<>();
     private Vec2D pos;
     private Vec2D vel;
 

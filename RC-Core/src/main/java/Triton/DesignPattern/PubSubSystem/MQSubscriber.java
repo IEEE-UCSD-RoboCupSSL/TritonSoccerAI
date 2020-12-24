@@ -1,13 +1,16 @@
 package Triton.DesignPattern.PubSubSystem;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MQSubscriber<T> extends Subscriber<T> {
-    private BlockingQueue<T> queue;
+    private final BlockingQueue<T> queue;
 
     public MQSubscriber(String topicName, String msgName, int queueSize) {
         super(topicName + "QUEUE", msgName);
-        queue = new LinkedBlockingQueue<T>(queueSize);
+        queue = new LinkedBlockingQueue<>(queueSize);
     }
 	
 	// Default size is 1
@@ -32,7 +35,7 @@ public class MQSubscriber<T> extends Subscriber<T> {
     @Override
     public T getMsg() {
         try {
-            return (T) queue.take();
+            return queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -42,7 +45,7 @@ public class MQSubscriber<T> extends Subscriber<T> {
     public T getMsg(long ms, T defaultReturn) {
         T rtn = null;
         try {
-            rtn = (T) queue.poll(ms, TimeUnit.MILLISECONDS);
+            rtn = queue.poll(ms, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
             e.printStackTrace();
         }

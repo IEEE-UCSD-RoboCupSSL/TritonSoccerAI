@@ -1,21 +1,25 @@
 package Triton.Geometry;
 
-import Triton.Shape.*;
-import Triton.DesignPattern.PubSubSystem.*;
+import Proto.MessagesRobocupSslGeometry.SSL_FieldLineSegment;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Triton.DesignPattern.PubSubSystem.Module;
-import java.util.*;
+import Triton.DesignPattern.PubSubSystem.*;
+import Triton.Shape.Line2D;
+import Triton.Shape.Vec2D;
 
-import Proto.MessagesRobocupSslGeometry.*;
+import java.util.HashMap;
+import java.util.List;
 
 public class GeometryModule implements Module {
-    private Subscriber<SSL_GeometryData> geoSub;
-    private Publisher<SSL_GeometryFieldSize> fieldSizePub;
-    private Publisher<HashMap<String, Line2D>> fieldLinesPub;
+    private final Subscriber<SSL_GeometryData> geoSub;
+    private final Publisher<SSL_GeometryFieldSize> fieldSizePub;
+    private final Publisher<HashMap<String, Line2D>> fieldLinesPub;
 
     public GeometryModule() {
-        geoSub = new MQSubscriber<SSL_GeometryData>("vision", "geometry");
-        fieldSizePub = new FieldPublisher<SSL_GeometryFieldSize>("geometry", "fieldSize", null);
-        fieldLinesPub = new FieldPublisher<HashMap<String, Line2D>>("geometry", "fieldLines", null);
+        geoSub = new MQSubscriber<>("vision", "geometry");
+        fieldSizePub = new FieldPublisher<>("geometry", "fieldSize", null);
+        fieldLinesPub = new FieldPublisher<>("geometry", "fieldLines", null);
     }
 
     private void subscribe() {
@@ -35,7 +39,7 @@ public class GeometryModule implements Module {
                 fieldSizePub.publish(geoData.getField());
 
                 List<SSL_FieldLineSegment> lineList = geoData.getField().getFieldLinesList();
-                HashMap<String, Line2D> lineMap = new HashMap<String, Line2D>();
+                HashMap<String, Line2D> lineMap = new HashMap<>();
                 for (SSL_FieldLineSegment line : lineList) {
                     Vec2D p1 = new Vec2D(line.getP1().getX(), line.getP1().getY());
                     Vec2D p2 = new Vec2D(line.getP2().getX(), line.getP2().getY());

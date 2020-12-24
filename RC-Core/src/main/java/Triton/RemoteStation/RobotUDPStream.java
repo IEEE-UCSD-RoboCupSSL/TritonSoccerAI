@@ -1,9 +1,8 @@
 package Triton.RemoteStation;
 
-import java.io.IOException;
-import java.net.*;
-
 import Triton.DesignPattern.PubSubSystem.Module;
+
+import java.net.DatagramSocket;
 
 public abstract class RobotUDPStream implements Module {
 

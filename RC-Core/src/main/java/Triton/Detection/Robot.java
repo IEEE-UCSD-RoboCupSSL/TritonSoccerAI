@@ -1,39 +1,38 @@
 package Triton.Detection;
 
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
+import Proto.RemoteAPI.Commands;
+import Proto.RemoteAPI.Vec3D;
+import Triton.Computation.PathFinder.JPS.JPSPathFinder;
+import Triton.Computation.PathFinder.PathFinder;
+import Triton.Config.ConnectionConfig;
+import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.*;
+import Triton.RemoteStation.RobotConnection;
+import Triton.Shape.Circle2D;
+import Triton.Shape.Vec2D;
+import org.javatuples.Pair;
+
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
 
-import org.javatuples.Pair;
-
-import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Proto.RemoteAPI.Commands;
-import Proto.RemoteAPI.Vec3D;
-import Triton.Computation.PathFinder.PathFinder;
-import Triton.Computation.PathFinder.JPS.JPSPathFinder;
-import Triton.Config.ConnectionConfig;
-import Triton.Config.ObjectConfig;
-import Triton.DesignPattern.PubSubSystem.*;
-import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.RemoteStation.RobotConnection;
-import Triton.Shape.Circle2D;
-import Triton.Shape.Vec2D;
-
 public class Robot implements Module {
-    private Team team;
-    private int ID;
-    private ThreadPoolExecutor pool;
+    private final Team team;
+    private final int ID;
+    private final ThreadPoolExecutor pool;
 
     private RobotData data;
-    private RobotConnection conn;
+    private final RobotConnection conn;
 
     private PathFinder pathFinder;
 
-    private Subscriber<RobotData> robotDataSub;
-    private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
-    private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
-    private ArrayList<Subscriber<RobotData>> blueRobotSubs;
-    private Subscriber<Pair<Vec2D, Double>> endPointSub;
+    private final Subscriber<RobotData> robotDataSub;
+    private final Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final Subscriber<Pair<Vec2D, Double>> endPointSub;
     private Publisher<Commands> commandsPub;
 
     private ArrayList<Vec2D> path;
@@ -47,55 +46,54 @@ public class Robot implements Module {
         String ip = "";
         int port = 0;
         switch (ID) {
-            case 0:
+            case 0 -> {
                 ip = ConnectionConfig.ROBOT_0_IP.getValue0();
                 port = ConnectionConfig.ROBOT_0_IP.getValue1();
-                break;
-            case 1:
+            }
+            case 1 -> {
                 ip = ConnectionConfig.ROBOT_1_IP.getValue0();
                 port = ConnectionConfig.ROBOT_1_IP.getValue1();
-                break;
-            case 2:
+            }
+            case 2 -> {
                 ip = ConnectionConfig.ROBOT_2_IP.getValue0();
                 port = ConnectionConfig.ROBOT_2_IP.getValue1();
-                break;
-            case 3:
+            }
+            case 3 -> {
                 ip = ConnectionConfig.ROBOT_3_IP.getValue0();
                 port = ConnectionConfig.ROBOT_3_IP.getValue1();
-                break;
-            case 4:
+            }
+            case 4 -> {
                 ip = ConnectionConfig.ROBOT_4_IP.getValue0();
                 port = ConnectionConfig.ROBOT_4_IP.getValue1();
-                break;
-            case 5:
+            }
+            case 5 -> {
                 ip = ConnectionConfig.ROBOT_5_IP.getValue0();
                 port = ConnectionConfig.ROBOT_5_IP.getValue1();
-                break;
-            default:
-                System.out.println("Invalid Robot ID");
+            }
+            default -> System.out.println("Invalid Robot ID");
         }
 
         conn = new RobotConnection(ID);
 
         String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
-        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
+        robotDataSub = new FieldSubscriber<>("detection", name);
+        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
 
-        yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
-        blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        yellowRobotSubs = new ArrayList<>();
+        blueRobotSubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
-            blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("detection", "yellow robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
         }
 
-        endPointSub = new FieldSubscriber<Pair<Vec2D, Double>>("endPoint", "" + ID);
+        endPointSub = new FieldSubscriber<>("endPoint", "" + ID);
 
         if (team == ObjectConfig.MY_TEAM && ID == 0) {
             conn.buildTcpConnection(ip, port + ConnectionConfig.TCP_OFFSET);
             conn.buildCommandUDP(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET);
             // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
             // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-            commandsPub = new MQPublisher<Commands>("commands", "" + ID);
+            commandsPub = new MQPublisher<>("commands", "" + ID);
             initPathfinder();
         }
     }
@@ -165,17 +163,17 @@ public class Robot implements Module {
     }
 
     private ArrayList<Circle2D> getObstacles() {
-        ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
+        ArrayList<RobotData> blueRobots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             blueRobots.add(blueRobotSubs.get(i).getMsg());
         }
 
-        ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
+        ArrayList<RobotData> yellowRobots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             yellowRobots.add(yellowRobotSubs.get(i).getMsg());
         }
 
-        ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
+        ArrayList<Circle2D> obstacles = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             if (team == Team.YELLOW && ID == i)
                 continue;

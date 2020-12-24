@@ -3,7 +3,7 @@ package Triton.Display;
 import Triton.Config.DisplayConfig;
 
 import java.awt.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 
 public class ImgLoader {
     public static BufferedImage yellowRobot;

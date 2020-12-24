@@ -2,9 +2,9 @@ package Triton.DesignPattern.Observer;
 
 public interface Object {
     
-    public void observe(Subject subject);
+    void observe(Subject subject);
 
-    public void disregard(Subject subject);
+    void disregard(Subject subject);
 
-    public void update(Subject subject);
+    void update(Subject subject);
 }

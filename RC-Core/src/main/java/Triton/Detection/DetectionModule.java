@@ -1,49 +1,45 @@
 package Triton.Detection;
 
-import Triton.Config.ObjectConfig;
-import Triton.DesignPattern.PubSubSystem.*;
-import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.DesignPattern.PubSubSystem.Publisher;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
-
-import java.util.*;
-import java.util.concurrent.TimeoutException;
-
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.*;
+
+import java.util.ArrayList;
 
 public class DetectionModule implements Module {
     // Data objects
-    private ArrayList<RobotData> yellowRobotsData;
-    private ArrayList<RobotData> blueRobotsData;
-    private BallData ball;
+    private final ArrayList<RobotData> yellowRobotsData;
+    private final ArrayList<RobotData> blueRobotsData;
+    private final BallData ball;
 
     // Publishers
-    private Subscriber<SSL_DetectionFrame> detectSub;
-    private ArrayList<Publisher<RobotData>> yellowRobotPubs;
-    private ArrayList<Publisher<RobotData>> blueRobotPubs;
-    private Publisher<BallData> ballPub;
+    private final Subscriber<SSL_DetectionFrame> detectSub;
+    private final ArrayList<Publisher<RobotData>> yellowRobotPubs;
+    private final ArrayList<Publisher<RobotData>> blueRobotPubs;
+    private final Publisher<BallData> ballPub;
 
     public DetectionModule() {
-        detectSub = new MQSubscriber<SSL_DetectionFrame>("vision", "detection", 10);
+        detectSub = new MQSubscriber<>("vision", "detection", 10);
 
-        yellowRobotsData = new ArrayList<RobotData>();
-        blueRobotsData = new ArrayList<RobotData>();
+        yellowRobotsData = new ArrayList<>();
+        blueRobotsData = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             yellowRobotsData.add(new RobotData(Team.YELLOW, i));
             blueRobotsData.add(new RobotData(Team.BLUE, i));
         }
 
-        yellowRobotPubs = new ArrayList<Publisher<RobotData>>();
-        blueRobotPubs = new ArrayList<Publisher<RobotData>>();
+        yellowRobotPubs = new ArrayList<>();
+        blueRobotPubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             yellowRobotPubs
-                    .add(new FieldPublisher<RobotData>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
-            blueRobotPubs.add(new FieldPublisher<RobotData>("detection", "blue robot data" + i, blueRobotsData.get(i)));
+                    .add(new FieldPublisher<>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
+            blueRobotPubs.add(new FieldPublisher<>("detection", "blue robot data" + i, blueRobotsData.get(i)));
         }
 
         ball = new BallData();
-        ballPub = new FieldPublisher<BallData>("detection", "ball", ball);
+        ballPub = new FieldPublisher<>("detection", "ball", ball);
     }
 
     private void subscribe() {

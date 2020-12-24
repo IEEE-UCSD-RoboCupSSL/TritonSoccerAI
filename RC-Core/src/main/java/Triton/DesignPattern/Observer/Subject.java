@@ -1,11 +1,11 @@
 package Triton.DesignPattern.Observer;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Subject {
 
-    protected List<Object> observers = new ArrayList<Object>();
+    protected List<Object> observers = new ArrayList<>();
 
     protected void attach(Object observer) {
         observers.add(observer);

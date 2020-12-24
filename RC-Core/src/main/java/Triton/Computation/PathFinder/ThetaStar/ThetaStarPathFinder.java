@@ -1,10 +1,10 @@
 package Triton.Computation.PathFinder.ThetaStar;
 
-import java.util.*;
-
 import Triton.Computation.PathFinder.PathFinder;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
+
+import java.util.*;
 
 public class ThetaStarPathFinder extends PathFinder {
 

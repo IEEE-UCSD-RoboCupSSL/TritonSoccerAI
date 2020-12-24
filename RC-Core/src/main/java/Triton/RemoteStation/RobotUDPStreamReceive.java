@@ -9,7 +9,7 @@ public class RobotUDPStreamReceive extends RobotUDPStream {
 
     private static final int MAX_BUFFER_SIZE = 67108864;
 
-    private byte[] buf;
+    private final byte[] buf;
 
     public RobotUDPStreamReceive(int port, int ID) {
         super(port, ID);

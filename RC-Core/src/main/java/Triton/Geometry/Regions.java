@@ -1,30 +1,28 @@
 package Triton.Geometry;
 
-import Triton.Shape.*;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
-import java.util.*;
-import java.util.concurrent.TimeoutException;
+import Triton.Shape.*;
 
-import Proto.MessagesRobocupSslGeometry.*;
+import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
 
 /*
  * Regions is definded as the collections of partitions of the field. 
  * Regions includes 9 parts: A, B, C, D, E, F, G, H, and I.
  */
 public class Regions {
-    private static HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
+    private static final HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
     private static Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private static Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 
     public static void createRegions() {
-        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
-        fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
+        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
         try {
-            while (!fieldSizeSub.subscribe(1000) || !fieldLinesSub.subscribe(1000))
-                ;
+            while (!fieldSizeSub.subscribe(1000) || !fieldLinesSub.subscribe(1000));
         } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
          

@@ -1,10 +1,10 @@
 package Triton.Detection;
 
+import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Triton.Shape.Vec2D;
+
 import java.util.ArrayList;
 import java.util.Collections;
-
-import Triton.Shape.Vec2D;
-import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 
 public class RobotData {
 
@@ -38,9 +38,9 @@ public class RobotData {
         }
     }
 
-    private Team team;
-    private int ID;
-    private ArrayList<SortedDetection> detections;
+    private final Team team;
+    private final int ID;
+    private final ArrayList<SortedDetection> detections;
     private Vec2D pos;
     private Vec2D vel;
     private double angle;
@@ -49,7 +49,7 @@ public class RobotData {
     public RobotData(Team team, int ID) {
         this.team = team;
         this.ID = ID;
-        detections = new ArrayList<SortedDetection>();
+        detections = new ArrayList<>();
         pos = new Vec2D(0, 0);
         vel = new Vec2D(0, 0);
         angle = 0;

@@ -1,17 +1,16 @@
 package Triton.RemoteStation;
 
-import java.util.concurrent.TimeoutException;
-
 import Proto.RemoteAPI.Commands;
-import Triton.DesignPattern.PubSubSystem.*;
+import Triton.DesignPattern.PubSubSystem.MQSubscriber;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 
 public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
-    private Subscriber<Commands> commandsSub;
+    private final Subscriber<Commands> commandsSub;
 
     public RobotCommandUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);
-        commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 10);
+        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
     }
 
     private void subscribe() {

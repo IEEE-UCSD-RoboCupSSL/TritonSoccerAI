@@ -1,13 +1,13 @@
 package Triton.Computation.PathFinder.ThetaStar;
 
-import java.util.ArrayList;
-import com.google.common.primitives.Ints;
-
 import Triton.Computation.Gridify;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Line2D;
 import Triton.Shape.Vec2D;
+import com.google.common.primitives.Ints;
+
+import java.util.ArrayList;
 
 public class Grid {
     private double worldSizeX;

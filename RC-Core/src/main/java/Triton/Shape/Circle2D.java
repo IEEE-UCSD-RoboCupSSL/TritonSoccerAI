@@ -1,7 +1,5 @@
 package Triton.Shape;
 
-import java.lang.Math;
-
 public class Circle2D extends Shape2D {
     
     public Vec2D center;

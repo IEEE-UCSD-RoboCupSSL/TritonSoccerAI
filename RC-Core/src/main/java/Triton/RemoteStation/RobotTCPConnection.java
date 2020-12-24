@@ -1,26 +1,29 @@
 package Triton.RemoteStation;
 
-import java.net.*;
-import java.util.concurrent.TimeoutException;
-
+import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Detection.RobotData;
 import Triton.Detection.Team;
-import Triton.Config.ObjectConfig;
-import Triton.DesignPattern.PubSubSystem.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class RobotTCPConnection implements Module {
-    private String ip;
-    private int port;
-    private int ID;
+    private final String ip;
+    private final int port;
+    private final int ID;
 
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
 
-    private Subscriber<RobotData> robotDataSub;
+    private final Subscriber<RobotData> robotDataSub;
     private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
 
@@ -30,7 +33,7 @@ public class RobotTCPConnection implements Module {
         this.ID = ID;
 
         String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotDataSub = new FieldSubscriber<RobotData>("detection", name);
+        robotDataSub = new FieldSubscriber<>("detection", name);
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
     }
 
@@ -96,20 +99,5 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
-        /*
-        try {
-            tcpCommandSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        String msg = tcpCommandSub.getMsg();
-        switch (msg) {
-            case "request dribbler status":
-                requestDribblerStatus();
-                break;
-        }
-        */
     }
 }

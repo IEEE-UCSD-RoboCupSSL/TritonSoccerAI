@@ -1,23 +1,22 @@
 package Triton.RemoteStation;
 
-import java.util.*;
-import java.util.concurrent.TimeoutException;
-
 import Proto.RemoteAPI.VisionData;
-import Triton.DesignPattern.PubSubSystem.*;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Detection.BallData;
 import Triton.Detection.RobotData;
-import Triton.Detection.Team;
+
+import java.util.concurrent.TimeoutException;
 
 public class RobotVisionUDPStream extends RobotUDPStreamSend {
 
-    private Subscriber<RobotData> robotSub;
-    private Subscriber<BallData> ballSub;
+    private final Subscriber<RobotData> robotSub;
+    private final Subscriber<BallData> ballSub;
 
     public RobotVisionUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);
-        robotSub = new FieldSubscriber<RobotData>("detection", "" + ID);
-        ballSub = new FieldSubscriber<BallData>("detection", "ball");
+        robotSub = new FieldSubscriber<>("detection", "" + ID);
+        ballSub = new FieldSubscriber<>("detection", "ball");
     }
 
     private void subscribe() {

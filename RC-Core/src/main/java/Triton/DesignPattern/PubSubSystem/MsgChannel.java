@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MsgChannel<T> {
-    private static HashMap<String, MsgChannel> channels = new HashMap<String, MsgChannel>();
+    private static final HashMap<String, MsgChannel> channels = new HashMap<>();
 
     private ReadWriteLock lock;
-    private String channelName;
+    private final String channelName;
     private T msg;
     private ArrayList<BlockingQueue<T>> queues;
 
@@ -22,7 +23,7 @@ public class MsgChannel<T> {
         }
 
         lock = new ReentrantReadWriteLock();
-        queues = new ArrayList<BlockingQueue<T>>();
+        queues = new ArrayList<>();
         channels.put(channelName, this);
     }
 

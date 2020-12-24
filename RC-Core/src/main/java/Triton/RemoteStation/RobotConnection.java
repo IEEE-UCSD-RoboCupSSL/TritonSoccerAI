@@ -1,11 +1,7 @@
 package Triton.RemoteStation;
 
-import java.util.concurrent.ExecutorService;
-
-import Triton.Detection.*;
-
 public class RobotConnection {
-    private int ID;
+    private final int ID;
 
     private RobotTCPConnection tcpConnect;
     private RobotCommandUDPStream commandStream;

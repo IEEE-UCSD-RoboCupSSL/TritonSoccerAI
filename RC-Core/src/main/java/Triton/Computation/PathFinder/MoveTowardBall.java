@@ -1,20 +1,16 @@
 package Triton.Computation.PathFinder;
 
-import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
-
-import org.javatuples.Pair;
-
 import Triton.Config.ObjectConfig;
-import Triton.DesignPattern.PubSubSystem.FieldPublisher;
-import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.DesignPattern.PubSubSystem.Publisher;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
+import Triton.DesignPattern.PubSubSystem.*;
 import Triton.Detection.BallData;
 import Triton.Detection.Robot;
 import Triton.Detection.RobotData;
 import Triton.Shape.Vec2D;
+import org.javatuples.Pair;
+
+import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 public class MoveTowardBall implements Module {
 
