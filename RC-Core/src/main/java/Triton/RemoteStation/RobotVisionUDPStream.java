@@ -8,11 +8,20 @@ import Triton.Detection.RobotData;
 
 import java.util.concurrent.TimeoutException;
 
+/**
+ * UDP stream to send vision data to robot
+ */
 public class RobotVisionUDPStream extends RobotUDPStreamSend {
 
     private final Subscriber<RobotData> robotSub;
     private final Subscriber<BallData> ballSub;
 
+    /**
+     * Constructs the UDP stream
+     * @param ip ip to send to
+     * @param port port to send to
+     * @param ID ID of robot
+     */
     public RobotVisionUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);
         robotSub = new FieldSubscriber<>("detection", "" + ID);
@@ -24,6 +33,9 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         subscribe();
 	}
 
+    /**
+     * Subscribe to publishers
+     */
     private void subscribe() {
         try {
             robotSub.subscribe(1000);
@@ -33,6 +45,9 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         }
     }
 
+    /**
+     * Sends vision data
+     */
     private void sendVision() {
         RobotData robotData = robotSub.getMsg();
         BallData ballData = ballSub.getMsg();

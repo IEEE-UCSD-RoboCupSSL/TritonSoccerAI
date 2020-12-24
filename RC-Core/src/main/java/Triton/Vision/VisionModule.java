@@ -14,6 +14,9 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 
+/**
+ * Module to receive data from grSim
+ */
 public class VisionModule implements Module {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
@@ -22,10 +25,18 @@ public class VisionModule implements Module {
     private MulticastSocket socket;
     private DatagramPacket packet;
 
+    /**
+     * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
+     */
     public VisionModule() {
         this(ConnectionConfig.GRSIM_MC_ADDR, ConnectionConfig.GRSIM_MC_PORT);
     }
 
+    /**
+     * Constructs a VisionModule listening on specified ip and port
+     * @param ip ip to receive from
+     * @param port port to recieve from
+     */
     public VisionModule(String ip, int port) {
         detectPub = new MQPublisher<>("vision", "detection");
         geoPub = new MQPublisher<>("vision", "geometry");
@@ -43,6 +54,10 @@ public class VisionModule implements Module {
         }
     }
 
+    /**
+     * Repeatedly to collect data
+     */
+    @Override
     public void run() {
         try {
             while (true) {
@@ -53,6 +68,9 @@ public class VisionModule implements Module {
         }
     }
 
+    /**
+     * Receive a single packet
+     */
     public void update() {
         try {
             socket.receive(packet);
@@ -73,12 +91,19 @@ public class VisionModule implements Module {
         }
     }
 
+    /**
+     * Receive a specified number of packets
+     * @param numIter Number of packets to receive
+     */
     public void collectData(int numIter) {
         for (int i = 0; i < numIter; i++) {
             update();
         }
     }
 
+    /**
+     * Receives 4 packets
+     */
     public void collectData() {
         // default configuration with 2x6 robots need 4 packets 
         collectData(4);

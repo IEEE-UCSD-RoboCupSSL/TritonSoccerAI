@@ -8,6 +8,9 @@ import Triton.DesignPattern.PubSubSystem.*;
 
 import java.util.ArrayList;
 
+/**
+ * Module to process object detection data from VisionModule
+ */
 public class DetectionModule implements Module {
     // Data objects
     private final ArrayList<RobotData> yellowRobotsData;
@@ -20,6 +23,9 @@ public class DetectionModule implements Module {
     private final ArrayList<Publisher<RobotData>> blueRobotPubs;
     private final Publisher<BallData> ballPub;
 
+    /**
+     * Constructs a DetectionModule
+     */
     public DetectionModule() {
         detectSub = new MQSubscriber<>("vision", "detection", 10);
 
@@ -42,22 +48,24 @@ public class DetectionModule implements Module {
         ballPub = new FieldPublisher<>("detection", "ball", ball);
     }
 
+    /**
+     * Repeatedly updates detection data
+     */
     public void run() {
         try {
             subscribe();
 
             while (true) {
-                try {
-                    update(detectSub.getMsg());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                update(detectSub.getMsg());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Subscribe to publishers
+     */
     private void subscribe() {
         try {
             detectSub.subscribe(1000);
@@ -66,6 +74,10 @@ public class DetectionModule implements Module {
         }
     }
 
+    /**
+     * Updates data and publish to subscribers
+     * @param frame SSL_Detection frame, sent from VisionModule
+     */
     public void update(SSL_DetectionFrame frame) {
         double time = frame.getTCapture();
 

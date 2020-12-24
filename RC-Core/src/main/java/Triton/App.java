@@ -14,6 +14,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Program to receive data from grSim and manage high-level behavior of robots
+ */
 public class App {
 
     // TCP connection: listener, each robot connects to the listener, and the

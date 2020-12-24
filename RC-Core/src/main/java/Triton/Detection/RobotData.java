@@ -6,6 +6,9 @@ import Triton.Shape.Vec2D;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Stores data about robot object
+ */
 public class RobotData {
 
     public static final int MAX_SIZE = 10;
@@ -26,6 +29,11 @@ public class RobotData {
         angVel = 0;
     }
 
+    /**
+     * Updates ArrayList of SortedDetections and calculates the current velocity of the robot
+     * @param detection SSL_DetectionRobot data to use to update
+     * @param time time of detection
+     */
     public void update(SSL_DetectionRobot detection, double time) {
         SortedDetection latest = new SortedDetection(detection, time);
         detections.add(latest);
@@ -54,38 +62,53 @@ public class RobotData {
         }
     }
 
+    /**
+     * @return team robot belongs to
+     */
     public Team getTeam() {
         return team;
     }
 
+    /**
+     * @return ID of robot
+     */
     public int getID() {
         return ID;
     }
 
+    /**
+     * @return current position of robot
+     */
     public Vec2D getPos() {
         return pos;
     }
 
+    /**
+     * @return current orientation of the robot
+     */
     public double getOrient() {
         return angle;
     }
 
+    /**
+     * @return current translational velocity of the robot
+     */
     public Vec2D getVel() {
         return vel;
     }
 
+    /**
+     * @return current angular velocity of the robot
+     */
     public double getAngularVelocity() {
         return angVel;
     }
 
+    /**
+     * @return current height of the robot
+     */
     public double getHeight() {
         return detections.get(detections.size() - 1).detection.getHeight();
-    }
-
-    public void commandPosition(Vec2D position) {
-    }
-
-    public void commandVelocity(Vec2D vel) {
     }
 
     public class SortedDetection implements Comparable<SortedDetection> {

@@ -14,6 +14,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * TCP connection to robot
+ */
 public class RobotTCPConnection implements Module {
     private final String ip;
     private final int port;
@@ -27,6 +30,12 @@ public class RobotTCPConnection implements Module {
     private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
 
+    /**
+     * Constructs TCP connection
+     * @param ip ip of connection
+     * @param port to connect to
+     * @param ID ID of robot
+     */
     public RobotTCPConnection(String ip, int port, int ID) {
         this.ip = ip;
         this.port = port;
@@ -37,6 +46,10 @@ public class RobotTCPConnection implements Module {
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
     }
 
+    /**
+     * Begin connection
+     * @return true if connection was successfully established
+     */
     public boolean connect() {
 
         try {
@@ -60,6 +73,9 @@ public class RobotTCPConnection implements Module {
         }
     }
 
+    /**
+     * Sends initial location to robot
+     */
     public void sendInit() {
         RobotData data = robotDataSub.getMsg();
 
@@ -79,6 +95,9 @@ public class RobotTCPConnection implements Module {
         subscribe();
     }
 
+    /**
+     * Subscribe to publishers
+     */
     private void subscribe() {
         try {
             robotDataSub.subscribe(1000);
@@ -87,6 +106,10 @@ public class RobotTCPConnection implements Module {
         }
     }
 
+    /**
+     * Returns the status of the dribbler
+     * @return true if
+     */
     public boolean requestDribblerStatus() {
         out.println("");
         try {
@@ -97,6 +120,10 @@ public class RobotTCPConnection implements Module {
         }
     }
 
+    /**
+     * Returns true if there is still a connection
+     * @return true if there is still a connection
+     */
     public boolean isConnected() {
         return isConnected;
     }

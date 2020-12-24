@@ -17,6 +17,9 @@ import org.javatuples.Pair;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * Representation of a single robot
+ */
 public class Robot implements Module {
     private final Team team;
     private final int ID;

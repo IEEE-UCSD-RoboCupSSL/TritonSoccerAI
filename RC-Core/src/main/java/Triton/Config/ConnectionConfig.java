@@ -2,6 +2,9 @@ package Triton.Config;
 
 import org.javatuples.Pair;
 
+/**
+ * Config file for connections
+ */
 public class ConnectionConfig {
     // Grsim
     public static final String GRSIM_MC_ADDR = "224.5.23.2";
