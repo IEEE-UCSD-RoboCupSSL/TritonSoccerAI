@@ -9,35 +9,6 @@ import java.util.Collections;
 public class RobotData {
 
     public static final int MAX_SIZE = 10;
-
-    public class SortedDetection implements Comparable<SortedDetection> {
-        public SSL_DetectionRobot detection;
-        public double time; 
-
-        public SortedDetection(SSL_DetectionRobot detection, double time) {
-            this.detection = detection;
-            this.time = time;
-        }
-
-        @Override
-        public int compareTo(SortedDetection other) {
-            return (int) (other.time - time);
-        }
-        
-        @Override
-        public String toString() {
-            return "[" +this.time+"," + this.detection +"]";
-        }
-
-        public Vec2D getPos() {
-            return new Vec2D(detection.getX(), detection.getY());
-        }
-
-        public double getAngle() {
-            return detection.getOrientation();
-        }
-    }
-
     private final Team team;
     private final int ID;
     private final ArrayList<SortedDetection> detections;
@@ -45,7 +16,6 @@ public class RobotData {
     private Vec2D vel;
     private double angle;
     private double angVel;
-
     public RobotData(Team team, int ID) {
         this.team = team;
         this.ID = ID;
@@ -77,7 +47,7 @@ public class RobotData {
         }
 
         SortedDetection secondLatest = detections.get(detections.size() - 2);
-        double dt = (latest.time - secondLatest.time) * 1000; 
+        double dt = (latest.time - secondLatest.time) * 1000;
         if (dt > 0) {
             vel = latest.getPos().sub(secondLatest.getPos()).mult(1 / dt);
             angVel = (latest.detection.getOrientation() - secondLatest.detection.getOrientation()) / dt;
@@ -99,7 +69,8 @@ public class RobotData {
     public double getOrient() {
         return angle;
     }
-    public Vec2D getVel() { 
+
+    public Vec2D getVel() {
         return vel;
     }
 
@@ -110,10 +81,38 @@ public class RobotData {
     public double getHeight() {
         return detections.get(detections.size() - 1).detection.getHeight();
     }
-    
+
     public void commandPosition(Vec2D position) {
     }
 
     public void commandVelocity(Vec2D vel) {
+    }
+
+    public class SortedDetection implements Comparable<SortedDetection> {
+        public SSL_DetectionRobot detection;
+        public double time;
+
+        public SortedDetection(SSL_DetectionRobot detection, double time) {
+            this.detection = detection;
+            this.time = time;
+        }
+
+        @Override
+        public int compareTo(SortedDetection other) {
+            return (int) (other.time - time);
+        }
+
+        @Override
+        public String toString() {
+            return "[" + this.time + "," + this.detection + "]";
+        }
+
+        public Vec2D getPos() {
+            return new Vec2D(detection.getX(), detection.getY());
+        }
+
+        public double getAngle() {
+            return detection.getOrientation();
+        }
     }
 }

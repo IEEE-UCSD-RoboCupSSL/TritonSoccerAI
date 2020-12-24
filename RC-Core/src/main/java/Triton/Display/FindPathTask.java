@@ -38,11 +38,6 @@ class FindPathTask extends TimerTask {
         ballSub = new FieldSubscriber<>("detection", "ball");
     }
 
-    public void setEnds(Vec2D start, Vec2D dest) {
-        this.start = start;
-        this.dest = dest;
-    }
-
     @Override
     public void run() {
         try {
@@ -111,5 +106,10 @@ class FindPathTask extends TimerTask {
         } else {
             display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
         }
+    }
+
+    public void setEnds(Vec2D start, Vec2D dest) {
+        this.start = start;
+        this.dest = dest;
     }
 }

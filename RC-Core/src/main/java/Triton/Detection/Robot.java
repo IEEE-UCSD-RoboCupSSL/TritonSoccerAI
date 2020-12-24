@@ -16,23 +16,19 @@ import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
 
 public class Robot implements Module {
     private final Team team;
     private final int ID;
     private final ThreadPoolExecutor pool;
-
-    private RobotData data;
     private final RobotConnection conn;
-
-    private PathFinder pathFinder;
-
     private final Subscriber<RobotData> robotDataSub;
     private final Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<Pair<Vec2D, Double>> endPointSub;
+    private RobotData data;
+    private PathFinder pathFinder;
     private Publisher<Commands> commandsPub;
 
     private ArrayList<Vec2D> path;
@@ -98,6 +94,33 @@ public class Robot implements Module {
         }
     }
 
+    public void run() {
+        try {
+            subscribe();
+            initPathfinder();
+
+            if (team == ObjectConfig.MY_TEAM && ID == 0) {
+                conn.getTCPConnection().connect();
+                conn.getTCPConnection().sendInit();
+
+                pool.execute(conn.getTCPConnection());
+                pool.execute(conn.getCommandStream());
+                // pool.execute(conn.getVisionStream());
+                // pool.execute(conn.getDataStream());
+            }
+
+            while (true) {
+                setData(robotDataSub.getMsg());
+                if (team == ObjectConfig.MY_TEAM && ID == 0) {
+                    updatePath();
+                    publishNextNode();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void subscribe() {
         try {
             robotDataSub.subscribe(1000);
@@ -113,11 +136,6 @@ public class Robot implements Module {
     }
 
     private void initPathfinder() {
-        try {
-            fieldSizeSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
         while (pathFinder == null) {
             SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
 
@@ -130,6 +148,36 @@ public class Robot implements Module {
 
             pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
         }
+    }
+
+    public void updatePath() {
+        Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
+        if (endPointPair == null)
+            return;
+
+        Vec2D endPoint = endPointPair.getValue0();
+        angle = endPointPair.getValue1();
+
+        pathFinder.setObstacles(getObstacles());
+        ArrayList<Vec2D> newPath = pathFinder.findPath(data.getPos(), endPoint);
+        if (newPath != null)
+            path = newPath;
+    }
+
+    private void publishNextNode() {
+        if (path == null || path.size() <= 1)
+            return;
+
+        Vec2D nextNode = path.get(1);
+        Commands.Builder command = Commands.newBuilder();
+        command.setMode(0);
+        command.setIsWorldFrame(true);
+        Vec3D.Builder dest = Vec3D.newBuilder();
+        dest.setX(-nextNode.y);
+        dest.setY(nextNode.x);
+        dest.setZ(angle);
+        command.setMotionSetPoint(dest);
+        commandsPub.publish(command.build());
     }
 
     public Team getTeam() {
@@ -146,20 +194,6 @@ public class Robot implements Module {
 
     public RobotConnection getRobotConnection() {
         return conn;
-    }
-
-    public void updatePath() {
-        Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
-        if (endPointPair == null)
-            return;
-
-        Vec2D endPoint = endPointPair.getValue0();
-        angle = endPointPair.getValue1();
-
-        pathFinder.setObstacles(getObstacles());
-        ArrayList<Vec2D> newPath = pathFinder.findPath(data.getPos(), endPoint);
-        if (newPath != null)
-            path = newPath;
     }
 
     private ArrayList<Circle2D> getObstacles() {
@@ -189,57 +223,16 @@ public class Robot implements Module {
 
         return obstacles;
     }
-    public void run() {
-        try {
-            subscribe();
-
-            if (team == ObjectConfig.MY_TEAM && ID == 0) {
-                conn.getTCPConnection().connect();
-                conn.getTCPConnection().sendInit();
-
-                pool.execute(conn.getTCPConnection());
-                pool.execute(conn.getCommandStream());
-                // pool.execute(conn.getVisionStream());
-                // pool.execute(conn.getDataStream());
-            }
-
-            while (true) {
-                setData(robotDataSub.getMsg());
-                if (team == ObjectConfig.MY_TEAM && ID == 0) {
-                    updatePath();
-                    publishNextNode();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void publishNextNode() {
-        if (path == null || path.size() <= 1)
-            return;
-
-        Vec2D nextNode = path.get(1);
-        Commands.Builder command = Commands.newBuilder();
-        command.setMode(0);
-        command.setIsWorldFrame(true);
-        Vec3D.Builder dest = Vec3D.newBuilder();
-        dest.setX(-nextNode.y);
-        dest.setY(nextNode.x);
-        dest.setZ(angle);
-        command.setMotionSetPoint(dest);
-        commandsPub.publish(command.build());
-    }
 
     public void setData(RobotData data) {
         this.data = data;
     }
 
-    public void setPath(ArrayList<Vec2D> path) {
-        this.path = path;
-    }
-
     public ArrayList<Vec2D> getPath() {
         return path;
+    }
+
+    public void setPath(ArrayList<Vec2D> path) {
+        this.path = path;
     }
 }

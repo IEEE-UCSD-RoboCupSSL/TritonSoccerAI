@@ -42,14 +42,6 @@ public class DetectionModule implements Module {
         ballPub = new FieldPublisher<>("detection", "ball", ball);
     }
 
-    private void subscribe() {
-        try {
-            detectSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void run() {
         try {
             subscribe();
@@ -63,7 +55,15 @@ public class DetectionModule implements Module {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }   
+        }
+    }
+
+    private void subscribe() {
+        try {
+            detectSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(SSL_DetectionFrame frame) {

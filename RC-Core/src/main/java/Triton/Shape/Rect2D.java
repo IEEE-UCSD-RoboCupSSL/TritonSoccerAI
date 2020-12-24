@@ -1,7 +1,7 @@
 package Triton.Shape;
 
 public class Rect2D extends Shape2D {
-   
+
     public Vec2D anchor;
     public double width;
     public double height;
@@ -18,14 +18,15 @@ public class Rect2D extends Shape2D {
         this.height = height;
     }
 
-    @Override public String toString() {
+    public boolean isInside(Vec2D point) {
+        return !(point.x < anchor.x) && !(point.x > anchor.x + width) && !(point.y < anchor.y) && !(point.y > anchor.y + height);
+    }
+
+    @Override
+    public String toString() {
         String s = "";
         s += "[" + anchor + ", " + width + ", " + height + "]";
         return s;
-    }
-
-    public boolean isInside(Vec2D point) {
-        return !(point.x < anchor.x) && !(point.x > anchor.x + width) && !(point.y < anchor.y) && !(point.y > anchor.y + height);
     }
 }
         

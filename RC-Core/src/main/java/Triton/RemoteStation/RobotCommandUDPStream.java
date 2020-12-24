@@ -13,14 +13,6 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
         commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
     }
 
-    private void subscribe() {
-        try {
-            commandsSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void run() {
         subscribe();
 
@@ -28,6 +20,14 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
             Commands command = commandsSub.getMsg();
             byte[] bytes = command.toByteArray();
             send(bytes);
+        }
+    }
+
+    private void subscribe() {
+        try {
+            commandsSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

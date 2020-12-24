@@ -55,13 +55,6 @@ public class Line2D {
         this.thickness = thickness;
     }
 
-    @Override
-    public String toString() {
-        String s = "";
-        s += "[" + p1 + ", " + p2 + "]";
-        return s;
-    }
-
     public Line2D[] split() {
         Line2D[] results;
         if (this.p1.x == this.p2.x) { // Vertical line
@@ -86,5 +79,12 @@ public class Line2D {
 
     public double length() {
         return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        s += "[" + p1 + ", " + p2 + "]";
+        return s;
     }
 }

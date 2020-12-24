@@ -22,14 +22,6 @@ public class GeometryModule implements Module {
         fieldLinesPub = new FieldPublisher<>("geometry", "fieldLines", null);
     }
 
-    private void subscribe() {
-        try {
-            geoSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void run() {
         try {
             subscribe();
@@ -47,6 +39,14 @@ public class GeometryModule implements Module {
                 }
                 fieldLinesPub.publish(lineMap);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void subscribe() {
+        try {
+            geoSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

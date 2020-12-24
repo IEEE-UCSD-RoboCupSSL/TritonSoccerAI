@@ -19,6 +19,11 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         ballSub = new FieldSubscriber<>("detection", "ball");
     }
 
+    @Override
+	public void run() {
+        subscribe();
+	}
+
     private void subscribe() {
         try {
             robotSub.subscribe(1000);
@@ -42,9 +47,4 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         byte[] bytes = toSend.build().toByteArray();
         send(bytes);
     }
-
-    @Override
-	public void run() {
-        subscribe();
-	}
 }

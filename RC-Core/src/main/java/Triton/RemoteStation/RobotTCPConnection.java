@@ -38,7 +38,6 @@ public class RobotTCPConnection implements Module {
     }
 
     public boolean connect() {
-        subscribe();
 
         try {
             clientSocket = new Socket(ip, port);
@@ -66,11 +65,24 @@ public class RobotTCPConnection implements Module {
 
         String str = String.format("init %d %d", (int) -data.getPos().y, (int) data.getPos().x);
         out.println(str);
-        
+
         try {
             String line = in.readLine();
             System.out.println(ID + " " + line);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        subscribe();
+    }
+
+    private void subscribe() {
+        try {
+            robotDataSub.subscribe(1000);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -87,17 +99,5 @@ public class RobotTCPConnection implements Module {
 
     public boolean isConnected() {
         return isConnected;
-    }
-
-    private void subscribe() {
-        try {
-            robotDataSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void run() {
     }
 }
