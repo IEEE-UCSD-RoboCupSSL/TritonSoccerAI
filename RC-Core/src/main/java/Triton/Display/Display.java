@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Display to convey information in separate window
+ */
 public class Display extends JPanel {
 
     private final Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
@@ -42,6 +45,9 @@ public class Display extends JPanel {
     private ArrayList<Vec2D> path;
     private Gridify convert;
 
+    /**
+     * Constructs the display
+     */
     public Display() {
         super();
 
@@ -56,7 +62,7 @@ public class Display extends JPanel {
         }
         ballSub = new FieldSubscriber<>("detection", "ball");
 
-        ImgLoader.loadImages();
+        ImgLoader.generateImages();
 
         Box box = new Box(BoxLayout.Y_AXIS);
         box.add(Box.createVerticalGlue());
@@ -71,6 +77,9 @@ public class Display extends JPanel {
         start();
     }
 
+    /**
+     * Begin displaying
+     */
     public void start() {
         subscribe();
 
@@ -126,6 +135,9 @@ public class Display extends JPanel {
 
     }
 
+    /**
+     * Subscribe to publishers
+     */
     private void subscribe() {
         try {
             fieldSizeSub.subscribe(1000);
@@ -140,6 +152,10 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Called to paint the display
+     * @param g Graphics object to paint to
+     */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -156,6 +172,10 @@ public class Display extends JPanel {
         lastPaint = System.currentTimeMillis();
     }
 
+    /**
+     * Paints the field and lines
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintGeo(Graphics2D g2d) {
         fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
@@ -176,6 +196,10 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Paints robots and ball
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintObjects(Graphics2D g2d) {
         ArrayList<RobotData> yellowRobots = new ArrayList<>();
         ArrayList<RobotData> blueRobots = new ArrayList<>();
@@ -217,6 +241,10 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
 
+    /**
+     * Paints various pathfinding info for debugging
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintPath(Graphics2D g2d) {
         /*
          * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
@@ -240,6 +268,10 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Paints additional information like FPS
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintInfo(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
 
@@ -253,6 +285,9 @@ public class Display extends JPanel {
         this.path = path;
     }
 
+    /**
+     * Task to call paint at set intervals
+     */
     private static class RepaintTask extends TimerTask {
         private final Display display;
 
@@ -266,6 +301,9 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Handles mouse inputs
+     */
     private class DisplayMouseInputAdapter extends MouseInputAdapter {
         private final FindPathTask findPathTask;
         private final int[] start = {0, 0};

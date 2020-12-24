@@ -39,6 +39,12 @@ public class Robot implements Module {
     private ArrayList<Vec2D> path;
     private double angle;
 
+    /**
+     * Construct a robot with specified team and ID
+     * @param team team robot belongs to
+     * @param ID ID of the robot
+     * @param pool thread pool to run submodules on
+     */
     public Robot(Team team, int ID, ThreadPoolExecutor pool) {
         this.team = team;
         this.ID = ID;
@@ -99,6 +105,10 @@ public class Robot implements Module {
         }
     }
 
+    /**
+     * Run connections on thread pool, update paths and publish if robot is on our own team
+     */
+    @Override
     public void run() {
         try {
             subscribe();
@@ -115,7 +125,7 @@ public class Robot implements Module {
             }
 
             while (true) {
-                setData(robotDataSub.getMsg());
+                data = robotDataSub.getMsg();
                 if (team == ObjectConfig.MY_TEAM && ID == 0) {
                     updatePath();
                     publishNextNode();
@@ -126,6 +136,9 @@ public class Robot implements Module {
         }
     }
 
+    /**
+     * Subscribe to publishers
+     */
     private void subscribe() {
         try {
             robotDataSub.subscribe(1000);
@@ -140,6 +153,9 @@ public class Robot implements Module {
         }
     }
 
+    /**
+     * Initialize pathfinder with geometry information
+     */
     private void initPathfinder() {
         while (pathFinder == null) {
             SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
@@ -155,6 +171,9 @@ public class Robot implements Module {
         }
     }
 
+    /**
+     * Update the set path of the robot
+     */
     public void updatePath() {
         Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
         if (endPointPair == null)
@@ -169,38 +188,10 @@ public class Robot implements Module {
             path = newPath;
     }
 
-    private void publishNextNode() {
-        if (path == null || path.size() <= 1)
-            return;
-
-        Vec2D nextNode = path.get(1);
-        Commands.Builder command = Commands.newBuilder();
-        command.setMode(0);
-        command.setIsWorldFrame(true);
-        Vec3D.Builder dest = Vec3D.newBuilder();
-        dest.setX(-nextNode.y);
-        dest.setY(nextNode.x);
-        dest.setZ(angle);
-        command.setMotionSetPoint(dest);
-        commandsPub.publish(command.build());
-    }
-
-    public Team getTeam() {
-        return this.team;
-    }
-
-    public int getID() {
-        return this.ID;
-    }
-
-    public RobotData getRobotData() {
-        return data;
-    }
-
-    public RobotConnection getRobotConnection() {
-        return conn;
-    }
-
+    /**
+     * Returns an ArrayList of circles representing the obstacles for pathfinding
+     * @return an ArrayList of circles representing the obstacles for pathfinding
+     */
     private ArrayList<Circle2D> getObstacles() {
         ArrayList<RobotData> blueRobots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
@@ -229,15 +220,43 @@ public class Robot implements Module {
         return obstacles;
     }
 
-    public void setData(RobotData data) {
-        this.data = data;
+    /**
+     * Publishes the next node in the set path of the robot
+     */
+    private void publishNextNode() {
+        if (path == null || path.size() <= 1)
+            return;
+
+        Vec2D nextNode = path.get(1);
+        Commands.Builder command = Commands.newBuilder();
+        command.setMode(0);
+        command.setIsWorldFrame(true);
+        Vec3D.Builder dest = Vec3D.newBuilder();
+        dest.setX(-nextNode.y);
+        dest.setY(nextNode.x);
+        dest.setZ(angle);
+        command.setMotionSetPoint(dest);
+        commandsPub.publish(command.build());
     }
 
-    public ArrayList<Vec2D> getPath() {
-        return path;
+    /**
+     * @return the team the robot belongs to
+     */
+    public Team getTeam() {
+        return this.team;
     }
 
-    public void setPath(ArrayList<Vec2D> path) {
-        this.path = path;
+    /**
+     * @return the ID of the robot
+     */
+    public int getID() {
+        return this.ID;
+    }
+
+    /**
+     * @return the RobotConnection object this robot is using
+     */
+    public RobotConnection getRobotConnection() {
+        return conn;
     }
 }

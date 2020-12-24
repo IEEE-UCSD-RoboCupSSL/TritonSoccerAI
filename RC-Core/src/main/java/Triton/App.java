@@ -3,10 +3,10 @@ package Triton;
 import Triton.Computation.PathFinder.MoveTowardBall;
 import Triton.Config.ObjectConfig;
 import Triton.Detection.DetectionModule;
-import Triton.Robot.Robot;
 import Triton.Detection.Team;
 import Triton.Display.Display;
 import Triton.Geometry.GeometryModule;
+import Triton.Robot.Robot;
 import Triton.Vision.VisionModule;
 
 import java.util.ArrayList;
