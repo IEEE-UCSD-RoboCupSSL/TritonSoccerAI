@@ -5,9 +5,9 @@ package Triton.Shape;
  */
 public class Rect2D extends Shape2D {
 
-    public Vec2D anchor;
-    public double width;
-    public double height;
+    public final Vec2D anchor;
+    public final double width;
+    public final double height;
 
     /**
      * Constructs a Rect2D with specified left edge and bottom edge

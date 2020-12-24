@@ -64,8 +64,8 @@ public class BallData {
      * SSL_DetectionBall that can be compared based on time of detection
      */
     public class SortedDetection implements Comparable<SortedDetection> {
-        public SSL_DetectionBall detection;
-        public double time;
+        public final SSL_DetectionBall detection;
+        public final double time;
 
         public SortedDetection(SSL_DetectionBall detection, double time) {
             this.detection = detection;

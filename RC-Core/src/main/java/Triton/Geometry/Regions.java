@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
  * Regions includes 9 parts: A, B, C, D, E, F, G, H, and I.
  */
 public class Regions {
-    private static final HashMap<String, Shape2D> regions = new HashMap<String, Shape2D>();
+    private static final HashMap<String, Shape2D> regions = new HashMap<>();
     private static Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
     private static Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 

@@ -5,8 +5,8 @@ package Triton.Shape;
  */
 public class Circle2D extends Shape2D {
     
-    public Vec2D center;
-    public double radius;
+    public final Vec2D center;
+    public final double radius;
 
     /**
      * Constructs a Circle2D at specified point with specified radius

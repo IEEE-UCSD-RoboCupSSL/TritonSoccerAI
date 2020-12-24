@@ -6,7 +6,8 @@ import Proto.RemoteAPI;
  * Represents a 2D vector
  */
 public class Vec2D {
-    public double x, y;
+    public final double x;
+    public final double y;
     private String name;
 
     /**

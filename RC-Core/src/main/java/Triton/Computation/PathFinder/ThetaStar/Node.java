@@ -3,9 +3,10 @@ package Triton.Computation.PathFinder.ThetaStar;
 import Triton.Shape.Vec2D;
 
 public class Node {
-    private Vec2D worldPos;
-    private int row, col;
-    private boolean walkable = true;
+    private final Vec2D worldPos;
+    private final int row;
+    private final int col;
+    private final boolean walkable = true;
     private double gCost, hCost, fCost;
     private Node parent;
 

@@ -5,7 +5,8 @@ package Triton.Shape;
  */
 public class Line2D {
 
-    public Vec2D p1, p2;
+    public final Vec2D p1;
+    public final Vec2D p2;
     private String name;
     private double thickness;
 

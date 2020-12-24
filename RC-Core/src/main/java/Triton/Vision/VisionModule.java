@@ -15,7 +15,7 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 
 /**
- * Module to receive data from grSim
+ * Module to receive data from grSim and send to GeometryModule and Detection Module
  */
 public class VisionModule implements Module {
 
