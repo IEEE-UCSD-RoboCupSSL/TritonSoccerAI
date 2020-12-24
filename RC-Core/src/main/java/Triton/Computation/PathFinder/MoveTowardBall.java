@@ -4,7 +4,7 @@ import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.DesignPattern.PubSubSystem.*;
 import Triton.Detection.BallData;
-import Triton.Detection.Robot;
+import Triton.Robot.Robot;
 import Triton.Detection.RobotData;
 import Triton.Shape.Vec2D;
 import org.javatuples.Pair;

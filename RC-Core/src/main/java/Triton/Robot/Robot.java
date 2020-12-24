@@ -1,4 +1,4 @@
-package Triton.Detection;
+package Triton.Robot;
 
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Proto.RemoteAPI.Commands;
@@ -9,6 +9,8 @@ import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.DesignPattern.PubSubSystem.Module;
 import Triton.DesignPattern.PubSubSystem.*;
+import Triton.Detection.RobotData;
+import Triton.Detection.Team;
 import Triton.RemoteStation.RobotConnection;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;

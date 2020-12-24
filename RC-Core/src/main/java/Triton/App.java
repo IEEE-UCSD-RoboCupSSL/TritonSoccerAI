@@ -3,7 +3,7 @@ package Triton;
 import Triton.Computation.PathFinder.MoveTowardBall;
 import Triton.Config.ObjectConfig;
 import Triton.Detection.DetectionModule;
-import Triton.Detection.Robot;
+import Triton.Robot.Robot;
 import Triton.Detection.Team;
 import Triton.Display.Display;
 import Triton.Geometry.GeometryModule;
