@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="Triton.AppTest" time="0.003" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="Triton.AppTest" time="0.002" errors="0" skipped="0">
   <properties>
     <property name="os.detected.version" value="5.4"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -49,7 +49,7 @@
     <property name="java.class.path" value="/usr/share/maven/boot/plexus-classworlds-2.x.jar"/>
     <property name="java.vm.specification.version" value="14"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher package exec:java"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher package"/>
     <property name="java.home" value="/usr/lib/jvm/java-14-oracle"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
@@ -65,5 +65,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.endian" value="little"/>
   </properties>
-  <testcase classname="Triton.AppTest" name="testApp" time="0.003"/>
+  <testcase classname="Triton.AppTest" name="testApp" time="0.002"/>
 </testsuite>

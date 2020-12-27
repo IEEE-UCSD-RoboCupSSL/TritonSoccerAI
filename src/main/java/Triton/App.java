@@ -1,13 +1,15 @@
 package Triton;
 
-import Triton.Computation.PathFinder.MoveTowardBall;
+import Triton.Algorithms.PathFinder.MoveTowardBall;
 import Triton.Config.ObjectConfig;
-import Triton.Detection.DetectionModule;
-import Triton.Detection.Team;
-import Triton.Display.Display;
-import Triton.Geometry.GeometryModule;
-import Triton.Robot.Robot;
-import Triton.Vision.VisionModule;
+import Triton.Modules.Detection.DetectionModule;
+import Triton.Modules.Detection.Team;
+import Triton.Modules.Display.Display;
+import Triton.Modules.Geometry.GeometryModule;
+import Triton.Modules.Vision.VisionModule;
+import Triton.Objects.Ally;
+import Triton.Objects.Ball;
+import Triton.Objects.Foe;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -46,13 +48,13 @@ public class App {
     public static void main(String[] args) {
         ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
-        Runnable visionRunnable = new VisionModule();
-        Runnable geoRunnable = new GeometryModule();
-        Runnable detectRunnable = new DetectionModule();
+        Runnable visionModule = new VisionModule();
+        Runnable geoModule = new GeometryModule();
+        Runnable detectModule = new DetectionModule();
 
-        pool.submit(visionRunnable);
-        pool.submit(geoRunnable);
-        pool.submit(detectRunnable);
+        pool.submit(visionModule);
+        pool.submit(geoModule);
+        pool.submit(detectModule);
 
         try {
             Thread.sleep(1000);
@@ -60,19 +62,23 @@ public class App {
             e.printStackTrace();
         }
 
-        ArrayList<Robot> robots = new ArrayList<>();
+        Ally[] allies = new Ally[ObjectConfig.ROBOT_COUNT];
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Robot robot = new Robot(Team.YELLOW, i, pool);
-            robots.add(robot);
-            pool.submit(robot);
-        }
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Robot robot = new Robot(Team.BLUE, i, pool);
-            robots.add(robot);
-            pool.submit(robot);
+            Ally ally = new Ally(Team.BLUE, i, pool);
+            allies[i] = ally;
+            pool.submit(ally);
         }
 
-        Runnable moveTowardBallRunnable = new MoveTowardBall(robots.get(6));
+        Foe[] foes = new Foe[ObjectConfig.ROBOT_COUNT];
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            Foe foe = new Foe(Team.YELLOW, i);
+            foes[i] = foe;
+            pool.submit(foe);
+        }
+
+        Ball ball = new Ball();
+
+        Runnable moveTowardBallRunnable = new MoveTowardBall(allies[0], ball);
         pool.submit(moveTowardBallRunnable);
 
         Display display = new Display();

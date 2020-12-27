@@ -1,6 +1,6 @@
 package Triton.Config;
 
-import Triton.Detection.Team;
+import Triton.Modules.Detection.Team;
 
 /**
  * Config file for various objects
