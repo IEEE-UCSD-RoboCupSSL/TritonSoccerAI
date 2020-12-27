@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+option java_package = "Proto";
+
+message Vec2D {
+    double x = 1;
+    double y = 2;
+}
+
+
+message Vec3D {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+// message RemoteGeometry {
+//     int32 field_length = 1;
+//     int32 field_width = 2;
+//     int32 goal_width = 3;
+//     int32 goal_depth = 4;
+// }
+
+
+
+message Commands {
+    bool enable_ball_auto_capture = 1; // if true, motion cmds are disabled, robot will 
+                                       // automatically perform delicate moves to capture ball 
+                                       // that's near the robot 
+
+    int32 mode = 2; /* enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement & rotational displacement (at the same time)
+                                       TDRV = 1, //TDRV: translational displacement & rotational velocity (at the same time)
+                                       TVRD = 2, //TVRD: translational velocity & rotational displacement (at the same time)
+                                       TVRV = 3, //TVRV: translational velocity & rotational velocity (at the same time)  
+                                       NSTDRD = 4, // No slowdown TDRD 
+                                       NSTDRV = 5  // No slowdown TDRV
+                                       }
+                                       */
+
+    bool is_world_frame = 3; // True WorldFrame | False BodyFrame for motion setpoint
+
+    Vec3D motion_set_point = 4; // <x, y, theta> 
+                                // theta is between -180 ~ 180 degree
+
+    Vec3D kicker_set_point = 5; // <x, y>
+
+    // Note: dribbler will be managed by the robot automatically
+}
+
+
+
+
+message RobotInternalData { /* Body Frame */
+    Vec2D trans_vel = 1;
+
+    // this is essentially the orientation angle, if we let both the robot and the camera to reference the same axis
+    Vec2D trans_disp = 2; // Displacement relative to Robot's body reference frame
+    
+    double rotat_vel = 3;
+    double rotat_disp = 4; // Rotational displacement would be the same as the bot angle in Vision_Data below
+                           // if we initialize the robot's 0 orientation to be the same orientation of 
+                           // the camera's frame.
+                           // Though coordinate transformation will take care of the nuences, it's recommended
+                           // to set them as the same to keep things simpler
+}
+
+message VisionData { /* World(Camera) Frame */
+    Vec2D bot_pos = 1; // Position on the field, relative to World camera's reference frame (world frame)
+    Vec2D bot_vel = 2;
+    double bot_ang = 3;
+    double bot_ang_vel = 4;
+    Vec2D ball_pos = 5;
+    Vec2D ball_vel = 6;
+}
+

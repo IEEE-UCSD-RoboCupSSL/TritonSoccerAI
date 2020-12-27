@@ -101,7 +101,6 @@ public class Robot implements Module {
             // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
             // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
             commandsPub = new MQPublisher<>("commands", "" + ID);
-            initPathfinder();
         }
     }
 
@@ -147,7 +146,9 @@ public class Robot implements Module {
                 robotSub.subscribe(1000);
             for (Subscriber<RobotData> robotSub : blueRobotSubs)
                 robotSub.subscribe(1000);
-            endPointSub.subscribe(1000);
+
+            if (team == ObjectConfig.MY_TEAM)
+                endPointSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

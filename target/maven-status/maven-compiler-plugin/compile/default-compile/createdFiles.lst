@@ -19,7 +19,6 @@ Proto/RemoteAPI$CommandsOrBuilder.class
 Triton/DesignPattern/PubSubSystem/Subscriber.class
 Proto/MessagesRobocupSslDetection$SSL_DetectionFrame$Builder.class
 Triton/Display/Display$DisplayMouseInputAdapter.class
-Triton/Computation/PathFinder/PathRelayer.class
 Triton/Shape/Vec2D.class
 Triton/Detection/RobotData.class
 Triton/Computation/PathFinder/JPS/JPS.class
@@ -30,7 +29,6 @@ Proto/GrSimCommands$grSim_Commands$1.class
 Proto/MessagesRobocupSslGeometry$SSL_GeometryData$1.class
 Proto/MessagesRobocupSslDetection$SSL_DetectionFrame$1.class
 Triton/Computation/PathFinder/JPS/JPSPathFinder.class
-Triton/Display/Display$FindPathTask.class
 Proto/MessagesRobocupSslWrapper$SSL_WrapperPacket.class
 Proto/RemoteAPI$RobotInternalData$1.class
 Proto/RemoteAPI$VisionDataOrBuilder.class
@@ -70,7 +68,6 @@ Proto/MessagesRobocupSslDetection.class
 Triton/Computation/PathFinder/JPS/JPSDiagNoObstacles.class
 Proto/GrSimCommands$grSim_Robot_Command.class
 Triton/Shape/Line2D.class
-Triton/Computation/PathFinder/PathRunner.class
 Triton/Computation/PathFinder/JPS/Graph$DistanceAlgo.class
 Proto/GrSimPacket$grSim_Packet$1.class
 Proto/RemoteAPI$RobotInternalDataOrBuilder.class
@@ -170,7 +167,6 @@ Proto/RemoteAPI$Vec3D$1.class
 Proto/GrSimReplacement$grSim_BallReplacementOrBuilder.class
 Proto/MessagesRobocupSslRefboxLog$Log_Frame$Builder.class
 Proto/MessagesRobocupSslWrapper$SSL_WrapperPacket$Builder.class
-Triton/Detection/Robot.class
 Proto/MessagesRobocupSslRefboxLog.class
 Proto/GrSimPacket$grSim_Packet$Builder.class
 Proto/RemoteAPI$Commands.class

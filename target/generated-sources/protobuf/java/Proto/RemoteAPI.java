@@ -1219,7 +1219,10 @@ public final class RemoteAPI {
      * enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement &amp; rotational displacement (at the same time)
      *TDRV = 1, //TDRV: translational displacement &amp; rotational velocity (at the same time)
      *TVRD = 2, //TVRD: translational velocity &amp; rotational displacement (at the same time)
-     *TVRV = 3}; //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+     *TVRV = 3, //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+     *NSTDRD = 4, // No slowdown TDRD 
+     *NSTDRV = 5  // No slowdown TDRV
+     *}
      * </pre>
      *
      * <code>int32 mode = 2;</code>
@@ -1430,7 +1433,10 @@ public final class RemoteAPI {
      * enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement &amp; rotational displacement (at the same time)
      *TDRV = 1, //TDRV: translational displacement &amp; rotational velocity (at the same time)
      *TVRD = 2, //TVRD: translational velocity &amp; rotational displacement (at the same time)
-     *TVRV = 3}; //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+     *TVRV = 3, //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+     *NSTDRD = 4, // No slowdown TDRD 
+     *NSTDRV = 5  // No slowdown TDRV
+     *}
      * </pre>
      *
      * <code>int32 mode = 2;</code>
@@ -1970,7 +1976,10 @@ public final class RemoteAPI {
        * enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement &amp; rotational displacement (at the same time)
        *TDRV = 1, //TDRV: translational displacement &amp; rotational velocity (at the same time)
        *TVRD = 2, //TVRD: translational velocity &amp; rotational displacement (at the same time)
-       *TVRV = 3}; //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *TVRV = 3, //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *NSTDRD = 4, // No slowdown TDRD 
+       *NSTDRV = 5  // No slowdown TDRV
+       *}
        * </pre>
        *
        * <code>int32 mode = 2;</code>
@@ -1984,7 +1993,10 @@ public final class RemoteAPI {
        * enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement &amp; rotational displacement (at the same time)
        *TDRV = 1, //TDRV: translational displacement &amp; rotational velocity (at the same time)
        *TVRD = 2, //TVRD: translational velocity &amp; rotational displacement (at the same time)
-       *TVRV = 3}; //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *TVRV = 3, //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *NSTDRD = 4, // No slowdown TDRD 
+       *NSTDRV = 5  // No slowdown TDRV
+       *}
        * </pre>
        *
        * <code>int32 mode = 2;</code>
@@ -2002,7 +2014,10 @@ public final class RemoteAPI {
        * enum CTRL_Mode {TDRD = 0, //TDRD: translational displacement &amp; rotational displacement (at the same time)
        *TDRV = 1, //TDRV: translational displacement &amp; rotational velocity (at the same time)
        *TVRD = 2, //TVRD: translational velocity &amp; rotational displacement (at the same time)
-       *TVRV = 3}; //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *TVRV = 3, //TVRV: translational velocity &amp; rotational velocity (at the same time)  
+       *NSTDRD = 4, // No slowdown TDRD 
+       *NSTDRV = 5  // No slowdown TDRV
+       *}
        * </pre>
        *
        * <code>int32 mode = 2;</code>

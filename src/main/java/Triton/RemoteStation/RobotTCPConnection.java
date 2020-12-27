@@ -77,6 +77,7 @@ public class RobotTCPConnection implements Module {
      * Sends initial location to robot
      */
     public void sendInit() {
+        subscribe();
         RobotData data = robotDataSub.getMsg();
 
         String str = String.format("init %d %d", (int) -data.getPos().y, (int) data.getPos().x);
@@ -92,7 +93,6 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
-        subscribe();
     }
 
     /**

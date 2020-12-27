@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="Triton.AppTest" time="0" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="Triton.AppTest" time="0.003" errors="0" skipped="0">
   <properties>
     <property name="os.detected.version" value="5.4"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="java.vm.version" value="14.0.2+12-46"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-14-oracle/lib"/>
-    <property name="maven.multiModuleProjectDirectory" value="/home/hongtao/RoboCup/SimuBot/RC-Core"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/hongtao/RoboCup/TritonSoccerAI"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="java.vendor.url" value="https://java.oracle.com/"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -15,7 +15,7 @@
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/home/hongtao/RoboCup/SimuBot/RC-Core"/>
+    <property name="user.dir" value="/home/hongtao/RoboCup/TritonSoccerAI"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="os.detected.release.like.debian" value="true"/>
     <property name="java.runtime.version" value="14.0.2+12-46"/>
@@ -38,7 +38,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="os.detected.name" value="linux"/>
-    <property name="os.version" value="5.4.0-52-generic"/>
+    <property name="os.version" value="5.4.0-58-generic"/>
     <property name="library.jansi.path" value="/usr/share/maven/lib/jansi-native"/>
     <property name="user.home" value="/home/hongtao"/>
     <property name="user.timezone" value="America/Los_Angeles"/>
@@ -65,5 +65,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.endian" value="little"/>
   </properties>
-  <testcase classname="Triton.AppTest" name="testApp" time="0"/>
+  <testcase classname="Triton.AppTest" name="testApp" time="0.003"/>
 </testsuite>
