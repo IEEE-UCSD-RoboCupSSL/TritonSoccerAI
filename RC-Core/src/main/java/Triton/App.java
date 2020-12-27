@@ -1,22 +1,22 @@
 package Triton;
 
-import java.util.ArrayList;
-import java.util.concurrent.*;
-
-import Triton.Vision.*;
 import Triton.Computation.PathFinder.MoveTowardBall;
 import Triton.Config.ObjectConfig;
-import Triton.Detection.*;
-import Triton.Geometry.*;
-import Triton.RemoteStation.*;
-import Triton.Display.*;
+import Triton.Detection.DetectionModule;
+import Triton.Detection.Team;
+import Triton.Display.Display;
+import Triton.Geometry.GeometryModule;
+import Triton.Robot.Robot;
+import Triton.Vision.VisionModule;
 
-/*import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.ServletHandler;*/
+import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Program to receive data from grSim and manage high-level behavior of robots
+ */
 public class App {
 
     // TCP connection: listener, each robot connects to the listener, and the
@@ -41,10 +41,10 @@ public class App {
     // listener)
     // + 1(server tcp connection listener)
 
-    private static int MAX_THREADS = 100;
+    private final static int MAX_THREADS = 100;
 
-    public static void main(String args[]) {
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>());
+    public static void main(String[] args) {
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         Runnable visionRunnable = new VisionModule();
         Runnable geoRunnable = new GeometryModule();
@@ -60,7 +60,7 @@ public class App {
             e.printStackTrace();
         }
 
-        ArrayList<Robot> robots = new ArrayList<Robot>();
+        ArrayList<Robot> robots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             Robot robot = new Robot(Team.YELLOW, i, pool);
             robots.add(robot);
@@ -76,37 +76,5 @@ public class App {
         pool.submit(moveTowardBallRunnable);
 
         Display display = new Display();
-
-        //robots.get(6).getRobotConnection().getTCPConnection().connect();
-        //robots.get(6).getRobotConnection().getTCPConnection().sendInit();
-
-        /*ViewerServlet.offline = true;
-        Server server = createServer(8980);
-        try {
-            server.start();
-            server.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
-
-    /*
-    public static Server createServer(int port)
-    {
-        Server server = new Server(port);
-        ServletHandler servletHandler = new ServletHandler();
-        servletHandler.addServletWithMapping(ViewerServlet.class, "/ViewerServlet");
-
-        ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setDirectoriesListed(true);
-        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
-        resource_handler.setResourceBase(".");
-
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { resource_handler, servletHandler });
-        server.setHandler(handlers);
-
-        return server;
-    }
-    */
 }

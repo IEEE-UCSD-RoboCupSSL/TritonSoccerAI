@@ -1,42 +1,49 @@
 package Triton.RemoteStation;
 
-import java.util.concurrent.TimeoutException;
-
 import Proto.RemoteAPI.Commands;
-import Triton.DesignPattern.PubSubSystem.*;
+import Triton.DesignPattern.PubSubSystem.MQSubscriber;
+import Triton.DesignPattern.PubSubSystem.Subscriber;
 
+/**
+ * UDP stream to send commands to robot
+ */
 public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
-    private Subscriber<Commands> commandsSub;
+    private final Subscriber<Commands> commandsSub;
 
+    /**
+     * Construct a RobotCommandUDPStream sending to specified ip, port, and robot ID
+     * @param ip ip to send to
+     * @param port port to send to
+     * @param ID ID of robot
+     */
     public RobotCommandUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);
-        commandsSub = new MQSubscriber<Commands>("commands", "" + ID, 10);
+        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
     }
 
+    /**
+     * Repeatedly sends commands from command subscriber
+     */
+    @Override
     public void run() {
-        try {
-            commandsSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        /*
-        while (true) {
-            Commands.Builder command = Commands.newBuilder();
-            Vec3D.Builder dest = Vec3D.newBuilder();
-            dest.setX(1000);
-            command.setMotionSetPoint(dest.build());
-            byte[] bytes = command.build().toByteArray();
-            send(bytes);
-        }
-        */
+        subscribe();
 
         while (true) {
             Commands command = commandsSub.getMsg();
             byte[] bytes = command.toByteArray();
             send(bytes);
+        }
+    }
+
+    /**
+     * Subscribe to publishers
+     */
+    private void subscribe() {
+        try {
+            commandsSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

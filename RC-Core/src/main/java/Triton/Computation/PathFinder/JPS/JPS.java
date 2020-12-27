@@ -167,17 +167,12 @@ public abstract class JPS<T extends Node> {
 
     public static class JPSFactory {
         public static <T extends Node> JPS<T> getJPS(Graph<T> graph, Graph.Diagonal diagonal) {
-            switch (diagonal) {
-                case ALWAYS:
-                    return new JPSDiagAlways<>(graph);
-                case ONE_OBSTACLE:
-                    return new JPSDiagOneObstacle<>(graph);
-                case NO_OBSTACLES:
-                    return new JPSDiagNoObstacles<>(graph);
-                case NEVER:
-                    return new JPSDiagNever<>(graph);
-            }
-            return null;
+            return switch (diagonal) {
+                case ALWAYS -> new JPSDiagAlways<>(graph);
+                case ONE_OBSTACLE -> new JPSDiagOneObstacle<>(graph);
+                case NO_OBSTACLES -> new JPSDiagNoObstacles<>(graph);
+                case NEVER -> new JPSDiagNever<>(graph);
+            };
         }
     }
 }

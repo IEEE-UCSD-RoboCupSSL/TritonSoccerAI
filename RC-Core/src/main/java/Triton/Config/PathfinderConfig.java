@@ -1,5 +1,8 @@
 package Triton.Config;
 
+/**
+ * Config file for pathfinding
+ */
 public class PathfinderConfig {
     // Theta* / JPS
     public static final int NODE_RADIUS = 30;

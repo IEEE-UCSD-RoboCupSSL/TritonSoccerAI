@@ -1,40 +1,48 @@
 package Triton.Vision;
 
+import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
+import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.ConnectionConfig;
+import Triton.DesignPattern.PubSubSystem.MQPublisher;
 import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.DesignPattern.PubSubSystem.*;
+import Triton.DesignPattern.PubSubSystem.Publisher;
 
+import java.io.ByteArrayInputStream;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.io.ByteArrayInputStream;
-import Proto.*;
-import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
 
+/**
+ * Module to receive data from grSim and send to GeometryModule and Detection Module
+ */
 public class VisionModule implements Module {
 
-    final static int MAX_BUFFER_SIZE = 67108864;
-
-    private byte[] buffer;
+    private final static int MAX_BUFFER_SIZE = 67108864;
+    private final Publisher<SSL_DetectionFrame> detectPub;
+    private final Publisher<SSL_GeometryData> geoPub;
     private MulticastSocket socket;
-    private DatagramPacket  packet;
+    private DatagramPacket packet;
 
-    public boolean geoInit = false;
-
-    private Publisher<SSL_DetectionFrame> detectPub;
-    private Publisher<SSL_GeometryData> geoPub;
-
+    /**
+     * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
+     */
     public VisionModule() {
         this(ConnectionConfig.GRSIM_MC_ADDR, ConnectionConfig.GRSIM_MC_PORT);
     }
 
+    /**
+     * Constructs a VisionModule listening on specified ip and port
+     * @param ip ip to receive from
+     * @param port port to recieve from
+     */
     public VisionModule(String ip, int port) {
-        detectPub = new MQPublisher<SSL_DetectionFrame>("vision", "detection");
-        geoPub = new MQPublisher<SSL_GeometryData>("vision", "geometry");
+        detectPub = new MQPublisher<>("vision", "detection");
+        geoPub = new MQPublisher<>("vision", "geometry");
 
-        buffer = new byte[MAX_BUFFER_SIZE];
+        byte[] buffer = new byte[MAX_BUFFER_SIZE];
+
         try {
             socket = new MulticastSocket(port);
             InetSocketAddress group = new InetSocketAddress(ip, port);
@@ -46,20 +54,31 @@ public class VisionModule implements Module {
         }
     }
 
+    /**
+     * Repeatedly to collect data
+     */
+    @Override
     public void run() {
-        while (true) {
-            collectData();
+        try {
+            while (true) {
+                collectData();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Receive a single packet
+     */
     public void update() {
         try {
             socket.receive(packet);
-            ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(), 
-                packet.getOffset(), packet.getLength());
-            MessagesRobocupSslWrapper.SSL_WrapperPacket SSLPacket = 
-                MessagesRobocupSslWrapper.SSL_WrapperPacket.parseFrom(input);
-            
+            ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
+                    packet.getOffset(), packet.getLength());
+            SSL_WrapperPacket SSLPacket =
+                    SSL_WrapperPacket.parseFrom(input);
+
             if (SSLPacket.hasDetection()) {
                 detectPub.publish(SSLPacket.getDetection());
             }
@@ -72,12 +91,19 @@ public class VisionModule implements Module {
         }
     }
 
+    /**
+     * Receive a specified number of packets
+     * @param numIter Number of packets to receive
+     */
     public void collectData(int numIter) {
         for (int i = 0; i < numIter; i++) {
             update();
         }
     }
 
+    /**
+     * Receives 4 packets
+     */
     public void collectData() {
         // default configuration with 2x6 robots need 4 packets 
         collectData(4);

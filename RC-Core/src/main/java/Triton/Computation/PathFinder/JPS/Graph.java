@@ -15,8 +15,8 @@ public class Graph<T extends Node> {
         NEVER
     }
 
-    private List<T> nodes;
-    private int width;
+    private final List<T> nodes;
+    private final int width;
 
     private BiFunction<Node, Node, Double> distance = euclidean;
     private BiFunction<Node, Node, Double> heuristic = euclidean;
@@ -209,13 +209,13 @@ public class Graph<T extends Node> {
             this.algo = algo;
         }
     }
-    private static BiFunction<Node, Node, Double> manhattan = (a, b) -> (double) Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    private static BiFunction<Node, Node, Double> euclidean = (a, b) -> Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-    private static BiFunction<Node, Node, Double> octile = (a, b) -> {
+    private static final BiFunction<Node, Node, Double> manhattan = (a, b) -> (double) Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    private static final BiFunction<Node, Node, Double> euclidean = (a, b) -> Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    private static final BiFunction<Node, Node, Double> octile = (a, b) -> {
         double F = Math.sqrt(2) - 1;
         double dx = Math.abs(a.x - b.x);
         double dy = Math.abs(a.y - b.y);
         return (dx < dy) ? F * dx + dy : F * dy + dx;
     };
-    private static BiFunction<Node, Node, Double> chebyshev = (a, b) -> (double) Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+    private static final BiFunction<Node, Node, Double> chebyshev = (a, b) -> (double) Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 }

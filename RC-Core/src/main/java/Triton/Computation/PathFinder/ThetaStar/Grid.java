@@ -1,21 +1,23 @@
 package Triton.Computation.PathFinder.ThetaStar;
 
-import java.util.ArrayList;
-import com.google.common.primitives.Ints;
-
 import Triton.Computation.Gridify;
 import Triton.Config.PathfinderConfig;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Line2D;
 import Triton.Shape.Vec2D;
+import com.google.common.primitives.Ints;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Grid {
-    private double worldSizeX;
-    private double worldSizeY;
+    private final double worldSizeX;
+    private final double worldSizeY;
     private Node[][] nodes;
-    private int numRows, numCols;
+    private final int numRows;
+    private final int numCols;
 
-    private Gridify convert;
+    private final Gridify convert;
 
     public Grid(double worldSizeX, double worldSizeY) {
         this.worldSizeX = worldSizeX;
@@ -39,7 +41,7 @@ public class Grid {
         } catch (IndexOutOfBoundsException e) {
             int col = Ints.constrainToRange(gridPos[0], 0, numCols - 1);
             int row = Ints.constrainToRange(gridPos[1], 0, numRows - 1);
-            System.err.println(String.format("POS %s is out of bound", worldPos));
+            System.err.printf("POS %s is out of bound%n", worldPos);
             return nodes[row][col];
         }
     }
@@ -59,14 +61,10 @@ public class Grid {
             for (int col = 0; col < numCols; col++) {
                 Node node = nodes[row][col];
                 Vec2D nodeWorldPos = node.getWorldPos();
-                if (nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.SAFE_DIST
-                        || nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.SAFE_DIST
-                        || nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.SAFE_DIST
-                        || nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.SAFE_DIST) {
-                    node.setWalkable(false);
-                } else {
-                    node.setWalkable(true);
-                }
+                node.setWalkable(!(nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.SAFE_DIST)
+                        && !(nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.SAFE_DIST)
+                        && !(nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.SAFE_DIST)
+                        && !(nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.SAFE_DIST));
             }
         }
 
@@ -89,22 +87,19 @@ public class Grid {
         int[] topLeftGridPos  = convert.fromPos(topLeft);
         int[] botRightGridPos = convert.fromPos(botRight);
 
-        ArrayList<Node> toCheck = new ArrayList<Node>();
+        ArrayList<Node> toCheck = new ArrayList<>();
         for (int row = topLeftGridPos[1]; row <= botRightGridPos[1]; row++)
-            for (int col = topLeftGridPos[0]; col <= botRightGridPos[0]; col++)
-                toCheck.add(nodes[row][col]);
+            toCheck.addAll(Arrays.asList(nodes[row]).subList(topLeftGridPos[0], botRightGridPos[0] + 1));
         return toCheck;
     }
 
     public boolean checkWalkable(Node node, Circle2D obstacle) {
         double unwalkableDist = obstacle.radius + PathfinderConfig.SAFE_DIST;
-        if (Vec2D.dist(node.getWorldPos(), obstacle.center) <= unwalkableDist)
-            return false;
-        return true;
+        return !(Vec2D.dist(node.getWorldPos(), obstacle.center) <= unwalkableDist);
     }
 
     public ArrayList<Node> getNeighbors(Node node) {
-        ArrayList<Node> neighbors = new ArrayList<Node>();
+        ArrayList<Node> neighbors = new ArrayList<>();
         for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
             for (int colOffset = -1; colOffset <= 1; colOffset++) {
                 if (rowOffset == 0 && colOffset == 0)

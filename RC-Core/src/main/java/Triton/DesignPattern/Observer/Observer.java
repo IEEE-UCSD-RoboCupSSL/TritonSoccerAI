@@ -1,11 +1,11 @@
 package Triton.DesignPattern.Observer;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Observer implements Object {
 
-    protected List<Subject> subjects = new ArrayList<Subject>();
+    protected List<Subject> subjects = new ArrayList<>();
 
     @Override
     public void observe(Subject subject) {

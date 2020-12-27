@@ -1,5 +1,8 @@
 package Triton.Config;
 
+/**
+ * Config file for display
+ */
 public final class DisplayConfig {
     public static final double SCALE = 1.0 / 10.0;
     public static final int TARGET_FPS = 1000;

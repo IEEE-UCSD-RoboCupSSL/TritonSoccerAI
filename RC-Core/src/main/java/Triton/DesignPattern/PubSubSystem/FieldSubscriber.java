@@ -8,7 +8,7 @@ public class FieldSubscriber<T> extends Subscriber<T> {
 
     @Override
     public T getMsg() {
-        return (T) channel.getMsg();
+        return channel.getMsg();
     }
 
     public void forceSetMsg(T msg) {

@@ -1,211 +1,68 @@
 package Triton.Display;
 
-import Triton.Computation.PathFinder.JPS.JPSPathFinder;
-import Triton.Computation.PathFinder.PathFinder;
-import Triton.Config.ObjectConfig;
+import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
+import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
 import Triton.Computation.Gridify;
+import Triton.Computation.PathFinder.JPS.JPSPathFinder;
 import Triton.Config.DisplayConfig;
-import Triton.Detection.*;
-import Triton.Detection.Robot;
-import Triton.Shape.*;
-import Triton.DesignPattern.PubSubSystem.*;
+import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.DesignPattern.PubSubSystem.Subscriber;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.event.MouseEvent;
-import java.awt.image.*;
-
-import java.util.*;
-import java.util.Timer;
-import java.util.concurrent.TimeoutException;
+import Triton.Detection.BallData;
+import Triton.Detection.RobotData;
+import Triton.Shape.Line2D;
+import Triton.Shape.Vec2D;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import org.javatuples.Pair;
-
-import Proto.MessagesRobocupSslGeometry.*;
-
-@SuppressWarnings("serial")
+/**
+ * Display to convey information in separate window
+ */
 public class Display extends JPanel {
 
-    private Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
-    private Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-    private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
-    private ArrayList<Subscriber<RobotData>> blueRobotSubs;
-    private Subscriber<BallData> ballSub;
-    private Subscriber<Pair<ArrayList<Vec2D>, Double>> newestPathSub;
-
+    private final Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
+    private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final Subscriber<BallData> ballSub;
+    private final JFrame frame;
     private SSL_GeometryFieldSize fieldSize;
     private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
-
     private JPSPathFinder JPS;
-    private JFrame frame;
     private long lastPaint;
 
     private ArrayList<Vec2D> path;
     private Gridify convert;
 
-    private static class RepaintTask extends TimerTask {
-        private final Display display;
-
-        public RepaintTask(Display display) {
-            this.display = display;
-        }
-
-        @Override
-        public void run() {
-            display.paintImmediately(0, 0, display.windowWidth, display.windowHeight);
-        }
-    }
-
-    private static class FindPathTask extends TimerTask {
-        private Display display;
-        private PathFinder pathfinder;
-        private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
-        private ArrayList<Subscriber<RobotData>> blueRobotSubs;
-        private Subscriber<BallData> ballSub;
-
-        /* If unspecified, find path from the closest robot to ball */
-        private Vec2D start;
-        private Vec2D dest;
-
-        public FindPathTask(Display display, PathFinder pathfinder) {
-            this.display = display;
-            this.pathfinder = pathfinder;
-
-            yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
-            blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
-            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
-                blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
-            }
-
-            ballSub = new FieldSubscriber<BallData>("detection", "ball");
-        }
-
-        public void setEnds(Vec2D start, Vec2D dest) {
-            this.start = start;
-            this.dest = dest;
-        }
-
-        @Override
-        public void run() {
-            try {
-                for (Subscriber<RobotData> robotSub : yellowRobotSubs)
-                    robotSub.subscribe(1000);
-                for (Subscriber<RobotData> robotSub : blueRobotSubs)
-                    robotSub.subscribe(1000);
-                ballSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-
-            ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
-            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                blueRobots.add(blueRobotSubs.get(i).getMsg());
-            }
-
-            ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
-            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                yellowRobots.add(yellowRobotSubs.get(i).getMsg());
-            }
-
-            BallData ball = ballSub.getMsg();
-            boolean customPath = start != null && dest != null;
-
-            /* Calculate the closest blue robot to the ball */
-            RobotData closestRobot = null;
-            Vec2D ballPos = ball.getPos();
-            double minDist = Double.MAX_VALUE;
-            for (int i = 0; i < 6; i++) {
-                RobotData robot = blueRobots.get(i);
-                Vec2D robotPos = robot.getPos();
-                double dist = Vec2D.dist2(ballPos, robotPos);
-                if (dist < minDist) {
-                    closestRobot = robot;
-                    minDist = dist;
-                }
-            }
-            Vec2D closestRobotPos = closestRobot.getPos();
-
-            /* Add all (other) robots as obstacles */
-            ArrayList<Circle2D> obstacles = new ArrayList<Circle2D>();
-            for (int i = 0; i < 6; i++) {
-                RobotData robot = yellowRobots.get(i);
-                if (!customPath && robot == closestRobot) {
-                    continue;
-                }
-                obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-            }
-            for (int i = 0; i < 6; i++) {
-                RobotData robot = blueRobots.get(i);
-                if (!customPath && robot == closestRobot) {
-                    continue;
-                }
-                obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-            }
-
-            pathfinder.setObstacles(obstacles);
-            if (customPath) {
-                long t0 = System.currentTimeMillis();
-                ArrayList<Vec2D> path = pathfinder.findPath(start, dest);
-                long t1 = System.currentTimeMillis();
-                System.out.println(pathfinder.getName() + " takes " + (t1 - t0) + " ms");
-
-                display.setPath(path);
-            } else {
-                display.setPath(pathfinder.findPath(closestRobotPos, ballPos));
-            }
-        }
-    }
-
-    private class DisplayMouseInputAdapter extends MouseInputAdapter {
-        private final FindPathTask findPathTask;
-        private final int[] start = { 0, 0 };
-        private final int[] dest = { 0, 0 };
-
-        public DisplayMouseInputAdapter(FindPathTask findPathTask) {
-            this.findPathTask = findPathTask;
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                start[0] = e.getX();
-                start[1] = e.getY();
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                dest[0] = e.getX();
-                dest[1] = e.getY();
-            }
-
-            findPathTask.setEnds(convert.fromInd(start), convert.fromInd(dest));
-            findPathTask.run();
-        }
-    }
-
+    /**
+     * Constructs the display
+     */
     public Display() {
         super();
 
-        fieldSizeSub = new FieldSubscriber<SSL_GeometryFieldSize>("geometry", "fieldSize");
-        fieldLinesSub = new FieldSubscriber<HashMap<String, Line2D>>("geometry", "fieldLines");
+        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
 
-        yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
-        blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        yellowRobotSubs = new ArrayList<>();
+        blueRobotSubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
-            blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("detection", "yellow robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
         }
+        ballSub = new FieldSubscriber<>("detection", "ball");
 
-        new FieldSubscriber<HashMap<Team, HashMap<Integer, RobotData>>>("detection", "robot");
-
-        ballSub = new FieldSubscriber<BallData>("detection", "ball");
-        newestPathSub = new FieldSubscriber<Pair<ArrayList<Vec2D>, Double>>("path commands", ObjectConfig.MY_TEAM.name() + 0);
-
-        ImgLoader.loadImages();
+        ImgLoader.generateImages();
 
         Box box = new Box(BoxLayout.Y_AXIS);
         box.add(Box.createVerticalGlue());
@@ -220,13 +77,11 @@ public class Display extends JPanel {
         start();
     }
 
+    /**
+     * Begin displaying
+     */
     public void start() {
-        try {
-            fieldSizeSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        subscribe();
 
         while (true) {
             fieldSize = fieldSizeSub.getMsg();
@@ -245,12 +100,6 @@ public class Display extends JPanel {
             break;
         }
 
-        try {
-            fieldLinesSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         do {
             fieldLines = fieldLinesSub.getMsg();
         } while (fieldLines == null);
@@ -286,6 +135,27 @@ public class Display extends JPanel {
 
     }
 
+    /**
+     * Subscribe to publishers
+     */
+    private void subscribe() {
+        try {
+            fieldSizeSub.subscribe(1000);
+            fieldLinesSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : yellowRobotSubs)
+                robotSub.subscribe(1000);
+            for (Subscriber<RobotData> robotSub : blueRobotSubs)
+                robotSub.subscribe(1000);
+            ballSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Called to paint the display
+     * @param g Graphics object to paint to
+     */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -302,6 +172,10 @@ public class Display extends JPanel {
         lastPaint = System.currentTimeMillis();
     }
 
+    /**
+     * Paints the field and lines
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintGeo(Graphics2D g2d) {
         fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
@@ -322,37 +196,15 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Paints robots and ball
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintObjects(Graphics2D g2d) {
-        for (Subscriber<RobotData> robotSub : yellowRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        for (Subscriber<RobotData> robotSub : blueRobotSubs) {
-            try {
-                robotSub.subscribe(1000);
-            } catch (TimeoutException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        try {
-            ballSub.subscribe(1000);
-        } catch (TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        ArrayList<RobotData> yellowRobots = new ArrayList<RobotData>();
+        ArrayList<RobotData> yellowRobots = new ArrayList<>();
+        ArrayList<RobotData> blueRobots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             yellowRobots.add(yellowRobotSubs.get(i).getMsg());
-        }
-
-        ArrayList<RobotData> blueRobots = new ArrayList<RobotData>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             blueRobots.add(blueRobotSubs.get(i).getMsg());
         }
 
@@ -389,6 +241,10 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
     }
 
+    /**
+     * Paints various pathfinding info for debugging
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintPath(Graphics2D g2d) {
         /*
          * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
@@ -412,6 +268,10 @@ public class Display extends JPanel {
         }
     }
 
+    /**
+     * Paints additional information like FPS
+     * @param g2d Graphics2D object to paint to
+     */
     private void paintInfo(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
 
@@ -423,5 +283,48 @@ public class Display extends JPanel {
 
     public void setPath(ArrayList<Vec2D> path) {
         this.path = path;
+    }
+
+    /**
+     * Task to call paint at set intervals
+     */
+    private static class RepaintTask extends TimerTask {
+        private final Display display;
+
+        public RepaintTask(Display display) {
+            this.display = display;
+        }
+
+        @Override
+        public void run() {
+            display.paintImmediately(0, 0, display.windowWidth, display.windowHeight);
+        }
+    }
+
+    /**
+     * Handles mouse inputs
+     */
+    private class DisplayMouseInputAdapter extends MouseInputAdapter {
+        private final FindPathTask findPathTask;
+        private final int[] start = {0, 0};
+        private final int[] dest = {0, 0};
+
+        public DisplayMouseInputAdapter(FindPathTask findPathTask) {
+            this.findPathTask = findPathTask;
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                start[0] = e.getX();
+                start[1] = e.getY();
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                dest[0] = e.getX();
+                dest[1] = e.getY();
+            }
+
+            findPathTask.setEnds(convert.fromInd(start), convert.fromInd(dest));
+            findPathTask.run();
+        }
     }
 }

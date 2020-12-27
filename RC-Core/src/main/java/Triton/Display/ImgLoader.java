@@ -3,8 +3,11 @@ package Triton.Display;
 import Triton.Config.DisplayConfig;
 
 import java.awt.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 
+/**
+ * Creates images to be displayed
+ */
 public class ImgLoader {
     public static BufferedImage yellowRobot;
     public static BufferedImage blueRobot;
@@ -12,7 +15,10 @@ public class ImgLoader {
     public static BufferedImage startPoint;
     public static BufferedImage desPoint;
 
-    public static void loadImages() {
+    /**
+     * Generates various images to be displayed
+     */
+    public static void generateImages() {
         yellowRobot = new BufferedImage((DisplayConfig.ROBOT_RADIUS_PIXELS + DisplayConfig.ROBOT_OUTLINE_THICKNESS) * 2,
                 (DisplayConfig.ROBOT_RADIUS_PIXELS + DisplayConfig.ROBOT_OUTLINE_THICKNESS) * 2, BufferedImage.TYPE_INT_ARGB);
         Graphics2D yellowRobotGraphics = (Graphics2D) yellowRobot.getGraphics();

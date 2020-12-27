@@ -1,30 +1,46 @@
 package Triton.RemoteStation;
 
 import Proto.RemoteAPI.RobotInternalData;
-import Triton.DesignPattern.PubSubSystem.*;
-import Triton.Detection.Team;
+import Triton.DesignPattern.PubSubSystem.MQPublisher;
+import Triton.DesignPattern.PubSubSystem.Publisher;
 
+/**
+ * UDP stream to receive robot internal data
+ */
 public class RobotDataUDPStream extends RobotUDPStreamReceive {
 
-    private Publisher<RobotInternalData> internalPub;
+    private final Publisher<RobotInternalData> internalPub;
+    private RobotInternalData internalData;
 
+    /**
+     * Construct a RobotDataUDPStream
+     * @param port port to listen
+     * @param ID ID of the robot
+     */
     public RobotDataUDPStream(int port, int ID) {
         super(port, ID);
-        internalPub = new MQPublisher<RobotInternalData>("robot", "internal" + ID);
+        internalPub = new MQPublisher<>("robot", "internal" + ID);
     }
 
-    private void receiveEKF() {
-        byte[] buf = receive();
-        try {
-            RobotInternalData internalPub = RobotInternalData.parseFrom(buf);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * Repeatedly receives robot EKF data
+     */
     public void run() {
         while (true) {
             receiveEKF();
+            internalPub.publish(internalData);
+        }
+    }
+
+    /**
+     * Receives EKF data
+     */
+    private void receiveEKF() {
+        byte[] buf = receive();
+        try {
+            internalData = RobotInternalData.parseFrom(buf);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

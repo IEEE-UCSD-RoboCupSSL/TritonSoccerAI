@@ -1,41 +1,37 @@
 package Triton.Computation.PathFinder;
 
+import Triton.Config.ObjectConfig;
+import Triton.DesignPattern.PubSubSystem.Module;
+import Triton.DesignPattern.PubSubSystem.*;
+import Triton.Detection.BallData;
+import Triton.Detection.RobotData;
+import Triton.Robot.Robot;
+import Triton.Shape.Vec2D;
+import org.javatuples.Pair;
+
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
-import org.javatuples.Pair;
-
-import Triton.Config.ObjectConfig;
-import Triton.DesignPattern.PubSubSystem.FieldPublisher;
-import Triton.DesignPattern.PubSubSystem.FieldSubscriber;
-import Triton.DesignPattern.PubSubSystem.Module;
-import Triton.DesignPattern.PubSubSystem.Publisher;
-import Triton.DesignPattern.PubSubSystem.Subscriber;
-import Triton.Detection.BallData;
-import Triton.Detection.Robot;
-import Triton.Detection.RobotData;
-import Triton.Shape.Vec2D;
-
 public class MoveTowardBall implements Module {
 
-    private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
-    private ArrayList<Subscriber<RobotData>> blueRobotSubs;
-    private Subscriber<BallData> ballSub;
+    private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final Subscriber<BallData> ballSub;
 
-    private ArrayList<Publisher<Pair<Vec2D, Double>>> endPointPubs;
+    private final ArrayList<Publisher<Pair<Vec2D, Double>>> endPointPubs;
 
     public MoveTowardBall(Robot robot) {
-        yellowRobotSubs = new ArrayList<Subscriber<RobotData>>();
-        blueRobotSubs = new ArrayList<Subscriber<RobotData>>();
+        yellowRobotSubs = new ArrayList<>();
+        blueRobotSubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotSubs.add(new FieldSubscriber<RobotData>("detection", "yellow robot data" + i));
-            blueRobotSubs.add(new FieldSubscriber<RobotData>("detection", "blue robot data" + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("detection", "yellow robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
         }
-        ballSub = new FieldSubscriber<BallData>("detection", "ball");
+        ballSub = new FieldSubscriber<>("detection", "ball");
 
-        endPointPubs = new ArrayList<Publisher<Pair<Vec2D, Double>>>();
+        endPointPubs = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
-            endPointPubs.add(new FieldPublisher<Pair<Vec2D, Double>>("endPoint", "" + i, null));
+            endPointPubs.add(new FieldPublisher<>("endPoint", "" + i, null));
         }
     }
 
@@ -54,17 +50,10 @@ public class MoveTowardBall implements Module {
         while (true) {
             BallData ballData = ballSub.getMsg();
 
-            Pair<Vec2D, Double> endPointPair = new Pair<Vec2D, Double>(ballData.getPos(), 0.0);
-            //System.out.println("in MoveTowardBall: " + endPointPair);
+            Pair<Vec2D, Double> endPointPair = new Pair<>(ballData.getPos(), 0.0);
             
             for (Publisher<Pair<Vec2D, Double>> endPointPub: endPointPubs) {
                 endPointPub.publish(endPointPair);
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }

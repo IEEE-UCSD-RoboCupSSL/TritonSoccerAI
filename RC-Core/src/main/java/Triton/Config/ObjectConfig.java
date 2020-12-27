@@ -2,6 +2,9 @@ package Triton.Config;
 
 import Triton.Detection.Team;
 
+/**
+ * Config file for various objects
+ */
 public final class ObjectConfig {
     public static final int ROBOT_COUNT = 6;
     public static final double ROBOT_RADIUS = 90;

@@ -1,10 +1,10 @@
 package Triton.Computation.PathFinder.ThetaStar;
 
-import java.util.*;
-
 import Triton.Computation.PathFinder.PathFinder;
 import Triton.Shape.Circle2D;
 import Triton.Shape.Vec2D;
+
+import java.util.*;
 
 public class ThetaStarPathFinder extends PathFinder {
 
@@ -29,8 +29,8 @@ public class ThetaStarPathFinder extends PathFinder {
         Node startNode = grid.nodeFromWorldPos(startPos);
         Node targetNode = grid.nodeFromWorldPos(targetPos);
 
-        PriorityQueue<Node> openSet = new PriorityQueue<Node>(1, new NodeComparator());
-        HashSet<Node> closedSet = new HashSet<Node>();
+        PriorityQueue<Node> openSet = new PriorityQueue<>(1, new NodeComparator());
+        HashSet<Node> closedSet = new HashSet<>();
         openSet.add(startNode);
 
         while (openSet.size() > 0) {
@@ -62,7 +62,7 @@ public class ThetaStarPathFinder extends PathFinder {
     }
 
     private ArrayList<Vec2D> retracePath(Node startNode, Node targetNode) {
-        ArrayList<Vec2D> worldPath = new ArrayList<Vec2D>();
+        ArrayList<Vec2D> worldPath = new ArrayList<>();
         Node currentNode = targetNode;
 
         while (currentNode != startNode) {
