@@ -1,35 +1,136 @@
-# SimuBot
-AI software specifically designed to run the virtual robots in the GrSim simulator
+# RC-Core
 
-Currently in development
+Robocup software core layer
+
+The RoboCup SSL project involves running an AI software on a **remote station** (usually a computer near the game field) that remotely controls 6~8 soccer robots on the field. 
+
+RC-Core is the **core** component of the **AI software** running on the remote station, where the rest of the AI components are micro-services in the form of **gRPC servers**. **RC-Core** serves as the **client** that calls other services through **gRPC** calls.
+
+RC-Core is written in Java, maintained using **Apache Maven**.
+
+[Install Maven and basic usage](https://github.com/IEEE-UCSD-RoboCup-2020/SoftExamples-Repo/blob/master/Docs/maven.md)
+
+RC-Core uses the following Maven **standard project structure**:
+
+```shell
+RC-Core
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── Triton
+│   │   │       ├── App.java
+│   │   │       ├── Control
+│   │   │       │   ├── Connection.java
+│   │   │       │   ├── RemoteBotConnection.java
+│   │   │       │   ├── RobotConnection.java
+│   │   │       │   └── VirtualBotConnection.java
+│   │   │       ├── DesignPattern
+│   │   │       │   ├── AbstractData.java
+│   │   │       │   ├── Observer.java
+│   │   │       │   └── Subject.java
+│   │   │       ├── ExternProto
+│   │   │       │   ├── ......
+│   │   │       ├── Geometry
+│   │   │       │   ├── Line2D.java
+│   │   │       │   ├── Point2D.java
+│   │   │       │   └── Vec2D.java
+│   │   │       ├── Utility
+│   │   │       │   └── keyboardCtrl.java
+│   │   │       └── Vision
+│   │   │           ├── DetectionData.java
+│   │   │           ├── FieldDetection.java
+│   │   │           ├── FieldGeometry.java
+│   │   │           ├── GeometryData.java
+│   │   │           └── VisionConnection.java
+│   │   └── proto
+│   │       └── remote_commands.proto
+│   └── test
+│       └── java
+│           └── Triton
+│               └── AppTest.java
+...............................
+```
+
+* App.java contains the main class
+* Triton/ExternProto contains the .proto files and proto-java files for SSL-Vision and grSim, which are imported from external sources, don't modify them!
+* main/proto contains the user-defined proto files
 
 
 
-## Sub-Repositories
+## Install dependency
 
-* **RC-Core** : [README.md](RC-Core/README.md)
-* **VirtualBot** : [README.md](VirtualBot/README.md)
+Dependencies are managed by Maven. Maven manages dependencies according to the **pom.xml** file under root.
 
-* ...... (more coming soon)
+run the following to install maven plug-ins and dependencies
 
-  
+```shell
+mvn clean install
+```
 
-## Dependencies
-* Linux/MacOS/Win10 WSL
-* grSim simulator for RoboCup SSL
-* Google protobuf library version 3.11.4 (libprotoc 3.11.4)
-* Java 11
-* Apache Maven 3.6.0
-* ......
+The install will invoke protoc to generate the needed proto-java files under
 
+```shell
+./target/generated-sources/protobuf/java/*.java
+```
 
 
 
+## VS Code
 
-## Known Issues
+If you are using VS Code, make sure to run "mvn clean install" every time you open this repository with VS Code. This is due to an issue with VS Code deleting generated-resources files on start up: https://github.com/redhat-developer/vscode-java/issues/177
 
-* Currently only support single camera configuration (for coding simplicity) since grSim simulates the game setup (virtual setup) with only one global vision camera. (number of cameras for the physical setup varies depending on the actual competition setup)
-* Number of robots per team is fixed to 6, this can be manually changed by modifying the DetectionType.java file, along with modifying the way how VisionConnection class handles the data packet, typically by changing the number of iterations needed to obtain the full information from multiple consecutive packets. (single packet usually misses few robot's data)
+
+
+## Compile/Test/Package
+
+To compile, run
+
+```shell
+mvn compile
+```
+
+
+
+To run JUnit Tests, 
+
+```shell
+mvn test
+```
+
+
+
+Run the following command to compile, run JUnit test, and generate the **jar package**
+
+```shell
+mvn package
+```
+
+The jar is generated under **target/RC-Core-[Version]-SNAPSHOT.jar**
+
+
+
+## Execute
+
+Execute using maven:
+
+```
+mvn exec:java
+```
+
+
+
+
+To execute by shell script, additional step is needed to package some of the needed **dependencies** installed in   **~/.m2/repository/....**  into the generated jar
+
+```shell
+mvn clean compile assembly:single
+```
+
+Then run
+
+```shell
+java -jar target/*.jar
+```
 
 
 
