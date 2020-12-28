@@ -11,7 +11,6 @@ import Triton.Objects.Ally;
 import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -77,9 +76,14 @@ public class App {
         }
 
         Ball ball = new Ball();
+        pool.submit(ball);
 
-        Runnable moveTowardBallRunnable = new MoveTowardBall(allies[0], ball);
-        pool.submit(moveTowardBallRunnable);
+        Runnable[] moveTowardBallRunnables = new Runnable[ObjectConfig.ROBOT_COUNT];
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            Runnable moveTowardBallRunnable = new MoveTowardBall(allies[i], ball);
+            moveTowardBallRunnables[i] = moveTowardBallRunnable;
+            pool.submit(moveTowardBallRunnable);
+        }
 
         Display display = new Display();
     }

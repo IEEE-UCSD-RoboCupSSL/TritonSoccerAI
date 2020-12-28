@@ -4,7 +4,6 @@ import Proto.MessagesRobocupSslGeometry;
 import Proto.RemoteAPI;
 import Triton.Algorithms.PathFinder.JPS.JPSPathFinder;
 import Triton.Algorithms.PathFinder.PathFinder;
-import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
@@ -19,12 +18,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class Ally extends Robot {
-    protected ThreadPoolExecutor pool;
     private final RobotConnection conn;
     private final Subscriber<MessagesRobocupSslGeometry.SSL_GeometryFieldSize> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<Pair<Vec2D, Double>> endPointSub;
+    protected ThreadPoolExecutor pool;
     private PathFinder pathFinder;
     private Publisher<RemoteAPI.Commands> commandsPub;
 
@@ -52,13 +51,12 @@ public class Ally extends Robot {
         endPointPub = new FieldPublisher<>("endPoint", "" + ID, null);
         endPointSub = new FieldSubscriber<>("endPoint", "" + ID);
 
-        if (team == ObjectConfig.MY_TEAM && ID == 0) {
-            conn.buildTcpConnection();
-            conn.buildCommandUDP();
-            // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
-            // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-            commandsPub = new MQPublisher<>("commands", "" + ID);
-        }
+        commandsPub = new MQPublisher<>("commands", "" + ID);
+
+        conn.buildTcpConnection();
+        conn.buildCommandUDP();
+        // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+        // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
     }
 
     // runs in the caller thread
@@ -67,9 +65,14 @@ public class Ally extends Robot {
         endPointPub.publish(endPointPair);
     }
 
-    public void getBall() {}
-    public void intercept() {}
-    public void pass() {}
+    public void getBall() {
+    }
+
+    public void intercept() {
+    }
+
+    public void pass() {
+    }
 
     // Everything in run() runs in the Ally Thread
     @Override
@@ -90,6 +93,21 @@ public class Ally extends Robot {
                 updatePath();
                 publishNextNode();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void subscribe() {
+        super.subscribe();
+        try {
+            fieldSizeSub.subscribe();
+            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+                yellowRobotSubs.get(i).subscribe();
+                blueRobotSubs.get(i).subscribe();
+            }
+            endPointSub.subscribe();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,6 +150,7 @@ public class Ally extends Robot {
 
     /**
      * Returns an ArrayList of circles representing the obstacles for pathfinding
+     *
      * @return an ArrayList of circles representing the obstacles for pathfinding
      */
     private ArrayList<Circle2D> getObstacles() {

@@ -1,7 +1,7 @@
 package Triton.Algorithms.PathFinder.JPS;
 
-import Triton.Dependencies.Gridify;
 import Triton.Algorithms.PathFinder.PathFinder;
+import Triton.Dependencies.Gridify;
 import Triton.Config.PathfinderConfig;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Line2D;
