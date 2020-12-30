@@ -51,7 +51,6 @@ public class RobotTCPConnection implements Module {
      * @return true if connection was successfully established
      */
     public boolean connect() {
-
         try {
             clientSocket = new Socket(ip, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);

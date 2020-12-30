@@ -1,5 +1,6 @@
 package Triton.Algorithms.PathFinder;
 
+import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Modules.Detection.BallData;
@@ -22,7 +23,12 @@ public class MoveTowardBall implements Module {
     @Override
     public void run() {
         while (true) {
-            ally.moveTo(ball.getData().getPos(), 0);
+            Vec2D allyPos = ally.getData().getPos();
+            Vec2D ballPos = ball.getData().getPos();
+            Vec2D dirBallToRobot = allyPos.sub(ballPos).norm();
+            Vec2D dirOffset = dirBallToRobot.mult(ObjectConfig.BALL_RADIUS + ObjectConfig.ROBOT_RADIUS + 50);
+            Vec2D target = ballPos.add(dirOffset);
+            ally.moveTo(target, 0);
         }
     }
 }

@@ -190,8 +190,15 @@ public class Ally extends Robot {
 
         Vec2D nextNode = path.get(1);
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setMode(0);
+
+        if (path.size() > 2) {
+            command.setMode(4);
+        } else {
+            command.setMode(0);
+        }
+
         command.setIsWorldFrame(true);
+
         RemoteAPI.Vec3D.Builder dest = RemoteAPI.Vec3D.newBuilder();
         dest.setX(-nextNode.y);
         dest.setY(nextNode.x);
