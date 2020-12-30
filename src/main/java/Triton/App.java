@@ -1,6 +1,6 @@
 package Triton;
 
-import Triton.Algorithms.PathFinder.MoveTowardBall;
+import Triton.Algorithms.AI;
 import Triton.Config.ObjectConfig;
 import Triton.Modules.Detection.DetectionModule;
 import Triton.Modules.Detection.Team;
@@ -78,12 +78,8 @@ public class App {
         Ball ball = new Ball();
         pool.submit(ball);
 
-        Runnable[] moveTowardBallRunnables = new Runnable[ObjectConfig.ROBOT_COUNT];
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Runnable moveTowardBallRunnable = new MoveTowardBall(allies[i], ball);
-            moveTowardBallRunnables[i] = moveTowardBallRunnable;
-            pool.submit(moveTowardBallRunnable);
-        }
+        Runnable ai = new AI(allies, foes, ball);
+        pool.submit(ai);
 
         Display display = new Display();
     }

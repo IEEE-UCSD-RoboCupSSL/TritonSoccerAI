@@ -42,7 +42,7 @@ message Commands {
     Vec3D motion_set_point = 4; // <x, y, theta> 
                                 // theta is between -180 ~ 180 degree
 
-    Vec3D kicker_set_point = 5; // <x, y>
+    Vec2D kicker_set_point = 5; // <x, y>
 
     // Note: dribbler will be managed by the robot automatically
 }

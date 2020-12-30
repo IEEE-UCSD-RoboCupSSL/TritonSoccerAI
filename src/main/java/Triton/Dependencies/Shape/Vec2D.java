@@ -140,6 +140,14 @@ public class Vec2D {
         return diffX2 + diffY2;
     }
 
+    public double toWorldAngle() {
+        if (Math.abs(x) <= 0.0001 || Math.abs(y) <= 0.0001) {
+            return 0;
+        }
+
+        return Math.toDegrees(Math.atan(y / x));
+    }
+
     /**
      * Returns current vector as a RemoteAPI Vec2D
      * @return current vector as a RemoteAPI Vec2D

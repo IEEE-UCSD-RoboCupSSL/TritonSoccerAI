@@ -19,18 +19,23 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Ally extends Robot {
     private final RobotConnection conn;
+    protected ThreadPoolExecutor pool;
     private final Subscriber<MessagesRobocupSslGeometry.SSL_GeometryFieldSize> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
-    private final Subscriber<Pair<Vec2D, Double>> endPointSub;
-    protected ThreadPoolExecutor pool;
-    private PathFinder pathFinder;
-    private Publisher<RemoteAPI.Commands> commandsPub;
+    private final Publisher<RemoteAPI.Commands> commandsPub;
 
+    private PathFinder pathFinder;
     private ArrayList<Vec2D> path;
     private double angle;
+    private Vec2D kickVel;
 
-    private Publisher<Pair<Vec2D, Double>> endPointPub;
+    private final Publisher<Vec2D> endPointPub;
+    private final Subscriber<Vec2D> endPointSub;
+    private final Publisher<Double> anglePub;
+    private final Subscriber<Double> angleSub;
+    private final Publisher<Vec2D> kickVelPub;
+    private final Subscriber<Vec2D> kickVelSub;
 
     public Ally(Team team, int ID, ThreadPoolExecutor pool) {
         super(team, ID);
@@ -48,8 +53,14 @@ public class Ally extends Robot {
             blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
         }
 
-        endPointPub = new FieldPublisher<>("endPoint", "" + ID, null);
-        endPointSub = new FieldSubscriber<>("endPoint", "" + ID);
+        endPointPub = new FieldPublisher<>("Ally endPoint", "" + ID, null);
+        endPointSub = new FieldSubscriber<>("Ally endPoint", "" + ID);
+
+        anglePub = new FieldPublisher<>("Ally angle", "" + ID, null);
+        angleSub = new FieldSubscriber<>("Ally angle", "" + ID);
+
+        kickVelPub = new FieldPublisher<>("Ally kickVel", "" + ID, null);
+        kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + ID);
 
         commandsPub = new MQPublisher<>("commands", "" + ID);
 
@@ -59,10 +70,24 @@ public class Ally extends Robot {
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
     }
 
+    public void setVel() {
+    }
+
+    public void setAngVel() {
+    }
+
     // runs in the caller thread
-    public void moveTo(Vec2D endPoint, double angle) {
-        Pair<Vec2D, Double> endPointPair = new Pair<>(endPoint, angle);
-        endPointPub.publish(endPointPair);
+    public void moveTo(Vec2D endPoint) {
+        endPointPub.publish(endPoint);
+    }
+
+    public void rotateTo(double angle) {
+        anglePub.publish(angle);
+    }
+
+    // runs in the caller thread
+    public void kick(Vec2D kickVel) {
+        kickVelPub.publish(kickVel);
     }
 
     public void getBall() {
@@ -91,7 +116,9 @@ public class Ally extends Robot {
 
             while (true) {
                 updatePath();
-                publishNextNode();
+                updateAngle();
+                updateKick();
+                publishNextCommand();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +134,10 @@ public class Ally extends Robot {
                 yellowRobotSubs.get(i).subscribe();
                 blueRobotSubs.get(i).subscribe();
             }
+
             endPointSub.subscribe();
+            angleSub.subscribe();
+            kickVelSub.subscribe();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,12 +165,9 @@ public class Ally extends Robot {
      * Update the set path of the robot
      */
     private void updatePath() {
-        Pair<Vec2D, Double> endPointPair = endPointSub.getMsg();
-        if (endPointPair == null)
+        Vec2D endPoint = endPointSub.getMsg();
+        if (endPoint == null)
             return;
-
-        Vec2D endPoint = endPointPair.getValue0();
-        angle = endPointPair.getValue1();
 
         pathFinder.setObstacles(getObstacles());
         ArrayList<Vec2D> newPath = pathFinder.findPath(getData().getPos(), endPoint);
@@ -181,29 +208,49 @@ public class Ally extends Robot {
         return obstacles;
     }
 
+    private void updateAngle() {
+        angle = angleSub.getMsg();
+    }
+
+    private void updateKick() {
+        Vec2D kickVel = kickVelSub.getMsg();
+        if (kickVel != null)
+            this.kickVel = kickVel;
+    }
+
     /**
      * Publishes the next node in the set path of the robot
      */
-    private void publishNextNode() {
-        if (path == null || path.size() <= 1)
-            return;
-
-        Vec2D nextNode = path.get(1);
+    private void publishNextCommand() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-
-        if (path.size() > 2) {
-            command.setMode(4);
-        } else {
-            command.setMode(0);
-        }
-
         command.setIsWorldFrame(true);
 
-        RemoteAPI.Vec3D.Builder dest = RemoteAPI.Vec3D.newBuilder();
-        dest.setX(-nextNode.y);
-        dest.setY(nextNode.x);
-        dest.setZ(angle);
-        command.setMotionSetPoint(dest);
+        command.setEnableBallAutoCapture(false);
+
+        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
+        if (path != null && path.size() > 1) {
+            Vec2D nextNode = path.get(1);
+            command.setMode(path.size() > 2 ? 4 : 0);
+            motionSetPoint.setX(-nextNode.y);
+            motionSetPoint.setY(nextNode.x);
+        } else {
+            command.setMode(0);
+            motionSetPoint.setX(0);
+            motionSetPoint.setY(0);
+        }
+        motionSetPoint.setZ(angle);
+        command.setMotionSetPoint(motionSetPoint);
+
+        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
+        if (kickVel != null) {
+            kickerSetPoint.setX(kickVel.x);
+            kickerSetPoint.setY(kickVel.y);
+        } else {
+            kickerSetPoint.setX(0);
+            kickerSetPoint.setY(0);
+        }
+        command.setKickerSetPoint(kickerSetPoint);
+
         commandsPub.publish(command.build());
     }
 }
