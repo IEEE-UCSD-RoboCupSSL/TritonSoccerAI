@@ -8,6 +8,7 @@ import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
 
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -79,7 +80,7 @@ public class JPSPathFinder extends PathFinder {
             node.setWalkable(true);
         }
         lastObstacles.clear();
-        
+
         for (Circle2D obstacle : obstacles) {
             double x = obstacle.center.x;
             double y = obstacle.center.y;
@@ -119,19 +120,101 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
+    /* if start/target node is not walkable, clear a way out */
+    public void wayOut(int y, int x) {
+        ArrayList<Node> left = new ArrayList<>();
+        ArrayList<Node> right = new ArrayList<>();
+        ArrayList<Node> up = new ArrayList<>();
+        ArrayList<Node> down = new ArrayList<>();
+
+        for (int i = 0; i <= (int) PathfinderConfig.SAFE_DIST / PathfinderConfig.NODE_RADIUS; i++) {
+            try {
+                Node node = nodeList.get(y).get(x - i);
+                if (node.isWalkable()) {
+                    for (Node n : left) {
+                        n.setWalkable(true); // clear the way
+                    }
+                    break;
+                }
+                left.add(node);
+            } catch (IndexOutOfBoundsException e) {
+                // do nothing
+            }
+            try {
+                Node node = nodeList.get(y).get(x + i);
+                if (node.isWalkable()) {
+                    for (Node n : right) {
+                        n.setWalkable(true); // clear the way
+                    }
+                    break;
+                }
+                right.add(node);
+            } catch (IndexOutOfBoundsException e) {
+                // do nothing
+            }
+            try {
+                Node node = nodeList.get(y - i).get(x);
+                if (node.isWalkable()) {
+                    for (Node n : up) {
+                        n.setWalkable(true); // clear the way
+                    }
+                    break;
+                }
+                up.add(node);
+            } catch (IndexOutOfBoundsException e) {
+                // do nothing
+            }
+            try {
+                Node node = nodeList.get(y + i).get(x);
+                if (node.isWalkable()) {
+                    for (Node n : down) {
+                        n.setWalkable(true); // clear the way
+                    }
+                    break;
+                }
+                down.add(node);
+            } catch (IndexOutOfBoundsException e) {
+                // do nothing
+            }
+        }
+    }
+
     public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
         int[] startIdx  = constrain(convert.fromPos(startPos));
         int[] targetIdx = constrain(convert.fromPos(targetPos));
-        Node start  = nodeList.get(startIdx[1]).get(startIdx[0]);
-        Node target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
+
+        Node start, target;
+        try {
+            start  = nodeList.get(startIdx[1]).get(startIdx[0]);
+            target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
+        } catch (IndexOutOfBoundsException e) {
+            return nullPath(startPos);
+        }
+
+        // find ways out
+        if(!start.isWalkable()) {
+            wayOut(startIdx[1], startIdx[0]);
+        }
+        if(!target.isWalkable()) {
+            wayOut(targetIdx[1], targetIdx[0]);
+        }
 
         Future<Queue<Node>> futurePath = jps.findPath(start, target);
         try {
             return toVec2DPath(futurePath.get());
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            return nullPath(startPos);
         }
+    }
+
+    public static ArrayList<Vec2D> nullPath(Vec2D startPos) {
+        ArrayList<Vec2D> empty = new ArrayList<>();
+        empty.add(startPos);
+        empty.add(startPos);
+        System.out.println("******************************************");
+        System.out.println("Ball/Robot Out of Bound, Return Empty Path");
+        System.out.println("******************************************");
+        return empty;
     }
 
     private int[] constrain(int[] idx) {
