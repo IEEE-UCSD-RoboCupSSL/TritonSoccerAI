@@ -4,6 +4,7 @@ import Proto.MessagesRobocupSslGeometry;
 import Proto.RemoteAPI;
 import Triton.Algorithms.PathFinder.JPS.JPSPathFinder;
 import Triton.Algorithms.PathFinder.PathFinder;
+import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
@@ -66,7 +67,7 @@ public class Ally extends Robot {
 
         conn.buildTcpConnection();
         conn.buildCommandUDP();
-        // conn.buildVisionStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET);
+        conn.buildVisionStream();
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
     }
 
@@ -111,7 +112,7 @@ public class Ally extends Robot {
 
             pool.execute(conn.getTCPConnection());
             pool.execute(conn.getCommandStream());
-            // pool.execute(conn.getVisionStream());
+            pool.execute(conn.getVisionStream());
             // pool.execute(conn.getDataStream());
 
             while (true) {

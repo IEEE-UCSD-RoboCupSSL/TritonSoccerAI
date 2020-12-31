@@ -31,6 +31,9 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     @Override
 	public void run() {
         subscribe();
+        while(true) {
+            sendVision();
+        }
 	}
 
     /**

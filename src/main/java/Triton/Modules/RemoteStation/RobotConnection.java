@@ -62,8 +62,6 @@ public class RobotConnection {
     /**
      * Constructs the command UDP stream
      *
-     * @param ip   ip to send to
-     * @param port port to send to
      */
     public void buildCommandUDP() {
         commandStream = new RobotCommandUDPStream(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET, ID);
@@ -72,11 +70,9 @@ public class RobotConnection {
     /**
      * Constructs the vision UDP stream
      *
-     * @param ip   ip to to send to
-     * @param port port to send to
      */
-    public void buildVisionStream(String ip, int port) {
-        visionStream = new RobotVisionUDPStream(ip, port, ID);
+    public void buildVisionStream() {
+        visionStream = new RobotVisionUDPStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET, ID);
     }
 
     /**
