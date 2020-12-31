@@ -24,7 +24,7 @@ public class BallData {
     public void update(SSL_DetectionBall detection, double time) {
         SortedDetectionBall latest = new SortedDetectionBall(detection, time);
         detections.add(latest);
-        Collections.sort(detections);
+        Collections.sort(detections, Collections.reverseOrder());
 
         SortedDetectionBall newest = detections.get(0);
         pos = newest.getPos();
@@ -74,7 +74,7 @@ public class BallData {
 
         @Override
         public int compareTo(SortedDetectionBall other) {
-            return Double.compare(other.time, time);
+            return Double.compare(time, other.time);
         }
 
         @Override

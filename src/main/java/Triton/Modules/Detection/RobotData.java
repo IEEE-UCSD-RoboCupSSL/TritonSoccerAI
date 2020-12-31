@@ -37,7 +37,7 @@ public class RobotData {
     public void update(SSL_DetectionRobot detection, double time) {
         SortedDetectionRobot latest = new SortedDetectionRobot(detection, time);
         detections.add(latest);
-        Collections.sort(detections);
+        Collections.sort(detections, Collections.reverseOrder());
 
         SortedDetectionRobot newest = detections.get(0);
         pos = newest.getPos();
@@ -122,7 +122,7 @@ public class RobotData {
 
         @Override
         public int compareTo(SortedDetectionRobot other) {
-            return Double.compare(other.time, time);
+            return Double.compare(time, other.time);
         }
 
         @Override
