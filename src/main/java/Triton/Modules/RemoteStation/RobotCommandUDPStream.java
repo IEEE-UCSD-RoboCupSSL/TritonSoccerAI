@@ -29,9 +29,11 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
     public void run() {
         subscribe();
 
+        Commands command;
+        byte[] bytes;
         while (true) {
-            Commands command = commandsSub.getMsg();
-            byte[] bytes = command.toByteArray();
+            command = commandsSub.getMsg();
+            bytes = command.toByteArray();
             send(bytes);
         }
     }
