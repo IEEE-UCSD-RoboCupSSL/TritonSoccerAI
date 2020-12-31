@@ -25,8 +25,8 @@ public class JPSPathFinder extends PathFinder {
 
     public JPSPathFinder(double worldSizeX, double worldSizeY) {
         super("JPS");
-        this.worldSizeX = worldSizeX;
-        this.worldSizeY = worldSizeY;
+        this.worldSizeX = worldSizeX + PathfinderConfig.BOUNDARY_EXTENSION * 2;
+        this.worldSizeY = worldSizeY + PathfinderConfig.BOUNDARY_EXTENSION * 2;
 
         convert = new Gridify(
                 new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
@@ -34,8 +34,8 @@ public class JPSPathFinder extends PathFinder {
                         PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
                 false, true);
 
-        numCols = convert.numCols(worldSizeX);
-        numRows = convert.numRows(worldSizeY);
+        numCols = convert.numCols(this.worldSizeX);
+        numRows = convert.numRows(this.worldSizeY);
 
         for (int row = 0; row < numRows; row++) {
             List<Node> nodes = new ArrayList<>();
@@ -51,23 +51,32 @@ public class JPSPathFinder extends PathFinder {
     /* Set the four boundaries as not walkable */
     public void setBoundary() {
         // Four boundaries
-        double up     =  worldSizeY / 2 - PathfinderConfig.SAFE_DIST;
-        double bottom = -worldSizeY / 2 + PathfinderConfig.SAFE_DIST;
-        double left   = -worldSizeX / 2 + PathfinderConfig.SAFE_DIST;
-        double right  =  worldSizeX / 2 - PathfinderConfig.SAFE_DIST;
+        double up     =  worldSizeY / 2 - PathfinderConfig.BOUNDARY_EXTENSION;
+        double bottom = -worldSizeY / 2 + PathfinderConfig.BOUNDARY_EXTENSION;
+        double left   = -worldSizeX / 2 + PathfinderConfig.BOUNDARY_EXTENSION;
+        double right  =  worldSizeX / 2 - PathfinderConfig.BOUNDARY_EXTENSION;
 
         // Upper-left and Bottom-right corners
         int[] ul = convert.fromPos(new Vec2D(left, up));
         int[] br = convert.fromPos(new Vec2D(right, bottom));
 
-        // Set the boundaries as not walkable
-        for (int col = ul[0]; col <= br[0]; col++) {
-            nodeList.get(ul[1]).get(col).setWalkable(false);
-            nodeList.get(br[1]).get(col).setWalkable(false);
+        // Set area outside the boundaries as not walkable
+        for (int col = 0; col < nodeList.get(0).size(); col++) {
+            for (int row = 0; row <= ul[1]; row++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+            for (int row = br[1]; row < nodeList.size(); row++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
         }
+
         for (int row = ul[1]; row <= br[1]; row++) {
-            nodeList.get(row).get(ul[0]).setWalkable(false);
-            nodeList.get(row).get(br[0]).setWalkable(false);
+            for (int col = 0; col <= ul[0]; col++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+            for (int col = br[0]; col < nodeList.get(0).size(); col++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
         }
     }
 
@@ -127,7 +136,8 @@ public class JPSPathFinder extends PathFinder {
         ArrayList<Node> up = new ArrayList<>();
         ArrayList<Node> down = new ArrayList<>();
 
-        for (int i = 0; i <= (int) PathfinderConfig.SAFE_DIST / PathfinderConfig.NODE_RADIUS; i++) {
+        for (int i = 0; i <= 100; i++) {
+        // for (int i = 0; i <= (int) PathfinderConfig.SAFE_DIST / PathfinderConfig.NODE_RADIUS; i++) {
             try {
                 Node node = nodeList.get(y).get(x - i);
                 if (node.isWalkable()) {
@@ -201,7 +211,8 @@ public class JPSPathFinder extends PathFinder {
 
         Future<Queue<Node>> futurePath = jps.findPath(start, target);
         try {
-            return toVec2DPath(futurePath.get());
+            Queue<Node> path = futurePath.get();
+            return toVec2DPath(path);
         } catch (Exception e) {
             return nullPath(startPos);
         }
@@ -211,9 +222,6 @@ public class JPSPathFinder extends PathFinder {
         ArrayList<Vec2D> empty = new ArrayList<>();
         empty.add(startPos);
         empty.add(startPos);
-        System.out.println("******************************************");
-        System.out.println("Ball/Robot Out of Bound, Return Empty Path");
-        System.out.println("******************************************");
         return empty;
     }
 
