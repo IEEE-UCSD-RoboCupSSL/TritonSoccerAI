@@ -5,6 +5,7 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
+import Triton.Modules.Detection.Team;
 
 import java.util.concurrent.TimeoutException;
 
@@ -22,9 +23,14 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
      * @param port port to send to
      * @param ID ID of robot
      */
-    public RobotVisionUDPStream(String ip, int port, int ID) {
+    public RobotVisionUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, ID);
-        robotSub = new FieldSubscriber<>("detection", "" + ID);
+        if(team == Team.BLUE) {
+            robotSub = new FieldSubscriber<>("detection", "blue robot data" + ID);
+        }
+        else {
+            robotSub = new FieldSubscriber<>("detection", "yellow robot data" + ID);
+        }
         ballSub = new FieldSubscriber<>("detection", "ball");
     }
 

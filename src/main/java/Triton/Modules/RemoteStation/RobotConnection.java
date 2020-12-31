@@ -1,6 +1,7 @@
 package Triton.Modules.RemoteStation;
 
 import Triton.Config.ConnectionConfig;
+import Triton.Modules.Detection.Team;
 
 /**
  * Contains all connections of a single robot
@@ -71,8 +72,8 @@ public class RobotConnection {
      * Constructs the vision UDP stream
      *
      */
-    public void buildVisionStream() {
-        visionStream = new RobotVisionUDPStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET, ID);
+    public void buildVisionStream(Team team) {
+        visionStream = new RobotVisionUDPStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET, team, ID);
     }
 
     /**

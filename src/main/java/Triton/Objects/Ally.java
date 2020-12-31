@@ -67,7 +67,7 @@ public class Ally extends Robot {
 
         conn.buildTcpConnection();
         conn.buildCommandUDP();
-        conn.buildVisionStream();
+        conn.buildVisionStream(team);
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
     }
 
