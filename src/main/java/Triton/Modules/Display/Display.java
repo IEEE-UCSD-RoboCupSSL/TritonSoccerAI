@@ -211,7 +211,7 @@ public class Display extends JPanel {
         for (RobotData robot : yellowRobots) {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.yellowRobot.getWidth() / 2,
+            AffineTransform tx = AffineTransform.getRotateInstance(-orient, ImgLoader.yellowRobot.getWidth() / 2.0,
                     ImgLoader.yellowRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
@@ -225,7 +225,7 @@ public class Display extends JPanel {
         for (RobotData robot : blueRobots) {
             int[] pos = convert.fromPos(robot.getPos());
             double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(orient, ImgLoader.blueRobot.getWidth() / 2,
+            AffineTransform tx = AffineTransform.getRotateInstance(-orient, ImgLoader.blueRobot.getWidth() / 2.0,
                     ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 

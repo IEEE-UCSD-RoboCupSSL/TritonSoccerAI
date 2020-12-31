@@ -141,11 +141,14 @@ public class Vec2D {
     }
 
     public double toWorldAngle() {
-        if (Math.abs(x) <= 0.0001 || Math.abs(y) <= 0.0001) {
+        if (Math.abs(x) <= 0.00001 || Math.abs(y) <= 0.00001) {
             return 0;
         }
 
-        return Math.toDegrees(Math.atan(y / x));
+        double botX = -y;
+        double botY = x;
+
+        return Math.toDegrees(Math.atan2(botY, botX)) - 90;
     }
 
     /**

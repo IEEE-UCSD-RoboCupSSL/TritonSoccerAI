@@ -29,9 +29,9 @@ public class AI implements Module {
                 Vec2D dirBallToAlly = allyPos.sub(ballPos).norm();
                 Vec2D dirOffset = dirBallToAlly.mult(KICK_DIST);
                 Vec2D target = ballPos.add(dirOffset);
-                Vec2D dirAllyToBall = dirBallToAlly.mult(-1);
+                Vec2D allyToBall = ballPos.sub(allyPos);
                 ally.moveTo(target);
-                ally.rotateTo(dirAllyToBall.toWorldAngle());
+                ally.rotateTo(allyToBall.toWorldAngle());
                 ally.kick(new Vec2D(4, 4));
             }
         }

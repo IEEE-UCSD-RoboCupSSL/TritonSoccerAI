@@ -12,7 +12,7 @@ import java.util.Collections;
 public class BallData {
 
     public static final int MAX_SIZE = 10;
-    private final ArrayList<SortedDetection> detections = new ArrayList<>();
+    private final ArrayList<SortedDetectionBall> detections = new ArrayList<>();
     private Vec2D pos;
     private Vec2D vel;
 
@@ -22,11 +22,11 @@ public class BallData {
      * @param time time of detection
      */
     public void update(SSL_DetectionBall detection, double time) {
-        SortedDetection latest = new SortedDetection(detection, time);
+        SortedDetectionBall latest = new SortedDetectionBall(detection, time);
         detections.add(latest);
         Collections.sort(detections);
 
-        SortedDetection newest = detections.get(0);
+        SortedDetectionBall newest = detections.get(0);
         pos = newest.getPos();
 
         // return when there is no previous data
@@ -36,10 +36,10 @@ public class BallData {
         }
         // if there are more than MAX_SIZE data, remove the oldest
         else if (detections.size() > MAX_SIZE) {
-            detections.remove(0);
+            detections.remove(detections.size() - 1);
         }
 
-        SortedDetection secondLatest = detections.get(detections.size() - 2); // change peek() to get(size  - 2);
+        SortedDetectionBall secondLatest = detections.get(detections.size() - 2); // change peek() to get(size  - 2);
         double dt = (latest.time - secondLatest.time) * 1000;
         if (dt != 0) {
             vel = latest.getPos().sub(secondLatest.getPos()).mult(1 / dt);
@@ -63,18 +63,18 @@ public class BallData {
     /**
      * SSL_DetectionBall that can be compared based on time of detection
      */
-    public class SortedDetection implements Comparable<SortedDetection> {
+    public static class SortedDetectionBall implements Comparable<SortedDetectionBall> {
         public final SSL_DetectionBall detection;
         public final double time;
 
-        public SortedDetection(SSL_DetectionBall detection, double time) {
+        public SortedDetectionBall(SSL_DetectionBall detection, double time) {
             this.detection = detection;
             this.time = time;
         }
 
         @Override
-        public int compareTo(SortedDetection other) {
-            return (int) (other.time - time);
+        public int compareTo(SortedDetectionBall other) {
+            return Double.compare(other.time, time);
         }
 
         @Override

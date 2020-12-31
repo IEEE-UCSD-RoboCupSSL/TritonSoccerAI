@@ -3,8 +3,8 @@ package Triton.Modules.Detection;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.Config.ObjectConfig;
-import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
+import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 
 import java.util.ArrayList;
 
@@ -76,25 +76,22 @@ public class DetectionModule implements Module {
 
     /**
      * Updates data and publish to subscribers
+     *
      * @param frame SSL_Detection frame, sent from VisionModule
      */
     public void update(SSL_DetectionFrame frame) {
         double time = frame.getTCapture();
 
         for (SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
-            if (robotFrame.getRobotId() < ObjectConfig.ROBOT_COUNT) {
-                int id = robotFrame.getRobotId();
-                yellowRobotsData.get(id).update(robotFrame, time);
-                yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
-            }
+            int id = robotFrame.getRobotId();
+            yellowRobotsData.get(id).update(robotFrame, time);
+            yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
         }
 
         for (SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
-            if (robotFrame.getRobotId() < ObjectConfig.ROBOT_COUNT) {
-                int id = robotFrame.getRobotId();
-                blueRobotsData.get(id).update(robotFrame, time);
-                blueRobotPubs.get(id).publish(blueRobotsData.get(id));
-            }
+            int id = robotFrame.getRobotId();
+            blueRobotsData.get(id).update(robotFrame, time);
+            blueRobotPubs.get(id).publish(blueRobotsData.get(id));
         }
 
         if (frame.getBallsCount() > 0)

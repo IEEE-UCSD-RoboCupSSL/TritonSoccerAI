@@ -14,7 +14,7 @@ public class RobotData {
     public static final int MAX_SIZE = 10;
     private final Team team;
     private final int ID;
-    private final ArrayList<SortedDetection> detections;
+    private final ArrayList<SortedDetectionRobot> detections;
     private Vec2D pos;
     private Vec2D vel;
     private double angle;
@@ -35,11 +35,11 @@ public class RobotData {
      * @param time time of detection
      */
     public void update(SSL_DetectionRobot detection, double time) {
-        SortedDetection latest = new SortedDetection(detection, time);
+        SortedDetectionRobot latest = new SortedDetectionRobot(detection, time);
         detections.add(latest);
         Collections.sort(detections);
 
-        SortedDetection newest = detections.get(0);
+        SortedDetectionRobot newest = detections.get(0);
         pos = newest.getPos();
         angle = newest.getAngle();
 
@@ -51,10 +51,10 @@ public class RobotData {
         }
         // if there are more than MAX_SIZE data, remove the oldest
         else if (detections.size() > MAX_SIZE) {
-            detections.remove(0);
+            detections.remove(detections.size() - 1);
         }
 
-        SortedDetection secondLatest = detections.get(detections.size() - 2);
+        SortedDetectionRobot secondLatest = detections.get(detections.size() - 2);
         double dt = (latest.time - secondLatest.time) * 1000;
         if (dt > 0) {
             vel = latest.getPos().sub(secondLatest.getPos()).mult(1 / dt);
@@ -111,18 +111,18 @@ public class RobotData {
         return detections.get(detections.size() - 1).detection.getHeight();
     }
 
-    public class SortedDetection implements Comparable<SortedDetection> {
+    public static class SortedDetectionRobot implements Comparable<SortedDetectionRobot> {
         public SSL_DetectionRobot detection;
         public double time;
 
-        public SortedDetection(SSL_DetectionRobot detection, double time) {
+        public SortedDetectionRobot(SSL_DetectionRobot detection, double time) {
             this.detection = detection;
             this.time = time;
         }
 
         @Override
-        public int compareTo(SortedDetection other) {
-            return (int) (other.time - time);
+        public int compareTo(SortedDetectionRobot other) {
+            return Double.compare(other.time, time);
         }
 
         @Override

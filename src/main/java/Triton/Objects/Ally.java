@@ -27,7 +27,7 @@ public class Ally extends Robot {
 
     private PathFinder pathFinder;
     private ArrayList<Vec2D> path;
-    private double angle;
+    private Double angle;
     private Vec2D kickVel;
 
     private final Publisher<Vec2D> endPointPub;
@@ -209,7 +209,10 @@ public class Ally extends Robot {
     }
 
     private void updateAngle() {
-        angle = angleSub.getMsg();
+        Double angle = angleSub.getMsg();
+        if (angle != null) {
+            this.angle = angle;
+        }
     }
 
     private void updateKick() {
@@ -238,7 +241,7 @@ public class Ally extends Robot {
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
         }
-        motionSetPoint.setZ(angle);
+        motionSetPoint.setZ(angle != null ? angle : 0);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();

@@ -33,6 +33,7 @@ public abstract class Robot implements Module {
     public RobotData getData() {
         return dataSub.getMsg();
     }
+
     public int timeToPoint() {
         return 0;
     }
@@ -44,5 +45,13 @@ public abstract class Robot implements Module {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public int getID() {
+        return ID;
     }
 }
