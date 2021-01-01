@@ -28,13 +28,8 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
     @Override
     public void run() {
         subscribe();
-
-        Commands command;
-        byte[] bytes;
         while (true) {
-            command = commandsSub.getMsg();
-            bytes = command.toByteArray();
-            send(bytes);
+            sendCommand();
         }
     }
 
@@ -47,5 +42,12 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendCommand() {
+        Commands command = commandsSub.getMsg();
+        byte[] bytes;
+        bytes = command.toByteArray();
+        send(bytes);
     }
 }

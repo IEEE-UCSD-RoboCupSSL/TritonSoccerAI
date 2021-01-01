@@ -60,15 +60,12 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     private void sendVision() {
         RobotData robotData;
         BallData ballData;
-        VisionData.Builder toSend;
-        byte[] bytes;
 
         robotData = robotSub.getMsg();
         ballData = ballSub.getMsg();
+        byte[] bytes;
 
-        // System.out.println(robotData.getPos());
-
-        toSend = VisionData.newBuilder();
+        VisionData.Builder toSend = VisionData.newBuilder();
         toSend.setBotPos(robotData.getPos().toProto());
         toSend.setBotVel(robotData.getVel().toProto());
         toSend.setBotAng(robotData.getOrient());
@@ -77,5 +74,7 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         toSend.setBallVel(ballData.getVel().toProto());
         bytes = toSend.build().toByteArray();
         send(bytes);
+
+        System.out.println(toSend.toString());
     }
 }
