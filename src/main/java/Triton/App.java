@@ -4,7 +4,6 @@ import Triton.Algorithms.AI;
 import Triton.Config.ObjectConfig;
 import Triton.Modules.Detection.DetectionModule;
 import Triton.Modules.Detection.Team;
-import Triton.Modules.Display.Display;
 import Triton.Modules.Geometry.GeometryModule;
 import Triton.Modules.Vision.VisionModule;
 import Triton.Objects.Ally;
@@ -81,6 +80,6 @@ public class App {
         Runnable ai = new AI(allies, foes, ball);
         pool.submit(ai);
 
-        Display display = new Display();
+        allies[0].displayPathFinder();
     }
 }

@@ -122,7 +122,7 @@ public class Ally extends Robot {
                 publishNextCommand();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
         }
     }
 
@@ -256,5 +256,11 @@ public class Ally extends Robot {
         command.setKickerSetPoint(kickerSetPoint);
 
         commandsPub.publish(command.build());
+    }
+
+    public void displayPathFinder() {
+        if (pathFinder instanceof JPSPathFinder) {
+            ((JPSPathFinder) pathFinder).display();
+        }
     }
 }

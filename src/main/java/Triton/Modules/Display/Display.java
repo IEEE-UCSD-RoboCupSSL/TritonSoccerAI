@@ -2,6 +2,7 @@ package Triton.Modules.Display;
 
 import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
+import Triton.Algorithms.PathFinder.JPS.Node;
 import Triton.Dependencies.Gridify;
 import Triton.Algorithms.PathFinder.JPS.JPSPathFinder;
 import Triton.Config.DisplayConfig;
@@ -39,15 +40,10 @@ public class Display extends JPanel {
     private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
-    private JPSPathFinder JPS;
     private long lastPaint;
+    protected Gridify convert;
 
-    private ArrayList<Vec2D> path;
-    private Gridify convert;
-
-    /**
-     * Constructs the display
-     */
+    /* Construct a display with robot, ball, and field */
     public Display() {
         super();
 
@@ -113,26 +109,6 @@ public class Display extends JPanel {
 
         Timer repaintTimer = new Timer();
         repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
-
-        // Timer findPathTimer = new Timer();
-        /*
-        double worldSizeX = fieldSize.getFieldLength();
-        double worldSizeY = fieldSize.getFieldWidth();
-
-        JPS = new JPSPathFinder(worldSizeX, worldSizeY);
-        FindPathTask JPSTask = new FindPathTask(this, JPS);
-        */
-
-        //PathFinder thetaStar = new ThetaStarPathFinder(worldSizeX, worldSizeY);
-        //FindPathTask thetaStarTask = new FindPathTask(this, thetaStar);
-
-        // findPathTimer.scheduleAtFixedRate(findPathTask, 0,
-        // DisplayConfig.UPDATE_DELAY);
-        //addMouseListener(new DisplayMouseInputAdapter(thetaStarTask));
-        /*
-        addMouseListener(new DisplayMouseInputAdapter(JPSTask));
-        */
-
     }
 
     /**
@@ -163,10 +139,6 @@ public class Display extends JPanel {
 
         paintGeo(g2d);
         paintObjects(g2d);
-        if (JPS != null) {
-            JPS.paintObstacles(g2d, convert);
-        }
-        paintPath(g2d);
         paintInfo(g2d);
 
         lastPaint = System.currentTimeMillis();
@@ -242,33 +214,6 @@ public class Display extends JPanel {
     }
 
     /**
-     * Paints various pathfinding info for debugging
-     * @param g2d Graphics2D object to paint to
-     */
-    private void paintPath(Graphics2D g2d) {
-        /*
-         * Grid grid = pathfinder.getGrid(); Node[][] nodes = grid.getNodes(); for (int
-         * row = 0; row < grid.getNumRows(); row++) { for (int col = 0; col <
-         * grid.getNumCols(); col++) { Node node = nodes[row][col]; Vec2D worldPos =
-         * node.getWorldPos(); int[] displayPos = convert.fromPos(worldPos); if
-         * (!node.getWalkable()) { g2d.setColor(Color.RED); g2d.setStroke(new
-         * BasicStroke(5)); g2d.drawLine(displayPos[0], displayPos[1], displayPos[0],
-         * displayPos[1]); } } }
-         */
-
-        g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));
-
-        if (path != null && !path.isEmpty()) {
-            for (int i = 0; i < path.size() - 1; i++) {
-                int[] pointA = convert.fromPos(path.get(i));
-                int[] pointB = convert.fromPos(path.get(i + 1));
-                g2d.drawLine(pointA[0], pointA[1], pointB[0], pointB[1]);
-            }
-        }
-    }
-
-    /**
      * Paints additional information like FPS
      * @param g2d Graphics2D object to paint to
      */
@@ -279,10 +224,6 @@ public class Display extends JPanel {
                 windowHeight - 70);
         g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
                 windowHeight - 50);
-    }
-
-    public void setPath(ArrayList<Vec2D> path) {
-        this.path = path;
     }
 
     /**
@@ -298,33 +239,6 @@ public class Display extends JPanel {
         @Override
         public void run() {
             display.paintImmediately(0, 0, display.windowWidth, display.windowHeight);
-        }
-    }
-
-    /**
-     * Handles mouse inputs
-     */
-    private class DisplayMouseInputAdapter extends MouseInputAdapter {
-        private final FindPathTask findPathTask;
-        private final int[] start = {0, 0};
-        private final int[] dest = {0, 0};
-
-        public DisplayMouseInputAdapter(FindPathTask findPathTask) {
-            this.findPathTask = findPathTask;
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                start[0] = e.getX();
-                start[1] = e.getY();
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                dest[0] = e.getX();
-                dest[1] = e.getY();
-            }
-
-            findPathTask.setEnds(convert.fromInd(start), convert.fromInd(dest));
-            findPathTask.run();
         }
     }
 }

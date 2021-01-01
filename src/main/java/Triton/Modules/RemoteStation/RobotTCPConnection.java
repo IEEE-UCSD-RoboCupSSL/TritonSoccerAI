@@ -50,26 +50,18 @@ public class RobotTCPConnection implements Module {
      * Begin connection
      * @return true if connection was successfully established
      */
-    public boolean connect() {
-        try {
-            clientSocket = new Socket(ip, port);
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    public boolean connect() throws IOException {
+        clientSocket = new Socket(ip, port);
+        out = new PrintWriter(clientSocket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            String line = in.readLine();
-            if (line.equals("CONNECTION ESTABLISHED")) {
-                isConnected = true;
-                System.out.println(ID + " " + line);
-                return true;
-            }
-            return false;
-        } catch (UnknownHostException e) {
-            isConnected = false;
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        String line = in.readLine();
+        if (line.equals("CONNECTION ESTABLISHED")) {
+            isConnected = true;
+            System.out.printf("Robot %d : %s\n", ID, line);
+            return true;
         }
+        return false;
     }
 
     /**

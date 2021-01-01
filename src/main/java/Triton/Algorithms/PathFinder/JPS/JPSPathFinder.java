@@ -6,9 +6,10 @@ import Triton.Config.PathfinderConfig;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
+import Triton.Modules.Display.Display;
+import Triton.Modules.Display.JPSPathfinderDisplay;
 
-import java.awt.*;
-import java.lang.reflect.Array;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -18,10 +19,11 @@ public class JPSPathFinder extends PathFinder {
 
     private final JPS<Node> jps;
     private final List<List<Node>> nodeList = new ArrayList<>();
-    public Gridify convert;
+    private final Gridify convert;
     private final int numRows, numCols;
     private final double worldSizeX, worldSizeY;
     private final List<Node> lastObstacles = new ArrayList<>();
+    private ArrayList<Vec2D> path = new ArrayList<>();
 
     public JPSPathFinder(double worldSizeX, double worldSizeY) {
         super("JPS");
@@ -48,7 +50,7 @@ public class JPSPathFinder extends PathFinder {
         jps = JPS.JPSFactory.getJPS(new Graph<>(nodeList), Graph.Diagonal.NO_OBSTACLES);
     }
 
-    /* Set the four boundaries as not walkable */
+    /* Set area outside the boundaries as not walkable */
     public void setBoundary() {
         // Four boundaries
         double up     =  worldSizeY / 2 - PathfinderConfig.BOUNDARY_EXTENSION;
@@ -60,7 +62,6 @@ public class JPSPathFinder extends PathFinder {
         int[] ul = convert.fromPos(new Vec2D(left, up));
         int[] br = convert.fromPos(new Vec2D(right, bottom));
 
-        // Set area outside the boundaries as not walkable
         for (int col = 0; col < nodeList.get(0).size(); col++) {
             for (int row = 0; row <= ul[1]; row++) {
                 nodeList.get(row).get(col).setWalkable(false);
@@ -114,77 +115,35 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
-    public void paintObstacles(Graphics2D g2d, Gridify convert) {
-        for (int col = 0; col < numCols; col++) {
-            for (int row = 0; row < numRows; row++) {
-                Node node = nodeList.get(row).get(col);
-                Vec2D worldPos = this.convert.fromInd(node.getX(), node.getY());
-                int[] displayPos = convert.fromPos(worldPos);
-                if (!node.isWalkable()) {
-                    g2d.setColor(Color.RED);
-                    g2d.setStroke(new BasicStroke(5));
-                    g2d.drawLine(displayPos[0], displayPos[1], displayPos[0], displayPos[1]);
-                }
-            }
+    /* if start/target node is not walkable, BFS a way out */
+    public void wayOut(int row, int col) {
+        ArrayList<Node> paths[] = new ArrayList[8];
+        for (int i = 0; i < 8; i++) {
+            paths[i] = new ArrayList<>();
         }
-    }
+        int searchBound = (int) Math.max(PathfinderConfig.SAFE_DIST, PathfinderConfig.BOUNDARY_EXTENSION)
+                / PathfinderConfig.NODE_RADIUS;
 
-    /* if start/target node is not walkable, clear a way out */
-    public void wayOut(int y, int x) {
-        ArrayList<Node> left = new ArrayList<>();
-        ArrayList<Node> right = new ArrayList<>();
-        ArrayList<Node> up = new ArrayList<>();
-        ArrayList<Node> down = new ArrayList<>();
-
-        for (int i = 0; i <= 100; i++) {
-        // for (int i = 0; i <= (int) PathfinderConfig.SAFE_DIST / PathfinderConfig.NODE_RADIUS; i++) {
-            try {
-                Node node = nodeList.get(y).get(x - i);
-                if (node.isWalkable()) {
-                    for (Node n : left) {
-                        n.setWalkable(true); // clear the way
+        for (int i = 0; i <= searchBound; i++) {
+            int arrInd = 0;
+            for (int d_row = -1; d_row <= 1; d_row++) {
+                for (int d_col = -1; d_col <= 1; d_col++) {
+                    if (d_row == 0 && d_col == 0) continue;
+                    try {
+                        Node node = nodeList.get(d_row * i + row).get(d_col * i + col);
+                        if (node.isWalkable()) {
+                            for (Node n : paths[arrInd]) {
+                                n.setWalkable(true); // clear the way
+                            }
+                            return;
+                        } else {
+                            paths[arrInd].add(node);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        // Search out of bound, do nothing
                     }
-                    break;
+                    arrInd++;
                 }
-                left.add(node);
-            } catch (IndexOutOfBoundsException e) {
-                // do nothing
-            }
-            try {
-                Node node = nodeList.get(y).get(x + i);
-                if (node.isWalkable()) {
-                    for (Node n : right) {
-                        n.setWalkable(true); // clear the way
-                    }
-                    break;
-                }
-                right.add(node);
-            } catch (IndexOutOfBoundsException e) {
-                // do nothing
-            }
-            try {
-                Node node = nodeList.get(y - i).get(x);
-                if (node.isWalkable()) {
-                    for (Node n : up) {
-                        n.setWalkable(true); // clear the way
-                    }
-                    break;
-                }
-                up.add(node);
-            } catch (IndexOutOfBoundsException e) {
-                // do nothing
-            }
-            try {
-                Node node = nodeList.get(y + i).get(x);
-                if (node.isWalkable()) {
-                    for (Node n : down) {
-                        n.setWalkable(true); // clear the way
-                    }
-                    break;
-                }
-                down.add(node);
-            } catch (IndexOutOfBoundsException e) {
-                // do nothing
             }
         }
     }
@@ -212,16 +171,21 @@ public class JPSPathFinder extends PathFinder {
         Future<Queue<Node>> futurePath = jps.findPath(start, target);
         try {
             Queue<Node> path = futurePath.get();
-            return toVec2DPath(path);
+            this.path = toVec2DPath(path);
+            return this.path;
         } catch (Exception e) {
             return nullPath(startPos);
         }
     }
 
-    public static ArrayList<Vec2D> nullPath(Vec2D startPos) {
+    private ArrayList<Vec2D> nullPath(Vec2D startPos) {
         ArrayList<Vec2D> empty = new ArrayList<>();
         empty.add(startPos);
         empty.add(startPos);
+        if (path != null) {
+            System.out.println("No valid path found; empty path returned");
+            path = null;
+        }
         return empty;
     }
 
@@ -275,9 +239,13 @@ public class JPSPathFinder extends PathFinder {
         return true;
     }
 
+    public void display() {
+        new JPSPathfinderDisplay(this);
+    }
+
     public int getNumRows() { return numRows; }
     public int getNumCols() { return numCols; }
-    public List<List<Node>> getNodeList() {
-        return nodeList;
-    }
+    public ArrayList<Vec2D> getPath() { return path; }
+    public Gridify getConvert() { return convert; }
+    public List<List<Node>> getNodeList() { return nodeList; }
 }
