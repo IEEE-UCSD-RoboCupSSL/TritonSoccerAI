@@ -75,6 +75,6 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         bytes = toSend.build().toByteArray();
         send(bytes);
 
-        System.out.println(toSend.toString());
+        // System.out.println(toSend.toString());
     }
 }
