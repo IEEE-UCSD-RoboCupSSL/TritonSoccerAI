@@ -6,10 +6,8 @@ import Triton.Config.PathfinderConfig;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.Modules.Display.Display;
 import Triton.Modules.Display.JPSPathfinderDisplay;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -23,6 +21,8 @@ public class JPSPathFinder extends PathFinder {
     private final int numRows, numCols;
     private final double worldSizeX, worldSizeY;
     private final List<Node> lastObstacles = new ArrayList<>();
+    private final int[] ul;
+    private final int[] br;
     private ArrayList<Vec2D> path = new ArrayList<>();
 
     public JPSPathFinder(double worldSizeX, double worldSizeY) {
@@ -32,9 +32,13 @@ public class JPSPathFinder extends PathFinder {
 
         convert = new Gridify(
                 new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
-                new Vec2D(PathfinderConfig.NODE_RADIUS - worldSizeX / 2,
-                        PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
+                new Vec2D(PathfinderConfig.NODE_RADIUS - this.worldSizeX / 2,
+                        PathfinderConfig.NODE_RADIUS - this.worldSizeY / 2),
                 false, true);
+
+        // Upper-left and Bottom-right corners
+        ul = convert.fromPos(new Vec2D(-worldSizeX / 2, worldSizeY / 2));
+        br = convert.fromPos(new Vec2D(worldSizeX / 2, -worldSizeY / 2));
 
         numCols = convert.numCols(this.worldSizeX);
         numRows = convert.numRows(this.worldSizeY);
@@ -50,18 +54,13 @@ public class JPSPathFinder extends PathFinder {
         jps = JPS.JPSFactory.getJPS(new Graph<>(nodeList), Graph.Diagonal.NO_OBSTACLES);
     }
 
+    /* Check if a point is in area outside the boundary */
+    public boolean isOutOfBound(int row, int col) {
+        return row <= ul[1] || row >= br[1] || col <= ul[0] || col >= br[0];
+    }
+
     /* Set area outside the boundaries as not walkable */
-    public void setBoundary() {
-        // Four boundaries
-        double up     =  worldSizeY / 2 - PathfinderConfig.BOUNDARY_EXTENSION;
-        double bottom = -worldSizeY / 2 + PathfinderConfig.BOUNDARY_EXTENSION;
-        double left   = -worldSizeX / 2 + PathfinderConfig.BOUNDARY_EXTENSION;
-        double right  =  worldSizeX / 2 - PathfinderConfig.BOUNDARY_EXTENSION;
-
-        // Upper-left and Bottom-right corners
-        int[] ul = convert.fromPos(new Vec2D(left, up));
-        int[] br = convert.fromPos(new Vec2D(right, bottom));
-
+    public void setBound() {
         for (int col = 0; col < nodeList.get(0).size(); col++) {
             for (int row = 0; row <= ul[1]; row++) {
                 nodeList.get(row).get(col).setWalkable(false);
@@ -83,7 +82,7 @@ public class JPSPathFinder extends PathFinder {
 
     /* Set the robot surroundings as not walkable */
     public void setObstacles(ArrayList<Circle2D> obstacles) {
-        setBoundary();
+        setBound();
 
         // Free last obstacles
         for (Node node : lastObstacles) {
@@ -115,9 +114,11 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
-    /* if start/target node is not walkable, BFS a way out */
+    /*
+     * if start/target node is not walkable, BFS a way out
+     */
     public void wayOut(int row, int col) {
-        ArrayList<Node> paths[] = new ArrayList[8];
+        ArrayList<Node>[] paths = new ArrayList[8];
         for (int i = 0; i < 8; i++) {
             paths[i] = new ArrayList<>();
         }
@@ -138,6 +139,10 @@ public class JPSPathFinder extends PathFinder {
                             return;
                         } else {
                             paths[arrInd].add(node);
+                            if (d_row * d_col != 0) { // diagonal entry
+                                // also unblock the node above
+                                paths[arrInd].add(nodeList.get(d_row * i + row + 1).get(d_col * i + col));
+                            }
                         }
                     } catch (IndexOutOfBoundsException e) {
                         // Search out of bound, do nothing
@@ -165,7 +170,9 @@ public class JPSPathFinder extends PathFinder {
             wayOut(startIdx[1], startIdx[0]);
         }
         if(!target.isWalkable()) {
-            wayOut(targetIdx[1], targetIdx[0]);
+            if (!isOutOfBound(targetIdx[1], targetIdx[0])) { // Do nothing if ball is outside the field
+                wayOut(targetIdx[1], targetIdx[0]);
+            }
         }
 
         Future<Queue<Node>> futurePath = jps.findPath(start, target);
