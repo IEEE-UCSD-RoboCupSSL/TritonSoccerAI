@@ -4,24 +4,23 @@ import Proto.MessagesRobocupSslGeometry;
 import Proto.RemoteAPI;
 import Triton.Algorithms.PathFinder.JPS.JPSPathFinder;
 import Triton.Algorithms.PathFinder.PathFinder;
-import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Modules.Detection.RobotData;
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 import Triton.Modules.RemoteStation.RobotConnection;
-import org.javatuples.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class Ally extends Robot {
     private final RobotConnection conn;
     protected ThreadPoolExecutor pool;
-    private final Subscriber<MessagesRobocupSslGeometry.SSL_GeometryFieldSize> fieldSizeSub;
+    private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Publisher<RemoteAPI.Commands> commandsPub;
@@ -71,12 +70,6 @@ public class Ally extends Robot {
         conn.buildVisionStream(team);
     }
 
-    public void setVel() {
-    }
-
-    public void setAngVel() {
-    }
-
     // runs in the caller thread
     public void moveTo(Vec2D endPoint) {
         endPointPub.publish(endPoint);
@@ -122,7 +115,7 @@ public class Ally extends Robot {
                 publishNextCommand();
             }
         } catch (Exception e) {
-            System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
+            e.printStackTrace();
         }
     }
 
@@ -149,14 +142,13 @@ public class Ally extends Robot {
      */
     private void initPathfinder() {
         while (pathFinder == null) {
-            MessagesRobocupSslGeometry.SSL_GeometryFieldSize fieldSize = fieldSizeSub.getMsg();
+            HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
 
-            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
-                    || fieldSize.getGoalDepth() == 0)
+            if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0)
                 continue;
 
-            double worldSizeX = fieldSize.getFieldLength();
-            double worldSizeY = fieldSize.getFieldWidth();
+            double worldSizeX = fieldSize.get("fieldWidth");
+            double worldSizeY = fieldSize.get("fieldLength");
 
             pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
         }
@@ -228,15 +220,14 @@ public class Ally extends Robot {
     private void publishNextCommand() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
-
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
         if (path != null && path.size() > 1) {
             Vec2D nextNode = path.get(1);
             command.setMode(path.size() > 2 ? 4 : 0);
-            motionSetPoint.setX(-nextNode.y);
-            motionSetPoint.setY(nextNode.x);
+            motionSetPoint.setX(nextNode.x);
+            motionSetPoint.setY(nextNode.y);
         } else {
             command.setMode(0);
             motionSetPoint.setX(0);

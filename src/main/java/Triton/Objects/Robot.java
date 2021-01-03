@@ -3,9 +3,7 @@ package Triton.Objects;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Modules.Detection.RobotData;
-import Triton.Modules.Detection.Team;
-
-import java.util.concurrent.ThreadPoolExecutor;
+import Triton.Dependencies.Team;
 
 public abstract class Robot implements Module {
     protected Team team;

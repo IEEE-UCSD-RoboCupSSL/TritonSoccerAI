@@ -9,6 +9,8 @@ import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
+import Triton.Dependencies.PerspectiveConverter;
+import Triton.Dependencies.Shape.Circle2D;
 import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
 import Triton.Dependencies.Shape.Line2D;
@@ -30,18 +32,20 @@ import java.util.TimerTask;
  */
 public class Display extends JPanel {
 
-    private final Subscriber<SSL_GeometryFieldSize> fieldSizeSub;
+    private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
+    private final Subscriber<Circle2D> fieldCenterSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
-    private SSL_GeometryFieldSize fieldSize;
     private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
+
     protected Gridify convert;
+
 
     /* Construct a display with robot, ball, and field */
     public Display() {
@@ -49,6 +53,7 @@ public class Display extends JPanel {
 
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
         fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
+        fieldCenterSub = new FieldSubscriber<>("geometry", "fieldCenter");
 
         yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
@@ -80,19 +85,21 @@ public class Display extends JPanel {
         subscribe();
 
         while (true) {
-            fieldSize = fieldSizeSub.getMsg();
+            HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
 
-            if (fieldSize == null || fieldSize.getFieldLength() == 0 || fieldSize.getFieldWidth() == 0
-                    || fieldSize.getGoalDepth() == 0)
+            if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0
+                    || fieldSize.get("fullLength") == 0)
                 continue;
 
-            double fullLength = fieldSize.getFieldLength() + fieldSize.getGoalDepth() * 2.0;
+            int fieldWidth = fieldSize.get("fieldWidth");
+            int fieldLength = fieldSize.get("fieldLength");
+            int fullLength = fieldSize.get("fullLength");
 
             convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
-                    new Vec2D(-fullLength / 2, -fieldSize.getFieldWidth() / 2.0), false, true);
+                    new Vec2D(-fieldWidth / 2.0, -fullLength / 2.0), false, true);
 
-            windowWidth = convert.numCols(fullLength);
-            windowHeight = convert.numRows(fieldSize.getFieldWidth());
+            windowWidth = convert.numCols(fieldWidth);
+            windowHeight = convert.numRows(fullLength);
             break;
         }
 
@@ -118,6 +125,7 @@ public class Display extends JPanel {
         try {
             fieldSizeSub.subscribe(1000);
             fieldLinesSub.subscribe(1000);
+            fieldCenterSub.subscribe(1000);
             for (Subscriber<RobotData> robotSub : yellowRobotSubs)
                 robotSub.subscribe(1000);
             for (Subscriber<RobotData> robotSub : blueRobotSubs)
@@ -152,20 +160,19 @@ public class Display extends JPanel {
         fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
                 return;
-            int[] p1 = convert.fromPos(line.p1);
-            int[] p2 = convert.fromPos(line.p2);
+            int[] p1 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p1));
+            int[] p2 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p2));
             g2d.setColor(Color.WHITE);
             g2d.setStroke(new BasicStroke(2));
             g2d.drawLine(p1[0], p1[1], p2[0], p2[1]);
         });
 
-        for (SSL_FieldCicularArc arc : fieldSize.getFieldArcsList()) {
-            int[] center = convert.fromPos(new Vec2D(arc.getCenter().getX(), arc.getCenter().getY()));
-            int radius = (int) (arc.getRadius() * DisplayConfig.SCALE);
+        Circle2D center = fieldCenterSub.getMsg();
+        int[] centerPos = convert.fromPos(new Vec2D(center.center.x, center.center.y));
+        int centerRadius = (int) (center.radius * DisplayConfig.SCALE);
 
-            g2d.drawArc(center[0] - radius, center[1] - radius, radius * 2, radius * 2,
-                    (int) Math.toDegrees(arc.getA1()), (int) Math.toDegrees(arc.getA2()));
-        }
+        g2d.drawArc(centerPos[0] - centerRadius, centerPos[1] - centerRadius, centerRadius * 2,
+                centerRadius * 2, 0, 360);
     }
 
     /**
@@ -182,8 +189,9 @@ public class Display extends JPanel {
 
         for (RobotData robot : yellowRobots) {
             int[] pos = convert.fromPos(robot.getPos());
-            double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(-orient, ImgLoader.yellowRobot.getWidth() / 2.0,
+            double angle = robot.getAngle() + 180;
+
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.yellowRobot.getWidth() / 2.0,
                     ImgLoader.yellowRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
@@ -196,8 +204,9 @@ public class Display extends JPanel {
 
         for (RobotData robot : blueRobots) {
             int[] pos = convert.fromPos(robot.getPos());
-            double orient = robot.getOrient();
-            AffineTransform tx = AffineTransform.getRotateInstance(-orient, ImgLoader.blueRobot.getWidth() / 2.0,
+            double angle = robot.getAngle() + 180;
+
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.blueRobot.getWidth() / 2.0,
                     ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
@@ -209,8 +218,8 @@ public class Display extends JPanel {
         }
 
         BallData ball = ballSub.getMsg();
-        int[] ballPos = convert.fromPos(ball.getPos());
-        g2d.drawImage(ImgLoader.ball, ballPos[0], ballPos[1], null);
+        int[] pos = convert.fromPos(ball.getPos());
+        g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
     }
 
     /**

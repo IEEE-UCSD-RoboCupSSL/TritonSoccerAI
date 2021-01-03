@@ -3,7 +3,7 @@ package Triton;
 import Triton.Algorithms.AI;
 import Triton.Config.ObjectConfig;
 import Triton.Modules.Detection.DetectionModule;
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 import Triton.Modules.Geometry.GeometryModule;
 import Triton.Modules.Vision.VisionModule;
 import Triton.Objects.Ally;

@@ -1,4 +1,4 @@
-package Triton.Modules.Detection;
+package Triton.Dependencies;
 
 /**
  * Enum representing the two teams

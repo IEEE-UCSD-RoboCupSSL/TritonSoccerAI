@@ -1,6 +1,6 @@
 package Triton.Objects;
 
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 
 public class Foe extends Robot {
 

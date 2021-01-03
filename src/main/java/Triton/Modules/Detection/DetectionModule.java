@@ -5,6 +5,7 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
+import Triton.Dependencies.Team;
 
 import java.util.ArrayList;
 

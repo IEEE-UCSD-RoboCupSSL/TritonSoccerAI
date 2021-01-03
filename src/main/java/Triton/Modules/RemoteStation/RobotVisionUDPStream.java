@@ -5,7 +5,7 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 
 import java.util.concurrent.TimeoutException;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class RobotVisionUDPStream extends RobotUDPStreamSend {
 
-    private final Subscriber<RobotData> robotSub;
+    private final Subscriber<RobotData> allySub;
     private final Subscriber<BallData> ballSub;
 
     /**
@@ -26,10 +26,10 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     public RobotVisionUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, ID);
         if(team == Team.BLUE) {
-            robotSub = new FieldSubscriber<>("detection", "blue robot data" + ID);
+            allySub = new FieldSubscriber<>("detection", "blue robot data" + ID);
         }
         else {
-            robotSub = new FieldSubscriber<>("detection", "yellow robot data" + ID);
+            allySub = new FieldSubscriber<>("detection", "yellow robot data" + ID);
         }
         ballSub = new FieldSubscriber<>("detection", "ball");
     }
@@ -47,7 +47,7 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
      */
     private void subscribe() {
         try {
-            robotSub.subscribe(1000);
+            allySub.subscribe(1000);
             ballSub.subscribe(1000);
         } catch (TimeoutException e) {
             e.printStackTrace();
@@ -58,23 +58,18 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
      * Sends vision data
      */
     private void sendVision() {
-        RobotData robotData;
-        BallData ballData;
+        RobotData allyData = allySub.getMsg();
+        BallData ballData = ballSub.getMsg();
 
-        robotData = robotSub.getMsg();
-        ballData = ballSub.getMsg();
         byte[] bytes;
-
         VisionData.Builder toSend = VisionData.newBuilder();
-        toSend.setBotPos(robotData.getPos().toProto());
-        toSend.setBotVel(robotData.getVel().toProto());
-        toSend.setBotAng(robotData.getOrient());
-        toSend.setBotAngVel(robotData.getAngularVelocity());
+        toSend.setBotPos(allyData.getPos().toProto());
+        toSend.setBotVel(allyData.getVel().toProto());
+        toSend.setBotAng(allyData.getAngle());
+        toSend.setBotAngVel(allyData.getAngVel());
         toSend.setBallPos(ballData.getPos().toProto());
         toSend.setBallVel(ballData.getVel().toProto());
         bytes = toSend.build().toByteArray();
         send(bytes);
-
-        // System.out.println(toSend.toString());
     }
 }

@@ -1,7 +1,7 @@
 package Triton.Modules.RemoteStation;
 
 import Triton.Config.ConnectionConfig;
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 
 /**
  * Contains all connections of a single robot
