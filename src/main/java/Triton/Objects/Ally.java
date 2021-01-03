@@ -65,8 +65,8 @@ public class Ally extends Robot {
 
         commandsPub = new MQPublisher<>("commands", "" + ID);
 
-        //conn.buildTcpConnection();
-        //conn.buildCommandUDP();
+        conn.buildTcpConnection();
+        conn.buildCommandUDP();
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
         conn.buildVisionStream(team);
     }
@@ -107,11 +107,11 @@ public class Ally extends Robot {
             super.run();
             initPathfinder();
 
-            //conn.getTCPConnection().connect();
-            //conn.getTCPConnection().sendInit();
+            conn.getTCPConnection().connect();
+            conn.getTCPConnection().sendInit();
 
-            //pool.execute(conn.getTCPConnection());
-            //pool.execute(conn.getCommandStream());
+            pool.execute(conn.getTCPConnection());
+            pool.execute(conn.getCommandStream());
             // pool.execute(conn.getDataStream());
             pool.execute(conn.getVisionStream());
 
