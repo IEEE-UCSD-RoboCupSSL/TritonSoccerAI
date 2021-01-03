@@ -39,7 +39,6 @@ public class Display extends JPanel {
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
-    private HashMap<String, Integer> fieldSize;
     private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
@@ -86,7 +85,7 @@ public class Display extends JPanel {
         subscribe();
 
         while (true) {
-            fieldSize = fieldSizeSub.getMsg();
+            HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
 
             if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0
                     || fieldSize.get("fullLength") == 0)
@@ -97,10 +96,10 @@ public class Display extends JPanel {
             int fullLength = fieldSize.get("fullLength");
 
             convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
-                    new Vec2D(-fullLength / 2.0, -fieldWidth / 2.0), false, true);
+                    new Vec2D(-fieldWidth / 2.0, -fullLength / 2.0), false, true);
 
-            windowWidth = convert.numCols(fullLength);
-            windowHeight = convert.numRows(fieldWidth);
+            windowWidth = convert.numCols(fieldWidth);
+            windowHeight = convert.numRows(fullLength);
             break;
         }
 
@@ -161,8 +160,8 @@ public class Display extends JPanel {
         fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
                 return;
-            int[] p1 = convert.fromPos(line.p1);
-            int[] p2 = convert.fromPos(line.p2);
+            int[] p1 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p1));
+            int[] p2 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p2));
             g2d.setColor(Color.WHITE);
             g2d.setStroke(new BasicStroke(2));
             g2d.drawLine(p1[0], p1[1], p2[0], p2[1]);
@@ -189,40 +188,38 @@ public class Display extends JPanel {
         }
 
         for (RobotData robot : yellowRobots) {
-            int[] audiencePos = convert.fromPos(PerspectiveConverter.playerToAudience(robot.getPos()));
-            double angle = robot.getAngle();
-            double audienceAngle = PerspectiveConverter.playerToAudience(angle);
+            int[] pos = convert.fromPos(robot.getPos());
+            double angle = robot.getAngle() + 180;
 
-            AffineTransform tx = AffineTransform.getRotateInstance(-audienceAngle, ImgLoader.yellowRobot.getWidth() / 2.0,
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.yellowRobot.getWidth() / 2.0,
                     ImgLoader.yellowRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            int imgX = audiencePos[0] - ImgLoader.yellowRobot.getWidth() / 2;
-            int imgY = audiencePos[1] - ImgLoader.yellowRobot.getHeight() / 2;
+            int imgX = pos[0] - ImgLoader.yellowRobot.getWidth() / 2;
+            int imgY = pos[1] - ImgLoader.yellowRobot.getHeight() / 2;
             g2d.drawImage(op.filter(ImgLoader.yellowRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), audiencePos[0] - 5, audiencePos[1] - 25);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
         for (RobotData robot : blueRobots) {
-            int[] audiencePos = convert.fromPos(PerspectiveConverter.playerToAudience(robot.getPos()));
-            double angle = robot.getAngle();
-            double audienceAngle = PerspectiveConverter.playerToAudience(angle);
+            int[] pos = convert.fromPos(robot.getPos());
+            double angle = robot.getAngle() + 180;
 
-            AffineTransform tx = AffineTransform.getRotateInstance(-audienceAngle, ImgLoader.blueRobot.getWidth() / 2.0,
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.blueRobot.getWidth() / 2.0,
                     ImgLoader.blueRobot.getWidth() / 2.0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            int imgX = audiencePos[0] - ImgLoader.blueRobot.getWidth() / 2;
-            int imgY = audiencePos[1] - ImgLoader.blueRobot.getHeight() / 2;
+            int imgX = pos[0] - ImgLoader.blueRobot.getWidth() / 2;
+            int imgY = pos[1] - ImgLoader.blueRobot.getHeight() / 2;
             g2d.drawImage(op.filter(ImgLoader.blueRobot, null), imgX, imgY, null);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), audiencePos[0] - 5, audiencePos[1] - 25);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
 
         BallData ball = ballSub.getMsg();
-        int[] audiencePos = convert.fromPos(PerspectiveConverter.playerToAudience(ball.getPos()));
-        g2d.drawImage(ImgLoader.ball, audiencePos[0], audiencePos[1], null);
+        int[] pos = convert.fromPos(ball.getPos());
+        g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
     }
 
     /**
