@@ -5,14 +5,13 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Modules.Detection.RobotData;
-import Triton.Modules.Detection.Team;
+import Triton.Dependencies.Team;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * TCP connection to robot
@@ -26,7 +25,7 @@ public class RobotTCPConnection implements Module {
     private PrintWriter out;
     private BufferedReader in;
 
-    private final Subscriber<RobotData> robotDataSub;
+    private final Subscriber<RobotData> allySub;
     private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
 
@@ -42,7 +41,7 @@ public class RobotTCPConnection implements Module {
         this.ID = ID;
 
         String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        robotDataSub = new FieldSubscriber<>("detection", name);
+        allySub = new FieldSubscriber<>("detection", name);
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
     }
 
@@ -69,9 +68,9 @@ public class RobotTCPConnection implements Module {
      */
     public void sendInit() {
         subscribe();
-        RobotData data = robotDataSub.getMsg();
+        RobotData allyData = allySub.getMsg();
 
-        String str = String.format("init %d %d", (int) -data.getPos().y, (int) data.getPos().x);
+        String str = String.format("init %d %d", (int) allyData.getPos().x, (int) allyData.getPos().y);
         out.println(str);
 
         try {
@@ -91,7 +90,7 @@ public class RobotTCPConnection implements Module {
      */
     private void subscribe() {
         try {
-            robotDataSub.subscribe(1000);
+            allySub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
