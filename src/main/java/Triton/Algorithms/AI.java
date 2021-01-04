@@ -31,7 +31,7 @@ public class AI implements Module {
                 Vec2D target = ballPos.add(dirOffset);
                 Vec2D allyToBall = ballPos.sub(allyPos);
                 ally.moveTo(target);
-                ally.rotateTo(allyToBall.toAngle() - 90);
+                ally.rotateTo(allyToBall.toAngle());
                 ally.kick(new Vec2D(4, 4));
             }
         }

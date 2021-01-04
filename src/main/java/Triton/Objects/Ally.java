@@ -233,7 +233,7 @@ public class Ally extends Robot {
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
         }
-        motionSetPoint.setZ(angle != null ? angle : 0);
+        motionSetPoint.setZ(angle != null ? angle - 90 : 0);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
