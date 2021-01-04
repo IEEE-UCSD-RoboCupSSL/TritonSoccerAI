@@ -35,23 +35,5 @@ public class AI implements Module {
                 ally.kick(new Vec2D(4, 4));
             }
         }
-
-//        while (true) {
-//            for (Ally ally : allies) {
-//                if (ally.getID() == 0) {
-//                    long t0;
-//                    t0 = System.currentTimeMillis();
-//                    while (System.currentTimeMillis() - t0 < 2000) {
-//                        ally.rotateTo(90);
-//                        System.out.println(ally.getData().getAngle() + " " + (System.currentTimeMillis() - t0) + "???");
-//                    }
-//                    t0 = System.currentTimeMillis();
-//                    while (System.currentTimeMillis() - t0 < 2000) {
-//                        ally.rotateTo(-90);
-//                        System.out.println(ally.getData().getAngle() + " " + (System.currentTimeMillis() - t0));
-//                    }
-//                }
-//            }
-//        }
     }
 }
