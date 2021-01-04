@@ -22,9 +22,9 @@ public class PerspectiveConverter {
 
     public static double audienceToPlayer(double audienceAngle) {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
-            return audienceAngle - 90;
+            return audienceAngle;
         } else {
-            return audienceAngle + 90;
+            return audienceAngle + 180;
         }
     }
     
@@ -46,9 +46,9 @@ public class PerspectiveConverter {
 
     public static double playerToAudience(double playerAngle) {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
-            return playerAngle + 90;
+            return playerAngle;
         } else {
-            return playerAngle - 90;
+            return playerAngle - 180;
         }
     }
 }

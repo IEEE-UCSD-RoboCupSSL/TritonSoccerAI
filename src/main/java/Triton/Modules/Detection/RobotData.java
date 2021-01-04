@@ -40,7 +40,7 @@ public class RobotData {
 
         Vec2D audienceRobotPos = new Vec2D(detection.getX(), detection.getY());
         pos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
-        double audienceRobotAngle = detection.getOrientation();
+        double audienceRobotAngle = Math.toDegrees(detection.getOrientation());
         angle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);
 
         if (lastPos != null)

@@ -140,12 +140,22 @@ public class Vec2D {
         return diffX2 + diffY2;
     }
 
-    public double toAngle() {
+    /**
+     * @return angle starting from x-axis, positive is counter clockwise
+     */
+    public  double toAngle() {
         if (Math.abs(x) <= 0.00001 || Math.abs(y) <= 0.00001) {
             return 0;
         }
 
         return Math.toDegrees(Math.atan2(y, x));
+    }
+
+    /**
+     * @return angle starting from y-axis, positive is counter clockwise
+     */
+    public double toPlayerAngle() {
+        return toAngle() - 90;
     }
 
     /**
