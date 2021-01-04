@@ -115,8 +115,8 @@ public class Ally extends Robot {
                 publishNextCommand();
             }
         } catch (Exception e) {
+            System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
             e.printStackTrace();
-            //System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass()); //why are we saying that TCP connection failed?
         }
     }
 
