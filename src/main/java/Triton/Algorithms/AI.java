@@ -8,7 +8,7 @@ import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 
 public class AI implements Module {
-    private static final double KICK_DIST = 0;
+    private static final double KICK_DIST = 100;
 
     private final Ally[] allies;
     private final Foe[] foes;
@@ -32,7 +32,7 @@ public class AI implements Module {
                 Vec2D allyToBall = ballPos.sub(allyPos);
                 ally.moveTo(target);
                 ally.rotateTo(allyToBall.toPlayerAngle());
-                ally.kick(new Vec2D(4, 4));
+                //ally.kick(new Vec2D(4, 4));
             }
         }
     }

@@ -11,6 +11,7 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Circle2D;
+import Triton.Dependencies.Team;
 import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
 import Triton.Dependencies.Shape.Line2D;
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -180,46 +182,40 @@ public class Display extends JPanel {
      * @param g2d Graphics2D object to paint to
      */
     private void paintObjects(Graphics2D g2d) {
-        ArrayList<RobotData> yellowRobots = new ArrayList<>();
-        ArrayList<RobotData> blueRobots = new ArrayList<>();
+        ArrayList<RobotData> robots = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
-            blueRobots.add(blueRobotSubs.get(i).getMsg());
+            robots.add(yellowRobotSubs.get(i).getMsg());
+            robots.add(blueRobotSubs.get(i).getMsg());
         }
 
-        for (RobotData robot : yellowRobots) {
-            int[] pos = convert.fromPos(robot.getPos());
-            double angle = Math.toRadians(robot.getAngle() + 180);
-
-            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.yellowRobot.getWidth() / 2.0,
-                    ImgLoader.yellowRobot.getWidth() / 2.0);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-            int imgX = pos[0] - ImgLoader.yellowRobot.getWidth() / 2;
-            int imgY = pos[1] - ImgLoader.yellowRobot.getHeight() / 2;
-            g2d.drawImage(op.filter(ImgLoader.yellowRobot, null), imgX, imgY, null);
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
-        }
-
-        for (RobotData robot : blueRobots) {
-            int[] pos = convert.fromPos(robot.getPos());
-            double angle = Math.toRadians(robot.getAngle() + 180);
-
-            AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.blueRobot.getWidth() / 2.0,
-                    ImgLoader.blueRobot.getWidth() / 2.0);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-            int imgX = pos[0] - ImgLoader.blueRobot.getWidth() / 2;
-            int imgY = pos[1] - ImgLoader.blueRobot.getHeight() / 2;
-            g2d.drawImage(op.filter(ImgLoader.blueRobot, null), imgX, imgY, null);
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
-        }
+        paintRobots(g2d, robots);
 
         BallData ball = ballSub.getMsg();
         int[] pos = convert.fromPos(ball.getPos());
         g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
+    }
+
+    private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
+        for (RobotData robot : robots) {
+            BufferedImage img;
+            if (robot.getTeam() == Team.BLUE)
+                img = ImgLoader.blueRobot;
+            else
+                img = ImgLoader.yellowRobot;
+
+            int[] pos = convert.fromPos(robot.getPos());
+            double angle = Math.toRadians(robot.getAngle() + 90);
+
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
+                    img.getWidth() / 2.0);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+            int imgX = pos[0] - img.getWidth() / 2;
+            int imgY = pos[1] - img.getHeight() / 2;
+            g2d.drawImage(op.filter(img, null), imgX, imgY, null);
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
+        }
     }
 
     /**

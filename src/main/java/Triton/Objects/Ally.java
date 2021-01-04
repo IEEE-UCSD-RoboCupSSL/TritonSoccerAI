@@ -115,7 +115,8 @@ public class Ally extends Robot {
                 publishNextCommand();
             }
         } catch (Exception e) {
-            System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
+            e.printStackTrace();
+            //System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass()); //why are we saying that TCP connection failed?
         }
     }
 
@@ -223,13 +224,19 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        if (path != null && path.size() > 1) {
-            Vec2D nextNode = path.get(1);
-            command.setMode(path.size() > 2 ? 4 : 0);
+        if (path != null && path.size() > 0) {
+            Vec2D nextNode;
+            if (path.size() == 1) {
+                command.setMode(0);
+                nextNode = path.get(0);
+            } else {
+                command.setMode(4);
+                nextNode = path.get(1);
+            }
             motionSetPoint.setX(nextNode.x);
             motionSetPoint.setY(nextNode.y);
         } else {
-            command.setMode(0);
+            command.setMode(3);
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
         }
