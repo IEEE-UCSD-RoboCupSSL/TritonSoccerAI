@@ -189,7 +189,7 @@ public class Display extends JPanel {
 
         for (RobotData robot : yellowRobots) {
             int[] pos = convert.fromPos(robot.getPos());
-            double angle = robot.getAngle() + 180;
+            double angle = Math.toRadians(robot.getAngle() + 180);
 
             AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.yellowRobot.getWidth() / 2.0,
                     ImgLoader.yellowRobot.getWidth() / 2.0);
@@ -204,7 +204,7 @@ public class Display extends JPanel {
 
         for (RobotData robot : blueRobots) {
             int[] pos = convert.fromPos(robot.getPos());
-            double angle = robot.getAngle() + 180;
+            double angle = Math.toRadians(robot.getAngle() + 180);
 
             AffineTransform tx = AffineTransform.getRotateInstance(-angle, ImgLoader.blueRobot.getWidth() / 2.0,
                     ImgLoader.blueRobot.getWidth() / 2.0);
