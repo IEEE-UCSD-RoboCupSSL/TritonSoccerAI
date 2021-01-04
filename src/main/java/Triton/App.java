@@ -1,6 +1,6 @@
 package Triton;
 
-import Triton.Algorithms.AI;
+import Triton.AI.AI;
 import Triton.Config.ObjectConfig;
 import Triton.Modules.Detection.DetectionModule;
 import Triton.Dependencies.Team;
@@ -9,6 +9,7 @@ import Triton.Modules.Vision.VisionModule;
 import Triton.Objects.Ally;
 import Triton.Objects.Ball;
 import Triton.Objects.Foe;
+import Triton.Testers.TestRobot;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -77,8 +78,8 @@ public class App {
         Ball ball = new Ball();
         pool.submit(ball);
 
-        Runnable ai = new AI(allies, foes, ball);
-        pool.submit(ai);
+        Runnable testRobot = new TestRobot(allies[0], ball);
+        pool.submit(testRobot);
 
         allies[0].displayPathFinder();
     }

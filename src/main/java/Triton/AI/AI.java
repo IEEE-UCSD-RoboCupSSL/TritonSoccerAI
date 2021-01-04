@@ -1,6 +1,5 @@
-package Triton.Algorithms;
+package Triton.AI;
 
-import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Objects.Ally;
@@ -30,9 +29,7 @@ public class AI implements Module {
                 Vec2D dirOffset = dirBallToAlly.mult(KICK_DIST);
                 Vec2D target = ballPos.add(dirOffset);
                 Vec2D allyToBall = ballPos.sub(allyPos);
-                ally.moveTo(target);
-                ally.rotateTo(allyToBall.toPlayerAngle());
-                //ally.kick(new Vec2D(4, 4));
+                ally.pathTo(target, allyToBall.toPlayerAngle());
             }
         }
     }
