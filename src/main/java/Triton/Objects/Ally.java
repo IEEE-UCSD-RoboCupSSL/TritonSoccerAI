@@ -366,24 +366,32 @@ public class Ally extends Robot {
         ArrayList<Vec2D> path = findPath(endPoint);
 
         if (path != null && path.size() > 0) {
+            double angle = 0;
             Vec2D pos = getData().getPos();
-            Vec2D dest = path.get(path.size() - 1);
-            double angle = dest.sub(pos).toPlayerAngle();
+            boolean rotatingToThresholdPoint = false;
             for (Vec2D node : path) {
                 double dist = node.sub(pos).mag();
                 if (dist >= PathfinderConfig.ANGLE_SWITCH_SPRINT_DIST_THRESH) {
                     angle = node.sub(pos).toPlayerAngle();
+                    rotatingToThresholdPoint = true;
                     break;
                 }
             }
-            motionSetPoint.setZ(angle);
+
+            if (rotatingToThresholdPoint) {
+                Vec2D dest = path.get(path.size() - 1);
+                angle = dest.sub(pos).toPlayerAngle();
+                motionSetPoint.setZ(angle);
+            } else {
+                motionSetPoint.setZ(angle);
+            }
 
             double currAngle = getData().getAngle();
             double angDiff = angle - currAngle;
             angDiff = (angDiff > 180) ? angDiff - 360 : angDiff;
             angDiff = (angDiff < -180) ? angDiff + 360 : angDiff;
             double absAngleDiff = Math.abs(angDiff);
-            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+            if (rotatingToThresholdPoint && absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
                 Vec2D nextNode;
                 if (path.size() == 1) {
                     command.setMode(TDRD);
