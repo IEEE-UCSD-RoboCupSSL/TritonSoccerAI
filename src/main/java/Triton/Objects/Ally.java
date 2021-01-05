@@ -7,8 +7,8 @@ import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.Modules.Detection.RobotData;
 import Triton.Dependencies.Team;
+import Triton.Modules.Detection.RobotData;
 import Triton.Modules.RemoteStation.RobotConnection;
 
 import java.util.ArrayList;
@@ -19,31 +19,25 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Ally extends Robot {
     private final RobotConnection conn;
-    protected ThreadPoolExecutor pool;
-    private PathFinder pathFinder;
+    /**
+     * external pub sub
+     **/
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Publisher<RemoteAPI.Commands> commandsPub;
-
-    private boolean usePrimitiveCommands;
-    private boolean useAsVel = true;
-    private boolean useAsAngVel = true;
-
-    private boolean autoCap;
-    private Vec2D point;
-    private ArrayList<Vec2D> path;
-    private Double angle;
-    private Vec2D kickVel;
-
-    private final Publisher<Boolean> autoCapPub;
-    private final Subscriber<Boolean> autoCapSub;
-    private final Publisher<Vec2D> pointPub;
-    private final Subscriber<Vec2D> pointSub;
+    /**
+     * internal pub sub
+     **/
+    private final Publisher<Boolean> usePrimitiveCmdPub, useAsVelPub, useAsAngVelPub, autoCapPub;
+    private final Subscriber<Boolean> usePrimitiveCmdSub, useAsVelSub, useAsAngVelSub, autoCapSub;
+    private final Publisher<Vec2D> pointPub, kickVelPub;
+    private final Subscriber<Vec2D> pointSub, kickVelSub;
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
-    private final Publisher<Vec2D> kickVelPub;
-    private final Subscriber<Vec2D> kickVelSub;
+
+    protected ThreadPoolExecutor pool;
+    private PathFinder pathFinder;
 
     public Ally(Team team, int ID, ThreadPoolExecutor pool) {
         super(team, ID);
@@ -61,15 +55,19 @@ public class Ally extends Robot {
             blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
         }
 
+        usePrimitiveCmdPub = new FieldPublisher<>("Ally usePrimitiveCmd", "" + ID, null);
+        usePrimitiveCmdSub = new FieldSubscriber<>("Ally usePrimitiveCmd", "" + ID);
+        useAsVelPub = new FieldPublisher<>("Ally useAsVelPub", "" + ID, true);
+        useAsVelSub = new FieldSubscriber<>("Ally useAsVelPub", "" + ID);
+        useAsAngVelPub = new FieldPublisher<>("Ally useAsAngVelPub", "" + ID, true);
+        useAsAngVelSub = new FieldSubscriber<>("Ally useAsAngVelPub", "" + ID);
+
         autoCapPub = new FieldPublisher<>("Ally autoCap", "" + ID, null);
         autoCapSub = new FieldSubscriber<>("Ally autoCap", "" + ID);
-
         pointPub = new FieldPublisher<>("Ally point", "" + ID, null);
         pointSub = new FieldSubscriber<>("Ally point", "" + ID);
-
         angPub = new FieldPublisher<>("Ally ang", "" + ID, null);
         angSub = new FieldSubscriber<>("Ally ang", "" + ID);
-
         kickVelPub = new FieldPublisher<>("Ally kickVel", "" + ID, null);
         kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + ID);
 
@@ -92,8 +90,8 @@ public class Ally extends Robot {
      * @param loc player perspective, millimeter
      */
     public void moveTo(Vec2D loc) {
-        usePrimitiveCommands = true;
-        useAsVel = false;
+        usePrimitiveCmdPub.publish(true);
+        useAsVelPub.publish(false);
         pointPub.publish(loc);
     }
 
@@ -101,8 +99,8 @@ public class Ally extends Robot {
      * @param vel player perspective, vector with unit as percentage from -100 to 100
      */
     public void moveAt(Vec2D vel) {
-        usePrimitiveCommands = true;
-        useAsVel = true;
+        usePrimitiveCmdPub.publish(true);
+        useAsVelPub.publish(true);
         pointPub.publish(vel);
     }
 
@@ -110,8 +108,8 @@ public class Ally extends Robot {
      * @param angle player perspective, degrees, starting from y-axis, positive is counter clockwise
      */
     public void spinTo(double angle) {
-        usePrimitiveCommands = true;
-        useAsAngVel = false;
+        usePrimitiveCmdPub.publish(true);
+        useAsAngVelPub.publish(false);
         angPub.publish(angle);
     }
 
@@ -119,8 +117,8 @@ public class Ally extends Robot {
      * @param angVel unit is percentage from -100 to 100, positive is counter clockwise
      */
     public void spinAt(double angVel) {
-        usePrimitiveCommands = true;
-        useAsAngVel = true;
+        usePrimitiveCmdPub.publish(true);
+        useAsAngVelPub.publish(true);
         angPub.publish(angVel);
     }
 
@@ -132,25 +130,25 @@ public class Ally extends Robot {
     /*** advanced control methods ***/
     // runs in the caller thread
     public void pathTo(Vec2D endPoint, double angle) {
-        usePrimitiveCommands = false;
+        usePrimitiveCmdPub.publish(false);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
 
     public void rotateTo(double angle) {
-        usePrimitiveCommands = false;
+        usePrimitiveCmdPub.publish(false);
     }
 
     public void getBall() {
-        usePrimitiveCommands = false;
+        usePrimitiveCmdPub.publish(false);
     }
 
     public void intercept() {
-        usePrimitiveCommands = false;
+        usePrimitiveCmdPub.publish(false);
     }
 
     public void pass() {
-        usePrimitiveCommands = false;
+        usePrimitiveCmdPub.publish(false);
     }
 
     // Everything in run() runs in the Ally Thread
@@ -186,6 +184,11 @@ public class Ally extends Robot {
                 yellowRobotSubs.get(i).subscribe();
                 blueRobotSubs.get(i).subscribe();
             }
+
+            usePrimitiveCmdSub.subscribe();
+            useAsVelSub.subscribe();
+            useAsAngVelSub.subscribe();
+
             autoCapSub.subscribe();
             pointSub.subscribe();
             angSub.subscribe();
@@ -217,11 +220,17 @@ public class Ally extends Robot {
      */
     private void publishCommand() {
         RemoteAPI.Commands command;
-        if (usePrimitiveCommands) {
-            command = createPrimitiveCommand();
+        Boolean usePrimitiveCmd = usePrimitiveCmdSub.getMsg();
+        if (usePrimitiveCmd != null) {
+            if (usePrimitiveCmd) {
+                command = createPrimitiveCommand();
+            } else {
+                command = createAdvancedCommand();
+            }
         } else {
-            command = createAdvancedCommand();
+            command = createPrimitiveCommand();
         }
+
         commandsPub.publish(command);
     }
 
@@ -237,18 +246,18 @@ public class Ally extends Robot {
         }
 
         int mode;
+        Boolean useAsVel = useAsVelSub.getMsg();
+        Boolean useAsAngVel = useAsAngVelSub.getMsg();
         if (useAsVel) {
             if (useAsAngVel) {
                 mode = 3; // TVRV
-            }
-            else {
+            } else {
                 mode = 2; // TVRD
             }
         } else {
             if (useAsAngVel) {
                 mode = 1; // TDRV
-            }
-            else {
+            } else {
                 mode = 0; // TDRD
             }
         }
@@ -288,7 +297,7 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(Objects.requireNonNullElse(autoCap, false));
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        ArrayList<Vec2D> path =  findPath();
+        ArrayList<Vec2D> path = findPath();
         if (path != null && path.size() > 0) {
             Vec2D nextNode;
             if (path.size() == 1) {

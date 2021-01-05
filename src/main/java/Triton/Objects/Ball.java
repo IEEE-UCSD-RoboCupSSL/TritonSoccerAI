@@ -2,6 +2,7 @@ package Triton.Objects;
 
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
+import Triton.Dependencies.Shape.Vec2D;
 import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
 
