@@ -20,14 +20,37 @@ public class TestRobot implements Module {
     public void run() {
         while (true) {
             try {
-                TDRD(1000, 1000, 45);
-                Thread.sleep(2000);
-                TDRV(1000, -1000, 100);
-                Thread.sleep(2000);
-                TVRD(-100, 0, -45);
-                Thread.sleep(2000);
-                TVRV(0, 100, -20);
-                Thread.sleep(2000);
+//                System.out.println("SPIN TO 90");
+//                ally.spinTo(90);
+//                Thread.sleep(2000);
+//
+//                System.out.println("SPIN TO -90");
+//                ally.spinTo(-90);
+//                Thread.sleep(2000);
+//
+//                System.out.println("ROTATE TO 90");
+//                ally.rotateTo(90);
+//                Thread.sleep(2000);
+//
+//                System.out.println("ROTATE TO -90");
+//                ally.rotateTo(-90);
+//                Thread.sleep(2000);
+
+                System.out.println("PATH TO 0, 2000");
+                ally.pathTo(new Vec2D(0, 2000), 90);
+                Thread.sleep(6000);
+
+                System.out.println("PATH TO 0, -2000");
+                ally.pathTo(new Vec2D(0, -2000), 90);
+                Thread.sleep(6000);
+
+                System.out.println("SPRINT TO 0, 2000");
+                ally.sprintTo(new Vec2D(0, 2000));
+                Thread.sleep(6000);
+
+                System.out.println("SPRINT TO 0, -2000");
+                ally.sprintTo(new Vec2D(0, -2000));
+                Thread.sleep(6000);
             } catch (Exception e) {
                 e.printStackTrace();
             }

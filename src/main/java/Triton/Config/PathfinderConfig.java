@@ -12,6 +12,9 @@ public class PathfinderConfig {
             + PathfinderConfig.ADD_DIST;
     public static final double BOUNDARY_EXTENSION = 800;
 
+    public static final double ANGLE_SWITCH_SPRINT_DIST_THRESH = 100;
+    public static final double MOVE_ANGLE_THRESH = 20;
+    public static final double RD_SWITCH_ROTATE_ANGLE_THRESH = 10;
     public static final double OVERSHOOT_DIST = 3000;
     public static final double BALL_CATCH_DIST = 500;
 }
