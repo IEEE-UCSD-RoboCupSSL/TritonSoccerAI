@@ -323,6 +323,9 @@ public class Ally extends Robot {
             if (path.size() == 1) {
                 command.setMode(TDRD);
                 nextNode = path.get(0);
+            } else if (path.size() == 2) {
+                command.setMode(TDRD);
+                nextNode = path.get(1);
             } else {
                 command.setMode(NSTDRD);
                 nextNode = path.get(1);
@@ -384,6 +387,9 @@ public class Ally extends Robot {
                 if (path.size() == 1) {
                     command.setMode(TDRD);
                     nextNode = path.get(0);
+                } else if (path.size() == 2) {
+                    command.setMode(TDRD);
+                    nextNode = path.get(1);
                 } else {
                     command.setMode(NSTDRD);
                     nextNode = path.get(1);
