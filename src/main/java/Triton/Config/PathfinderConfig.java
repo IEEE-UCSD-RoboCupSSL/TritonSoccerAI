@@ -12,7 +12,7 @@ public class PathfinderConfig {
             + PathfinderConfig.ADD_DIST;
     public static final double BOUNDARY_EXTENSION = 800;
 
-    public static final double ANGLE_SWITCH_SPRINT_DIST_THRESH = 200;
+    public static final double SPRINT_TO_ROTATE_DIST_THRESH = 1000;
     public static final double MOVE_ANGLE_THRESH = 20;
     public static final double RD_SWITCH_ROTATE_ANGLE_THRESH = 10;
     public static final double OVERSHOOT_DIST = 3000;

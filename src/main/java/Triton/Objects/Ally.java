@@ -360,7 +360,7 @@ public class Ally extends Robot {
             boolean rotatingToThresholdPoint = false;
             for (Vec2D node : path) {
                 double dist = node.sub(pos).mag();
-                if (dist >= PathfinderConfig.ANGLE_SWITCH_SPRINT_DIST_THRESH) {
+                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
                     angle = node.sub(pos).toPlayerAngle();
                     rotatingToThresholdPoint = true;
                     break;
