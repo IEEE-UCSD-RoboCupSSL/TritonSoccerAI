@@ -45,6 +45,17 @@ public class App {
     private final static int MAX_THREADS = 100;
 
     public static void main(String[] args) {
+        if (args.length != 0) {
+            switch (args[0]) {
+                case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
+                case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
+                default -> {
+                    System.out.println("Invalid team");
+                    return;
+                }
+            }
+        }
+
         ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         Runnable visionModule = new VisionModule();
