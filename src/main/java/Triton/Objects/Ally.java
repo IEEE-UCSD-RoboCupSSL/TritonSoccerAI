@@ -378,7 +378,8 @@ public class Ally extends Robot {
             angDiff = (angDiff > 180) ? angDiff - 360 : angDiff;
             angDiff = (angDiff < -180) ? angDiff + 360 : angDiff;
             double absAngleDiff = Math.abs(angDiff);
-            if (rotatingToThresholdPoint && absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+
+            if (!rotatingToThresholdPoint || absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
                 Vec2D nextNode;
                 if (path.size() == 1) {
                     command.setMode(TDRD);
