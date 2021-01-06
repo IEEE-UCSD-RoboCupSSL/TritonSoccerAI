@@ -15,8 +15,7 @@ public abstract class Robot implements Module {
         this.team = team;
         this.ID = ID;
 
-        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        dataSub = new FieldSubscriber<>("detection", name);
+        dataSub = new FieldSubscriber<>("detection", team.name() + ID);
     }
 
     protected void subscribe() {

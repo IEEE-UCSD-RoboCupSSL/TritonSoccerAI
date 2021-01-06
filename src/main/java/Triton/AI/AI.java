@@ -5,6 +5,7 @@ import Triton.Dependencies.Shape.Vec2D;
 import Triton.Objects.Ally;
 import Triton.Objects.Ball;
 import Triton.Objects.Foe;
+import Triton.Objects.Robot;
 
 public class AI implements Module {
     private static final double KICK_DIST = 100;

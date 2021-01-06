@@ -2,8 +2,8 @@ package Triton;
 
 import Triton.AI.AI;
 import Triton.Config.ObjectConfig;
-import Triton.Modules.Detection.DetectionModule;
 import Triton.Dependencies.Team;
+import Triton.Modules.Detection.DetectionModule;
 import Triton.Modules.Geometry.GeometryModule;
 import Triton.Modules.Vision.VisionModule;
 import Triton.Objects.Ally;
@@ -45,12 +45,12 @@ public class App {
     private final static int MAX_THREADS = 100;
 
     public static void main(String[] args) {
-        if (args.length != 0) {
+        if (args != null && args.length > 0) {
             switch (args[0]) {
                 case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
                 case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
                 default -> {
-                    System.out.println("Invalid team");
+                    System.out.println("Error: Invalid Team");
                     return;
                 }
             }
@@ -72,22 +72,23 @@ public class App {
             e.printStackTrace();
         }
 
+        Ball ball = new Ball();
+        pool.submit(ball);
+
         Ally[] allies = new Ally[ObjectConfig.ROBOT_COUNT];
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Ally ally = new Ally(Team.BLUE, i, pool);
+            Ally ally = new Ally(ObjectConfig.MY_TEAM, i, pool);
             allies[i] = ally;
             pool.submit(ally);
         }
 
+        Team foeTeam = (ObjectConfig.MY_TEAM == Team.BLUE) ? Team.YELLOW : Team.BLUE;
         Foe[] foes = new Foe[ObjectConfig.ROBOT_COUNT];
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Foe foe = new Foe(Team.YELLOW, i);
+            Foe foe = new Foe(foeTeam, i);
             foes[i] = foe;
             pool.submit(foe);
         }
-
-        Ball ball = new Ball();
-        pool.submit(ball);
 
         Runnable testRobot = new TestRobot(allies[0], ball);
         pool.submit(testRobot);

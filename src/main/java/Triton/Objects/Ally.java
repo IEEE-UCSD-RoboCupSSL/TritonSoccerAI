@@ -50,14 +50,13 @@ public class Ally extends Robot {
 
         conn = new RobotConnection(ID);
 
-        String name = (team == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
 
-        yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
+        yellowRobotSubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotSubs.add(new FieldSubscriber<>("detection", "yellow robot data" + i));
-            blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
         }
 
         statePub = new FieldPublisher<>("Ally state", "" + ID, AllyState.TVRV);

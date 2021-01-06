@@ -40,8 +40,7 @@ public class RobotTCPConnection implements Module {
         this.port = port;
         this.ID = ID;
 
-        String name = (ObjectConfig.MY_TEAM == Team.YELLOW) ? "yellow robot data" + ID : "blue robot data" + ID;
-        allySub = new FieldSubscriber<>("detection", name);
+        allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
     }
 

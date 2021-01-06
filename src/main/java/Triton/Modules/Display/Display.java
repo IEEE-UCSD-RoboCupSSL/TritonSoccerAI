@@ -60,8 +60,8 @@ public class Display extends JPanel {
         yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotSubs.add(new FieldSubscriber<>("detection", "yellow robot data" + i));
-            blueRobotSubs.add(new FieldSubscriber<>("detection", "blue robot data" + i));
+            blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
         }
         ballSub = new FieldSubscriber<>("detection", "ball");
 

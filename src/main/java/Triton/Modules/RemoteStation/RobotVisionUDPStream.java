@@ -1,6 +1,7 @@
 package Triton.Modules.RemoteStation;
 
 import Proto.RemoteAPI.VisionData;
+import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Modules.Detection.BallData;
@@ -25,12 +26,7 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
      */
     public RobotVisionUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, ID);
-        if(team == Team.BLUE) {
-            allySub = new FieldSubscriber<>("detection", "blue robot data" + ID);
-        }
-        else {
-            allySub = new FieldSubscriber<>("detection", "yellow robot data" + ID);
-        }
+        allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         ballSub = new FieldSubscriber<>("detection", "ball");
     }
 

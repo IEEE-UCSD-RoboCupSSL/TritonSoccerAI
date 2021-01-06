@@ -40,9 +40,8 @@ public class DetectionModule implements Module {
         yellowRobotPubs = new ArrayList<>();
         blueRobotPubs = new ArrayList<>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobotPubs
-                    .add(new FieldPublisher<>("detection", "yellow robot data" + i, yellowRobotsData.get(i)));
-            blueRobotPubs.add(new FieldPublisher<>("detection", "blue robot data" + i, blueRobotsData.get(i)));
+            blueRobotPubs.add(new FieldPublisher<>("detection", Team.BLUE.name() + i, blueRobotsData.get(i)));
+            yellowRobotPubs.add(new FieldPublisher<>("detection", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
         }
 
         ball = new BallData();
@@ -83,16 +82,16 @@ public class DetectionModule implements Module {
     public void update(SSL_DetectionFrame frame) {
         double time = frame.getTCapture();
 
-        for (SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
-            int id = robotFrame.getRobotId();
-            yellowRobotsData.get(id).update(robotFrame, time);
-            yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
-        }
-
         for (SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
             int id = robotFrame.getRobotId();
             blueRobotsData.get(id).update(robotFrame, time);
             blueRobotPubs.get(id).publish(blueRobotsData.get(id));
+        }
+
+        for (SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
+            int id = robotFrame.getRobotId();
+            yellowRobotsData.get(id).update(robotFrame, time);
+            yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
         }
 
         if (frame.getBallsCount() > 0)

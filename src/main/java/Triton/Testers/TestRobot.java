@@ -20,13 +20,13 @@ public class TestRobot implements Module {
     public void run() {
         while (true) {
             try {
-                System.out.println("SPIN TO 90");
-                ally.spinTo(90);
-                Thread.sleep(2000);
-
-                System.out.println("SPIN TO -90");
-                ally.spinTo(-90);
-                Thread.sleep(2000);
+//                System.out.println("SPIN TO 90");
+//                ally.spinTo(90);
+//                Thread.sleep(2000);
+//
+//                System.out.println("SPIN TO -90");
+//                ally.spinTo(-90);
+//                Thread.sleep(2000);
 
 //                System.out.println("PATH TO 0, 2000");
 //                ally.pathTo(new Vec2D(0, 2000), 90);
@@ -43,6 +43,9 @@ public class TestRobot implements Module {
 //                System.out.println("SPRINT TO 0, -2000");
 //                ally.sprintTo(new Vec2D(0, -2000));
 //                Thread.sleep(6000);
+
+                System.out.println("SPRINT TO 2000, 2000");
+                ally.sprintTo(new Vec2D(2000, 2000));
             } catch (Exception e) {
                 e.printStackTrace();
             }
