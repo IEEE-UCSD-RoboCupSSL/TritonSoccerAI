@@ -258,14 +258,19 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        motionSetPoint.setX(pointSub.getMsg().x);
-        motionSetPoint.setY(pointSub.getMsg().y);
-        motionSetPoint.setZ(angSub.getMsg());
+        Vec2D point = pointSub.getMsg();
+        motionSetPoint.setX(point.x);
+        motionSetPoint.setY(point.y);
+        double angle = angSub.getMsg();
+        angle = (angle > 180) ? angle - 360 : angle;
+        angle = (angle < -180) ? angle + 360 : angle;
+        motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        kickerSetPoint.setX(kickVelSub.getMsg().x);
-        kickerSetPoint.setY(kickVelSub.getMsg().y);
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
         return command;
@@ -298,14 +303,19 @@ public class Ally extends Robot {
         command.setMode(TVRV);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        motionSetPoint.setX(pointSub.getMsg().x);
-        motionSetPoint.setY(pointSub.getMsg().y);
-        motionSetPoint.setZ(angSub.getMsg());
+        Vec2D point = pointSub.getMsg();
+        motionSetPoint.setX(point.x);
+        motionSetPoint.setY(point.y);
+        double angle = angSub.getMsg();
+        angle = (angle > 180) ? angle - 360 : angle;
+        angle = (angle < -180) ? angle + 360 : angle;
+        motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        kickerSetPoint.setX(kickVelSub.getMsg().x);
-        kickerSetPoint.setY(kickVelSub.getMsg().y);
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
         return command.build();
@@ -338,12 +348,16 @@ public class Ally extends Robot {
             motionSetPoint.setY(0);
         }
 
-        motionSetPoint.setZ(angSub.getMsg() != null ? angSub.getMsg() : 0);
+        double angle = angSub.getMsg();
+        angle = (angle > 180) ? angle - 360 : angle;
+        angle = (angle < -180) ? angle + 360 : angle;
+        motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        kickerSetPoint.setX(kickVelSub.getMsg().x);
-        kickerSetPoint.setY(kickVelSub.getMsg().y);
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
         return command.build();
@@ -374,6 +388,9 @@ public class Ally extends Robot {
                 Vec2D dest = path.get(path.size() - 1);
                 angle = dest.sub(pos).toPlayerAngle();
             }
+
+            angle = (angle > 180) ? angle - 360 : angle;
+            angle = (angle < -180) ? angle + 360 : angle;
             motionSetPoint.setZ(angle);
 
             double currAngle = getData().getAngle();
@@ -410,8 +427,9 @@ public class Ally extends Robot {
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        kickerSetPoint.setX(kickVelSub.getMsg().x);
-        kickerSetPoint.setY(kickVelSub.getMsg().y);
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
         return command.build();
@@ -427,6 +445,8 @@ public class Ally extends Robot {
         motionSetPoint.setY(0);
 
         Double angle = angSub.getMsg();
+        angle = (angle > 180) ? angle - 360 : angle;
+        angle = (angle < -180) ? angle + 360 : angle;
         double currAngle = getData().getAngle();
         double angDiff = angle - currAngle;
         angDiff = (angDiff > 180) ? angDiff - 360 : angDiff;
@@ -443,8 +463,9 @@ public class Ally extends Robot {
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        kickerSetPoint.setX(kickVelSub.getMsg().x);
-        kickerSetPoint.setY(kickVelSub.getMsg().y);
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
         return command.build();

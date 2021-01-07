@@ -152,10 +152,13 @@ public class Vec2D {
     }
 
     /**
-     * @return angle starting from y-axis, positive is counter clockwise
+     * @return angle starting from y-axis, positive is counter clockwise, between -180 to 180
      */
     public double toPlayerAngle() {
-        return toAngle() - 90;
+        double angle = toAngle() - 90;
+        angle = (angle > 180) ? angle - 360 : angle;
+        angle = (angle < -180) ? angle + 360 : angle;
+        return angle;
     }
 
     /**

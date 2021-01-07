@@ -149,6 +149,7 @@ public class Display extends JPanel {
 
         paintGeo(g2d);
         paintObjects(g2d);
+        paintProbability(g2d);
         paintInfo(g2d);
 
         lastPaint = System.currentTimeMillis();
@@ -216,6 +217,31 @@ public class Display extends JPanel {
             g2d.setColor(Color.WHITE);
             g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
         }
+    }
+
+    private void paintProbability(Graphics2D g2d) {
+        int checkDist = 10;
+        Vec2D pos = blueRobotSubs.get(0).getMsg().getPos();
+        for (int x = 0; x < windowWidth; x += checkDist) {
+            for (int y = 0; y < windowHeight; y += checkDist) {
+                int[] displayPos = {x, y};
+                Vec2D worldPos = convert.fromInd(displayPos);
+                double prob = exampleProbabilityFunc(worldPos, pos);
+
+                g2d.setColor(new Color((float) prob, (float) prob, (float) prob, 1.0f));
+                g2d.fillRect(x, y, checkDist, checkDist);
+            }
+        }
+    }
+
+    private double exampleProbabilityFunc(Vec2D point, Vec2D pos) {
+//        return sigmoid((point.x + point.y) / 2000);
+        double dist = point.sub(pos).mag();
+        return sigmoid(dist / 250 - 10 + (Math.random() - 0.5));
+    }
+
+    private double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
     /**
