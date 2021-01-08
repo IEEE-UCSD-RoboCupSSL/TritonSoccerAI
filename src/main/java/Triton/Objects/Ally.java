@@ -77,6 +77,10 @@ public class Ally extends Robot {
         conn.buildVisionStream(team);
     }
 
+    public boolean requestDribblerStatus() {
+        return conn.getTCPConnection().requestDribblerStatus();
+    }
+
     /*** primitive control methods ***/
     public void setAutoCap(boolean enable) {
         if (enable) {

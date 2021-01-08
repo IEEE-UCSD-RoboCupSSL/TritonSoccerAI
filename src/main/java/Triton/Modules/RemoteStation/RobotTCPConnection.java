@@ -100,9 +100,14 @@ public class RobotTCPConnection implements Module {
      * @return true if
      */
     public boolean requestDribblerStatus() {
-        out.println("");
+        out.println("reqdrib");
         try {
-            return Boolean.parseBoolean(in.readLine());
+            String str = in.readLine();
+            if (str == "Success") {
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
