@@ -14,7 +14,7 @@ public class PathfinderConfig {
 
     public static final double SPRINT_TO_ROTATE_DIST_THRESH = 500;
     public static final double MOVE_ANGLE_THRESH = 20;
-    public static final double RD_SWITCH_ROTATE_ANGLE_THRESH = 60;
+    public static final double RD_SWITCH_ROTATE_ANGLE_THRESH = 40;
     public static final double OVERSHOOT_DIST = 3000;
     public static final double BALL_CATCH_DIST = 500;
 }

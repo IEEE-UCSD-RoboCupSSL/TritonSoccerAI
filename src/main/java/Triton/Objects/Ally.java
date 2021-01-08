@@ -306,9 +306,7 @@ public class Ally extends Robot {
         Vec2D point = pointSub.getMsg();
         motionSetPoint.setX(point.x);
         motionSetPoint.setY(point.y);
-        double angle = angSub.getMsg();
-        angle = (angle > 180) ? angle - 360 : angle;
-        angle = (angle < -180) ? angle + 360 : angle;
+        double angle = normAng(angSub.getMsg());
         motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
@@ -327,31 +325,56 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
-        if (path != null && path.size() > 0) {
-            Vec2D nextNode;
-            if (path.size() == 1) {
-                command.setMode(TDRD);
-                nextNode = path.get(0);
-            } else if (path.size() == 2) {
-                command.setMode(TDRD);
-                nextNode = path.get(1);
-            } else {
-                command.setMode(NSTDRD);
-                nextNode = path.get(1);
-            }
-            motionSetPoint.setX(nextNode.x);
-            motionSetPoint.setY(nextNode.y);
+
+        double targetAngle = normAng(angSub.getMsg());
+        double currAngle = getData().getAngle();
+        double angDiff = calcAngDiff(targetAngle, currAngle);
+
+        boolean usingRD = false;
+        double absAngleDiff = Math.abs(angDiff);
+        if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
+            usingRD = true;
+            motionSetPoint.setZ(targetAngle);
         } else {
-            command.setMode(TVRV);
+            motionSetPoint.setZ(Math.signum(angDiff) * 100);
+        }
+        motionSetPoint.setZ(targetAngle);
+
+        if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+            ArrayList<Vec2D> path = findPath(pointSub.getMsg());
+            if (path != null && path.size() > 0) {
+                Vec2D nextNode;
+                if (path.size() == 1) {
+                    if (usingRD)
+                        command.setMode(TDRD);
+                    else
+                        command.setMode(TDRV);
+                    nextNode = path.get(0);
+                } else if (path.size() == 2) {
+                    if (usingRD)
+                        command.setMode(TDRD);
+                    else
+                        command.setMode(TDRV);
+                    nextNode = path.get(1);
+                } else {
+                    if (usingRD)
+                        command.setMode(NSTDRD);
+                    else
+                        command.setMode(NSTDRV);
+                    nextNode = path.get(1);
+                }
+                motionSetPoint.setX(nextNode.x);
+                motionSetPoint.setY(nextNode.y);
+            } else {
+                command.setMode(TVRD);
+                motionSetPoint.setX(0);
+                motionSetPoint.setY(0);
+            }
+        } else {
+            command.setMode(TVRD);
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
         }
-
-        double angle = angSub.getMsg();
-        angle = (angle > 180) ? angle - 360 : angle;
-        angle = (angle < -180) ? angle + 360 : angle;
-        motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
@@ -372,13 +395,13 @@ public class Ally extends Robot {
         ArrayList<Vec2D> path = findPath(pointSub.getMsg());
 
         if (path != null && path.size() > 0) {
-            double angle = 0;
+            double targetAngle = 0;
             Vec2D pos = getData().getPos();
             boolean rotatingToThresholdPoint = false;
             for (Vec2D node : path) {
                 double dist = node.sub(pos).mag();
                 if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
-                    angle = node.sub(pos).toPlayerAngle();
+                    targetAngle = normAng(node.sub(pos).toPlayerAngle());
                     rotatingToThresholdPoint = true;
                     break;
                 }
@@ -386,29 +409,42 @@ public class Ally extends Robot {
 
             if (!rotatingToThresholdPoint) {
                 Vec2D dest = path.get(path.size() - 1);
-                angle = dest.sub(pos).toPlayerAngle();
+                targetAngle = dest.sub(pos).toPlayerAngle();
             }
 
-            angle = (angle > 180) ? angle - 360 : angle;
-            angle = (angle < -180) ? angle + 360 : angle;
-            motionSetPoint.setZ(angle);
 
             double currAngle = getData().getAngle();
-            double angDiff = angle - currAngle;
-            angDiff = (angDiff > 180) ? angDiff - 360 : angDiff;
-            angDiff = (angDiff < -180) ? angDiff + 360 : angDiff;
+            double angDiff = calcAngDiff(targetAngle, currAngle);
+
+            boolean usingRD = false;
             double absAngleDiff = Math.abs(angDiff);
+            if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
+                usingRD = true;
+                motionSetPoint.setZ(targetAngle);
+            } else {
+                motionSetPoint.setZ(Math.signum(angDiff) * 100);
+            }
+            motionSetPoint.setZ(targetAngle);
 
             if (!rotatingToThresholdPoint || absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
                 Vec2D nextNode;
                 if (path.size() == 1) {
-                    command.setMode(TDRD);
+                    if (usingRD)
+                        command.setMode(TDRD);
+                    else
+                        command.setMode(TDRV);
                     nextNode = path.get(0);
                 } else if (path.size() == 2) {
-                    command.setMode(TDRD);
+                    if (usingRD)
+                        command.setMode(TDRD);
+                    else
+                        command.setMode(TDRV);
                     nextNode = path.get(1);
                 } else {
-                    command.setMode(NSTDRD);
+                    if (usingRD)
+                        command.setMode(NSTDRD);
+                    else
+                        command.setMode(NSTDRV);
                     nextNode = path.get(1);
                 }
                 motionSetPoint.setX(nextNode.x);
@@ -444,18 +480,14 @@ public class Ally extends Robot {
         motionSetPoint.setX(0);
         motionSetPoint.setY(0);
 
-        Double angle = angSub.getMsg();
-        angle = (angle > 180) ? angle - 360 : angle;
-        angle = (angle < -180) ? angle + 360 : angle;
+        double targetAngle = normAng(angSub.getMsg());
         double currAngle = getData().getAngle();
-        double angDiff = angle - currAngle;
-        angDiff = (angDiff > 180) ? angDiff - 360 : angDiff;
-        angDiff = (angDiff < -180) ? angDiff + 360 : angDiff;
+        double angDiff = calcAngDiff(targetAngle, currAngle);
 
         double absAngleDiff = Math.abs(angDiff);
         if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
             command.setMode(TVRD);
-            motionSetPoint.setZ(angle);
+            motionSetPoint.setZ(targetAngle);
         } else {
             command.setMode(TVRV);
             motionSetPoint.setZ(Math.signum(angDiff) * 100);
@@ -481,6 +513,16 @@ public class Ally extends Robot {
 
     private RemoteAPI.Commands createPassCmd() {
         return null;
+    }
+
+    private double normAng(double ang) {
+        ang = (ang > 180) ? ang - 360 : ang;
+        ang = (ang < -180) ? ang + 360 : ang;
+        return ang;
+    }
+
+    private double calcAngDiff(double angA, double angB) {
+        return normAng(angB - angA);
     }
 
     public void displayPathFinder() {
