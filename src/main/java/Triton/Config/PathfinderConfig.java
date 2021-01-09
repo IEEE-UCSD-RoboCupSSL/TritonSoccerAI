@@ -12,8 +12,8 @@ public class PathfinderConfig {
             + PathfinderConfig.ADD_DIST;
     public static final double BOUNDARY_EXTENSION = 800;
 
-    public static final double SPRINT_TO_ROTATE_DIST_THRESH = 500; // Face closest node outside of this threshold
-    public static final double MOVE_ANGLE_THRESH = 20; // Don't move if outside angle threshold
+    public static final double SPRINT_TO_ROTATE_DIST_THRESH = 500; // When sprinting, face closest node outside of this threshold
     public static final double RD_ANGLE_THRESH = 40; // Outside angle threshold, use RV, inside angle, use RD
-    public static final double BALL_CAP_DIST_THRESH = 500; // Turn on autocap if ball is within threshold
+    public static final double MOVE_ANGLE_THRESH = 20; // Don't move if outside angle threshold
+    public static final double GET_BALL_CAP_DIST_THRESH = 500; // For getBall, Turn on autocap if ball is within threshold
 }

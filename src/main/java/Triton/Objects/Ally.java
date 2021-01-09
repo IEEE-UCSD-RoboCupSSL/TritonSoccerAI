@@ -533,7 +533,7 @@ public class Ally extends Robot {
         Vec2D ballPos = ballSub.getMsg().getPos();
         Vec2D currPos = getData().getPos();
         Vec2D currPosToBall = ballPos.sub(currPos);
-        if (currPosToBall.mag() <= PathfinderConfig.BALL_CAP_DIST_THRESH) {
+        if (currPosToBall.mag() <= PathfinderConfig.GET_BALL_CAP_DIST_THRESH) {
             return createAutoCapCmd();
         } else {
             pointPub.publish(ballPos);
