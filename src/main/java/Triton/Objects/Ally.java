@@ -351,7 +351,7 @@ public class Ally extends Robot {
 
         boolean usingRD = false;
         double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
+        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
             usingRD = true;
             motionSetPoint.setZ(targetAngle);
         } else {
@@ -442,7 +442,7 @@ public class Ally extends Robot {
 
             boolean usingRD = false;
             double absAngleDiff = Math.abs(angDiff);
-            if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
+            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
                 usingRD = true;
                 motionSetPoint.setZ(targetAngle);
             } else {
@@ -511,7 +511,7 @@ public class Ally extends Robot {
         double angDiff = calcAngDiff(targetAngle, currAngle);
 
         double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_SWITCH_ROTATE_ANGLE_THRESH) {
+        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
             command.setMode(TVRD);
             motionSetPoint.setZ(targetAngle);
         } else {
