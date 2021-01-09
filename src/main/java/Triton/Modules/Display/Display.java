@@ -150,6 +150,7 @@ public class Display extends JPanel {
         paintGeo(g2d);
         paintObjects(g2d);
 //        paintProbability(g2d);
+        paintPrediction(g2d);
         paintInfo(g2d);
 
         lastPaint = System.currentTimeMillis();
@@ -242,6 +243,22 @@ public class Display extends JPanel {
 
     private double sigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
+    }
+
+    private void paintPrediction(Graphics2D g2d) {
+        RobotData robotData = blueRobotSubs.get(0).getMsg();
+        Vec2D pos = robotData.getPos();
+        Vec2D vel = robotData.getVel();
+        Vec2D accel = robotData.getAccel();
+
+        double time = 1;
+        Vec2D predPos = pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
+
+        int[] screenPos = convert.fromPos(pos);
+        int[] screenPredPos = convert.fromPos(predPos);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(5));
+        g2d.drawLine(screenPos[0], screenPos[1], screenPredPos[0], screenPredPos[1]);
     }
 
     /**

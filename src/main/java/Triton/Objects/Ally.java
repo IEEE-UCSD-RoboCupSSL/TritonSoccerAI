@@ -9,6 +9,7 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Dependencies.Team;
+import Triton.Modules.Detection.BallData;
 import Triton.Modules.Detection.RobotData;
 import Triton.Modules.RemoteStation.RobotConnection;
 
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Objects.AllyState.*;
+import static Triton.Objects.AllyState.TVRV_MOTION;
 
 
 public class Ally extends Robot {
@@ -32,9 +34,11 @@ public class Ally extends Robot {
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final Subscriber<BallData> ballSub;
     private final Subscriber<Boolean> dribStatSub;
     private final Publisher<RemoteAPI.Commands> commandsPub;
     /*** internal pub sub ***/
+
     private final Publisher<AllyState> statePub;
     private final Subscriber<AllyState> stateSub;
     private final Publisher<Vec2D> pointPub, kickVelPub;
@@ -44,6 +48,7 @@ public class Ally extends Robot {
 
     protected ThreadPoolExecutor pool;
     private PathFinder pathFinder;
+    private AllyState prevState;
 
     public Ally(Team team, int ID, ThreadPoolExecutor pool) {
         super(team, ID);
@@ -59,8 +64,9 @@ public class Ally extends Robot {
             blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
             yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
         }
+        ballSub = new FieldSubscriber<>("detection", "ball");
 
-        statePub = new FieldPublisher<>("Ally state", "" + ID, AllyState.TVRV);
+        statePub = new FieldPublisher<>("Ally state", "" + ID, TVRV_MOTION);
         stateSub = new FieldSubscriber<>("Ally state", "" + ID);
 
         pointPub = new FieldPublisher<>("Ally point", "" + ID, new Vec2D(0, 0));
@@ -79,17 +85,18 @@ public class Ally extends Robot {
         conn.buildVisionStream(team);
     }
 
-    public boolean requestDribblerStatus() {
+    private void setState(AllyState state) {
+        setState(state);
+        prevState = state;
+    }
+
+    public boolean getDribblerStatus() {
         return dribStatSub.getMsg();
     }
 
     /*** primitive control methods ***/
-    public void setAutoCap(boolean enable) {
-        if (enable) {
-            statePub.publish(AllyState.AUTO_CAPTURE);
-        } else {
-            statePub.publish(AllyState.TVRV);
-        }
+    public void autoCap() {
+        setState(AUTO_CAPTURE);
     }
 
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
@@ -99,8 +106,8 @@ public class Ally extends Robot {
      */
     public void moveTo(Vec2D loc) {
         switch (stateSub.getMsg()) {
-            case TDRD, TVRD -> statePub.publish(AllyState.TDRD);
-            default -> statePub.publish(AllyState.TDRV);
+            case TDRD_MOTION, TVRD_MOTION -> setState(TDRD_MOTION);
+            default -> setState(TDRV_MOTION);
         }
         pointPub.publish(loc);
     }
@@ -110,8 +117,8 @@ public class Ally extends Robot {
      */
     public void moveAt(Vec2D vel) {
         switch (stateSub.getMsg()) {
-            case TDRD, TVRD -> statePub.publish(AllyState.TVRD);
-            default -> statePub.publish(AllyState.TVRV);
+            case TDRD_MOTION, TVRD_MOTION -> setState(TVRD_MOTION);
+            default -> setState(TVRV_MOTION);
         }
         pointPub.publish(vel);
     }
@@ -121,8 +128,8 @@ public class Ally extends Robot {
      */
     public void spinTo(double angle) {
         switch (stateSub.getMsg()) {
-            case TDRD, TDRV -> statePub.publish(AllyState.TDRD);
-            default -> statePub.publish(AllyState.TVRD);
+            case TDRD_MOTION, TDRV_MOTION -> setState(TDRD_MOTION);
+            default -> setState(TVRD_MOTION);
         }
         angPub.publish(angle);
     }
@@ -132,8 +139,8 @@ public class Ally extends Robot {
      */
     public void spinAt(double angVel) {
         switch (stateSub.getMsg()) {
-            case TDRD, TDRV -> statePub.publish(AllyState.TDRV);
-            default -> statePub.publish(AllyState.TVRV);
+            case TDRD_MOTION, TDRV_MOTION -> setState(TDRV_MOTION);
+            default -> setState(TVRV_MOTION);
         }
         angPub.publish(angVel);
     }
@@ -146,32 +153,36 @@ public class Ally extends Robot {
     /*** advanced control methods ***/
     /*** path control methods ***/
     public void pathTo(Vec2D endPoint, double angle) {
-        statePub.publish(FOLLOW_PATH);
+        setState(FOLLOW_PATH);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
 
     public void sprintTo(Vec2D endPoint) {
-        statePub.publish(SPRINT);
+        setState(SPRINT);
         pointPub.publish(endPoint);
     }
 
     public void rotateTo(double angle) {
-        statePub.publish(ROTATE);
+        setState(ROTATE);
         angPub.publish(angle);
     }
 
     /*** ... methods ***/
     public void getBall() {
-        statePub.publish(AllyState.GET_BALL);
+        if (prevState != GET_BALL) {
+            conn.getTCPConnection().requestDribblerStatus();
+        }
+
+        setState(GET_BALL);
     }
 
     public void intercept() {
-        statePub.publish(AllyState.INTERCEPT);
+        setState(INTERCEPT);
     }
 
     public void pass() {
-        statePub.publish(AllyState.PASS);
+        setState(PASS);
     }
 
     // Everything in run() runs in the Ally Thread
@@ -207,8 +218,9 @@ public class Ally extends Robot {
                 yellowRobotSubs.get(i).subscribe();
                 blueRobotSubs.get(i).subscribe();
             }
-            dribStatSub.subscribe();
+            ballSub.subscribe();
 
+            dribStatSub.subscribe();
             stateSub.subscribe();
             pointSub.subscribe();
             angSub.subscribe();
@@ -243,10 +255,10 @@ public class Ally extends Robot {
         AllyState state = stateSub.getMsg();
 
         switch (state) {
-            case TDRD -> command = createTDRDCmd();
-            case TDRV -> command = createTDRVCmd();
-            case TVRD -> command = createTVRDCmd();
-            case TVRV -> command = createTVRVCmd();
+            case TDRD_MOTION -> command = createTDRDCmd();
+            case TDRV_MOTION -> command = createTDRVCmd();
+            case TVRD_MOTION -> command = createTVRDCmd();
+            case TVRV_MOTION -> command = createTVRVCmd();
             case AUTO_CAPTURE -> command = createAutoCapCmd();
             case FOLLOW_PATH -> command = createFollowPathCmd();
             case SPRINT -> command = createSprintCmd();
@@ -511,7 +523,16 @@ public class Ally extends Robot {
     }
 
     private RemoteAPI.Commands createGetBallCmd() {
-        return null;
+        Vec2D ballPos = ballSub.getMsg().getPos();
+        Vec2D currPos = getData().getPos();
+        Vec2D currPosToBall = ballPos.sub(currPos);
+        if (currPosToBall.mag() <= PathfinderConfig.BALL_CAP_DIST_THRESH) {
+            return createAutoCapCmd();
+        } else {
+            pointPub.publish(ballPos);
+            angPub.publish(currPosToBall.toPlayerAngle());
+            return createFollowPathCmd();
+        }
     }
 
     private RemoteAPI.Commands createInterceptCmd() {

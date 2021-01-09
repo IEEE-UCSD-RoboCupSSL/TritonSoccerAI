@@ -1,10 +1,10 @@
 package Triton.Objects;
 
 public enum AllyState {
-    TDRD,
-    TDRV,
-    TVRD,
-    TVRV,
+    TDRD_MOTION,
+    TDRV_MOTION,
+    TVRD_MOTION,
+    TVRV_MOTION,
     AUTO_CAPTURE,
     FOLLOW_PATH,
     SPRINT,

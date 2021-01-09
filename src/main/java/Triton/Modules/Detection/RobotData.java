@@ -44,9 +44,9 @@ public class RobotData {
         angle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);
 
         if (lastPos != null)
-            vel = pos.sub(lastPos).mult(timeDiff);
+            vel = pos.sub(lastPos).mult(1 / timeDiff);
         if (lastVel != null)
-            accel = vel.sub(lastVel).mult(timeDiff);
+            accel = vel.sub(lastVel).mult(1 / timeDiff);
 
         angVel = angle - lastAngle;
         angAccel = angVel - lastAngVel;

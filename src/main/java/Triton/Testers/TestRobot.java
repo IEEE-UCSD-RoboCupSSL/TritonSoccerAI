@@ -20,30 +20,34 @@ public class TestRobot implements Module {
     public void run() {
         try {
             while (true) {
-                ally.setAutoCap(true);
-                System.out.println(ally.requestDribblerStatus());
+                System.out.println(ally.getDribblerStatus());
+                if (ally.getDribblerStatus()) {
+                    ally.sprintTo(new Vec2D(2000, 2000));
+                } else {
+                    ally.getBall();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void TDRD(double x, double y, double angle) {
+    private void moveTDRD(double x, double y, double angle) {
         ally.moveTo(new Vec2D(x, y));
         ally.spinTo(angle);
     }
 
-    private void TDRV(double x, double y, double angVel) {
+    private void moveTDRV(double x, double y, double angVel) {
         ally.moveTo(new Vec2D(x, y));
         ally.spinAt(angVel);
     }
 
-    private void TVRD(double velX, double velY, double angle) {
+    private void moveTVRD(double velX, double velY, double angle) {
         ally.moveAt(new Vec2D(velX, velY));
         ally.spinTo(angle);
     }
 
-    private void TVRV(double velX, double velY, double angVel) {
+    private void moveTVRV(double velX, double velY, double angVel) {
         ally.moveAt(new Vec2D(velX, velY));
         ally.spinAt(angVel);
     }

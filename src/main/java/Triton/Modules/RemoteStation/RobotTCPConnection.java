@@ -1,8 +1,8 @@
 package Triton.Modules.RemoteStation;
 
 import Triton.Config.ObjectConfig;
-import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
+import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Modules.Detection.RobotData;
 
 import java.io.BufferedReader;
@@ -18,21 +18,20 @@ public class RobotTCPConnection implements Module {
     private final String ip;
     private final int port;
     private final int ID;
-
+    private final Publisher<Boolean> dribStatPub;
+    private final Subscriber<RobotData> allySub;
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-
-    private final Publisher<Boolean> dribStatPub;
-    private final Subscriber<RobotData> allySub;
     private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
 
     /**
      * Constructs TCP connection
-     * @param ip ip of connection
+     *
+     * @param ip   ip of connection
      * @param port to connect to
-     * @param ID ID of robot
+     * @param ID   ID of robot
      */
     public RobotTCPConnection(String ip, int port, int ID) {
         this.ip = ip;
@@ -46,6 +45,7 @@ public class RobotTCPConnection implements Module {
 
     /**
      * Begin connection
+     *
      * @return true if connection was successfully established
      */
     public boolean connect() throws IOException {
@@ -82,8 +82,16 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
-        while (true) {
-            dribStatPub.publish(requestDribblerStatus());
+        try {
+            while (true) {
+                String str = in.readLine();
+                switch (str) {
+                    case "DRIB Failure" -> dribStatPub.publish(false);
+                    case "DRIB Success" -> dribStatPub.publish(true);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -98,19 +106,19 @@ public class RobotTCPConnection implements Module {
         }
     }
 
+    public void requestDribblerStatus() {
+        out.println("reqdrib");
+    }
+
     /**
      * Returns the status of the dribbler
+     *
      * @return true if
      */
-    public boolean requestDribblerStatus() {
-        out.println("reqdrib");
+    public boolean getDribblerStatus() {
         try {
             String str = in.readLine();
-            if (str.equals("Success")) {
-                return true;
-            } else {
-                return false;
-            }
+            return str.equals("DRIB Success");
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -119,6 +127,7 @@ public class RobotTCPConnection implements Module {
 
     /**
      * Returns true if there is still a connection
+     *
      * @return true if there is still a connection
      */
     public boolean isConnected() {
