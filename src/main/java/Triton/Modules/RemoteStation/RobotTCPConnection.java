@@ -1,11 +1,9 @@
 package Triton.Modules.RemoteStation;
 
 import Triton.Config.ObjectConfig;
-import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
+import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
-import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Modules.Detection.RobotData;
-import Triton.Dependencies.Team;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +23,7 @@ public class RobotTCPConnection implements Module {
     private PrintWriter out;
     private BufferedReader in;
 
+    private final Publisher<Boolean> dribStatPub;
     private final Subscriber<RobotData> allySub;
     private Subscriber<String> tcpCommandSub;
     private boolean isConnected;
@@ -40,6 +39,7 @@ public class RobotTCPConnection implements Module {
         this.port = port;
         this.ID = ID;
 
+        dribStatPub = new FieldPublisher<>("Ally drib", "" + ID, false);
         allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         //tcpCommandSub = new MQSubscriber<String>("tcpCommand", name);
     }
@@ -82,6 +82,9 @@ public class RobotTCPConnection implements Module {
 
     @Override
     public void run() {
+        while (true) {
+            dribStatPub.publish(requestDribblerStatus());
+        }
     }
 
     /**
@@ -103,7 +106,7 @@ public class RobotTCPConnection implements Module {
         out.println("reqdrib");
         try {
             String str = in.readLine();
-            if (str == "Success") {
+            if (str.equals("Success")) {
                 return true;
             } else {
                 return false;

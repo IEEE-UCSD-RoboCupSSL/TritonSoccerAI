@@ -32,6 +32,7 @@ public class Ally extends Robot {
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final Subscriber<Boolean> dribStatSub;
     private final Publisher<RemoteAPI.Commands> commandsPub;
     /*** internal pub sub ***/
     private final Publisher<AllyState> statePub;
@@ -69,6 +70,7 @@ public class Ally extends Robot {
         kickVelPub = new FieldPublisher<>("Ally kickVel", "" + ID, new Vec2D(0, 0));
         kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + ID);
 
+        dribStatSub = new FieldSubscriber<>("Ally drib", "" + ID);
         commandsPub = new MQPublisher<>("commands", "" + ID);
 
         conn.buildTcpConnection();
@@ -78,7 +80,7 @@ public class Ally extends Robot {
     }
 
     public boolean requestDribblerStatus() {
-        return conn.getTCPConnection().requestDribblerStatus();
+        return dribStatSub.getMsg();
     }
 
     /*** primitive control methods ***/
@@ -205,6 +207,7 @@ public class Ally extends Robot {
                 yellowRobotSubs.get(i).subscribe();
                 blueRobotSubs.get(i).subscribe();
             }
+            dribStatSub.subscribe();
 
             stateSub.subscribe();
             pointSub.subscribe();
