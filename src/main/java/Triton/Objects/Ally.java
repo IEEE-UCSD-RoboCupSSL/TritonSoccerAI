@@ -357,7 +357,6 @@ public class Ally extends Robot {
         } else {
             motionSetPoint.setZ(Math.signum(angDiff) * 100);
         }
-        motionSetPoint.setZ(targetAngle);
 
         if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
             ArrayList<Vec2D> path = findPath(pointSub.getMsg());
@@ -385,12 +384,18 @@ public class Ally extends Robot {
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
             } else {
-                command.setMode(TVRD);
+                if (usingRD)
+                    command.setMode(TVRD);
+                else
+                    command.setMode(TVRV);
                 motionSetPoint.setX(0);
                 motionSetPoint.setY(0);
             }
         } else {
-            command.setMode(TVRD);
+            if (usingRD)
+                command.setMode(TVRD);
+            else
+                command.setMode(TVRV);
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
         }
@@ -443,7 +448,6 @@ public class Ally extends Robot {
             } else {
                 motionSetPoint.setZ(Math.signum(angDiff) * 100);
             }
-            motionSetPoint.setZ(targetAngle);
 
             if (!rotatingToThresholdPoint || absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
                 Vec2D nextNode;
@@ -469,7 +473,10 @@ public class Ally extends Robot {
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
             } else {
-                command.setMode(TVRD);
+                if (usingRD)
+                    command.setMode(TVRD);
+                else
+                    command.setMode(TVRV);
                 motionSetPoint.setX(0);
                 motionSetPoint.setY(0);
             }
