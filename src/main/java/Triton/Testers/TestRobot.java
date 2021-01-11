@@ -20,7 +20,7 @@ public class TestRobot implements Module {
     public void run() {
         try {
             while (true) {
-                System.out.println("ALLY DRIB STATUS: " + ally.getDribblerStatus());
+//                System.out.println("DRIB: " + ally.getDribblerStatus());
                 if (ally.getDribblerStatus()) {
                     ally.sprintTo(new Vec2D(2000, 2000));
                 } else {

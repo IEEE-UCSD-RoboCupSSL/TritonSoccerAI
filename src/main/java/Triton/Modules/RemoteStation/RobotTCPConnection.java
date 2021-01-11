@@ -25,6 +25,7 @@ public class RobotTCPConnection implements Module {
     private BufferedReader in;
     private final Publisher<String> tcpCommandPub;
     private final Subscriber<String> tcpCommandSub;
+    private final Publisher<Boolean> tcpInitPub;
     private boolean isConnected;
 
     private SendTCPRunnable sendTCP;
@@ -32,11 +33,9 @@ public class RobotTCPConnection implements Module {
 
     private class SendTCPRunnable implements Runnable {
         private PrintWriter out;
-        private Subscriber<String> tcpCommandSub;
 
-        public SendTCPRunnable(PrintWriter out, Subscriber<String> tcpCommandSub) {
+        public SendTCPRunnable(PrintWriter out) {
             this.out = out;
-            this.tcpCommandSub = tcpCommandSub;
         }
 
         private void subscribe() {
@@ -54,6 +53,7 @@ public class RobotTCPConnection implements Module {
 
                 while (true) {
                     String msg = tcpCommandSub.getMsg();
+                    System.out.println(msg);
                     out.println(msg);
                 }
             } catch (Exception e) {
@@ -76,10 +76,15 @@ public class RobotTCPConnection implements Module {
             try {
                 while (true) {
                     String line = in.readLine();
-                    System.out.printf("Ally %d TCP : %s\n", ID, line);
+//                    System.out.printf("Ally %d TCP : %s\n", ID, line);
+                    if (!line.equals("bazinga")) {
+                        System.out.printf("Ally %d TCP : %s\n", ID, line);
+                    }
+
                     switch (line) {
-                        case "BallOnHold" -> dribStatPub.publish(false);
-                        case "BallOffHold" -> dribStatPub.publish(true);
+                        case "BallOnHold" -> dribStatPub.publish(true);
+                        case "BallOffHold" -> dribStatPub.publish(false);
+                        case "Initialized" -> tcpInitPub.publish(true);
                     }
                 }
             } catch (IOException e) {
@@ -103,7 +108,8 @@ public class RobotTCPConnection implements Module {
         dribStatPub = new FieldPublisher<>("Ally drib", "" + ID, false);
         allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         tcpCommandPub = new MQPublisher<>("tcpCommand", "" + ID);
-        tcpCommandSub = new MQSubscriber<String>("tcpCommand", "" + ID);
+        tcpCommandSub = new MQSubscriber<>("tcpCommand", "" + ID);
+        tcpInitPub = new FieldPublisher<>("tcpInit", "" + ID, true);
     }
 
     /**
@@ -121,7 +127,7 @@ public class RobotTCPConnection implements Module {
         if (line.equals("CONNECTION ESTABLISHED")) {
             isConnected = true;
 
-            sendTCP = new SendTCPRunnable(out, tcpCommandSub);
+            sendTCP = new SendTCPRunnable(out);
             receiveTCP = new ReceiveTCPRunnable(in, ID);
             return true;
         }
@@ -154,7 +160,9 @@ public class RobotTCPConnection implements Module {
     @Override
     public void run() {
         try {
-            //sendDummy();
+            while (true) {
+                sendDummy();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,21 +176,6 @@ public class RobotTCPConnection implements Module {
             allySub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Returns the status of the dribbler
-     *
-     * @return true if
-     */
-    public boolean getDribblerStatus() {
-        try {
-            String str = in.readLine();
-            return str.equals("DRIB Success");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 
