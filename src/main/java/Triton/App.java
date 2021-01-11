@@ -1,6 +1,7 @@
 package Triton;
 
 import Triton.AI.AI;
+import Triton.AI.DataCollector;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.Team;
 import Triton.Modules.Detection.DetectionModule;
@@ -90,7 +91,7 @@ public class App {
             pool.submit(foe);
         }
 
-        Runnable testRobot = new TestRobot(allies[0], ball);
+        Runnable testRobot = new DataCollector(allies[0], ball);
         pool.submit(testRobot);
 
         allies[0].displayPathFinder();
