@@ -150,7 +150,7 @@ public class Display extends JPanel {
         paintGeo(g2d);
         paintObjects(g2d);
 //        paintProbability(g2d);
-        paintPrediction(g2d);
+//        paintPrediction(g2d);
         paintInfo(g2d);
 
         lastPaint = System.currentTimeMillis();

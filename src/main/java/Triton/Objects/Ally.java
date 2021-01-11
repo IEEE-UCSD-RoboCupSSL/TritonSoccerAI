@@ -86,11 +86,12 @@ public class Ally extends Robot {
     }
 
     private void setState(AllyState state) {
-        setState(state);
+        statePub.publish(state);
         prevState = state;
     }
 
     public boolean getDribblerStatus() {
+        subscribe();
         return dribStatSub.getMsg();
     }
 
@@ -170,10 +171,6 @@ public class Ally extends Robot {
 
     /*** ... methods ***/
     public void getBall() {
-        if (prevState != GET_BALL) {
-            conn.getTCPConnection().requestDribblerStatus();
-        }
-
         setState(GET_BALL);
     }
 
@@ -195,16 +192,18 @@ public class Ally extends Robot {
             conn.getTCPConnection().connect();
             conn.getTCPConnection().sendInit();
 
-            pool.execute(conn.getTCPConnection());
-            pool.execute(conn.getCommandStream());
+            pool.submit(conn.getTCPConnection());
+            pool.submit(conn.getTCPConnection().getSendTCP());
+            pool.submit(conn.getTCPConnection().getReceiveTCP());
+            pool.submit(conn.getCommandStream());
             // pool.execute(conn.getDataStream());
-            pool.execute(conn.getVisionStream());
+            pool.submit(conn.getVisionStream());
 
             while (true) {
                 publishCommand();
             }
         } catch (Exception e) {
-            System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
+            // System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
             e.printStackTrace();
         }
     }
@@ -280,9 +279,7 @@ public class Ally extends Robot {
         Vec2D point = pointSub.getMsg();
         motionSetPoint.setX(point.x);
         motionSetPoint.setY(point.y);
-        double angle = angSub.getMsg();
-        angle = (angle > 180) ? angle - 360 : angle;
-        angle = (angle < -180) ? angle + 360 : angle;
+        double angle = normAng(angSub.getMsg());
         motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
@@ -416,69 +413,71 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
 
+        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
         if (path != null && path.size() > 0) {
             double targetAngle = 0;
-            Vec2D pos = getData().getPos();
-            boolean rotatingToThresholdPoint = false;
+            Vec2D allyPos = getData().getPos();
+            boolean targetAngleFound = false;
             for (Vec2D node : path) {
-                double dist = node.sub(pos).mag();
+                double dist = node.sub(allyPos).mag();
                 if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
-                    targetAngle = normAng(node.sub(pos).toPlayerAngle());
-                    rotatingToThresholdPoint = true;
+                    targetAngle = node.sub(allyPos).toPlayerAngle();
+                    targetAngleFound = true;
                     break;
                 }
             }
 
-            if (!rotatingToThresholdPoint) {
-                Vec2D dest = path.get(path.size() - 1);
-                targetAngle = dest.sub(pos).toPlayerAngle();
-            }
-
-
-            double currAngle = getData().getAngle();
-            double angDiff = calcAngDiff(targetAngle, currAngle);
-
-            boolean usingRD = false;
-            double absAngleDiff = Math.abs(angDiff);
-            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-                usingRD = true;
-                motionSetPoint.setZ(targetAngle);
+            Vec2D nextNode;
+            if (path.size() == 1) {
+                nextNode = path.get(0);
+            } else if (path.size() == 2) {
+                nextNode = path.get(1);
             } else {
-                motionSetPoint.setZ(Math.signum(angDiff) * 100);
+                nextNode = path.get(1);
             }
 
-            if (!rotatingToThresholdPoint || absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                Vec2D nextNode;
-                if (path.size() == 1) {
-                    if (usingRD)
-                        command.setMode(TDRD);
-                    else
-                        command.setMode(TDRV);
-                    nextNode = path.get(0);
-                } else if (path.size() == 2) {
-                    if (usingRD)
-                        command.setMode(TDRD);
-                    else
-                        command.setMode(TDRV);
-                    nextNode = path.get(1);
+            if (targetAngleFound) {
+                double currAngle = getData().getAngle();
+                double angDiff = calcAngDiff(targetAngle, currAngle);
+
+                double absAngleDiff = Math.abs(angDiff);
+                boolean usingRD = false;
+
+                if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+                    usingRD = true;
+                    motionSetPoint.setZ(targetAngle);
+                } else {
+                    motionSetPoint.setZ(Math.signum(angDiff) * 100);
+                }
+
+                if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+                    if (path.size() <= 2) {
+                        if (usingRD)
+                            command.setMode(TDRD);
+                        else
+                            command.setMode(TDRV);
+                    } else {
+                        if (usingRD)
+                            command.setMode(NSTDRD);
+                        else
+                            command.setMode(NSTDRV);
+                    }
+                    motionSetPoint.setX(nextNode.x);
+                    motionSetPoint.setY(nextNode.y);
                 } else {
                     if (usingRD)
-                        command.setMode(NSTDRD);
+                        command.setMode(TVRD);
                     else
-                        command.setMode(NSTDRV);
-                    nextNode = path.get(1);
+                        command.setMode(TVRV);
+                    motionSetPoint.setX(0);
+                    motionSetPoint.setY(0);
                 }
+            } else {
+                command.setMode(TDRV);
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
-            } else {
-                if (usingRD)
-                    command.setMode(TVRD);
-                else
-                    command.setMode(TVRV);
-                motionSetPoint.setX(0);
-                motionSetPoint.setY(0);
+                motionSetPoint.setZ(0);
             }
         } else {
             command.setMode(TVRV);
@@ -557,7 +556,7 @@ public class Ally extends Robot {
     }
 
     private double calcAngDiff(double angA, double angB) {
-        return normAng(angB - angA);
+        return normAng(angA - angB);
     }
 
     public void displayPathFinder() {
