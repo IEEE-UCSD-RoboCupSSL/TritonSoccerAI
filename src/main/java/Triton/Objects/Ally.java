@@ -18,17 +18,10 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Objects.AllyState.*;
-import static Triton.Objects.AllyState.TVRV_MOTION;
+import static Triton.Objects.AllyState.TVRV;
 
 
 public class Ally extends Robot {
-    private static final int TDRD = 0;
-    private static final int TDRV = 1;
-    private static final int TVRD = 2;
-    private static final int TVRV = 3;
-    private static final int NSTDRD = 4;
-    private static final int NSTDRV = 5;
-
     private final RobotConnection conn;
     /*** external pub sub ***/
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
@@ -48,7 +41,6 @@ public class Ally extends Robot {
 
     protected ThreadPoolExecutor pool;
     private PathFinder pathFinder;
-    private AllyState prevState;
 
     public Ally(Team team, int ID, ThreadPoolExecutor pool) {
         super(team, ID);
@@ -66,7 +58,7 @@ public class Ally extends Robot {
         }
         ballSub = new FieldSubscriber<>("detection", "ball");
 
-        statePub = new FieldPublisher<>("Ally state", "" + ID, TVRV_MOTION);
+        statePub = new FieldPublisher<>("Ally state", "" + ID, TVRV);
         stateSub = new FieldSubscriber<>("Ally state", "" + ID);
 
         pointPub = new FieldPublisher<>("Ally point", "" + ID, new Vec2D(0, 0));
@@ -85,11 +77,6 @@ public class Ally extends Robot {
         conn.buildVisionStream(team);
     }
 
-    private void setState(AllyState state) {
-        statePub.publish(state);
-        prevState = state;
-    }
-
     public boolean getDribblerStatus() {
         subscribe();
         return dribStatSub.getMsg();
@@ -97,7 +84,7 @@ public class Ally extends Robot {
 
     /*** primitive control methods ***/
     public void autoCap() {
-        setState(AUTO_CAPTURE);
+        statePub.publish(AUTO_CAPTURE);
     }
 
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
@@ -107,8 +94,8 @@ public class Ally extends Robot {
      */
     public void moveTo(Vec2D loc) {
         switch (stateSub.getMsg()) {
-            case TDRD_MOTION, TVRD_MOTION -> setState(TDRD_MOTION);
-            default -> setState(TDRV_MOTION);
+            case TDRD, TVRD -> statePub.publish(TDRD);
+            default -> statePub.publish(TDRV);
         }
         pointPub.publish(loc);
     }
@@ -118,8 +105,8 @@ public class Ally extends Robot {
      */
     public void moveAt(Vec2D vel) {
         switch (stateSub.getMsg()) {
-            case TDRD_MOTION, TVRD_MOTION -> setState(TVRD_MOTION);
-            default -> setState(TVRV_MOTION);
+            case TDRD, TVRD -> statePub.publish(TVRD);
+            default -> statePub.publish(TVRV);
         }
         pointPub.publish(vel);
     }
@@ -129,8 +116,8 @@ public class Ally extends Robot {
      */
     public void spinTo(double angle) {
         switch (stateSub.getMsg()) {
-            case TDRD_MOTION, TDRV_MOTION -> setState(TDRD_MOTION);
-            default -> setState(TVRD_MOTION);
+            case TDRD, TDRV -> statePub.publish(TDRD);
+            default -> statePub.publish(TVRD);
         }
         angPub.publish(angle);
     }
@@ -140,8 +127,8 @@ public class Ally extends Robot {
      */
     public void spinAt(double angVel) {
         switch (stateSub.getMsg()) {
-            case TDRD_MOTION, TDRV_MOTION -> setState(TDRV_MOTION);
-            default -> setState(TVRV_MOTION);
+            case TDRD, TDRV -> statePub.publish(TDRV);
+            default -> statePub.publish(TVRV);
         }
         angPub.publish(angVel);
     }
@@ -154,32 +141,43 @@ public class Ally extends Robot {
     /*** advanced control methods ***/
     /*** path control methods ***/
     public void pathTo(Vec2D endPoint, double angle) {
-        setState(FOLLOW_PATH);
+        statePub.publish(FOLLOW_PATH);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
 
     public void sprintTo(Vec2D endPoint) {
-        setState(SPRINT);
+        statePub.publish(SPRINT);
         pointPub.publish(endPoint);
     }
 
+    public void sprintToAngle(Vec2D endPoint, double angle) {
+        statePub.publish(SPRINT_ANGLE);
+        pointPub.publish(endPoint);
+        angPub.publish(angle);
+    }
+
     public void rotateTo(double angle) {
-        setState(ROTATE);
+        statePub.publish(ROTATE);
         angPub.publish(angle);
     }
 
     /*** ... methods ***/
     public void getBall() {
-        setState(GET_BALL);
+        statePub.publish(GET_BALL);
+    }
+
+    public void receiveBall(Vec2D receivePoint) {
+        statePub.publish(RECEIVE_BALL);
+        pointPub.publish(receivePoint);
     }
 
     public void intercept() {
-        setState(INTERCEPT);
+        statePub.publish(INTERCEPT);
     }
 
     public void pass() {
-        setState(PASS);
+        statePub.publish(PASS);
     }
 
     // Everything in run() runs in the Ally Thread
@@ -254,15 +252,17 @@ public class Ally extends Robot {
         AllyState state = stateSub.getMsg();
 
         switch (state) {
-            case TDRD_MOTION -> command = createTDRDCmd();
-            case TDRV_MOTION -> command = createTDRVCmd();
-            case TVRD_MOTION -> command = createTVRDCmd();
-            case TVRV_MOTION -> command = createTVRVCmd();
+            case TDRD -> command = createTDRDCmd();
+            case TDRV -> command = createTDRVCmd();
+            case TVRD -> command = createTVRDCmd();
+            case TVRV -> command = createTVRVCmd();
             case AUTO_CAPTURE -> command = createAutoCapCmd();
             case FOLLOW_PATH -> command = createFollowPathCmd();
             case SPRINT -> command = createSprintCmd();
+            case SPRINT_ANGLE -> command = createSprintAngleCmd();
             case ROTATE -> command = createRotateCmd();
             case GET_BALL -> command = createGetBallCmd();
+            case RECEIVE_BALL -> command = receiveBallCmd();
             case INTERCEPT -> command = createInterceptCmd();
             case PASS -> command = createPassCmd();
             default -> command = createTVRVCmd();
@@ -270,10 +270,11 @@ public class Ally extends Robot {
         commandsPub.publish(command);
     }
 
-    private RemoteAPI.Commands.Builder createPrimitiveCmdBuilder() {
+    private RemoteAPI.Commands createPrimitiveCmdBuilder(MoveMode mode) {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);
+        command.setMode(mode.ordinal());
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
         Vec2D point = pointSub.getMsg();
@@ -289,34 +290,30 @@ public class Ally extends Robot {
         kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
-        return command;
+        return command.build();
     }
 
     private RemoteAPI.Commands createTDRDCmd() {
-        RemoteAPI.Commands.Builder command = createPrimitiveCmdBuilder();
-        return command.setMode(TDRD).build();
+        return createPrimitiveCmdBuilder(MoveMode.TDRD);
     }
 
     private RemoteAPI.Commands createTDRVCmd() {
-        RemoteAPI.Commands.Builder command = createPrimitiveCmdBuilder();
-        return command.setMode(TDRV).build();
+        return createPrimitiveCmdBuilder(MoveMode.TDRV);
     }
 
     private RemoteAPI.Commands createTVRDCmd() {
-        RemoteAPI.Commands.Builder command = createPrimitiveCmdBuilder();
-        return command.setMode(TVRD).build();
+        return createPrimitiveCmdBuilder(MoveMode.TVRD);
     }
 
     private RemoteAPI.Commands createTVRVCmd() {
-        RemoteAPI.Commands.Builder command = createPrimitiveCmdBuilder();
-        return command.setMode(TVRV).build();
+        return createPrimitiveCmdBuilder(MoveMode.TVRV);
     }
 
     private RemoteAPI.Commands createAutoCapCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(true);
-        command.setMode(TVRV);
+        command.setMode(MoveMode.TVRV.ordinal());
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
         Vec2D point = pointSub.getMsg();
@@ -360,41 +357,44 @@ public class Ally extends Robot {
             if (path != null && path.size() > 0) {
                 Vec2D nextNode;
                 if (path.size() == 1) {
-                    if (usingRD)
-                        command.setMode(TDRD);
-                    else
-                        command.setMode(TDRV);
                     nextNode = path.get(0);
                 } else if (path.size() == 2) {
-                    if (usingRD)
-                        command.setMode(TDRD);
-                    else
-                        command.setMode(TDRV);
                     nextNode = path.get(1);
                 } else {
-                    if (usingRD)
-                        command.setMode(NSTDRD);
-                    else
-                        command.setMode(NSTDRV);
                     nextNode = path.get(1);
                 }
+
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
+
+                if (path.size() <= 2) {
+                    if (usingRD)
+                        command.setMode(MoveMode.TDRD.ordinal());
+                    else
+                        command.setMode(MoveMode.TDRV.ordinal());
+                } else {
+                    if (usingRD)
+                        command.setMode(MoveMode.NSTDRD.ordinal());
+                    else
+                        command.setMode(MoveMode.NSTDRV.ordinal());
+                }
             } else {
-                if (usingRD)
-                    command.setMode(TVRD);
-                else
-                    command.setMode(TVRV);
                 motionSetPoint.setX(0);
                 motionSetPoint.setY(0);
+
+                if (usingRD)
+                    command.setMode(MoveMode.TVRD.ordinal());
+                else
+                    command.setMode(MoveMode.TVRV.ordinal());
             }
         } else {
-            if (usingRD)
-                command.setMode(TVRD);
-            else
-                command.setMode(TVRV);
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
+
+            if (usingRD)
+                command.setMode(MoveMode.TVRD.ordinal());
+            else
+                command.setMode(MoveMode.TVRV.ordinal());
         }
         command.setMotionSetPoint(motionSetPoint);
 
@@ -413,7 +413,6 @@ public class Ally extends Robot {
         command.setEnableBallAutoCapture(false);
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-
         ArrayList<Vec2D> path = findPath(pointSub.getMsg());
         if (path != null && path.size() > 0) {
             double targetAngle = 0;
@@ -429,13 +428,12 @@ public class Ally extends Robot {
             }
 
             Vec2D nextNode;
-            if (path.size() == 1) {
+            if (path.size() == 1)
                 nextNode = path.get(0);
-            } else if (path.size() == 2) {
+            else if (path.size() == 2)
                 nextNode = path.get(1);
-            } else {
+            else
                 nextNode = path.get(1);
-            }
 
             if (targetAngleFound) {
                 double currAngle = getData().getAngle();
@@ -452,35 +450,123 @@ public class Ally extends Robot {
                 }
 
                 if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                    if (path.size() <= 2) {
-                        if (usingRD)
-                            command.setMode(TDRD);
-                        else
-                            command.setMode(TDRV);
-                    } else {
-                        if (usingRD)
-                            command.setMode(NSTDRD);
-                        else
-                            command.setMode(NSTDRV);
-                    }
                     motionSetPoint.setX(nextNode.x);
                     motionSetPoint.setY(nextNode.y);
+
+                    if (path.size() <= 2) {
+                        if (usingRD)
+                            command.setMode(MoveMode.TDRD.ordinal());
+                        else
+                            command.setMode(MoveMode.TDRV.ordinal());
+                    } else {
+                        if (usingRD)
+                            command.setMode(MoveMode.NSTDRD.ordinal());
+                        else
+                            command.setMode(MoveMode.NSTDRV.ordinal());
+                    }
                 } else {
-                    if (usingRD)
-                        command.setMode(TVRD);
-                    else
-                        command.setMode(TVRV);
                     motionSetPoint.setX(0);
                     motionSetPoint.setY(0);
+
+                    if (usingRD)
+                        command.setMode(MoveMode.TVRD.ordinal());
+                    else
+                        command.setMode(MoveMode.TVRV.ordinal());
                 }
             } else {
-                command.setMode(TDRV);
+                command.setMode(MoveMode.TDRV.ordinal());
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
                 motionSetPoint.setZ(0);
             }
         } else {
-            command.setMode(TVRV);
+            command.setMode(MoveMode.TVRV.ordinal());
+            motionSetPoint.setX(0);
+            motionSetPoint.setY(0);
+            motionSetPoint.setZ(0);
+        }
+        command.setMotionSetPoint(motionSetPoint);
+
+        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
+        command.setKickerSetPoint(kickerSetPoint);
+
+        return command.build();
+    }
+
+    private RemoteAPI.Commands createSprintAngleCmd() {
+        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
+        command.setIsWorldFrame(true);
+        command.setEnableBallAutoCapture(false);
+
+        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
+        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
+        if (path != null && path.size() > 0) {
+            double targetAngle = 0;
+            Vec2D allyPos = getData().getPos();
+            boolean targetAngleFound = false;
+            for (Vec2D node : path) {
+                double dist = node.sub(allyPos).mag();
+                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
+                    targetAngle = node.sub(allyPos).toPlayerAngle();
+                    targetAngleFound = true;
+                    break;
+                }
+            }
+
+            if (!targetAngleFound) {
+                targetAngle = angSub.getMsg();
+            }
+
+            Vec2D nextNode;
+            if (path.size() == 1)
+                nextNode = path.get(0);
+            else if (path.size() == 2)
+                nextNode = path.get(1);
+            else
+                nextNode = path.get(1);
+
+            double currAngle = getData().getAngle();
+            double angDiff = calcAngDiff(targetAngle, currAngle);
+
+            double absAngleDiff = Math.abs(angDiff);
+            boolean usingRD = false;
+
+            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+                usingRD = true;
+                motionSetPoint.setZ(targetAngle);
+            } else {
+                motionSetPoint.setZ(Math.signum(angDiff) * 100);
+            }
+
+            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+                motionSetPoint.setX(nextNode.x);
+                motionSetPoint.setY(nextNode.y);
+
+                if (path.size() <= 2) {
+                    if (usingRD)
+                        command.setMode(MoveMode.TDRD.ordinal());
+                    else
+                        command.setMode(MoveMode.TDRV.ordinal());
+                } else {
+                    if (usingRD)
+                        command.setMode(MoveMode.NSTDRD.ordinal());
+                    else
+                        command.setMode(MoveMode.NSTDRV.ordinal());
+                }
+            } else {
+                motionSetPoint.setX(0);
+                motionSetPoint.setY(0);
+
+                if (usingRD)
+                    command.setMode(MoveMode.TVRD.ordinal());
+                else
+                    command.setMode(MoveMode.TVRV.ordinal());
+            }
+        } else {
+            command.setMode(MoveMode.TVRV.ordinal());
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
             motionSetPoint.setZ(0);
@@ -511,10 +597,10 @@ public class Ally extends Robot {
 
         double absAngleDiff = Math.abs(angDiff);
         if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            command.setMode(TVRD);
+            command.setMode(MoveMode.TVRD.ordinal());
             motionSetPoint.setZ(targetAngle);
         } else {
-            command.setMode(TVRV);
+            command.setMode(MoveMode.TVRV.ordinal());
             motionSetPoint.setZ(Math.signum(angDiff) * 100);
         }
         command.setMotionSetPoint(motionSetPoint);
@@ -532,12 +618,25 @@ public class Ally extends Robot {
         Vec2D ballPos = ballSub.getMsg().getPos();
         Vec2D currPos = getData().getPos();
         Vec2D currPosToBall = ballPos.sub(currPos);
-        if (currPosToBall.mag() <= PathfinderConfig.GET_BALL_CAP_DIST_THRESH) {
+        if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             return createAutoCapCmd();
         } else {
             pointPub.publish(ballPos);
             angPub.publish(currPosToBall.toPlayerAngle());
             return createFollowPathCmd();
+        }
+    }
+
+    private RemoteAPI.Commands receiveBallCmd() {
+        Vec2D ballPos = ballSub.getMsg().getPos();
+        Vec2D currPos = getData().getPos();
+        double dist = ballPos.sub(currPos).mag();
+        if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
+            return createAutoCapCmd();
+        } else {
+            double targetAngle = ballPos.sub(currPos).toPlayerAngle();
+            angPub.publish(targetAngle);
+            return createSprintAngleCmd();
         }
     }
 
