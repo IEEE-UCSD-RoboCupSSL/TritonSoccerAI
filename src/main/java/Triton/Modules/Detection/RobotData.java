@@ -1,9 +1,13 @@
 package Triton.Modules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Triton.Config.ObjectConfig;
 import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Dependencies.Team;
+import org.javatuples.Pair;
+
+import java.util.ArrayList;
 
 /**
  * Stores data about robot object
@@ -14,48 +18,119 @@ public class RobotData {
     private final Team team;
     private final int ID;
 
-    private double time;
-    private Vec2D lastPos, pos;
-    private Vec2D lastVel, vel;
+    private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
     private Vec2D accel;
 
-    private double lastAngle, angle;
-    private double lastAngVel, angVel;
-    private double angAccel;
+    private final ArrayList<Pair<Double, Double>> angleArray, angleVelArray;
+    private double angleAccel;
 
     public RobotData(Team team, int ID) {
         this.team = team;
         this.ID = ID;
 
-        pos = new Vec2D(0, 0);
-        vel = new Vec2D(0, 0);
+        posArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
+        posArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
+        velArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
+        velArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
         accel = new Vec2D(0, 0);
+
+        angleArray = new ArrayList<Pair<Double, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
+        angleArray.add(new Pair<Double, Double>(0.0, 0.0));
+        angleVelArray = new ArrayList<Pair<Double, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
+        angleVelArray.add(new Pair<Double, Double>(0.0, 0.0));
+        angleAccel = 0.0;
     }
 
     public void update(SSL_DetectionRobot detection, double time) {
-        if (time < this.time)
-            return;
-
-        double timeDiff = time - this.time;
-
         Vec2D audienceRobotPos = new Vec2D(detection.getX(), detection.getY());
-        pos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
+        Vec2D currPos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
+        Pair<Vec2D, Double> posTimePair = new Pair<>(currPos, time);
+
         double audienceRobotAngle = Math.toDegrees(detection.getOrientation());
-        angle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);
+        double currAngle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);
+        Pair<Double, Double> angleTimePair = new Pair<>(currAngle, time);
 
-        if (lastPos != null)
-            vel = pos.sub(lastPos).mult(1 / timeDiff);
-        if (lastVel != null)
-            accel = vel.sub(lastVel).mult(1 / timeDiff);
+        updatePos(posTimePair);
+        updateVel();
+        updateAccel();
 
-        angVel = angle - lastAngle;
-        angAccel = angVel - lastAngVel;
+        updateAngle(angleTimePair);
+        updateAngleVel();
+        updateAngleAccel();
+    }
 
-        this.time = time;
-        lastPos = pos;
-        lastVel = vel;
-        lastAngle = angle;
-        lastAngVel = angVel;
+    private void updatePos(Pair<Vec2D, Double> posTimePair) {
+        posArray.add(posTimePair);
+        posArray.sort(new TimePairComparator<Vec2D>());
+        if (posArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
+            posArray.remove(0);
+    }
+
+    private void updateVel() {
+        Pair<Vec2D, Double> newestPosTimePair = posArray.get(posArray.size() - 1);
+        Vec2D newestPos = newestPosTimePair.getValue0();
+        double newestPosTime = newestPosTimePair.getValue1();
+
+        Pair<Vec2D, Double> oldestPosTimePair = posArray.get(0);
+        Vec2D oldestPos = oldestPosTimePair.getValue0();
+        double oldestPosTime = oldestPosTimePair.getValue1();
+
+        Vec2D newestVel = newestPos.sub(oldestPos).mult(1 / (newestPosTime - oldestPosTime));
+        Pair<Vec2D, Double> newestVelTimePair = new Pair<Vec2D, Double>(newestVel, newestPosTime);
+        velArray.add(newestVelTimePair);
+        velArray.sort(new TimePairComparator<Vec2D>());
+
+        if (velArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
+            velArray.remove(0);
+    }
+
+    private void updateAccel() {
+        Pair<Vec2D, Double> newestVelTimePair = velArray.get(velArray.size() - 1);
+        Vec2D newestVel = newestVelTimePair.getValue0();
+        double newestVelTime = newestVelTimePair.getValue1();
+
+        Pair<Vec2D, Double> oldestVelTimePair = velArray.get(0);
+        Vec2D oldestVel = oldestVelTimePair.getValue0();
+        double oldestVelTime = oldestVelTimePair.getValue1();
+
+        accel = newestVel.sub(oldestVel).mult(1 / (newestVelTime - oldestVelTime));
+    }
+
+    private void updateAngle(Pair<Double, Double> angleTimePair) {
+        angleArray.add(angleTimePair);
+        angleArray.sort(new TimePairComparator<Double>());
+        if (angleArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
+            angleArray.remove(0);
+    }
+
+    private void updateAngleVel() {
+        Pair<Double, Double> newestAngleTimePair = angleArray.get(angleArray.size() - 1);
+        double newestAngle = newestAngleTimePair.getValue0();
+        double newestAngleTime = newestAngleTimePair.getValue1();
+
+        Pair<Double, Double> oldestAngleTimePair = angleArray.get(0);
+        double oldestAngle = oldestAngleTimePair.getValue0();
+        double oldestAngleTime = oldestAngleTimePair.getValue1();
+
+        double newestAngleVel = (newestAngle - oldestAngle) / (newestAngleTime - oldestAngleTime);
+        Pair<Double, Double> newestAngleVelTimePair = new Pair<Double, Double>(newestAngleVel, newestAngleTime);
+        angleVelArray.add(newestAngleVelTimePair);
+        angleVelArray.sort(new TimePairComparator<Double>());
+
+        if (angleVelArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
+            angleVelArray.remove(0);
+    }
+
+    private void updateAngleAccel() {
+        Pair<Double, Double> newestAngleVelTimePair = angleVelArray.get(angleVelArray.size() - 1);
+        double newestAngleVel = newestAngleVelTimePair.getValue0();
+        double newestAngleVelTime = newestAngleVelTimePair.getValue1();
+
+        Pair<Double, Double> oldestAngleVelTimePair = angleVelArray.get(0);
+        double oldestAngleVel = oldestAngleVelTimePair.getValue0();
+        double oldestAngleVelTime = oldestAngleVelTimePair.getValue1();
+
+        angleAccel = (newestAngleVel - oldestAngleVel) / (newestAngleVelTime - oldestAngleVelTime);
     }
 
     public Team getTeam() {
@@ -67,15 +142,15 @@ public class RobotData {
     }
 
     public double getTime() {
-        return time;
+        return posArray.get(posArray.size() - 1).getValue1();
     }
 
     public Vec2D getPos() {
-        return pos;
+        return posArray.get(posArray.size() - 1).getValue0();
     }
 
     public Vec2D getVel() {
-        return vel;
+        return velArray.get(velArray.size() - 1).getValue0();
     }
 
     public Vec2D getAccel() {
@@ -83,14 +158,14 @@ public class RobotData {
     }
 
     public double getAngle() {
-        return angle;
+        return angleArray.get(angleArray.size() - 1).getValue0();
     }
 
-    public double getAngVel() {
-        return angVel;
+    public double getAngleVel() {
+        return angleVelArray.get(angleVelArray.size() - 1).getValue0();
     }
 
     public double getAngAccel() {
-        return angAccel;
+        return angleAccel;
     }
 }

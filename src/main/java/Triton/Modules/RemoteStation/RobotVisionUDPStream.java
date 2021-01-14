@@ -62,7 +62,7 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         toSend.setBotPos(allyData.getPos().toProto());
         toSend.setBotVel(allyData.getVel().toProto());
         toSend.setBotAng(allyData.getAngle());
-        toSend.setBotAngVel(allyData.getAngVel());
+        toSend.setBotAngVel(allyData.getAngleVel());
         toSend.setBallPos(ballData.getPos().toProto());
         toSend.setBallVel(ballData.getVel().toProto());
         bytes = toSend.build().toByteArray();

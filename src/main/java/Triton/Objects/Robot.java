@@ -2,6 +2,7 @@ package Triton.Objects;
 
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
+import Triton.Dependencies.Shape.Vec2D;
 import Triton.Modules.Detection.RobotData;
 import Triton.Dependencies.Team;
 
@@ -29,6 +30,16 @@ public abstract class Robot implements Module {
 
     public RobotData getData() {
         return dataSub.getMsg();
+    }
+
+    public Vec2D predPosAtTime(double time) {
+        RobotData robotData = getData();
+        Vec2D pos = robotData.getPos();
+        Vec2D vel = robotData.getVel();
+        Vec2D accel = robotData.getAccel();
+
+        return pos.add(vel.mult(time));
+//        return pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
     }
 
     public int timeToPoint() {

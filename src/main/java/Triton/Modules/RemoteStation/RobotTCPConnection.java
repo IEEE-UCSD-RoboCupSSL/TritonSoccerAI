@@ -134,14 +134,6 @@ public class RobotTCPConnection implements Module {
         return false;
     }
 
-    public void sendDummy() {
-        if (!isConnected) {
-            return;
-        }
-
-        tcpCommandPub.publish("anything");
-    }
-
     /**
      * Sends initial location to robot
      */
@@ -161,7 +153,6 @@ public class RobotTCPConnection implements Module {
     public void run() {
         try {
             while (true) {
-                sendDummy();
             }
         } catch (Exception e) {
             e.printStackTrace();

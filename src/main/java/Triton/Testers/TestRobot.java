@@ -2,6 +2,7 @@ package Triton.Testers;
 
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.Shape.Vec2D;
+import Triton.Modules.Detection.BallData;
 import Triton.Objects.Ally;
 import Triton.Objects.Ball;
 
@@ -20,7 +21,12 @@ public class TestRobot implements Module {
     public void run() {
         try {
             while (true) {
-                ally.receiveBall(new Vec2D(2000, 2000));
+//                BallData ballData = ball.getData();
+//                Vec2D ballPos = ballData.getPos();
+//                Vec2D ballVel = ballData.getVel();
+//                Vec2D allyPos = ally.getData().getPos();
+
+                ally.receiveBall(ball.predPosAtTime(0.25));
             }
         } catch (Exception e) {
             e.printStackTrace();

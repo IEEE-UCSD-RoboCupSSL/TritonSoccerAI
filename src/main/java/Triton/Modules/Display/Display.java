@@ -1,10 +1,6 @@
 package Triton.Modules.Display;
 
-import Proto.MessagesRobocupSslGeometry.SSL_FieldCicularArc;
-import Proto.MessagesRobocupSslGeometry.SSL_GeometryFieldSize;
-import Triton.Algorithms.PathFinder.JPS.Node;
 import Triton.Dependencies.Gridify;
-import Triton.Algorithms.PathFinder.JPS.JPSPathFinder;
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
@@ -18,9 +14,7 @@ import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -246,13 +240,14 @@ public class Display extends JPanel {
     }
 
     private void paintPrediction(Graphics2D g2d) {
-        RobotData robotData = blueRobotSubs.get(0).getMsg();
-        Vec2D pos = robotData.getPos();
-        Vec2D vel = robotData.getVel();
-        Vec2D accel = robotData.getAccel();
+        BallData ballData = ballSub.getMsg();
+        Vec2D pos = ballData.getPos();
+        Vec2D vel = ballData.getVel();
+        Vec2D accel = ballData.getAccel();
 
         double time = 1;
-        Vec2D predPos = pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
+        Vec2D predPos = pos.add(vel.mult(time));
+//        Vec2D predPos = pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
 
         int[] screenPos = convert.fromPos(pos);
         int[] screenPredPos = convert.fromPos(predPos);

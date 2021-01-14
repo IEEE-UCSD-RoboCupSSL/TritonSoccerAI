@@ -90,8 +90,8 @@ public class App {
             pool.submit(foe);
         }
 
-        Runnable testRobot = new TestRobot(allies[0], ball);
-        pool.submit(testRobot);
+        Runnable ai = new AI(allies, foes, ball);
+        pool.submit(ai);
 
         allies[0].displayPathFinder();
     }
