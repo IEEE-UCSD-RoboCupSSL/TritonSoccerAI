@@ -164,7 +164,7 @@ public class Ally extends Robot {
         angPub.publish(angle);
     }
 
-    /*** ... methods ***/
+    /*** Skills methods ***/
     public void getBall() {
         statePub.publish(GET_BALL);
     }
