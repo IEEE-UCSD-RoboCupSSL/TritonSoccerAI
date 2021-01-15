@@ -26,10 +26,10 @@ public class AI implements Module {
     public void run() {
         try {
             ArrayList<Vec2D> innerPath = new ArrayList<>();
-            innerPath.add(new Vec2D(1000, 1000));
-            innerPath.add(new Vec2D(1000, -1000));
-            innerPath.add(new Vec2D(-1000, -1000));
-            innerPath.add(new Vec2D(-1000, 1000));
+            innerPath.add(new Vec2D(500, 500));
+            innerPath.add(new Vec2D(500, -500));
+            innerPath.add(new Vec2D(-500, -500));
+            innerPath.add(new Vec2D(-500, 500));
 
             int innerOffset = 0;
 
@@ -39,10 +39,10 @@ public class AI implements Module {
             }
 
             ArrayList<Vec2D> outerPath = new ArrayList<>();
-            outerPath.add(new Vec2D(2000, 2000));
-            outerPath.add(new Vec2D(-2000, -2000));
-            outerPath.add(new Vec2D(2000, -2000));
-            outerPath.add(new Vec2D(-2000, 2000));
+            outerPath.add(new Vec2D(1000, 1000));
+            outerPath.add(new Vec2D(-1000, -1000));
+            outerPath.add(new Vec2D(1000, -1000));
+            outerPath.add(new Vec2D(-1000, 1000));
 
             int outerOffset = 0;
 
