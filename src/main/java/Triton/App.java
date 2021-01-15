@@ -57,43 +57,51 @@ public class App {
             }
         }
 
+        /* Prepare a Thread Pool*/
         ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
+        /* Instantiate & Run each independent modules in a separate thread from the thread pool */
         Runnable visionModule = new VisionModule();
         Runnable geoModule = new GeometryModule();
         Runnable detectModule = new DetectionModule();
-
         pool.submit(visionModule);
         pool.submit(geoModule);
         pool.submit(detectModule);
-
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        /* Instantiate & run Ball module*/
         Ball ball = new Ball();
         pool.submit(ball);
 
-        Ally[] allies = new Ally[ObjectConfig.ROBOT_COUNT];
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        /* Instantiate & run Our Robots (Ally) modules */
+        Ally[] allies = new Ally[ObjectConfig.ROBOT_COUNT - 1];
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT - 1; i++) {
             Ally ally = new Ally(ObjectConfig.MY_TEAM, i, pool);
             allies[i] = ally;
             pool.submit(ally);
         }
+        Ally goalKeeper = new Ally(ObjectConfig.MY_TEAM, ObjectConfig.ROBOT_COUNT - 1, pool);
+        pool.submit(goalKeeper);
 
-        Team foeTeam = (ObjectConfig.MY_TEAM == Team.BLUE) ? Team.YELLOW : Team.BLUE;
+
+        /* Instantiate & run Opponent Robots (Foe) modules */
         Foe[] foes = new Foe[ObjectConfig.ROBOT_COUNT];
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            Team foeTeam = (ObjectConfig.MY_TEAM == Team.BLUE) ? Team.YELLOW : Team.BLUE;
             Foe foe = new Foe(foeTeam, i);
             foes[i] = foe;
             pool.submit(foe);
         }
 
-        Runnable ai = new AI(allies, foes, ball);
+        /* Instantiate & Run the main AI module, which is the core of this software */
+        Runnable ai = new AI(allies, goalKeeper, foes, ball);
         pool.submit(ai);
 
+        /* A visualization tool */
         Display display = new Display();
     }
 }
