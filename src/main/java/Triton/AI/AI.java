@@ -9,8 +9,6 @@ import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 import Triton.Objects.Robot;
 
-import java.util.concurrent.ThreadPoolExecutor;
-
 public class AI implements Module {
     private static final double KICK_DIST = 100;
 
@@ -22,6 +20,7 @@ public class AI implements Module {
     private final Estimator estimator;
     private final GoalKeeping goalKeeping;
 
+
     public AI(Ally[] allies, Ally goalKeeper, Foe[] foes, Ball ball) {
         this.allies = allies;
         this.goalKeeper = goalKeeper;
@@ -32,13 +31,41 @@ public class AI implements Module {
         goalKeeping = new GoalKeeping(goalKeeper, ball, estimator);
     }
 
+    private GameStates getCurrGameState() {
+        // ...
+        return GameStates.Active;
+    }
+
+    private void DecisionTreeEins() {
+        GameStates currGameState = getCurrGameState();
+        if(currGameState == GameStates.Active) {
+            Robot ballHolder = estimator.getBallHolder();
+            if(ballHolder == null) {
+                // Eval & SeizeOpportunity
+            }
+            else {
+                if (ballHolder instanceof Ally) {
+                    // play Attack
+                }
+                else if (ballHolder instanceof Foe ){
+                    // play defense
+                }
+            }
+        }
+        else {
+            // ...
+        }
+    }
+
+
     @Override
     public void run() {
 
         try {
             while (true) {
                 //printBallHolder();
-                printBallTraj();
+                //printBallTraj();
+                DecisionTreeEins();
             }
         } catch (Exception e) {
             e.printStackTrace();
