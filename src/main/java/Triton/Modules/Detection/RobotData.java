@@ -18,11 +18,11 @@ public class RobotData {
     private final Team team;
     private final int ID;
 
+    private Vec2D pos, vel, accel;
     private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
-    private Vec2D accel;
 
+    private double angle, angleVel, angleAccel, time;
     private final ArrayList<Pair<Double, Double>> angleArray, angleVelArray;
-    private double angleAccel;
 
     public RobotData(Team team, int ID) {
         this.team = team;
@@ -32,13 +32,20 @@ public class RobotData {
         posArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
         velArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
         velArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
+
+        pos = new Vec2D(0, 0);
+        vel = new Vec2D(0, 0);
         accel = new Vec2D(0, 0);
 
         angleArray = new ArrayList<Pair<Double, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
         angleArray.add(new Pair<Double, Double>(0.0, 0.0));
         angleVelArray = new ArrayList<Pair<Double, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
         angleVelArray.add(new Pair<Double, Double>(0.0, 0.0));
+
+        angle = 0.0;
+        angleVel = 0.0;
         angleAccel = 0.0;
+        time = 0.0;
     }
 
     public void update(SSL_DetectionRobot detection, double time) {
@@ -64,6 +71,9 @@ public class RobotData {
         posArray.sort(new TimePairComparator<Vec2D>());
         if (posArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             posArray.remove(0);
+
+        pos = posArray.get(posArray.size() - 1).getValue0();
+        time = posArray.get(posArray.size() - 1).getValue1();
     }
 
     private void updateVel() {
@@ -82,6 +92,8 @@ public class RobotData {
 
         if (velArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             velArray.remove(0);
+
+        vel = velArray.get(velArray.size() - 1).getValue0();
     }
 
     private void updateAccel() {
@@ -101,6 +113,8 @@ public class RobotData {
         angleArray.sort(new TimePairComparator<Double>());
         if (angleArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             angleArray.remove(0);
+
+        angle = angleArray.get(angleArray.size() - 1).getValue0();
     }
 
     private void updateAngleVel() {
@@ -119,6 +133,8 @@ public class RobotData {
 
         if (angleVelArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             angleVelArray.remove(0);
+
+        angleVel = angleVelArray.get(angleVelArray.size() - 1).getValue0();
     }
 
     private void updateAngleAccel() {
@@ -142,15 +158,15 @@ public class RobotData {
     }
 
     public double getTime() {
-        return posArray.get(posArray.size() - 1).getValue1();
+        return time;
     }
 
     public Vec2D getPos() {
-        return posArray.get(posArray.size() - 1).getValue0();
+        return pos;
     }
 
     public Vec2D getVel() {
-        return velArray.get(velArray.size() - 1).getValue0();
+        return vel;
     }
 
     public Vec2D getAccel() {
@@ -158,11 +174,11 @@ public class RobotData {
     }
 
     public double getAngle() {
-        return angleArray.get(angleArray.size() - 1).getValue0();
+        return angle;
     }
 
     public double getAngleVel() {
-        return angleVelArray.get(angleVelArray.size() - 1).getValue0();
+        return angleVel;
     }
 
     public double getAngAccel() {

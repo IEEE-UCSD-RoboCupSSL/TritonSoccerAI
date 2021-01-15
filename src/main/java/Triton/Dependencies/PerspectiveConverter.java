@@ -51,4 +51,14 @@ public class PerspectiveConverter {
             return playerAngle - 180;
         }
     }
+
+    public static double normAng(double ang) {
+        ang = (ang > 180) ? ang - 360 : ang;
+        ang = (ang < -180) ? ang + 360 : ang;
+        return ang;
+    }
+
+    public static double calcAngDiff(double angA, double angB) {
+        return normAng(angA - angB);
+    }
 }

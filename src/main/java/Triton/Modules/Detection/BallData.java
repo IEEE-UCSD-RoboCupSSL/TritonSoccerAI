@@ -12,15 +12,20 @@ import java.util.ArrayList;
  * Class to store information about the ball
  */
 public class BallData {
+    private Vec2D pos, vel, accel;
     private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
-    private Vec2D accel;
+    private double time;
 
     public BallData() {
         posArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
         posArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
         velArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
         velArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
+
+        pos = new Vec2D(0, 0);
+        vel = new Vec2D(0, 0);
         accel = new Vec2D(0, 0);
+        time = 0.0;
     }
 
     /**
@@ -43,6 +48,9 @@ public class BallData {
         posArray.sort(new TimePairComparator<Vec2D>());
         if (posArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             posArray.remove(0);
+
+        pos = posArray.get(posArray.size() - 1).getValue0();
+        time = posArray.get(posArray.size() - 1).getValue1();
     }
 
     private void updateVel() {
@@ -61,6 +69,8 @@ public class BallData {
 
         if (velArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
             velArray.remove(0);
+
+        vel = velArray.get(velArray.size() - 1).getValue0();
     }
 
     private void updateAccel() {
@@ -76,15 +86,15 @@ public class BallData {
     }
 
     public double getTime() {
-        return posArray.get(posArray.size() - 1).getValue1();
+        return time;
     }
 
     public Vec2D getPos() {
-        return posArray.get(posArray.size() - 1).getValue0();
+        return pos;
     }
 
     public Vec2D getVel() {
-        return velArray.get(velArray.size() - 1).getValue0();
+        return vel;
     }
 
     public Vec2D getAccel() {
