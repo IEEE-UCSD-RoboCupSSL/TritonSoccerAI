@@ -1,6 +1,7 @@
 package Triton.AI.Estimators;
 
 
+import Triton.AI.GoalKeeping.GoalKeeping;
 import Triton.Config.AIConfig;
 import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Vec2D;
@@ -22,10 +23,12 @@ public class Estimator {
     private final Ally[] allies;
     private final Foe[] foes;
     private final Ball ball;
-    public Estimator(Ally[] allies, Foe[] foes, Ball ball) {
+    private final Ally goalKeeper;
+    public Estimator(Ally[] allies, Ally goalKeeper, Foe[] foes, Ball ball) {
         this.allies = allies;
         this.foes = foes;
         this.ball = ball;
+        this.goalKeeper = goalKeeper;
     }
 
     /*
@@ -38,6 +41,7 @@ public class Estimator {
         ArrayList<Robot> bots = new ArrayList<Robot>();
         bots.addAll(Arrays.asList(allies));
         bots.addAll(Arrays.asList(foes));
+        bots.add(goalKeeper);
 
         for (Robot bot: bots) {
             RobotData botData = bot.getData();
@@ -63,7 +67,7 @@ public class Estimator {
     public Vec2D getAimTrajectory() {
         Robot bot = getBallHolder();
         if (bot == null)
-            return null;
+            return new Vec2D(0.00, 0.00);
 
         return new Vec2D(bot.getData().getAngle());
     }

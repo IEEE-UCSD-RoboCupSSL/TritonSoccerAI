@@ -1,6 +1,7 @@
 package Triton.AI;
 
 import Triton.AI.Estimators.Estimator;
+import Triton.AI.GoalKeeping.GoalKeeping;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Objects.Ally;
@@ -8,7 +9,7 @@ import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 import Triton.Objects.Robot;
 
-import java.util.ArrayList;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class AI implements Module {
     private static final double KICK_DIST = 100;
@@ -18,8 +19,8 @@ public class AI implements Module {
     private final Foe[] foes;
     private final Ball ball;
 
-
-    private Estimator estimator;
+    private final Estimator estimator;
+    private final GoalKeeping goalKeeping;
 
     public AI(Ally[] allies, Ally goalKeeper, Foe[] foes, Ball ball) {
         this.allies = allies;
@@ -27,11 +28,13 @@ public class AI implements Module {
         this.foes = foes;
         this.ball = ball;
 
-        estimator = new Estimator(allies, foes, ball);
+        estimator = new Estimator(allies, goalKeeper, foes, ball);
+        goalKeeping = new GoalKeeping(goalKeeper, ball, estimator);
     }
 
     @Override
     public void run() {
+
         try {
             while (true) {
                 //printBallHolder();
