@@ -65,9 +65,7 @@ public class Estimator {
         if (bot == null)
             return null;
 
-        Vec2D botPos = bot.getData().getPos();
-        Vec2D ballPos = ball.getData().getPos();
-        return ballPos.sub(botPos).norm();
+        return new Vec2D(bot.getData().getAngle());
     }
 
 

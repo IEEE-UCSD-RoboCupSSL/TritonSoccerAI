@@ -22,9 +22,9 @@ public class Vec2D {
     }
 
     public Vec2D(double playerAngle) {
-        double angle = playerAngle + 90;
-        x = Math.cos(angle);
-        y = Math.sin(angle);
+        double angle = -(playerAngle + 90);
+        x = Math.sin(angle);
+        y = Math.cos(angle);
     }
 
     /**
