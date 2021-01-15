@@ -1,6 +1,7 @@
 package Triton.Dependencies.Shape;
 
 import Proto.RemoteAPI;
+import Triton.Dependencies.PerspectiveConverter;
 
 /**
  * Represents a 2D vector
@@ -18,6 +19,12 @@ public class Vec2D {
     public Vec2D(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vec2D(double playerAngle) {
+        double angle = playerAngle + 90;
+        x = Math.cos(angle);
+        y = Math.sin(angle);
     }
 
     /**
@@ -140,6 +147,10 @@ public class Vec2D {
         return diffX2 + diffY2;
     }
 
+    public static double angleDiff(Vec2D v1, Vec2D v2) {
+        return Math.atan2(v2.y,v2.x) - Math.atan2(v1.y,v1.x);
+    }
+
     /**
      * @return angle starting from x-axis, positive is counter clockwise
      */
@@ -156,9 +167,7 @@ public class Vec2D {
      */
     public double toPlayerAngle() {
         double angle = toAngle() - 90;
-        angle = (angle > 180) ? angle - 360 : angle;
-        angle = (angle < -180) ? angle + 360 : angle;
-        return angle;
+        return PerspectiveConverter.normAng(angle);
     }
 
     /**

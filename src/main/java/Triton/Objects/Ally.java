@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static Triton.Dependencies.PerspectiveConverter.calcAngDiff;
+import static Triton.Dependencies.PerspectiveConverter.normAng;
 import static Triton.Objects.AllyState.*;
 import static Triton.Objects.AllyState.TVRV;
 
@@ -646,16 +648,6 @@ public class Ally extends Robot {
 
     private RemoteAPI.Commands createPassCmd() {
         return null;
-    }
-
-    private double normAng(double ang) {
-        ang = (ang > 180) ? ang - 360 : ang;
-        ang = (ang < -180) ? ang + 360 : ang;
-        return ang;
-    }
-
-    private double calcAngDiff(double angA, double angB) {
-        return normAng(angA - angB);
     }
 
     public void displayPathFinder() {
