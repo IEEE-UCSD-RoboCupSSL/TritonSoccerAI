@@ -9,12 +9,14 @@ import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 import Triton.Objects.Robot;
 
+import java.util.ArrayList;
+
 public class AI implements Module {
     private static final double KICK_DIST = 100;
 
-    private final Ally[] allies;
-    private final Ally goalKeeper;
-    private final Foe[] foes;
+    private final ArrayList<Ally> allies;
+    private final Ally keeper;
+    private final ArrayList<Foe> foes;
     private final Ball ball;
 
     private final Formation formation;
@@ -22,15 +24,15 @@ public class AI implements Module {
     private final GoalKeeping goalKeeping;
 
 
-    public AI(Ally[] allies, Ally goalKeeper, Foe[] foes, Ball ball) {
+    public AI(ArrayList<Ally> allies, Ally keeper, ArrayList<Foe> foes, Ball ball) {
         this.allies = allies;
-        this.goalKeeper = goalKeeper;
+        this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
 
         formation = Formation.getInstance();
-        estimator = new Estimator(allies, goalKeeper, foes, ball);
-        goalKeeping = new GoalKeeping(goalKeeper, ball, estimator);
+        estimator = new Estimator(allies, keeper, foes, ball);
+        goalKeeping = new GoalKeeping(keeper, ball, estimator);
     }
 
     @Override

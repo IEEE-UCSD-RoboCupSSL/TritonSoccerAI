@@ -20,11 +20,11 @@ import java.util.Arrays;
  * on the game field
  * */
 public class Estimator {
-    private final Ally[] allies;
-    private final Foe[] foes;
+    private final ArrayList<Ally> allies;
+    private final ArrayList<Foe> foes;
     private final Ball ball;
     private final Ally goalKeeper;
-    public Estimator(Ally[] allies, Ally goalKeeper, Foe[] foes, Ball ball) {
+    public Estimator(ArrayList<Ally> allies, Ally goalKeeper, ArrayList<Foe> foes, Ball ball) {
         this.allies = allies;
         this.foes = foes;
         this.ball = ball;
@@ -39,8 +39,8 @@ public class Estimator {
         Vec2D ballPos = ball.getData().getPos();
 
         ArrayList<Robot> bots = new ArrayList<Robot>();
-        bots.addAll(Arrays.asList(allies));
-        bots.addAll(Arrays.asList(foes));
+        bots.addAll(allies);
+        bots.addAll(foes);
         bots.add(goalKeeper);
 
         for (Robot bot: bots) {

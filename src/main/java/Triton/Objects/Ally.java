@@ -41,12 +41,12 @@ public class Ally extends Robot {
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
-    protected ThreadPoolExecutor pool;
+    protected ThreadPoolExecutor threadPool;
     private PathFinder pathFinder;
 
-    public Ally(Team team, int ID, ThreadPoolExecutor pool) {
+    public Ally(Team team, int ID, ThreadPoolExecutor threadPool) {
         super(team, ID);
-        this.pool = pool;
+        this.threadPool = threadPool;
 
         conn = new RobotConnection(ID);
 
@@ -192,12 +192,12 @@ public class Ally extends Robot {
             conn.getTCPConnection().connect();
             conn.getTCPConnection().sendInit();
 
-            pool.submit(conn.getTCPConnection());
-            pool.submit(conn.getTCPConnection().getSendTCP());
-            pool.submit(conn.getTCPConnection().getReceiveTCP());
-            pool.submit(conn.getCommandStream());
-            // pool.execute(conn.getDataStream());
-            pool.submit(conn.getVisionStream());
+            threadPool.submit(conn.getTCPConnection());
+            threadPool.submit(conn.getTCPConnection().getSendTCP());
+            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
+            threadPool.submit(conn.getCommandStream());
+            // threadPool.execute(conn.getDataStream());
+            threadPool.submit(conn.getVisionStream());
 
             while (true) {
                 publishCommand();

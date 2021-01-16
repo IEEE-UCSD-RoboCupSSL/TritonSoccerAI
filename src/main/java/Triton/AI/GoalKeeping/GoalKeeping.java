@@ -1,18 +1,18 @@
 package Triton.AI.GoalKeeping;
 
 import Triton.AI.Estimators.Estimator;
+import Triton.Dependencies.Shape.Vec2D;
 import Triton.Objects.Ally;
 import Triton.Objects.Ball;
-import Triton.Objects.Foe;
 
 public class GoalKeeping {
 
-    private final Ally goalKeeper;
+    private final Ally keeper;
     private final Ball ball;
     private final Estimator estimator;
 
-    public GoalKeeping(Ally goalKeeper, Ball ball, Estimator estimator) {
-        this.goalKeeper = goalKeeper;
+    public GoalKeeping(Ally keeper, Ball ball, Estimator estimator) {
+        this.keeper = keeper;
         this.ball = ball;
         this.estimator = estimator;
     }
@@ -24,6 +24,8 @@ public class GoalKeeping {
         }
         else {
             // more dangerous situation
+            Vec2D ballTraj = estimator.getAimTrajectory();
+
         }
     }
 

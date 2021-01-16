@@ -12,6 +12,7 @@ import Triton.Objects.Ball;
 import Triton.Objects.Foe;
 import Triton.Testers.TestRobot;
 
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,15 +59,15 @@ public class App {
         }
 
         /* Prepare a Thread Pool*/
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
-        /* Instantiate & Run each independent modules in a separate thread from the thread pool */
+        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         Runnable visionModule = new VisionModule();
         Runnable geoModule = new GeometryModule();
         Runnable detectModule = new DetectionModule();
-        pool.submit(visionModule);
-        pool.submit(geoModule);
-        pool.submit(detectModule);
+        threadPool.submit(visionModule);
+        threadPool.submit(geoModule);
+        threadPool.submit(detectModule);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -75,31 +76,31 @@ public class App {
 
         /* Instantiate & run Ball module*/
         Ball ball = new Ball();
-        pool.submit(ball);
+        threadPool.submit(ball);
 
         /* Instantiate & run Our Robots (Ally) modules */
-        Ally[] allies = new Ally[ObjectConfig.ROBOT_COUNT - 1];
+        ArrayList<Ally> allies = new ArrayList<Ally>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT - 1; i++) {
-            Ally ally = new Ally(ObjectConfig.MY_TEAM, i, pool);
-            allies[i] = ally;
-            pool.submit(ally);
+            Ally ally = new Ally(ObjectConfig.MY_TEAM, i, threadPool);
+            allies.add(ally);
+            threadPool.submit(ally);
         }
-        Ally goalKeeper = new Ally(ObjectConfig.MY_TEAM, ObjectConfig.ROBOT_COUNT - 1, pool);
-        pool.submit(goalKeeper);
+        Ally goalKeeper = new Ally(ObjectConfig.MY_TEAM, ObjectConfig.ROBOT_COUNT - 1, threadPool);
+        threadPool.submit(goalKeeper);
 
 
         /* Instantiate & run Opponent Robots (Foe) modules */
-        Foe[] foes = new Foe[ObjectConfig.ROBOT_COUNT];
+        ArrayList<Foe> foes = new ArrayList<Foe>();
         for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
             Team foeTeam = (ObjectConfig.MY_TEAM == Team.BLUE) ? Team.YELLOW : Team.BLUE;
             Foe foe = new Foe(foeTeam, i);
-            foes[i] = foe;
-            pool.submit(foe);
+            foes.add(foe);
+            threadPool.submit(foe);
         }
 
         /* Instantiate & Run the main AI module, which is the core of this software */
         Runnable ai = new AI(allies, goalKeeper, foes, ball);
-        pool.submit(ai);
+        threadPool.submit(ai);
 
         /* A visualization tool */
         Display display = new Display();
