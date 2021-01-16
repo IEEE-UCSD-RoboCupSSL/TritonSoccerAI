@@ -17,6 +17,7 @@ public class AI implements Module {
     private final Foe[] foes;
     private final Ball ball;
 
+    private final Formation formation;
     private final Estimator estimator;
     private final GoalKeeping goalKeeping;
 
@@ -27,21 +28,29 @@ public class AI implements Module {
         this.foes = foes;
         this.ball = ball;
 
+        formation = Formation.getInstance();
         estimator = new Estimator(allies, goalKeeper, foes, ball);
         goalKeeping = new GoalKeeping(goalKeeper, ball, estimator);
     }
 
-    private GameStates getCurrGameState() {
-        // ...
-        return GameStates.ACTIVE;
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                DecisionTree();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void DecisionTreeEins() {
+    private void DecisionTree() {
         GameStates currGameState = getCurrGameState();
 
         switch (currGameState) {
             case ACTIVE -> activeBranch();
             case PAUSED -> pausedBranch();
+            case DEBUG -> debugBranch();
             default -> defaultBranch();
         }
     }
@@ -49,7 +58,6 @@ public class AI implements Module {
     private void activeBranch() {
         Robot ballHolder = estimator.getBallHolder();
         if (ballHolder == null) {
-            // Eval & SeizeOpportunity
         }
         else {
             if (ballHolder instanceof Ally) {
@@ -64,21 +72,16 @@ public class AI implements Module {
     private void pausedBranch() {
     }
 
+    private void debugBranch() {
+        formation.defaultFormation(allies);
+    }
+
     private void defaultBranch() {
     }
 
-    @Override
-    public void run() {
-
-        try {
-            while (true) {
-                //printBallHolder();
-                //printBallTraj();
-                DecisionTreeEins();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private GameStates getCurrGameState() {
+        // ...
+        return GameStates.DEBUG;
     }
 
     private void printBallHolder() {

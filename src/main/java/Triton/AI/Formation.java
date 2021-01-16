@@ -24,10 +24,10 @@ public class Formation {
         return formation;
     }
 
-    public static boolean defaultFormation(Ally[] bots) {
+    public boolean defaultFormation(Ally[] bots) {
         return defaultFormation((ArrayList<Ally>)Arrays.asList(bots));
     }
-    public static boolean defaultFormation(ArrayList<Ally> bots) {
+    public boolean defaultFormation(ArrayList<Ally> bots) {
         Vec2D[] formationPoints = new Vec2D[ObjectConfig.ROBOT_COUNT - 1];
         formationPoints[0] = new Vec2D(0.00, -1000);
         formationPoints[1] = new Vec2D(-1000.00, -2000);
@@ -38,12 +38,12 @@ public class Formation {
         return moveToFormation(formationPoints, bots);
     }
 
-    public static boolean freeKickFormation(/*...*/) {
+    public boolean freeKickFormation(/*...*/) {
         return false;
     }
 
 
-    public static boolean penaltyFormation(/*...*/) {
+    public boolean penaltyFormation(/*...*/) {
         return false;
     }
 
@@ -51,7 +51,7 @@ public class Formation {
         return false;
     }
 
-    public static boolean moveToFormation(Vec2D[] formationPoints, ArrayList<Ally> bots) {
+    public boolean moveToFormation(Vec2D[] formationPoints, ArrayList<Ally> bots) {
         for (Ally ally : bots) {
             int botID = ally.getID();
             Vec2D allyPos = ally.getData().getPos();
