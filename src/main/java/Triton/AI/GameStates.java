@@ -1,10 +1,10 @@
 package Triton.AI;
 
 public enum GameStates {
-    Active,
-    Paused,
-    KickOff,
+    ACTIVE,
+    PAUSED,
+    KICK_OFF,
     //...
-    Debug,
-    InActive
+    DEBUG,
+    INACTIVE
 }

@@ -33,30 +33,39 @@ public class AI implements Module {
 
     private GameStates getCurrGameState() {
         // ...
-        return GameStates.Active;
+        return GameStates.ACTIVE;
     }
 
     private void DecisionTreeEins() {
         GameStates currGameState = getCurrGameState();
-        if(currGameState == GameStates.Active) {
-            Robot ballHolder = estimator.getBallHolder();
-            if(ballHolder == null) {
-                // Eval & SeizeOpportunity
-            }
-            else {
-                if (ballHolder instanceof Ally) {
-                    // play Attack
-                }
-                else if (ballHolder instanceof Foe ){
-                    // play defense
-                }
-            }
-        }
-        else {
-            // ...
+
+        switch (currGameState) {
+            case ACTIVE -> activeBranch();
+            case PAUSED -> pausedBranch();
+            default -> defaultBranch();
         }
     }
 
+    private void activeBranch() {
+        Robot ballHolder = estimator.getBallHolder();
+        if (ballHolder == null) {
+            // Eval & SeizeOpportunity
+        }
+        else {
+            if (ballHolder instanceof Ally) {
+                // play Attack
+            }
+            else if (ballHolder instanceof Foe ){
+                // play defense
+            }
+        }
+    }
+
+    private void pausedBranch() {
+    }
+
+    private void defaultBranch() {
+    }
 
     @Override
     public void run() {

@@ -18,7 +18,7 @@ public class Formation {
     }
 
     public static Formation getInstance() {
-        if(formation == null) {
+        if (formation == null) {
             formation = new Formation();
         }
         return formation;
@@ -35,12 +35,7 @@ public class Formation {
         formationPoints[3] = new Vec2D(-2000.00, -3000);
         formationPoints[4] = new Vec2D(2000.00, -3000);
 
-        for(Ally bot : bots) {
-            // ...
-        }
-
-        // return true when all our robots have arrived at their designated formation points
-        return false;
+        return moveToFormation(formationPoints, bots);
     }
 
     public static boolean freeKickFormation(/*...*/) {
@@ -56,6 +51,25 @@ public class Formation {
         return false;
     }
 
+    public static boolean moveToFormation(Vec2D[] formationPoints, ArrayList<Ally> bots) {
+        for (Ally ally : bots) {
+            int botID = ally.getID();
+            Vec2D allyPos = ally.getData().getPos();
+            Vec2D targetPos = formationPoints[botID];
+            ally.sprintTo(targetPos);
+        }
 
+        // return false when any robot is outside of their designated formation point
+        for (Ally ally : bots) {
+            int botID = ally.getID();
+            Vec2D allyPos = ally.getData().getPos();
+            Vec2D targetPos = formationPoints[botID];
+            double dist = Vec2D.dist(targetPos, allyPos);
+            if (dist > 200)
+                return false;
+        }
 
+        // return true when all our robots have arrived at their designated formation points
+        return true;
+    }
 }
