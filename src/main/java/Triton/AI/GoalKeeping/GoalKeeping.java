@@ -5,6 +5,8 @@ import Triton.Dependencies.Shape.Vec2D;
 import Triton.Objects.Ally;
 import Triton.Objects.Ball;
 
+import static java.lang.Math.abs;
+
 public class GoalKeeping {
 
     private final Ally keeper;
@@ -24,8 +26,28 @@ public class GoalKeeping {
         }
         else {
             // more dangerous situation
+            Vec2D ballPos = ball.getData().getPos();
             Vec2D ballTraj = estimator.getAimTrajectory();
+            Vec2D keeperPos = keeper.getData().getPos();
+            Vec2D keeperLine = new Vec2D(1, 0);
 
+            if (Math.abs(ballTraj.y) <= 0.0001) {
+                return;
+            } else if (Math.abs(ballTraj.x) <= 0.0001) {
+                keeper.pathTo(new Vec2D(ballPos.x, keeperPos.y), 0);
+                return;
+            }
+
+            double m1 = ballTraj.y / ballTraj.x;
+            double b1 = ballPos.y - (ballPos.x / m1);
+
+            double m2 = 0;
+            double b2 = keeperPos.y;
+
+            Vec2D targetPos = new Vec2D((b2 - b1) / m1, b2);
+
+            Vec2D targetToBall = ballPos.sub(targetPos);
+            keeper.pathTo(targetPos, targetToBall.toPlayerAngle());
         }
     }
 

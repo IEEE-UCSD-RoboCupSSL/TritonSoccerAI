@@ -76,6 +76,7 @@ public class AI implements Module {
 
     private void debugBranch() {
         formation.defaultFormation(allies);
+        goalKeeping.passiveGuarding();
     }
 
     private void defaultBranch() {
