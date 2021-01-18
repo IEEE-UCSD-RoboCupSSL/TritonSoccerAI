@@ -1,19 +1,16 @@
 package Triton.AI.Estimators;
 
 
-import Triton.AI.GoalKeeping.GoalKeeping;
 import Triton.Config.AIConfig;
 import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.Modules.Detection.RobotData;
-import Triton.Objects.Ally;
-import Triton.Objects.Ball;
-import Triton.Objects.Foe;
-import Triton.Objects.Robot;
-import org.eclipse.jetty.util.ArrayUtil;
+import Triton.MovingObjectModules.Robot.Ally;
+import Triton.MovingObjectModules.Robot.Foe;
+import Triton.StandAlongModules.Detection.RobotData;
+import Triton.MovingObjectModules.Ball.Ball;
+import Triton.MovingObjectModules.Robot.Robot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /* provide misc estimations methods to give AI
  * situation awareness of everything happening
@@ -72,6 +69,15 @@ public class Estimator {
         return new Vec2D(bot.getData().getAngle());
     }
 
+
+    /*
+     * under the premises of no robots is holding the ball,
+     * evaluate if Ally robots have a chance to get and hold
+     * the ball at the current timestamp
+     */
+    public boolean hasHoldBallChance() {
+        return true;
+    }
 
 
 }

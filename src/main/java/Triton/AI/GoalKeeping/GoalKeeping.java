@@ -2,8 +2,8 @@ package Triton.AI.GoalKeeping;
 
 import Triton.AI.Estimators.Estimator;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.Objects.Ally;
-import Triton.Objects.Ball;
+import Triton.MovingObjectModules.Ball.Ball;
+import Triton.MovingObjectModules.Robot.Ally;
 
 import static java.lang.Math.abs;
 

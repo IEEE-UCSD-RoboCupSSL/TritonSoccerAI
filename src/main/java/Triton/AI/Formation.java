@@ -2,12 +2,10 @@ package Triton.AI;
 
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.Objects.Ally;
-import Triton.Objects.Robot;
+import Triton.MovingObjectModules.Robot.Ally;
 
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Formation {
 

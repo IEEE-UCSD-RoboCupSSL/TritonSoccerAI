@@ -3,14 +3,14 @@ package Triton;
 import Triton.AI.AI;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.Team;
-import Triton.Modules.Detection.DetectionModule;
-import Triton.Modules.Display.Display;
-import Triton.Modules.Geometry.GeometryModule;
-import Triton.Modules.Vision.VisionModule;
-import Triton.Objects.Ally;
-import Triton.Objects.Ball;
-import Triton.Objects.Foe;
-import Triton.Testers.TestRobot;
+import Triton.MovingObjectModules.Robot.Ally;
+import Triton.MovingObjectModules.Robot.Foe;
+import Triton.StandAlongModules.Detection.DetectionModule;
+import Triton.StandAlongModules.Display.Display;
+import Triton.StandAlongModules.Geometry.GeometryModule;
+import Triton.StandAlongModules.Vision.GrSimVisionModule;
+import Triton.MovingObjectModules.Ball.Ball;
+
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -62,7 +62,7 @@ public class App {
         ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        Runnable visionModule = new VisionModule();
+        Runnable visionModule = new GrSimVisionModule();
         Runnable geoModule = new GeometryModule();
         Runnable detectModule = new DetectionModule();
         threadPool.submit(visionModule);
