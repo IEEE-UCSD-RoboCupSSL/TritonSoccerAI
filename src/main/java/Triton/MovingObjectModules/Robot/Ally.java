@@ -627,7 +627,7 @@ public class Ally extends Robot {
         } else {
             pointPub.publish(ballPos);
             angPub.publish(currPosToBall.toPlayerAngle());
-            return createFollowPathCmd();
+            return createSprintAngleCmd();
         }
     }
 
