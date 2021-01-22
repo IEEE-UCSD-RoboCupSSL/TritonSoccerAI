@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Display;
+package Triton.StandAloneModules.Display;
 
 import Triton.Config.DisplayConfig;
 

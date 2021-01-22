@@ -19,12 +19,15 @@ public class GoalKeeping {
         this.estimator = estimator;
     }
 
+    public void moveToStart() {
+        keeper.sprintToAngle(new Vec2D(0, -4400), 0);
+    }
 
     public void passiveGuarding() {
-        if(estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
-            // safer situation
-        }
-        else {
+//        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
+//            // safer situation
+//        }
+//        else {
             // more dangerous situation
             Vec2D ballPos = ball.getData().getPos();
             Vec2D ballTraj = estimator.getAimTrajectory();
@@ -48,11 +51,11 @@ public class GoalKeeping {
 
             Vec2D targetToBall = ballPos.sub(targetPos);
             keeper.pathTo(targetPos, targetToBall.toPlayerAngle());
-        }
+//        }
     }
 
     public void activeGuarding() {
-        if(estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
+        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
             // safer situation
         }
         else {

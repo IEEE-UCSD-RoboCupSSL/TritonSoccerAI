@@ -1,11 +1,10 @@
-package Triton.StandAlongModules.Vision;
+package Triton.StandAloneModules.Vision;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
 import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.ConnectionConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.MQPublisher;
-import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Publisher;
 
 import java.io.ByteArrayInputStream;

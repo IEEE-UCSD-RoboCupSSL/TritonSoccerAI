@@ -3,7 +3,7 @@ package Triton.MovingObjectModules.Ball;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.StandAlongModules.Detection.BallData;
+import Triton.StandAloneModules.Detection.BallData;
 
 public class Ball implements Module {
 
@@ -15,7 +15,7 @@ public class Ball implements Module {
 
     protected void subscribe() {
         try {
-            dataSub.subscribe();
+            dataSub.subscribe(1000);
         }
         catch(Exception e) {
             e.printStackTrace();

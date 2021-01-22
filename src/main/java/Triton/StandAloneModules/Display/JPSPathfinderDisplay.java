@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Display;
+package Triton.StandAloneModules.Display;
 
 import Triton.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.AI.Algorithms.PathFinder.JumpPointSearch.Node;

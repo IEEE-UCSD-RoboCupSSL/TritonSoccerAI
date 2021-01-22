@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.GameControl;
+package Triton.StandAloneModules.GameControl;
 
 public class CustomGameCtrlModule extends GameCtrlModule {
 }

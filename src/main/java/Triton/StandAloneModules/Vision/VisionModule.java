@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Vision;
+package Triton.StandAloneModules.Vision;
 
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 

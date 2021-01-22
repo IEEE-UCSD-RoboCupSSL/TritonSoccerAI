@@ -6,7 +6,7 @@ import Triton.Config.PathfinderConfig;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.StandAlongModules.Display.JPSPathfinderDisplay;
+import Triton.StandAloneModules.Display.JPSPathfinderDisplay;
 
 import java.util.ArrayList;
 import java.util.List;

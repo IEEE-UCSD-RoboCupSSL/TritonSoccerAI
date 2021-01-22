@@ -3,7 +3,7 @@ package Triton.MovingObjectModules.Robot;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.Shape.Vec2D;
-import Triton.StandAlongModules.Detection.RobotData;
+import Triton.StandAloneModules.Detection.RobotData;
 import Triton.Dependencies.Team;
 
 public abstract class Robot implements Module {
@@ -21,7 +21,7 @@ public abstract class Robot implements Module {
 
     protected void subscribe() {
         try {
-            dataSub.subscribe();
+            dataSub.subscribe(1000);
         }
         catch(Exception e) {
             e.printStackTrace();

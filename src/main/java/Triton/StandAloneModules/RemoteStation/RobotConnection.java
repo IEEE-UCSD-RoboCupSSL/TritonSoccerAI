@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.RemoteStation;
+package Triton.StandAloneModules.RemoteStation;
 
 import Triton.Config.ConnectionConfig;
 import Triton.Dependencies.Team;

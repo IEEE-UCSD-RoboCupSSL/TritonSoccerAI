@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.RemoteStation;
+package Triton.StandAloneModules.RemoteStation;
 
 import Proto.RemoteAPI.Commands;
 import Triton.Dependencies.DesignPattern.PubSubSystem.MQSubscriber;

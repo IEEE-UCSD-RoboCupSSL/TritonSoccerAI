@@ -9,9 +9,9 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.*;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.Dependencies.Team;
-import Triton.StandAlongModules.Detection.BallData;
-import Triton.StandAlongModules.Detection.RobotData;
-import Triton.StandAlongModules.RemoteStation.RobotConnection;
+import Triton.StandAloneModules.Detection.BallData;
+import Triton.StandAloneModules.Detection.RobotData;
+import Triton.StandAloneModules.RemoteStation.RobotConnection;
 
 import static Triton.MovingObjectModules.Robot.AllyState.*;
 import static Triton.MovingObjectModules.Robot.AllyState.MOVE_TDRD;
@@ -214,18 +214,18 @@ public class Ally extends Robot {
     protected void subscribe() {
         super.subscribe();
         try {
-            fieldSizeSub.subscribe();
+            fieldSizeSub.subscribe(1000);
             for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                yellowRobotSubs.get(i).subscribe();
-                blueRobotSubs.get(i).subscribe();
+                yellowRobotSubs.get(i).subscribe(1000);
+                blueRobotSubs.get(i).subscribe(1000);
             }
-            ballSub.subscribe();
+            ballSub.subscribe(1000);
 
-            dribStatSub.subscribe();
-            stateSub.subscribe();
-            pointSub.subscribe();
-            angSub.subscribe();
-            kickVelSub.subscribe();
+            dribStatSub.subscribe(1000);
+            stateSub.subscribe(1000);
+            pointSub.subscribe(1000);
+            angSub.subscribe(1000);
+            kickVelSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

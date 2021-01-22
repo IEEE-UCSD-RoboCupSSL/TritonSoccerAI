@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Detection;
+package Triton.StandAloneModules.Detection;
 
 import org.javatuples.Pair;
 

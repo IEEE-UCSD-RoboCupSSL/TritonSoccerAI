@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Display;
+package Triton.StandAloneModules.Display;
 
 import Triton.Dependencies.Gridify;
 import Triton.Config.DisplayConfig;
@@ -8,8 +8,8 @@ import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
 import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Circle2D;
 import Triton.Dependencies.Team;
-import Triton.StandAlongModules.Detection.BallData;
-import Triton.StandAlongModules.Detection.RobotData;
+import Triton.StandAloneModules.Detection.BallData;
+import Triton.StandAloneModules.Detection.RobotData;
 import Triton.Dependencies.Shape.Line2D;
 import Triton.Dependencies.Shape.Vec2D;
 

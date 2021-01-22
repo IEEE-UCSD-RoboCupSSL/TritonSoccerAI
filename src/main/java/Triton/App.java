@@ -5,10 +5,10 @@ import Triton.Config.ObjectConfig;
 import Triton.Dependencies.Team;
 import Triton.MovingObjectModules.Robot.Ally;
 import Triton.MovingObjectModules.Robot.Foe;
-import Triton.StandAlongModules.Detection.DetectionModule;
-import Triton.StandAlongModules.Display.Display;
-import Triton.StandAlongModules.Geometry.GeometryModule;
-import Triton.StandAlongModules.Vision.GrSimVisionModule;
+import Triton.StandAloneModules.Detection.DetectionModule;
+import Triton.StandAloneModules.Display.Display;
+import Triton.StandAloneModules.Geometry.GeometryModule;
+import Triton.StandAloneModules.Vision.GrSimVisionModule;
 import Triton.MovingObjectModules.Ball.Ball;
 
 

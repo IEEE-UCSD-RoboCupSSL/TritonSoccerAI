@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Detection;
+package Triton.StandAloneModules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.Config.ObjectConfig;

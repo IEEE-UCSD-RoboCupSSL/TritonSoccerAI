@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.RemoteStation;
+package Triton.StandAloneModules.RemoteStation;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

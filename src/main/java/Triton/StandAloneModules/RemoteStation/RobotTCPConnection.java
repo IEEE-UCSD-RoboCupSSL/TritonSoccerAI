@@ -1,9 +1,9 @@
-package Triton.StandAlongModules.RemoteStation;
+package Triton.StandAloneModules.RemoteStation;
 
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Module;
 import Triton.Dependencies.DesignPattern.PubSubSystem.*;
-import Triton.StandAlongModules.Detection.RobotData;
+import Triton.StandAloneModules.Detection.RobotData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class RobotTCPConnection implements Module {
 
         private void subscribe() {
             try {
-                tcpCommandSub.subscribe();
+                tcpCommandSub.subscribe(1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -76,10 +76,7 @@ public class RobotTCPConnection implements Module {
             try {
                 while (true) {
                     String line = in.readLine();
-//                    System.out.printf("Ally %d TCP : %s\n", ID, line);
-                    if (!line.equals("bazinga")) {
-                        System.out.printf("Ally %d TCP : %s\n", ID, line);
-                    }
+                    System.out.printf("Ally %d TCP : %s\n", ID, line);
 
                     switch (line) {
                         case "BallOnHold" -> dribStatPub.publish(true);
@@ -87,7 +84,7 @@ public class RobotTCPConnection implements Module {
                         case "Initialized" -> tcpInitPub.publish(true);
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -1,4 +1,4 @@
-package Triton.StandAlongModules.Geometry;
+package Triton.StandAloneModules.Geometry;
 
 import Proto.MessagesRobocupSslGeometry;
 import Proto.MessagesRobocupSslGeometry.SSL_FieldLineSegment;

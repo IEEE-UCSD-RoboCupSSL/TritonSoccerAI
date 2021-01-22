@@ -1,11 +1,11 @@
-package Triton.StandAlongModules.RemoteStation;
+package Triton.StandAloneModules.RemoteStation;
 
 import Proto.RemoteAPI.VisionData;
 import Triton.Config.ObjectConfig;
 import Triton.Dependencies.DesignPattern.PubSubSystem.FieldSubscriber;
 import Triton.Dependencies.DesignPattern.PubSubSystem.Subscriber;
-import Triton.StandAlongModules.Detection.BallData;
-import Triton.StandAlongModules.Detection.RobotData;
+import Triton.StandAloneModules.Detection.BallData;
+import Triton.StandAloneModules.Detection.RobotData;
 import Triton.Dependencies.Team;
 
 import java.util.concurrent.TimeoutException;

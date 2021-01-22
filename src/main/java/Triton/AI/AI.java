@@ -62,10 +62,23 @@ public class AI implements Module {
         GameStates currGameState = getCurrGameState();
 
         switch (currGameState) {
+            case START -> startBranch();
             case ACTIVE -> activeBranch();
             case PAUSED -> pausedBranch();
             case DEBUG -> debugBranch();
             default -> defaultBranch();
+        }
+    }
+
+    private void startBranch() {
+        goalKeeping.passiveGuarding();
+
+        Ally shooter = allies.get(0);
+
+        if (shooter.getDribblerStatus()) {
+            shooter.sprintToAngle(new Vec2D(1000, -2000), 170);
+        } else {
+            shooter.getBall();
         }
     }
 
@@ -106,8 +119,7 @@ public class AI implements Module {
     }
 
     private GameStates getCurrGameState() {
-        // ...
-        return GameStates.DEBUG;
+        return GameStates.START;
     }
 
     private void printBallHolder() {

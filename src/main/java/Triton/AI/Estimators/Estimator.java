@@ -6,7 +6,7 @@ import Triton.Dependencies.PerspectiveConverter;
 import Triton.Dependencies.Shape.Vec2D;
 import Triton.MovingObjectModules.Robot.Ally;
 import Triton.MovingObjectModules.Robot.Foe;
-import Triton.StandAlongModules.Detection.RobotData;
+import Triton.StandAloneModules.Detection.RobotData;
 import Triton.MovingObjectModules.Ball.Ball;
 import Triton.MovingObjectModules.Robot.Robot;
 
