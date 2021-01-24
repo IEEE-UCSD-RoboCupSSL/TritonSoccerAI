@@ -1,15 +1,14 @@
 package Triton;
 
-import Triton.AI.AI;
+import Triton.CoreModules.AI.AI;
 import Triton.Config.ObjectConfig;
-import Triton.Dependencies.Team;
-import Triton.MovingObjectModules.Robot.Ally;
-import Triton.MovingObjectModules.Robot.Foe;
-import Triton.StandAloneModules.Detection.DetectionModule;
-import Triton.StandAloneModules.Display.Display;
-import Triton.StandAloneModules.Geometry.GeometryModule;
-import Triton.StandAloneModules.Vision.GrSimVisionModule;
-import Triton.MovingObjectModules.Ball.Ball;
+import Triton.CoreModules.Robot.Team;
+import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Foe;
+import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
+import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.CoreModules.Ball.Ball;
 
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Program to receive data from grSim and manage high-level behavior of robots
+ * Main Program
  */
 public class App {
 
@@ -44,7 +43,7 @@ public class App {
     // listener)
     // + 1(server tcp connection listener)
 
-    private final static int MAX_THREADS = 100;
+    private final static int TOTAL_THREADS = 100;
 
     public static void main(String[] args) {
         if (args != null && args.length > 0) {
@@ -59,11 +58,12 @@ public class App {
         }
 
         /* Prepare a Thread Pool*/
-        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_THREADS, MAX_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS,
+                                        0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         Runnable visionModule = new GrSimVisionModule();
-        Runnable geoModule = new GeometryModule();
+        Runnable geoModule = new FieldGeometryModule();
         Runnable detectModule = new DetectionModule();
         threadPool.submit(visionModule);
         threadPool.submit(geoModule);

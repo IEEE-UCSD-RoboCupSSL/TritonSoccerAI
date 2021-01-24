@@ -1,6 +1,6 @@
 package Triton.Config;
 
-import Triton.Dependencies.Team;
+import Triton.CoreModules.Robot.Team;
 
 /**
  * Config file for various objects
