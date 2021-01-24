@@ -103,6 +103,6 @@ public class App {
         threadPool.submit(ai);
 
         /* A visualization tool */
-        Display display = new Display();
+        // Display display = new Display();
     }
 }
