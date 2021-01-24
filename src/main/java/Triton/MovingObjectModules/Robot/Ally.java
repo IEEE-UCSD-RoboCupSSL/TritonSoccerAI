@@ -17,6 +17,7 @@ import static Triton.MovingObjectModules.Robot.AllyState.*;
 import static Triton.MovingObjectModules.Robot.AllyState.MOVE_TDRD;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -80,6 +81,49 @@ public class Ally extends Robot {
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
         conn.buildVisionStream(team);
     }
+    
+    public boolean connect() {
+        // To-do
+        return false;
+    }
+
+    public boolean setOrigin() {
+        // To-do
+        return false;
+    }
+
+
+    // Everything in run() runs in the Ally Thread
+    @Override
+    public void run() {
+        try {
+            super.run();
+            initPathfinder();
+
+            conn.getTCPConnection().connect();
+            conn.getTCPConnection().sendInit();
+
+            threadPool.submit(conn.getTCPConnection());
+            threadPool.submit(conn.getTCPConnection().getSendTCP());
+            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
+            threadPool.submit(conn.getCommandStream());
+            // threadPool.execute(conn.getDataStream());
+            threadPool.submit(conn.getVisionStream());
+
+            while (true) {
+                publishCommand();
+            }
+        } catch (Exception e) {
+            if(e instanceof IOException) {
+                System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
+            }
+            else {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
     public boolean getDribblerStatus() {
         subscribe();
@@ -184,31 +228,7 @@ public class Ally extends Robot {
         statePub.publish(PASS);
     }
 
-    // Everything in run() runs in the Ally Thread
-    @Override
-    public void run() {
-        try {
-            super.run();
-            initPathfinder();
 
-            conn.getTCPConnection().connect();
-            conn.getTCPConnection().sendInit();
-
-            threadPool.submit(conn.getTCPConnection());
-            threadPool.submit(conn.getTCPConnection().getSendTCP());
-            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
-            threadPool.submit(conn.getCommandStream());
-            // threadPool.execute(conn.getDataStream());
-            threadPool.submit(conn.getVisionStream());
-
-            while (true) {
-                publishCommand();
-            }
-        } catch (Exception e) {
-            // System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void subscribe() {
