@@ -5,7 +5,7 @@ import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
-import Triton.Misc.DesignPattern.PubSubSystem.*;
+import Triton.Misc.ModulePubSubSystem.*;
 import Triton.Misc.Geometry.Circle2D;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.PeriphModules.Detection.BallData;

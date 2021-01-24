@@ -4,8 +4,8 @@ import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
 import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.ConnectionConfig;
-import Triton.Misc.DesignPattern.PubSubSystem.MQPublisher;
-import Triton.Misc.DesignPattern.PubSubSystem.Publisher;
+import Triton.Misc.ModulePubSubSystem.MQPublisher;
+import Triton.Misc.ModulePubSubSystem.Publisher;
 
 import java.io.ByteArrayInputStream;
 import java.net.DatagramPacket;

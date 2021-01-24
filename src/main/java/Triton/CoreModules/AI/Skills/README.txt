@@ -1,2 +1,1 @@
 All skills are defined inside the Ally class (one of the subclasses of the Robot class)
-Location: MovingObjectModules/Ally.java

@@ -2,8 +2,8 @@ package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI.VisionData;
 import Triton.Config.ObjectConfig;
-import Triton.Misc.DesignPattern.PubSubSystem.FieldSubscriber;
-import Triton.Misc.DesignPattern.PubSubSystem.Subscriber;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
+import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
 import Triton.CoreModules.Robot.Team;

@@ -1,4 +1,4 @@
-package Triton.Misc.DesignPattern.PubSubSystem;
+package Triton.Misc.ModulePubSubSystem;
 
 public abstract class Publisher<T> {
     protected MsgChannel<T> channel;

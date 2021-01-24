@@ -1,8 +1,8 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI.Commands;
-import Triton.Misc.DesignPattern.PubSubSystem.MQSubscriber;
-import Triton.Misc.DesignPattern.PubSubSystem.Subscriber;
+import Triton.Misc.ModulePubSubSystem.MQSubscriber;
+import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 /**
  * UDP stream to send commands to robot

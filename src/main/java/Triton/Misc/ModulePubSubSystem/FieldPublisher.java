@@ -1,4 +1,4 @@
-package Triton.Misc.DesignPattern.PubSubSystem;
+package Triton.Misc.ModulePubSubSystem;
 
 public class FieldPublisher<T> extends Publisher<T> {
 

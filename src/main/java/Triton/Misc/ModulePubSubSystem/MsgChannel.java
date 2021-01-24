@@ -1,4 +1,4 @@
-package Triton.Misc.DesignPattern.PubSubSystem;
+package Triton.Misc.ModulePubSubSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -3,8 +3,8 @@ package Triton.PeriphModules.Detection;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.Config.ObjectConfig;
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
-import Triton.Misc.DesignPattern.PubSubSystem.*;
+import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.*;
 import Triton.CoreModules.Robot.Team;
 
 import java.util.ArrayList;

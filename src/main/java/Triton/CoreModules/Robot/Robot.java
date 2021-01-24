@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot;
 
-import Triton.Misc.DesignPattern.PubSubSystem.FieldSubscriber;
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
+import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.PeriphModules.Detection.RobotData;
 

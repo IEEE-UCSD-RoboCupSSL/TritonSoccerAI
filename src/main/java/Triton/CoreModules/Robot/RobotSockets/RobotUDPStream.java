@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.net.DatagramSocket;
 

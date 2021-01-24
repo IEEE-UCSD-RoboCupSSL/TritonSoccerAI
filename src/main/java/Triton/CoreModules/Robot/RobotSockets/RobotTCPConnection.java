@@ -1,8 +1,8 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
 import Triton.Config.ObjectConfig;
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
-import Triton.Misc.DesignPattern.PubSubSystem.*;
+import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.RobotData;
 
 import java.io.BufferedReader;

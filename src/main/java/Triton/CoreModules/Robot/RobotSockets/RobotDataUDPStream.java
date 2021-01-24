@@ -1,8 +1,8 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI.RobotInternalData;
-import Triton.Misc.DesignPattern.PubSubSystem.MQPublisher;
-import Triton.Misc.DesignPattern.PubSubSystem.Publisher;
+import Triton.Misc.ModulePubSubSystem.MQPublisher;
+import Triton.Misc.ModulePubSubSystem.Publisher;
 
 /**
  * UDP stream to receive robot internal data

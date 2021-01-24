@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.MannualTesters.SkillTests;
 
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Module;
 
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;

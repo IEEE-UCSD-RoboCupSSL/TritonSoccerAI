@@ -6,7 +6,7 @@ import Triton.CoreModules.AI.Strategies.Attack.BasicAttack;
 import Triton.CoreModules.AI.Strategies.Defense.BasicDefense;
 import Triton.CoreModules.AI.Strategies.SeizeOpportunity.ForwardFilling;
 import Triton.CoreModules.AI.Strategies.Strategies;
-import Triton.Misc.DesignPattern.PubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
