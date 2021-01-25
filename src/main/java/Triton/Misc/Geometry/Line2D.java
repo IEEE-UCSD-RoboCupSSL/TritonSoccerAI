@@ -14,6 +14,7 @@ public class Line2D {
 
     /**
      * Constructs a Line2D with specified endpoints
+     *
      * @param p1 point 1
      * @param p2 point 2
      */
@@ -24,6 +25,7 @@ public class Line2D {
 
     /**
      * Constructs a Line2D with specified endpoints as x and y coordinates
+     *
      * @param p1x x coordinate of point 1
      * @param p1y y coordinate of point 1
      * @param p2x x coordinate of point 2
@@ -36,6 +38,7 @@ public class Line2D {
 
     /**
      * Constructs a deep copy of a given line
+     *
      * @param line line to copy from
      */
     public Line2D(Line2D line) {
@@ -47,6 +50,7 @@ public class Line2D {
 
     /**
      * Return the line as an equation with format Ax + By = C
+     *
      * @return values A, B, and C as an array in that order
      */
     public double[] toEqn() {
@@ -58,6 +62,7 @@ public class Line2D {
 
     /**
      * Returns the direction the line points toward, starting at point 1 to point 2
+     *
      * @return the direction from point 1 to point 2
      */
     public Vec2D getDir() {
@@ -66,6 +71,7 @@ public class Line2D {
 
     /**
      * Returns the shortest distance from a specified point to any point on the line
+     *
      * @param point the point to check
      * @return the shortest distance from the point to the line
      */
@@ -76,6 +82,7 @@ public class Line2D {
 
     /**
      * Returns the line split into two at its midpoint
+     *
      * @return an array corresponding to the first and second line
      */
     public Line2D[] split() {
@@ -98,6 +105,7 @@ public class Line2D {
 
     /**
      * Returns the midpoint of the line
+     *
      * @return the midpoint of the line
      */
     public Vec2D midpoint() {
@@ -106,6 +114,7 @@ public class Line2D {
 
     /**
      * Returns the length of the line
+     *
      * @return the length of the line
      */
     public double length() {

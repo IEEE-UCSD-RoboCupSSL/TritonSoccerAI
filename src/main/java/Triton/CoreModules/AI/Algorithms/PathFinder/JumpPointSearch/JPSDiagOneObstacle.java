@@ -8,7 +8,9 @@ import java.util.Set;
  * @author Kevin
  */
 public class JPSDiagOneObstacle<T extends Node> extends JPS<T> {
-    public JPSDiagOneObstacle(Graph<T> graph) { super(graph); }
+    public JPSDiagOneObstacle(Graph<T> graph) {
+        super(graph);
+    }
 
     @Override
     protected Set<T> findNeighbors(T node, Map<T, T> parentMap) {

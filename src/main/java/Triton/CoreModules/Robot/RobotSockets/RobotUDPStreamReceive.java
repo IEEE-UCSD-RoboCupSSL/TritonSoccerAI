@@ -16,8 +16,9 @@ public class RobotUDPStreamReceive extends RobotUDPStream {
 
     /**
      * Constructs a RobotUDPStreamReceive
+     *
      * @param port port to receive from
-     * @param ID ID of robot
+     * @param ID   ID of robot
      */
     public RobotUDPStreamReceive(int port, int ID) {
         super(port, ID);
@@ -26,11 +27,12 @@ public class RobotUDPStreamReceive extends RobotUDPStream {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-		buf = new byte[MAX_BUFFER_SIZE];
+        buf = new byte[MAX_BUFFER_SIZE];
     }
 
     /**
      * Receive a packet
+     *
      * @return the contents of the packet
      */
     protected byte[] receive() {

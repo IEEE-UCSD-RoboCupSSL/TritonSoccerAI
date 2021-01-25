@@ -2,14 +2,14 @@ package Triton.CoreModules.AI.Estimators;
 
 
 import Triton.Config.AIConfig;
+import Triton.CoreModules.Ball.Ball;
+import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Coordinates.PerspectiveConverter;
 import Triton.Misc.Coordinates.Vec2D;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
 import Triton.PeriphModules.Detection.RobotData;
-import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Robot;
 
 
 /* provide misc estimations methods to give AI
@@ -21,6 +21,7 @@ public class Estimator {
     private final RobotList<Foe> foes;
     private final Ball ball;
     private final Ally goalKeeper;
+
     public Estimator(RobotList<Ally> allies, Ally goalKeeper, RobotList<Foe> foes, Ball ball) {
         this.allies = allies;
         this.foes = foes;
@@ -40,7 +41,7 @@ public class Estimator {
         bots.addAll(foes);
         bots.add(goalKeeper);
 
-        for (Robot bot: bots) {
+        for (Robot bot : bots) {
             RobotData botData = bot.getData();
             Vec2D botPos = botData.getPos();
             double botAngle = botData.getAngle();

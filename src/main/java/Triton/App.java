@@ -1,15 +1,13 @@
 package Triton;
 
-import Triton.CoreModules.AI.AI;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.AI.AI;
+import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
-import Triton.CoreModules.Ball.Ball;
 
-
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +55,7 @@ public class App {
 
         /* Prepare a Thread Pool*/
         ThreadPoolExecutor threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS,
-                                        0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+                0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         Runnable visionModule = new GrSimVisionModule();
@@ -80,7 +78,7 @@ public class App {
         RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1, threadPool);
         Ally goalKeeper = RobotFactory.createGoalKeeperBot(threadPool);
         RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT, threadPool);
-        if(allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
+        if (allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
                 && goalKeeper.connect()) {
             allies.runAll(threadPool);
             goalKeeper.run();

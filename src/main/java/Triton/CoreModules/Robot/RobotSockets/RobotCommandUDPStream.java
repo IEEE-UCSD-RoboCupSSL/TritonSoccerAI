@@ -13,9 +13,10 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
 
     /**
      * Construct a RobotCommandUDPStream sending to specified ip, port, and robot ID
-     * @param ip ip to send to
+     *
+     * @param ip   ip to send to
      * @param port port to send to
-     * @param ID ID of robot
+     * @param ID   ID of robot
      */
     public RobotCommandUDPStream(String ip, int port, int ID) {
         super(ip, port, ID);

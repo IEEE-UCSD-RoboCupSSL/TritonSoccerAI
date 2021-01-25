@@ -14,8 +14,9 @@ public class RobotDataUDPStream extends RobotUDPStreamReceive {
 
     /**
      * Construct a RobotDataUDPStream
+     *
      * @param port port to listen
-     * @param ID ID of the robot
+     * @param ID   ID of the robot
      */
     public RobotDataUDPStream(int port, int ID) {
         super(port, ID);

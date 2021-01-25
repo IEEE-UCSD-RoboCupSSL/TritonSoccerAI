@@ -27,13 +27,13 @@ public class Node {
     public int getCol() {
         return col;
     }
-    
-    public void setWalkable(boolean walkable) {
-        walkable = true;
-    }
 
     public boolean getWalkable() {
         return walkable;
+    }
+
+    public void setWalkable(boolean walkable) {
+        walkable = true;
     }
 
     public double getGCost() {
@@ -57,11 +57,11 @@ public class Node {
         return fCost;
     }
 
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
     public Node getParent() {
         return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
 }

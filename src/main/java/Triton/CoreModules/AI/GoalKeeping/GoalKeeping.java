@@ -1,11 +1,9 @@
 package Triton.CoreModules.AI.GoalKeeping;
 
 import Triton.CoreModules.AI.Estimators.Estimator;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
-
-import static java.lang.Math.abs;
+import Triton.Misc.Coordinates.Vec2D;
 
 public class GoalKeeping {
 
@@ -27,40 +25,38 @@ public class GoalKeeping {
 //        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
 //        }
 //        else {
-            Vec2D ballPos = ball.getData().getPos();
-            Vec2D ballTraj = estimator.getAimTrajectory();
-            Vec2D keeperPos = keeper.getData().getPos();
-            Vec2D keeperLine = new Vec2D(1, 0);
+        Vec2D ballPos = ball.getData().getPos();
+        Vec2D ballTraj = estimator.getAimTrajectory();
+        Vec2D keeperPos = keeper.getData().getPos();
+        Vec2D keeperLine = new Vec2D(1, 0);
 
-            if (Math.abs(ballTraj.y) <= 0.0001) {
-                return;
-            } else if (Math.abs(ballTraj.x) <= 0.0001) {
-                keeper.pathTo(new Vec2D(ballPos.x, keeperPos.y), 0);
-                return;
-            }
+        if (Math.abs(ballTraj.y) <= 0.0001) {
+            return;
+        } else if (Math.abs(ballTraj.x) <= 0.0001) {
+            keeper.pathTo(new Vec2D(ballPos.x, keeperPos.y), 0);
+            return;
+        }
 
-            double m1 = ballTraj.y / ballTraj.x;
-            double b1 = ballPos.y - (ballPos.x / m1);
+        double m1 = ballTraj.y / ballTraj.x;
+        double b1 = ballPos.y - (ballPos.x / m1);
 
-            double m2 = 0;
-            double b2 = keeperPos.y;
+        double m2 = 0;
+        double b2 = keeperPos.y;
 
-            Vec2D targetPos = new Vec2D((b2 - b1) / m1, b2);
+        Vec2D targetPos = new Vec2D((b2 - b1) / m1, b2);
 
-            double targetAngle = ballTraj.mult(-1).toPlayerAngle();
-            keeper.pathTo(targetPos, targetAngle);
+        double targetAngle = ballTraj.mult(-1).toPlayerAngle();
+        keeper.pathTo(targetPos, targetAngle);
 //        }
     }
 
     public void activeGuarding() {
         if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
             // safer situation
-        }
-        else {
+        } else {
             // more dangerous situation
         }
     }
-
 
 
 }

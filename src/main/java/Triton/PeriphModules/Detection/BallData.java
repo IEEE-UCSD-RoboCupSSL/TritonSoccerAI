@@ -12,8 +12,8 @@ import java.util.ArrayList;
  * Class to store information about the ball
  */
 public class BallData {
-    private Vec2D pos, vel, accel;
     private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
+    private Vec2D pos, vel, accel;
     private double time;
 
     public BallData() {
@@ -30,8 +30,9 @@ public class BallData {
 
     /**
      * Updates ArrayList of SortedDetections and calculates the current velocity of the ball
+     *
      * @param detection SSL_Detection of the ball
-     * @param time time of detection
+     * @param time      time of detection
      */
     public void update(SSL_DetectionBall detection, double time) {
         Vec2D audienceBallPos = new Vec2D(detection.getX(), detection.getY());

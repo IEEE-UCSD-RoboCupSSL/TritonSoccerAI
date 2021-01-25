@@ -6,13 +6,13 @@ import Triton.CoreModules.AI.Strategies.Attack.BasicAttack;
 import Triton.CoreModules.AI.Strategies.Defense.BasicDefense;
 import Triton.CoreModules.AI.Strategies.SeizeOpportunity.ForwardFilling;
 import Triton.CoreModules.AI.Strategies.Strategies;
-import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
+import Triton.CoreModules.Robot.RobotList;
+import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.ModulePubSubSystem.Module;
 
 
 public class AI implements Module {
@@ -88,21 +88,18 @@ public class AI implements Module {
         Robot ballHolder = estimator.getBallHolder();
         if (ballHolder == null) {
             // Eval & SeizeOpportunity
-            if(estimator.hasHoldBallChance()) {
+            if (estimator.hasHoldBallChance()) {
                 // delegate nearest bot to get ball & push remainder bots forward in attack formation
                 seizeOpportunity.play();
-            }
-            else {
+            } else {
                 // rally an defensive formation
                 defense.play();
             }
-        }
-        else {
+        } else {
             if (ballHolder instanceof Ally) {
                 // play Attack
                 attack.play();
-            }
-            else if (ballHolder instanceof Foe){
+            } else if (ballHolder instanceof Foe) {
                 // play defense
                 defense.play();
             }

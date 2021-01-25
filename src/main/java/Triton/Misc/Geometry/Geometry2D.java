@@ -8,6 +8,7 @@ import Triton.Misc.Coordinates.Vec2D;
 public abstract class Geometry2D {
     /**
      * Returns true if point is within shape
+     *
      * @param point point to check
      * @return true if point is within shape
      */

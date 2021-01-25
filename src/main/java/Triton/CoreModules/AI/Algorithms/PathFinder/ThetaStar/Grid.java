@@ -1,10 +1,10 @@
 package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
 
-import Triton.Misc.Coordinates.Gridify;
 import Triton.Config.PathfinderConfig;
+import Triton.Misc.Coordinates.Gridify;
+import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.Geometry.Circle2D;
 import Triton.Misc.Geometry.Line2D;
-import Triton.Misc.Coordinates.Vec2D;
 import com.google.common.primitives.Ints;
 
 import java.util.ArrayList;
@@ -13,21 +13,20 @@ import java.util.Arrays;
 public class Grid {
     private final double worldSizeX;
     private final double worldSizeY;
-    private Node[][] nodes;
     private final int numRows;
     private final int numCols;
-
     private final Gridify convert;
+    private Node[][] nodes;
 
     public Grid(double worldSizeX, double worldSizeY) {
         this.worldSizeX = worldSizeX;
         this.worldSizeY = worldSizeY;
 
         convert = new Gridify(
-            new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
-            new Vec2D(PathfinderConfig.NODE_RADIUS - worldSizeX / 2, 
-                      PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
-            false, true);
+                new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
+                new Vec2D(PathfinderConfig.NODE_RADIUS - worldSizeX / 2,
+                        PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
+                false, true);
 
         numCols = convert.numCols(worldSizeX);
         numRows = convert.numRows(worldSizeY);
@@ -84,7 +83,7 @@ public class Grid {
         Vec2D topLeft = new Vec2D(center.x - radius, center.y + radius);
         Vec2D botRight = new Vec2D(center.x + radius, center.y - radius);
 
-        int[] topLeftGridPos  = convert.fromPos(topLeft);
+        int[] topLeftGridPos = convert.fromPos(topLeft);
         int[] botRightGridPos = convert.fromPos(botRight);
 
         ArrayList<Node> toCheck = new ArrayList<>();
@@ -124,7 +123,7 @@ public class Grid {
         int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
         Vec2D dir = line.getDir();
         Vec2D moveAdd = dir.mult(PathfinderConfig.NODE_RADIUS);
-        
+
         Vec2D currentPos = new Vec2D(pointA);
         for (int i = 0; i < moveCount; i++) {
             currentPos = currentPos.add(moveAdd);

@@ -1,8 +1,8 @@
 package Triton.CoreModules.Ball;
 
+import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.PeriphModules.Detection.BallData;
 
 public class Ball implements Module {
@@ -16,8 +16,7 @@ public class Ball implements Module {
     protected void subscribe() {
         try {
             dataSub.subscribe(1000);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

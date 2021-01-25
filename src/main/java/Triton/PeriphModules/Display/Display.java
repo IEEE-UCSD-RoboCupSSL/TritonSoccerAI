@@ -1,17 +1,17 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Misc.Coordinates.Gridify;
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Coordinates.Gridify;
+import Triton.Misc.Coordinates.PerspectiveConverter;
+import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Geometry.Circle2D;
+import Triton.Misc.Geometry.Line2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
-import Triton.Misc.Coordinates.PerspectiveConverter;
-import Triton.Misc.Geometry.Circle2D;
-import Triton.CoreModules.Robot.Team;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
-import Triton.Misc.Geometry.Line2D;
-import Triton.Misc.Coordinates.Vec2D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,12 +35,11 @@ public class Display extends JPanel {
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
+    protected Gridify convert;
     private HashMap<String, Line2D> fieldLines;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
-
-    protected Gridify convert;
 
 
     /* Construct a display with robot, ball, and field */
@@ -134,6 +133,7 @@ public class Display extends JPanel {
 
     /**
      * Called to paint the display
+     *
      * @param g Graphics object to paint to
      */
     @Override
@@ -152,6 +152,7 @@ public class Display extends JPanel {
 
     /**
      * Paints the field and lines
+     *
      * @param g2d Graphics2D object to paint to
      */
     private void paintGeo(Graphics2D g2d) {
@@ -175,6 +176,7 @@ public class Display extends JPanel {
 
     /**
      * Paints robots and ball
+     *
      * @param g2d Graphics2D object to paint to
      */
     private void paintObjects(Graphics2D g2d) {
@@ -258,6 +260,7 @@ public class Display extends JPanel {
 
     /**
      * Paints additional information like FPS
+     *
      * @param g2d Graphics2D object to paint to
      */
     private void paintInfo(Graphics2D g2d) {

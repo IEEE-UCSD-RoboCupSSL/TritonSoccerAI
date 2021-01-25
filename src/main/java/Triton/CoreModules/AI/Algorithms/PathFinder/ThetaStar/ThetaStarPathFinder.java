@@ -1,22 +1,12 @@
 package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
 
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
-import Triton.Misc.Geometry.Circle2D;
 import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Geometry.Circle2D;
 
 import java.util.*;
 
 public class ThetaStarPathFinder extends PathFinder {
-
-    public static class NodeComparator implements Comparator<Node> {
-        public int compare(Node a, Node b) {
-            if (a.getFCost() == b.getFCost()) {
-                return (int) (a.getHCost() - b.getHCost());
-            } else {
-                return (int) (a.getFCost() - b.getFCost());
-            }
-        }
-    }
 
     public Grid grid;
 
@@ -48,7 +38,7 @@ public class ThetaStarPathFinder extends PathFinder {
                 if (currentNode != startNode && grid.checkLineOfSight(currentNode.getParent(), neighbor))
                     previousNode = currentNode.getParent();
 
-                double newMovementCostToNeighbor = previousNode .getGCost() + getDist(previousNode, neighbor);
+                double newMovementCostToNeighbor = previousNode.getGCost() + getDist(previousNode, neighbor);
                 if (newMovementCostToNeighbor < neighbor.getGCost() || !openSet.contains(neighbor)) {
                     neighbor.setGCost(newMovementCostToNeighbor);
                     neighbor.setHCost(getDist(neighbor, targetNode));
@@ -84,5 +74,15 @@ public class ThetaStarPathFinder extends PathFinder {
 
     public Grid getGrid() {
         return grid;
+    }
+
+    public static class NodeComparator implements Comparator<Node> {
+        public int compare(Node a, Node b) {
+            if (a.getFCost() == b.getFCost()) {
+                return (int) (a.getHCost() - b.getHCost());
+            } else {
+                return (int) (a.getFCost() - b.getFCost());
+            }
+        }
     }
 }

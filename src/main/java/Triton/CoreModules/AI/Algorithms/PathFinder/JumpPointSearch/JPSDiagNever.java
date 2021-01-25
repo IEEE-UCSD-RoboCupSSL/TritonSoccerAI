@@ -8,7 +8,9 @@ import java.util.Set;
  * @author Kevin
  */
 public class JPSDiagNever<T extends Node> extends JPS<T> {
-    public JPSDiagNever(Graph<T> graph) { super(graph); }
+    public JPSDiagNever(Graph<T> graph) {
+        super(graph);
+    }
 
     @Override
     protected Set<T> findNeighbors(T node, Map<T, T> parentMap) {

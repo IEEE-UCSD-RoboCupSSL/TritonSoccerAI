@@ -1,15 +1,14 @@
 package Triton.CoreModules.Robot;
 
+import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.PeriphModules.Detection.RobotData;
 
 public abstract class Robot implements Module {
+    private final FieldSubscriber<RobotData> dataSub;
     protected Team team;
     protected int ID;
-
-    private final FieldSubscriber<RobotData> dataSub;
 
     public Robot(Team team, int ID) {
         this.team = team;
@@ -21,8 +20,7 @@ public abstract class Robot implements Module {
     protected void subscribe() {
         try {
             dataSub.subscribe(1000);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,9 +1,8 @@
 package Triton.CoreModules.AI;
 
 import Triton.Config.ObjectConfig;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Robot.Ally;
-
+import Triton.Misc.Coordinates.Vec2D;
 
 import java.util.ArrayList;
 
@@ -20,6 +19,10 @@ public class Formation {
             formation = new Formation();
         }
         return formation;
+    }
+
+    public static boolean xxxFormation(/*...*/) {
+        return false;
     }
 
     public boolean defaultFormation(ArrayList<Ally> bots) {
@@ -44,12 +47,7 @@ public class Formation {
         return false;
     }
 
-
     public boolean penaltyFormation(/*...*/) {
-        return false;
-    }
-
-    public static boolean xxxFormation(/*...*/) {
         return false;
     }
 

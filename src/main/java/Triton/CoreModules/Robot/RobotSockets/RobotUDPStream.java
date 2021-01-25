@@ -9,21 +9,22 @@ import java.net.DatagramSocket;
  */
 public abstract class RobotUDPStream implements Module {
 
-	protected int port;
-	protected int ID;
+    protected int port;
+    protected int ID;
 
-	protected DatagramSocket socket;
+    protected DatagramSocket socket;
 
-	/**
-	 * Constructs a UDP stream
-	 * @param port port of UDP stream
-	 * @param ID ID of robot
-	 */
-	public RobotUDPStream(int port, int ID) {
-		this.port = port;
-	}
+    /**
+     * Constructs a UDP stream
+     *
+     * @param port port of UDP stream
+     * @param ID   ID of robot
+     */
+    public RobotUDPStream(int port, int ID) {
+        this.port = port;
+    }
 
-	@Override
-	public void run() {
-	}
+    @Override
+    public void run() {
+    }
 }

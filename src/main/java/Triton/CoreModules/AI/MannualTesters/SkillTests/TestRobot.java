@@ -1,9 +1,8 @@
 package Triton.CoreModules.AI.MannualTesters.SkillTests;
 
-import Triton.Misc.ModulePubSubSystem.Module;
-
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
+import Triton.Misc.ModulePubSubSystem.Module;
 
 public class TestRobot implements Module {
     private static final double KICK_DIST = 100;

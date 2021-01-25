@@ -9,9 +9,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MsgChannel<T> {
     private static final HashMap<String, MsgChannel> channels = new HashMap<>();
-
-    private ReadWriteLock lock;
     private final String channelName;
+    private ReadWriteLock lock;
     private T msg;
     private ArrayList<BlockingQueue<T>> queues;
 
@@ -42,6 +41,15 @@ public class MsgChannel<T> {
         }
     }
 
+    public T getMsg() {
+        lock.readLock().lock();
+        try {
+            return msg;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
     public void setMsg(T msg) {
         lock.writeLock().lock();
         try {
@@ -51,15 +59,6 @@ public class MsgChannel<T> {
         }
     }
 
-    public T getMsg() {
-        lock.readLock().lock();
-        try {
-            return msg;
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-    
     public void addMsg(T msg) {
         lock.writeLock().lock();
         try {
@@ -80,7 +79,7 @@ public class MsgChannel<T> {
         try {
             for (BlockingQueue<T> queue : queues) {
                 try {
-                    queue.offer(msg, timeout_ms, TimeUnit.MILLISECONDS); 
+                    queue.offer(msg, timeout_ms, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

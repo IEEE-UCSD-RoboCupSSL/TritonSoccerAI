@@ -1,11 +1,11 @@
 package Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch;
 
+import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
 import Triton.Misc.Coordinates.Gridify;
-import Triton.Config.PathfinderConfig;
+import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.Geometry.Circle2D;
 import Triton.Misc.Geometry.Line2D;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.PeriphModules.Display.JPSPathfinderDisplay;
 
 import java.util.ArrayList;
@@ -154,22 +154,22 @@ public class JPSPathFinder extends PathFinder {
     }
 
     public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
-        int[] startIdx  = constrain(convert.fromPos(startPos));
+        int[] startIdx = constrain(convert.fromPos(startPos));
         int[] targetIdx = constrain(convert.fromPos(targetPos));
 
         Node start, target;
         try {
-            start  = nodeList.get(startIdx[1]).get(startIdx[0]);
+            start = nodeList.get(startIdx[1]).get(startIdx[0]);
             target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
         } catch (IndexOutOfBoundsException e) {
             return nullPath(startPos);
         }
 
         // find ways out
-        if(!start.isWalkable()) {
+        if (!start.isWalkable()) {
             wayOut(startIdx[1], startIdx[0]);
         }
-        if(!target.isWalkable()) {
+        if (!target.isWalkable()) {
             if (!isOutOfBound(targetIdx[1], targetIdx[0])) { // Do nothing if ball is outside the field
                 wayOut(targetIdx[1], targetIdx[0]);
             }
@@ -250,9 +250,23 @@ public class JPSPathFinder extends PathFinder {
         new JPSPathfinderDisplay(this);
     }
 
-    public int getNumRows() { return numRows; }
-    public int getNumCols() { return numCols; }
-    public ArrayList<Vec2D> getPath() { return path; }
-    public Gridify getConvert() { return convert; }
-    public List<List<Node>> getNodeList() { return nodeList; }
+    public int getNumRows() {
+        return numRows;
+    }
+
+    public int getNumCols() {
+        return numCols;
+    }
+
+    public ArrayList<Vec2D> getPath() {
+        return path;
+    }
+
+    public Gridify getConvert() {
+        return convert;
+    }
+
+    public List<List<Node>> getNodeList() {
+        return nodeList;
+    }
 }

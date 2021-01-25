@@ -2,11 +2,11 @@ package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI.VisionData;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
-import Triton.CoreModules.Robot.Team;
 
 import java.util.concurrent.TimeoutException;
 
@@ -20,9 +20,10 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
 
     /**
      * Constructs the UDP stream
-     * @param ip ip to send to
+     *
+     * @param ip   ip to send to
      * @param port port to send to
-     * @param ID ID of robot
+     * @param ID   ID of robot
      */
     public RobotVisionUDPStream(String ip, int port, Team team, int ID) {
         super(ip, port, ID);
@@ -31,12 +32,12 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     }
 
     @Override
-	public void run() {
+    public void run() {
         subscribe();
-        while(true) {
+        while (true) {
             sendVision();
         }
-	}
+    }
 
     /**
      * Subscribe to publishers

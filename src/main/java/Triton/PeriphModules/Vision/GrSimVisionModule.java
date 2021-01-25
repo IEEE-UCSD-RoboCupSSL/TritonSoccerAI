@@ -33,7 +33,8 @@ public class GrSimVisionModule extends VisionModule {
 
     /**
      * Constructs a VisionModule listening on specified ip and port
-     * @param ip ip to receive from
+     *
+     * @param ip   ip to receive from
      * @param port port to recieve from
      */
     public GrSimVisionModule(String ip, int port) {
@@ -92,6 +93,7 @@ public class GrSimVisionModule extends VisionModule {
 
     /**
      * Receive a specified number of packets
+     *
      * @param numIter Number of packets to receive
      */
     protected void collectData(int numIter) {

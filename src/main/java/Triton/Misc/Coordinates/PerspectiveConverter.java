@@ -27,7 +27,7 @@ public class PerspectiveConverter {
             return audienceAngle + 180;
         }
     }
-    
+
     public static Vec2D playerToAudience(Vec2D playerVector) {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
             return new Vec2D(playerVector.y, -playerVector.x);

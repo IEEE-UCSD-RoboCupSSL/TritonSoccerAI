@@ -10,5 +10,5 @@ public class MQPublisher<T> extends Publisher<T> {
     public void publish(T msg) {
         channel.addMsg(msg);
     }
-    
+
 }

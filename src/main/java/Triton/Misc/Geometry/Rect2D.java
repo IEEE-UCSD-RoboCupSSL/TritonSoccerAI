@@ -13,7 +13,8 @@ public class Rect2D extends Geometry2D {
 
     /**
      * Constructs a Rect2D with specified left edge and bottom edge
-     * @param left left edge of the rectangle
+     *
+     * @param left   left edge of the rectangle
      * @param bottom bottom edge of the rectangle
      */
     public Rect2D(Line2D left, Line2D bottom) {
@@ -24,8 +25,9 @@ public class Rect2D extends Geometry2D {
 
     /**
      * Constructs a Rect2D with specified bottom left point, width, and height
-     * @param point bottom left point
-     * @param width width of rectangle
+     *
+     * @param point  bottom left point
+     * @param width  width of rectangle
      * @param height height of rectangle
      */
     public Rect2D(Vec2D point, double width, double height) {
@@ -36,6 +38,7 @@ public class Rect2D extends Geometry2D {
 
     /**
      * Returns true if point is within the rectangle
+     *
      * @param point the point to check
      * @return true if point is within the rectangle, false otherwise
      */

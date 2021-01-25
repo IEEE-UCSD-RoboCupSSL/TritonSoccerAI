@@ -20,75 +20,16 @@ public class RobotTCPConnection implements Module {
     private final int ID;
     private final Publisher<Boolean> dribStatPub;
     private final Subscriber<RobotData> allySub;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
     private final Publisher<String> tcpCommandPub;
     private final Subscriber<String> tcpCommandSub;
     private final Publisher<Boolean> tcpInitPub;
+    private Socket clientSocket;
+    private PrintWriter out;
+    private BufferedReader in;
     private boolean isConnected;
 
     private SendTCPRunnable sendTCP;
     private ReceiveTCPRunnable receiveTCP;
-
-    private class SendTCPRunnable implements Runnable {
-        private PrintWriter out;
-
-        public SendTCPRunnable(PrintWriter out) {
-            this.out = out;
-        }
-
-        private void subscribe() {
-            try {
-                tcpCommandSub.subscribe(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            try {
-                subscribe();
-
-                while (true) {
-                    String msg = tcpCommandSub.getMsg();
-                    System.out.println(msg);
-                    out.println(msg);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private class ReceiveTCPRunnable implements Runnable {
-        private BufferedReader in;
-        private int ID;
-
-        public ReceiveTCPRunnable(BufferedReader in, int ID) {
-            this.in = in;
-            this.ID = ID;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    String line = in.readLine();
-                    System.out.printf("Ally %d TCP : %s\n", ID, line);
-
-                    switch (line) {
-                        case "BallOnHold" -> dribStatPub.publish(true);
-                        case "BallOffHold" -> dribStatPub.publish(false);
-                        case "Initialized" -> tcpInitPub.publish(true);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * Constructs TCP connection
@@ -183,5 +124,64 @@ public class RobotTCPConnection implements Module {
 
     public ReceiveTCPRunnable getReceiveTCP() {
         return receiveTCP;
+    }
+
+    private class SendTCPRunnable implements Runnable {
+        private final PrintWriter out;
+
+        public SendTCPRunnable(PrintWriter out) {
+            this.out = out;
+        }
+
+        private void subscribe() {
+            try {
+                tcpCommandSub.subscribe(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                subscribe();
+
+                while (true) {
+                    String msg = tcpCommandSub.getMsg();
+                    System.out.println(msg);
+                    out.println(msg);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class ReceiveTCPRunnable implements Runnable {
+        private final BufferedReader in;
+        private final int ID;
+
+        public ReceiveTCPRunnable(BufferedReader in, int ID) {
+            this.in = in;
+            this.ID = ID;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    String line = in.readLine();
+                    System.out.printf("Ally %d TCP : %s\n", ID, line);
+
+                    switch (line) {
+                        case "BallOnHold" -> dribStatPub.publish(true);
+                        case "BallOffHold" -> dribStatPub.publish(false);
+                        case "Initialized" -> tcpInitPub.publish(true);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

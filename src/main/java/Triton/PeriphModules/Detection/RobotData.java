@@ -2,9 +2,9 @@ package Triton.PeriphModules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Coordinates.PerspectiveConverter;
 import Triton.Misc.Coordinates.Vec2D;
-import Triton.CoreModules.Robot.Team;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
@@ -17,12 +17,10 @@ public class RobotData {
     public static final int MAX_SIZE = 10;
     private final Team team;
     private final int ID;
-
-    private Vec2D pos, vel, accel;
     private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
-
-    private double angle, angleVel, angleAccel, time;
     private final ArrayList<Pair<Double, Double>> angleArray, angleVelArray;
+    private Vec2D pos, vel, accel;
+    private double angle, angleVel, angleAccel, time;
 
     public RobotData(Team team, int ID) {
         this.team = team;

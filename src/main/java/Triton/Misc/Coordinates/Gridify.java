@@ -14,10 +14,11 @@ public class Gridify {
 
     /**
      * Construct a grid with specified size, offset, and whether to mirror x and y values
+     *
      * @param grid_size width and height of grid as a vector
-     * @param offset offset to shift by
-     * @param flipX whether to flip x coordinates
-     * @param flipY whether to flip y coordinates
+     * @param offset    offset to shift by
+     * @param flipX     whether to flip x coordinates
+     * @param flipY     whether to flip y coordinates
      */
     public Gridify(Vec2D grid_size, Vec2D offset, boolean flipX, boolean flipY) {
         this.grid_size = grid_size;
@@ -28,6 +29,7 @@ public class Gridify {
 
     /**
      * Returns the number of columns in the grid
+     *
      * @param worldSizeX width of the world
      * @return the number of columns in the grid
      */
@@ -37,6 +39,7 @@ public class Gridify {
 
     /**
      * Returns the number of rows in the grid
+     *
      * @param worldSizeY height of the world
      * @return the number of rows in the grid
      */
@@ -46,6 +49,7 @@ public class Gridify {
 
     /**
      * Convert from world coordinates to grid indices
+     *
      * @param vec world coordinates to convert
      * @return grid indices corresponding to the world coordinates
      */
@@ -57,6 +61,7 @@ public class Gridify {
 
     /**
      * Convert from grid indices to world coordinates
+     *
      * @param ind array of indices of element in grid
      * @return Vec2D corresponding to the grid indices
      */
@@ -66,6 +71,7 @@ public class Gridify {
 
     /**
      * Convert from grid indices to world coordinates
+     *
      * @param col column index of element in grid
      * @param row row index of element in grid
      * @return Vec2D corresponding to the grid indices

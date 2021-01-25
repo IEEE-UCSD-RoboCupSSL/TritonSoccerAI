@@ -1,26 +1,23 @@
 package Triton.CoreModules.Robot;
 
 import Proto.RemoteAPI;
-import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
-import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
-import Triton.Misc.ModulePubSubSystem.*;
-import Triton.Misc.Geometry.Circle2D;
+import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
+import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
+import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Geometry.Circle2D;
+import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
-import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
-
-import static Triton.CoreModules.Robot.AllyState.*;
-import static Triton.CoreModules.Robot.AllyState.MOVE_TDRD;
-
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static Triton.CoreModules.Robot.AllyState.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
 
@@ -80,7 +77,7 @@ public class Ally extends Robot {
         // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
         conn.buildVisionStream(team);
     }
-    
+
     public boolean connect() {
         boolean rtn = false;
         try {
@@ -121,7 +118,6 @@ public class Ally extends Robot {
             e.printStackTrace();
         }
     }
-
 
 
     public boolean getDribblerStatus() {
@@ -226,7 +222,6 @@ public class Ally extends Robot {
     public void pass() {
         statePub.publish(PASS);
     }
-
 
 
     @Override

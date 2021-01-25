@@ -12,12 +12,12 @@ public class MQSubscriber<T> extends Subscriber<T> {
         super(topicName + "QUEUE", msgName);
         queue = new LinkedBlockingQueue<>(queueSize);
     }
-	
-	// Default size is 1
-	public MQSubscriber(String topicName, String msgName) {
-		this(topicName, msgName, 1);
-	}
-    
+
+    // Default size is 1
+    public MQSubscriber(String topicName, String msgName) {
+        this(topicName, msgName, 1);
+    }
+
     @Override
     public boolean subscribe() {
         boolean rtn = super.subscribe();
@@ -46,7 +46,7 @@ public class MQSubscriber<T> extends Subscriber<T> {
         T rtn = null;
         try {
             rtn = queue.poll(ms, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 

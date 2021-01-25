@@ -1,9 +1,9 @@
 package Triton.PeriphModules.Display;
 
-import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
-import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.Node;
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
+import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.Node;
 import Triton.Misc.Coordinates.Vec2D;
 
 import java.awt.*;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class JPSPathfinderDisplay extends Display {
 
-    private JPSPathFinder JPS;
+    private final JPSPathFinder JPS;
 
     /**
      * Construct a display with additional path and obstacles
@@ -23,6 +23,7 @@ public class JPSPathfinderDisplay extends Display {
 
     /**
      * Called to paint the display
+     *
      * @param g Graphics object to paint to
      */
     @Override
@@ -36,6 +37,7 @@ public class JPSPathfinderDisplay extends Display {
 
     /**
      * Paints various pathfinding info for debugging
+     *
      * @param g2d Graphics2D object to paint to
      */
     private void paintPath(Graphics2D g2d) {
