@@ -6,6 +6,7 @@ import Triton.CoreModules.AI.Strategies.Attack.BasicAttack;
 import Triton.CoreModules.AI.Strategies.Defense.BasicDefense;
 import Triton.CoreModules.AI.Strategies.SeizeOpportunity.ForwardFilling;
 import Triton.CoreModules.AI.Strategies.Strategies;
+import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Ball.Ball;
@@ -13,14 +14,13 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 
-import java.util.ArrayList;
 
 public class AI implements Module {
     private static final double KICK_DIST = 100;
 
-    private final ArrayList<Ally> allies;
+    private final RobotList<Ally> allies;
     private final Ally keeper;
-    private final ArrayList<Foe> foes;
+    private final RobotList<Foe> foes;
     private final Ball ball;
 
     private final Formation formation;
@@ -31,11 +31,13 @@ public class AI implements Module {
     private final Strategies defense;
 
 
-    public AI(ArrayList<Ally> allies, Ally keeper, ArrayList<Foe> foes, Ball ball) {
+    public AI(RobotList<Ally> allies, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.allies = allies;
         this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
+
+        // To-do: check nullptr for inputs
 
         formation = Formation.getInstance();
 

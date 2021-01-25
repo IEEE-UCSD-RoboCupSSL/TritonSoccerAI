@@ -4,15 +4,15 @@ import Triton.CoreModules.AI.Strategies.Strategies;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.RobotList;
 
-import java.util.ArrayList;
 
 public class ForwardFilling extends Strategies {
-    private final ArrayList<Ally> allies;
-    private final ArrayList<Foe> foes;
+    private final RobotList<Ally> allies;
+    private final RobotList<Foe> foes;
     private final Ball ball;
 
-    public ForwardFilling(ArrayList<Ally> allies, ArrayList<Foe> foes, Ball ball) {
+    public ForwardFilling(RobotList<Ally> allies, RobotList<Foe> foes, Ball ball) {
         this.allies = allies;
         this.foes = foes;
         this.ball = ball;

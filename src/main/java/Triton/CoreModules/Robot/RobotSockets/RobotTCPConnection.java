@@ -82,7 +82,6 @@ public class RobotTCPConnection implements Module {
                         case "BallOnHold" -> dribStatPub.publish(true);
                         case "BallOffHold" -> dribStatPub.publish(false);
                         case "Initialized" -> tcpInitPub.publish(true);
-                        default -> System.out.println("Invalid TCP input");
                     }
                 }
             } catch (Exception e) {
@@ -151,6 +150,7 @@ public class RobotTCPConnection implements Module {
     public void run() {
         try {
             while (true) {
+                Thread.sleep(1000);
             }
         } catch (Exception e) {
             e.printStackTrace();

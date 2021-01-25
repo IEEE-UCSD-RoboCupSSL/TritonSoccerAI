@@ -82,13 +82,18 @@ public class Ally extends Robot {
     }
     
     public boolean connect() {
-        // To-do
-        return false;
+        boolean rtn = false;
+        try {
+            rtn = conn.getTCPConnection().connect();
+        } catch (IOException e) {
+            // System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
+            e.printStackTrace();
+        }
+        return rtn;
     }
 
-    public boolean setOrigin() {
+    public void reinit() {
         // To-do
-        return false;
     }
 
 
@@ -99,9 +104,6 @@ public class Ally extends Robot {
             super.run();
             initPathfinder();
 
-            conn.getTCPConnection().connect();
-            conn.getTCPConnection().sendInit();
-
             threadPool.submit(conn.getTCPConnection());
             threadPool.submit(conn.getTCPConnection().getSendTCP());
             threadPool.submit(conn.getTCPConnection().getReceiveTCP());
@@ -109,16 +111,14 @@ public class Ally extends Robot {
             // threadPool.execute(conn.getDataStream());
             threadPool.submit(conn.getVisionStream());
 
+            Thread.sleep(1000);
+            conn.getTCPConnection().sendInit();
+
             while (true) {
                 publishCommand();
             }
         } catch (Exception e) {
-            if(e instanceof IOException) {
-                System.out.printf("Robot %d TCP connection fails: %s\n", super.ID, e.getClass());
-            }
-            else {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
     }
 

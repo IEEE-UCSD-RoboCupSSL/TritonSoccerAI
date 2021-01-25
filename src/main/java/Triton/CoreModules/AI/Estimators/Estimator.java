@@ -2,6 +2,7 @@ package Triton.CoreModules.AI.Estimators;
 
 
 import Triton.Config.AIConfig;
+import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Coordinates.PerspectiveConverter;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.CoreModules.Robot.Ally;
@@ -10,18 +11,17 @@ import Triton.PeriphModules.Detection.RobotData;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Robot;
 
-import java.util.ArrayList;
 
 /* provide misc estimations methods to give AI
  * situation awareness of everything happening
  * on the game field
  * */
 public class Estimator {
-    private final ArrayList<Ally> allies;
-    private final ArrayList<Foe> foes;
+    private final RobotList<Ally> allies;
+    private final RobotList<Foe> foes;
     private final Ball ball;
     private final Ally goalKeeper;
-    public Estimator(ArrayList<Ally> allies, Ally goalKeeper, ArrayList<Foe> foes, Ball ball) {
+    public Estimator(RobotList<Ally> allies, Ally goalKeeper, RobotList<Foe> foes, Ball ball) {
         this.allies = allies;
         this.foes = foes;
         this.ball = ball;
@@ -35,7 +35,7 @@ public class Estimator {
     public Robot getBallHolder() {
         Vec2D ballPos = ball.getData().getPos();
 
-        ArrayList<Robot> bots = new ArrayList<Robot>();
+        RobotList<Robot> bots = new RobotList<Robot>();
         bots.addAll(allies);
         bots.addAll(foes);
         bots.add(goalKeeper);

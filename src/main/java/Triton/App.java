@@ -2,9 +2,7 @@ package Triton;
 
 import Triton.CoreModules.AI.AI;
 import Triton.Config.ObjectConfig;
-import Triton.CoreModules.Robot.Team;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.*;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
@@ -78,25 +76,17 @@ public class App {
         Ball ball = new Ball();
         threadPool.submit(ball);
 
-        /* Instantiate & run Our Robots (Ally) modules */
-        ArrayList<Ally> allies = new ArrayList<Ally>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT - 1; i++) {
-            Ally ally = new Ally(ObjectConfig.MY_TEAM, i, threadPool);
-            allies.add(ally);
-            threadPool.submit(ally);
-        }
-        Ally goalKeeper = new Ally(ObjectConfig.MY_TEAM, ObjectConfig.ROBOT_COUNT - 1, threadPool);
-        threadPool.submit(goalKeeper);
 
-
-        /* Instantiate & run Opponent Robots (Foe) modules */
-        ArrayList<Foe> foes = new ArrayList<Foe>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            Team foeTeam = (ObjectConfig.MY_TEAM == Team.BLUE) ? Team.YELLOW : Team.BLUE;
-            Foe foe = new Foe(foeTeam, i);
-            foes.add(foe);
-            threadPool.submit(foe);
+        RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1, threadPool);
+        Ally goalKeeper = RobotFactory.createGoalKeeperBot(threadPool);
+        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT, threadPool);
+        if(allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
+                && goalKeeper.connect()) {
+            allies.runAll(threadPool);
+            goalKeeper.run();
         }
+        foes.runAll(threadPool); // submit all to threadPool
+
 
         /* Instantiate & Run the main AI module, which is the core of this software */
         Runnable ai = new AI(allies, goalKeeper, foes, ball);
