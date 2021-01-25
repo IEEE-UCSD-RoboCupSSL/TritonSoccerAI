@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static Triton.PeriphModules.Display.PaintOption.*;
+
 /**
  * Display to convey information in separate window
  */
@@ -37,6 +39,7 @@ public class Display extends JPanel {
     private final JFrame frame;
     protected Gridify convert;
     private HashMap<String, Line2D> fieldLines;
+    private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
@@ -141,11 +144,16 @@ public class Display extends JPanel {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        paintGeo(g2d);
-        paintObjects(g2d);
-//        paintProbability(g2d);
-//        paintPrediction(g2d);
-        paintInfo(g2d);
+        if (paintOptions.contains(GEOMETRY))
+            paintGeo(g2d);
+        if (paintOptions.contains(OBJECTS))
+            paintObjects(g2d);
+        if (paintOptions.contains(PROBABILITY))
+            paintProbability(g2d);
+        if (paintOptions.contains(PREDICTION))
+            paintPrediction(g2d);
+        if (paintOptions.contains(INFO))
+            paintInfo(g2d);
 
         lastPaint = System.currentTimeMillis();
     }
@@ -270,6 +278,10 @@ public class Display extends JPanel {
                 windowHeight - 70);
         g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
                 windowHeight - 50);
+    }
+
+    public void setPaintOptions(ArrayList<PaintOption> paintOptions) {
+        this.paintOptions = paintOptions;
     }
 
     /**

@@ -57,7 +57,7 @@ public class Formation {
             Vec2D allyPos = ally.getData().getPos();
             Vec2D targetPos = formationPoints.get(botID);
             double targetAngle = formationAngle.get(botID);
-            ally.pathTo(targetPos, targetAngle);
+            ally.strafeTo(targetPos, targetAngle);
         }
 
         // return false when any robot is outside of their designated formation point

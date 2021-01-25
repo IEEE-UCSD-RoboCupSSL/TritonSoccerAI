@@ -205,12 +205,14 @@ public class Graph<T extends Node> {
     public void setHeuristicAlgo(BiFunction<Node, Node, Double> heuristic) {
         this.heuristic = heuristic;
     }
+
     public enum Diagonal {
         ALWAYS,
         NO_OBSTACLES,
         ONE_OBSTACLE,
         NEVER
     }
+
     public enum DistanceAlgo {
         MANHATTAN(manhattan),
         EUCLIDEAN(euclidean),

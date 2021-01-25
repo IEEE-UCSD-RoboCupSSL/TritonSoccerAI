@@ -22,15 +22,12 @@ public class RobotList<T> extends ArrayList<T> {
 
     public void runAll(ThreadPoolExecutor threadPool) {
         for (T bot : this) {
-            if (bot instanceof Ally) {
-                threadPool.submit((Ally) bot);
-            } else if (bot instanceof Foe) {
-                threadPool.submit((Foe) bot);
+            if (bot instanceof Robot) {
+                threadPool.submit((Robot) bot);
             } else {
                 System.out.println("Invalid Type");
             }
         }
     }
-
 
 }

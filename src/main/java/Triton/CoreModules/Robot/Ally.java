@@ -108,7 +108,6 @@ public class Ally extends Robot {
             // threadPool.execute(conn.getDataStream());
             threadPool.submit(conn.getVisionStream());
 
-            Thread.sleep(1000);
             conn.getTCPConnection().sendInit();
 
             while (true) {
@@ -183,8 +182,8 @@ public class Ally extends Robot {
 
     /*** advanced control methods ***/
     /*** path control methods ***/
-    public void pathTo(Vec2D endPoint, double angle) {
-        statePub.publish(FOLLOW_PATH);
+    public void strafeTo(Vec2D endPoint, double angle) {
+        statePub.publish(STRAFE);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
@@ -275,7 +274,7 @@ public class Ally extends Robot {
             case MOVE_TVRD -> command = createTVRDCmd();
             case MOVE_TVRV -> command = createTVRVCmd();
             case AUTO_CAPTURE -> command = createAutoCapCmd();
-            case FOLLOW_PATH -> command = createFollowPathCmd();
+            case STRAFE -> command = createStrafeCmd();
             case SPRINT -> command = createSprintCmd();
             case SPRINT_ANGLE -> command = createSprintAngleCmd();
             case ROTATE -> command = createRotateCmd();
@@ -350,7 +349,7 @@ public class Ally extends Robot {
         return command.build();
     }
 
-    private RemoteAPI.Commands createFollowPathCmd() {
+    private RemoteAPI.Commands createStrafeCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);
@@ -367,7 +366,7 @@ public class Ally extends Robot {
             usingRD = true;
             motionSetPoint.setZ(targetAngle);
         } else {
-            motionSetPoint.setZ(Math.signum(angDiff) * 100);
+            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * 50 : Math.signum(angDiff) * 100);
         }
 
         if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -548,10 +547,9 @@ public class Ally extends Robot {
 
             double currAngle = getData().getAngle();
             double angDiff = calcAngDiff(targetAngle, currAngle);
-
             double absAngleDiff = Math.abs(angDiff);
-            boolean usingRD = false;
 
+            boolean usingRD = false;
             if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
                 usingRD = true;
                 motionSetPoint.setZ(targetAngle);
@@ -596,6 +594,10 @@ public class Ally extends Robot {
         kickerSetPoint.setX(kickVel.x);
         kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
+
+        if (ID == 0) {
+            System.out.println(command.build());
+        }
 
         return command.build();
     }

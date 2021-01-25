@@ -18,7 +18,7 @@ public class GoalKeeping {
     }
 
     public void moveToStart() {
-        keeper.sprintToAngle(new Vec2D(0, -4400), 0);
+        keeper.sprintToAngle(new Vec2D(0, -4200), 0);
     }
 
     public void passiveGuarding() {
@@ -28,25 +28,27 @@ public class GoalKeeping {
         Vec2D ballPos = ball.getData().getPos();
         Vec2D ballTraj = estimator.getAimTrajectory();
         Vec2D keeperPos = keeper.getData().getPos();
-        Vec2D keeperLine = new Vec2D(1, 0);
+        double keeperY = -4200;
 
         if (Math.abs(ballTraj.y) <= 0.0001) {
             return;
         } else if (Math.abs(ballTraj.x) <= 0.0001) {
-            keeper.pathTo(new Vec2D(ballPos.x, keeperPos.y), 0);
+            keeper.strafeTo(new Vec2D(ballPos.x, keeperPos.y), 0);
             return;
         }
 
         double m1 = ballTraj.y / ballTraj.x;
-        double b1 = ballPos.y - (ballPos.x / m1);
+        double b1 = ballPos.y - (ballPos.x * m1);
 
         double m2 = 0;
-        double b2 = keeperPos.y;
+        double b2 = keeperY;
 
-        Vec2D targetPos = new Vec2D((b2 - b1) / m1, b2);
+        double targetX = (b2 - b1) / m1;
+
+        Vec2D targetPos = new Vec2D(targetX, b2);
 
         double targetAngle = ballTraj.mult(-1).toPlayerAngle();
-        keeper.pathTo(targetPos, targetAngle);
+        keeper.strafeTo(targetPos, targetAngle);
 //        }
     }
 

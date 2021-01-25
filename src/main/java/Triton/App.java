@@ -5,12 +5,18 @@ import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import static Triton.Config.SimConfig.TOTAL_THREADS;
+import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**
  * Main Program
@@ -38,8 +44,6 @@ public class App {
     // 12(robot udp command listener) + 1(multicast vision) + 1(server udp ekf data
     // listener)
     // + 1(server tcp connection listener)
-
-    private final static int TOTAL_THREADS = 100;
 
     public static void main(String[] args) {
         if (args != null && args.length > 0) {
@@ -74,23 +78,27 @@ public class App {
         Ball ball = new Ball();
         threadPool.submit(ball);
 
-
         RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1, threadPool);
         Ally goalKeeper = RobotFactory.createGoalKeeperBot(threadPool);
         RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT, threadPool);
         if (allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
                 && goalKeeper.connect()) {
             allies.runAll(threadPool);
-            goalKeeper.run();
+            threadPool.submit(goalKeeper);
         }
+//        allies.runAll(threadPool);
+//        threadPool.submit(goalKeeper);
         foes.runAll(threadPool); // submit all to threadPool
-
 
         /* Instantiate & Run the main AI module, which is the core of this software */
         Runnable ai = new AI(allies, goalKeeper, foes, ball);
         threadPool.submit(ai);
 
-        /* A visualization tool */
-        // Display display = new Display();
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        display.setPaintOptions(paintOptions);
     }
 }
