@@ -13,20 +13,12 @@ public class Ball implements Module {
         dataSub = new FieldSubscriber<>("detection", "ball");
     }
 
-    protected void subscribe() {
-        try {
-            dataSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Vec2D getTrajectoryConstraint() {
+        return getData().getVel().norm();
     }
 
     public BallData getData() {
         return dataSub.getMsg();
-    }
-
-    public Vec2D getTrajectoryConstraint() {
-        return getData().getVel().norm();
     }
 
     public Vec2D predPosAtTime(double time) {
@@ -47,6 +39,14 @@ public class Ball implements Module {
     public void run() {
         try {
             subscribe();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void subscribe() {
+        try {
+            dataSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

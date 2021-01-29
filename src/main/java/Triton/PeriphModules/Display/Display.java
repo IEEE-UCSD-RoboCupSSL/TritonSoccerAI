@@ -201,29 +201,6 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
     }
 
-    private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
-        for (RobotData robot : robots) {
-            BufferedImage img;
-            if (robot.getTeam() == Team.BLUE)
-                img = ImgLoader.blueRobot;
-            else
-                img = ImgLoader.yellowRobot;
-
-            int[] pos = convert.fromPos(robot.getPos());
-            double angle = Math.toRadians(robot.getAngle() + 90);
-
-            AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
-                    img.getWidth() / 2.0);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-            int imgX = pos[0] - img.getWidth() / 2;
-            int imgY = pos[1] - img.getHeight() / 2;
-            g2d.drawImage(op.filter(img, null), imgX, imgY, null);
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
-        }
-    }
-
     private void paintProbability(Graphics2D g2d) {
         int checkDist = 10;
         Vec2D pos = blueRobotSubs.get(0).getMsg().getPos();
@@ -237,16 +214,6 @@ public class Display extends JPanel {
                 g2d.fillRect(x, y, checkDist, checkDist);
             }
         }
-    }
-
-    private double exampleProbabilityFunc(Vec2D point, Vec2D pos) {
-//        return sigmoid((point.x + point.y) / 2000);
-        double dist = point.sub(pos).mag();
-        return sigmoid(dist / 250 - 10 + (Math.random() - 0.5));
-    }
-
-    private double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
     }
 
     private void paintPrediction(Graphics2D g2d) {
@@ -278,6 +245,39 @@ public class Display extends JPanel {
                 windowHeight - 70);
         g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
                 windowHeight - 50);
+    }
+
+    private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
+        for (RobotData robot : robots) {
+            BufferedImage img;
+            if (robot.getTeam() == Team.BLUE)
+                img = ImgLoader.blueRobot;
+            else
+                img = ImgLoader.yellowRobot;
+
+            int[] pos = convert.fromPos(robot.getPos());
+            double angle = Math.toRadians(robot.getAngle() + 90);
+
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
+                    img.getWidth() / 2.0);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+            int imgX = pos[0] - img.getWidth() / 2;
+            int imgY = pos[1] - img.getHeight() / 2;
+            g2d.drawImage(op.filter(img, null), imgX, imgY, null);
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
+        }
+    }
+
+    private double exampleProbabilityFunc(Vec2D point, Vec2D pos) {
+//        return sigmoid((point.x + point.y) / 2000);
+        double dist = point.sub(pos).mag();
+        return sigmoid(dist / 250 - 10 + (Math.random() - 0.5));
+    }
+
+    private double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {

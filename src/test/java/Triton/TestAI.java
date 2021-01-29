@@ -2,18 +2,11 @@ package Triton;
 
 import Triton.CoreModules.AI.Estimators.Estimator;
 import Triton.CoreModules.AI.Formation;
-import Triton.CoreModules.AI.GameStates;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
-import Triton.CoreModules.AI.Strategies.Attack.BasicAttack;
-import Triton.CoreModules.AI.Strategies.Defense.BasicDefense;
-import Triton.CoreModules.AI.Strategies.SeizeOpportunity.ForwardFilling;
-import Triton.CoreModules.AI.Strategies.Strategies;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
-import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 
 public class TestAI implements Module {

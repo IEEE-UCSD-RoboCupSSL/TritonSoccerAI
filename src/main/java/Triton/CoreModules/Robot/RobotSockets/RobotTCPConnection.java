@@ -87,23 +87,23 @@ public class RobotTCPConnection implements Module {
         tcpCommandPub.publish(str);
     }
 
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                Thread.sleep(1000);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Subscribe to publishers
      */
     private void subscribe() {
         try {
             allySub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                Thread.sleep(1000);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,14 +133,6 @@ public class RobotTCPConnection implements Module {
             this.out = out;
         }
 
-        private void subscribe() {
-            try {
-                tcpCommandSub.subscribe(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         @Override
         public void run() {
             try {
@@ -151,6 +143,14 @@ public class RobotTCPConnection implements Module {
                     System.out.println(msg);
                     out.println(msg);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void subscribe() {
+            try {
+                tcpCommandSub.subscribe(1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }

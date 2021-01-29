@@ -43,14 +43,6 @@ public class Formation {
         return moveToFormation(formationPoints, formationAngle, bots);
     }
 
-    public boolean freeKickFormation(/*...*/) {
-        return false;
-    }
-
-    public boolean penaltyFormation(/*...*/) {
-        return false;
-    }
-
     public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
         for (Ally ally : bots) {
             int botID = ally.getID();
@@ -72,5 +64,13 @@ public class Formation {
 
         // return true when all our robots have arrived at their designated formation points
         return true;
+    }
+
+    public boolean freeKickFormation(/*...*/) {
+        return false;
+    }
+
+    public boolean penaltyFormation(/*...*/) {
+        return false;
     }
 }

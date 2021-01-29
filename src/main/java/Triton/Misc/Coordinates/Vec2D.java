@@ -10,17 +10,6 @@ public class Vec2D {
     public final double y;
     private String name;
 
-    /**
-     * Constructs a vector with specified x and y values
-     *
-     * @param x x value of vector
-     * @param y y value of vector
-     */
-    public Vec2D(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-
     public Vec2D(double playerAngle) {
         double angle = Math.toRadians(playerAngle + 90);
         x = Math.cos(angle);
@@ -35,6 +24,17 @@ public class Vec2D {
     public Vec2D(Vec2D target) {
         this(target.x, target.y);
         name = target.name;
+    }
+
+    /**
+     * Constructs a vector with specified x and y values
+     *
+     * @param x x value of vector
+     * @param y y value of vector
+     */
+    public Vec2D(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -144,6 +144,16 @@ public class Vec2D {
     }
 
     /**
+     * Returns the unit vector (vector with length 1)
+     *
+     * @return the unit vector
+     */
+    public Vec2D norm() {
+        double mag = mag();
+        return new Vec2D(x / mag, y / mag);
+    }
+
+    /**
      * Returns the length of the vector
      *
      * @return the length of the vector
@@ -153,13 +163,11 @@ public class Vec2D {
     }
 
     /**
-     * Returns the unit vector (vector with length 1)
-     *
-     * @return the unit vector
+     * @return angle starting from y-axis, positive is counter clockwise, between -180 to 180
      */
-    public Vec2D norm() {
-        double mag = mag();
-        return new Vec2D(x / mag, y / mag);
+    public double toPlayerAngle() {
+        double angle = toAngle() - 90;
+        return PerspectiveConverter.normAng(angle);
     }
 
     /**
@@ -171,14 +179,6 @@ public class Vec2D {
         }
 
         return Math.toDegrees(Math.atan2(y, x));
-    }
-
-    /**
-     * @return angle starting from y-axis, positive is counter clockwise, between -180 to 180
-     */
-    public double toPlayerAngle() {
-        double angle = toAngle() - 90;
-        return PerspectiveConverter.normAng(angle);
     }
 
     /**

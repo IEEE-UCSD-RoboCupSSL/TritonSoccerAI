@@ -92,6 +92,14 @@ public class GrSimVisionModule extends VisionModule {
     }
 
     /**
+     * Receives 4 packets
+     */
+    protected void collectData() {
+        // default configuration with 2x6 robots need 4 packets
+        collectData(4);
+    }
+
+    /**
      * Receive a specified number of packets
      *
      * @param numIter Number of packets to receive
@@ -100,13 +108,5 @@ public class GrSimVisionModule extends VisionModule {
         for (int i = 0; i < numIter; i++) {
             update();
         }
-    }
-
-    /**
-     * Receives 4 packets
-     */
-    protected void collectData() {
-        // default configuration with 2x6 robots need 4 packets 
-        collectData(4);
     }
 }

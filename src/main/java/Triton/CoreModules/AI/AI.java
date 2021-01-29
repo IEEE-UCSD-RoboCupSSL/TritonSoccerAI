@@ -72,6 +72,10 @@ public class AI implements Module {
         }
     }
 
+    private GameStates getCurrGameState() {
+        return GameStates.START;
+    }
+
     private void startBranch() {
         goalKeeping.passiveGuarding();
 
@@ -115,10 +119,6 @@ public class AI implements Module {
     }
 
     private void defaultBranch() {
-    }
-
-    private GameStates getCurrGameState() {
-        return GameStates.START;
     }
 
 //    private void printBallHolder() {

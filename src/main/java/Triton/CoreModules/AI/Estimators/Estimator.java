@@ -30,6 +30,18 @@ public class Estimator {
     }
 
     /*
+     * under the premises a robot is holding the ball,
+     * return the trajectory of its currently aiming
+     */
+    public Vec2D getAimTrajectory() {
+        Robot bot = getBallHolder();
+        if (bot == null)
+            return new Vec2D(0.00, 0.00);
+
+        return new Vec2D(bot.getData().getAngle());
+    }
+
+    /*
      * return the reference of the robot currently holding/dribbling the ball,
      * if no robot is currently holding the ball, return null
      */
@@ -57,19 +69,6 @@ public class Estimator {
 
         return null;
     }
-
-    /*
-     * under the premises a robot is holding the ball,
-     * return the trajectory of its currently aiming
-     */
-    public Vec2D getAimTrajectory() {
-        Robot bot = getBallHolder();
-        if (bot == null)
-            return new Vec2D(0.00, 0.00);
-
-        return new Vec2D(bot.getData().getAngle());
-    }
-
 
     /*
      * under the premises of no robots is holding the ball,

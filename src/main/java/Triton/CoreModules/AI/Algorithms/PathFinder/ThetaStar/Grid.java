@@ -33,18 +33,6 @@ public class Grid {
         createGrid();
     }
 
-    public Node nodeFromWorldPos(Vec2D worldPos) {
-        int[] gridPos = convert.fromPos(worldPos);
-        try {
-            return nodes[gridPos[1]][gridPos[0]];
-        } catch (IndexOutOfBoundsException e) {
-            int col = Ints.constrainToRange(gridPos[0], 0, numCols - 1);
-            int row = Ints.constrainToRange(gridPos[1], 0, numRows - 1);
-            System.err.printf("POS %s is out of bound%n", worldPos);
-            return nodes[row][col];
-        }
-    }
-
     private void createGrid() {
         nodes = new Node[numRows][numCols];
         for (int row = 0; row < numRows; row++) {
@@ -132,6 +120,18 @@ public class Grid {
                 return false;
         }
         return true;
+    }
+
+    public Node nodeFromWorldPos(Vec2D worldPos) {
+        int[] gridPos = convert.fromPos(worldPos);
+        try {
+            return nodes[gridPos[1]][gridPos[0]];
+        } catch (IndexOutOfBoundsException e) {
+            int col = Ints.constrainToRange(gridPos[0], 0, numCols - 1);
+            int row = Ints.constrainToRange(gridPos[1], 0, numRows - 1);
+            System.err.printf("POS %s is out of bound%n", worldPos);
+            return nodes[row][col];
+        }
     }
 
     public Node[][] getNodes() {

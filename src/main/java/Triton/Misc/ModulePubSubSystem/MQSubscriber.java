@@ -8,14 +8,14 @@ import java.util.concurrent.TimeoutException;
 public class MQSubscriber<T> extends Subscriber<T> {
     private final BlockingQueue<T> queue;
 
-    public MQSubscriber(String topicName, String msgName, int queueSize) {
-        super(topicName + "QUEUE", msgName);
-        queue = new LinkedBlockingQueue<>(queueSize);
-    }
-
     // Default size is 1
     public MQSubscriber(String topicName, String msgName) {
         this(topicName, msgName, 1);
+    }
+
+    public MQSubscriber(String topicName, String msgName, int queueSize) {
+        super(topicName + "QUEUE", msgName);
+        queue = new LinkedBlockingQueue<>(queueSize);
     }
 
     @Override

@@ -8,21 +8,17 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotFactory;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.SimConfig.TOTAL_THREADS;
-import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**
  * Unit test for simple App.

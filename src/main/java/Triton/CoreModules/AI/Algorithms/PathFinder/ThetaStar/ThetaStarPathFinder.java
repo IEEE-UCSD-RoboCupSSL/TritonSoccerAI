@@ -15,6 +15,10 @@ public class ThetaStarPathFinder extends PathFinder {
         grid = new Grid(worldSizeX, worldSizeY);
     }
 
+    public void setObstacles(ArrayList<Circle2D> obstacles) {
+        grid.updateGrid(obstacles);
+    }
+
     public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
         Node startNode = grid.nodeFromWorldPos(startPos);
         Node targetNode = grid.nodeFromWorldPos(targetPos);
@@ -66,10 +70,6 @@ public class ThetaStarPathFinder extends PathFinder {
 
     private double getDist(Node nodeA, Node nodeB) {
         return Vec2D.dist(nodeA.getWorldPos(), nodeB.getWorldPos());
-    }
-
-    public void setObstacles(ArrayList<Circle2D> obstacles) {
-        grid.updateGrid(obstacles);
     }
 
     public Grid getGrid() {

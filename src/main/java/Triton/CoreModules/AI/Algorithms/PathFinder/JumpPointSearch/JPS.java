@@ -18,22 +18,10 @@ public abstract class JPS<T extends Node> {
         return findPath(start, goal, false, false);
     }
 
-    public Future<Queue<T>> findPath(T start, T goal, boolean adjacentStop) {
-        return findPath(start, goal, adjacentStop, true);
-    }
-
     public Future<Queue<T>> findPath(T start, T goal, boolean adjacentStop, boolean diagonalStop) {
         FutureTask<Queue<T>> future = new FutureTask<>(() -> findPathSync(start, goal, adjacentStop, diagonalStop));
         future.run();
         return future;
-    }
-
-    public Queue<T> findPathSync(T start, T goal) {
-        return findPathSync(start, goal, false, false);
-    }
-
-    public Queue<T> findPathSync(T start, T goal, boolean adjacentStop) {
-        return findPathSync(start, goal, adjacentStop, true);
     }
 
     public Queue<T> findPathSync(T start, T goal, boolean adjacentStop, boolean diagonalStop) {
@@ -85,6 +73,43 @@ public abstract class JPS<T extends Node> {
     }
 
     /**
+     * Find all neighbors for a given node. If node has a parent then prune neighbors based on JPS algorithm,
+     * otherwise return all neighbors.
+     */
+    protected abstract Set<T> findNeighbors(T node, Map<T, T> parentMap);
+
+    /**
+     * Returns a path of the parent nodes from a given node.
+     */
+    private Queue<T> backtrace(T node, Map<T, T> parentMap) {
+        LinkedList<T> path = new LinkedList<>();
+        path.add(node);
+
+        int previousX, previousY, currentX, currentY;
+        int dx, dy;
+        int steps;
+        T temp;
+        while (parentMap.containsKey(node)) {
+            previousX = parentMap.get(node).x;
+            previousY = parentMap.get(node).y;
+            currentX = node.x;
+            currentY = node.y;
+            steps = Integer.max(Math.abs(previousX - currentX), Math.abs(previousY - currentY));
+            dx = Integer.compare(previousX, currentX);
+            dy = Integer.compare(previousY, currentY);
+
+            temp = node;
+            for (int i = 0; i < steps; i++) {
+                temp = graph.getNode(temp.x + dx, temp.y + dy);
+                path.addFirst(temp);
+            }
+
+            node = parentMap.get(node);
+        }
+        return path;
+    }
+
+    /**
      * Identify successors for the given node. Runs a JPS in direction of each available neighbor, adding any open
      * nodes found to the open list.
      *
@@ -125,45 +150,20 @@ public abstract class JPS<T extends Node> {
     }
 
     /**
-     * Find all neighbors for a given node. If node has a parent then prune neighbors based on JPS algorithm,
-     * otherwise return all neighbors.
-     */
-    protected abstract Set<T> findNeighbors(T node, Map<T, T> parentMap);
-
-    /**
      * Search towards the child from the parent, returning when a jump point is found.
      */
     protected abstract T jump(T neighbor, T current, Set<T> goals);
 
-    /**
-     * Returns a path of the parent nodes from a given node.
-     */
-    private Queue<T> backtrace(T node, Map<T, T> parentMap) {
-        LinkedList<T> path = new LinkedList<>();
-        path.add(node);
+    public Future<Queue<T>> findPath(T start, T goal, boolean adjacentStop) {
+        return findPath(start, goal, adjacentStop, true);
+    }
 
-        int previousX, previousY, currentX, currentY;
-        int dx, dy;
-        int steps;
-        T temp;
-        while (parentMap.containsKey(node)) {
-            previousX = parentMap.get(node).x;
-            previousY = parentMap.get(node).y;
-            currentX = node.x;
-            currentY = node.y;
-            steps = Integer.max(Math.abs(previousX - currentX), Math.abs(previousY - currentY));
-            dx = Integer.compare(previousX, currentX);
-            dy = Integer.compare(previousY, currentY);
+    public Queue<T> findPathSync(T start, T goal) {
+        return findPathSync(start, goal, false, false);
+    }
 
-            temp = node;
-            for (int i = 0; i < steps; i++) {
-                temp = graph.getNode(temp.x + dx, temp.y + dy);
-                path.addFirst(temp);
-            }
-
-            node = parentMap.get(node);
-        }
-        return path;
+    public Queue<T> findPathSync(T start, T goal, boolean adjacentStop) {
+        return findPathSync(start, goal, adjacentStop, true);
     }
 
     public static class JPSFactory {

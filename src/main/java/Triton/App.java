@@ -6,18 +6,15 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 
-import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.SimConfig.TOTAL_THREADS;
-import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**
  * Main Program
@@ -49,21 +46,27 @@ public class App {
     public static void main(String[] args) {
 
         boolean isTestMode = false;
-        String testName = "";
 
         if (args != null && args.length > 0) {
             switch (args[0]) {
                 case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
                 case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
+                case "TEST" -> isTestMode = true;
                 default -> {
                     System.out.println("Error: Invalid Team");
                     return;
                 }
             }
-        }
 
-        if(isTestMode) {
-            /* get test name from stdin */
+            if (args.length > 1) {
+                switch (args[1]) {
+                    case "TEST" -> isTestMode = true;
+                    default -> {
+                        System.out.println("Error: Invalid Args");
+                        return;
+                    }
+                }
+            }
         }
 
         /* Prepare a Thread Pool*/
@@ -98,12 +101,11 @@ public class App {
         foes.runAll(threadPool); // submit all to threadPool
 
 
-        if(!isTestMode) {
+        if (!isTestMode) {
             /* Instantiate & Run the main AI module, which is the core of this software */
             threadPool.submit(new AI(allies, goalKeeper, foes, ball));
-        }
-        else {
-            threadPool.submit(new TestRunner(testName, allies, goalKeeper, foes, ball));
+        } else {
+            threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         }
 
 

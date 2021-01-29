@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
+import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
 import static Triton.CoreModules.Robot.AllyState.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
@@ -93,32 +95,6 @@ public class Ally extends Robot {
         // To-do
     }
 
-
-    // Everything in run() runs in the Ally Thread
-    @Override
-    public void run() {
-        try {
-            super.run();
-            initPathfinder();
-
-            threadPool.submit(conn.getTCPConnection());
-            threadPool.submit(conn.getTCPConnection().getSendTCP());
-            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
-            threadPool.submit(conn.getCommandStream());
-            // threadPool.execute(conn.getDataStream());
-            threadPool.submit(conn.getVisionStream());
-
-            conn.getTCPConnection().sendInit();
-
-            while (true) {
-                publishCommand();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public boolean getDribblerStatus() {
         subscribe();
         return dribStatSub.getMsg();
@@ -129,7 +105,10 @@ public class Ally extends Robot {
         statePub.publish(AUTO_CAPTURE);
     }
 
-    // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
+    public void stop() {
+        moveAt(new Vec2D(0, 0));
+        spinAt(0);
+    }
 
     /**
      * @param loc player perspective, millimeter
@@ -141,6 +120,8 @@ public class Ally extends Robot {
         }
         pointPub.publish(loc);
     }
+
+    // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
 
     /**
      * @param vel player perspective, vector with unit as percentage from -100 to 100
@@ -177,16 +158,31 @@ public class Ally extends Robot {
 
     // runs in the caller thread
     public void kick(Vec2D kickVel) {
+        double mag = kickVel.mag();
+        if (mag >= MAX_KICK_VEL) {
+            kickVel = kickVel.norm().mult(MAX_KICK_VEL);
+        }
+
         kickVelPub.publish(kickVel);
+
+        threadPool.submit(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            kickVelPub.publish(new Vec2D(0, 0));
+        });
     }
 
-    /*** advanced control methods ***/
     /*** path control methods ***/
     public void strafeTo(Vec2D endPoint, double angle) {
         statePub.publish(STRAFE);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
+
+    /*** advanced control methods ***/
 
     public void sprintTo(Vec2D endPoint) {
         statePub.publish(SPRINT);
@@ -222,7 +218,6 @@ public class Ally extends Robot {
         statePub.publish(PASS);
     }
 
-
     @Override
     protected void subscribe() {
         super.subscribe();
@@ -239,6 +234,30 @@ public class Ally extends Robot {
             pointSub.subscribe(1000);
             angSub.subscribe(1000);
             kickVelSub.subscribe(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Everything in run() runs in the Ally Thread
+    @Override
+    public void run() {
+        try {
+            super.run();
+            initPathfinder();
+
+            threadPool.submit(conn.getTCPConnection());
+            threadPool.submit(conn.getTCPConnection().getSendTCP());
+            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
+            threadPool.submit(conn.getCommandStream());
+            // threadPool.execute(conn.getDataStream());
+            threadPool.submit(conn.getVisionStream());
+
+            conn.getTCPConnection().sendInit();
+
+            while (true) {
+                publishCommand();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -366,7 +385,7 @@ public class Ally extends Robot {
             usingRD = true;
             motionSetPoint.setZ(targetAngle);
         } else {
-            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * 50 : Math.signum(angDiff) * 100);
+            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
         }
 
         if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -463,7 +482,7 @@ public class Ally extends Robot {
                     usingRD = true;
                     motionSetPoint.setZ(targetAngle);
                 } else {
-                    motionSetPoint.setZ(Math.signum(angDiff) * 100);
+                    motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
                 }
 
                 if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -554,7 +573,7 @@ public class Ally extends Robot {
                 usingRD = true;
                 motionSetPoint.setZ(targetAngle);
             } else {
-                motionSetPoint.setZ(Math.signum(angDiff) * 100);
+                motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
             }
 
             if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -595,10 +614,6 @@ public class Ally extends Robot {
         kickerSetPoint.setY(kickVel.y);
         command.setKickerSetPoint(kickerSetPoint);
 
-        if (ID == 0) {
-            System.out.println(command.build());
-        }
-
         return command.build();
     }
 
@@ -621,7 +636,7 @@ public class Ally extends Robot {
             motionSetPoint.setZ(targetAngle);
         } else {
             command.setMode(MoveMode.TVRV.ordinal());
-            motionSetPoint.setZ(Math.signum(angDiff) * 100);
+            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
         }
         command.setMotionSetPoint(motionSetPoint);
 

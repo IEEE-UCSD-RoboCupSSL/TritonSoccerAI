@@ -17,18 +17,6 @@ public abstract class Robot implements Module {
         dataSub = new FieldSubscriber<>("detection", team.name() + ID);
     }
 
-    protected void subscribe() {
-        try {
-            dataSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public RobotData getData() {
-        return dataSub.getMsg();
-    }
-
     public Vec2D predPosAtTime(double time) {
         RobotData robotData = getData();
         Vec2D pos = robotData.getPos();
@@ -39,6 +27,10 @@ public abstract class Robot implements Module {
 //        return pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
     }
 
+    public RobotData getData() {
+        return dataSub.getMsg();
+    }
+
     public int timeToPoint() {
         return 0;
     }
@@ -47,6 +39,14 @@ public abstract class Robot implements Module {
     public void run() {
         try {
             subscribe();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void subscribe() {
+        try {
+            dataSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -75,13 +75,6 @@ public class Graph<T extends Node> {
         return nodes;
     }
 
-    public T getNode(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= nodes.size() / width) {
-            return null;
-        }
-        return nodes.get(x + y * width);
-    }
-
     /**
      * Given two adjacent nodes, returns the distance between them.
      *
@@ -190,6 +183,13 @@ public class Graph<T extends Node> {
 
     public boolean isWalkable(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < nodes.size() / width && getNode(x, y).walkable;
+    }
+
+    public T getNode(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= nodes.size() / width) {
+            return null;
+        }
+        return nodes.get(x + y * width);
     }
 
     /**

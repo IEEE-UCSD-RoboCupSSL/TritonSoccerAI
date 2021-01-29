@@ -54,32 +54,6 @@ public class JPSPathFinder extends PathFinder {
         jps = JPS.JPSFactory.getJPS(new Graph<>(nodeList), Graph.Diagonal.NO_OBSTACLES);
     }
 
-    /* Check if a point is in area outside the boundary */
-    public boolean isOutOfBound(int row, int col) {
-        return row <= ul[1] || row >= br[1] || col <= ul[0] || col >= br[0];
-    }
-
-    /* Set area outside the boundaries as not walkable */
-    public void setBound() {
-        for (int col = 0; col < nodeList.get(0).size(); col++) {
-            for (int row = 0; row <= ul[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-            for (int row = br[1]; row < nodeList.size(); row++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-        }
-
-        for (int row = ul[1]; row <= br[1]; row++) {
-            for (int col = 0; col <= ul[0]; col++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-            for (int col = br[0]; col < nodeList.get(0).size(); col++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-        }
-    }
-
     /* Set the robot surroundings as not walkable */
     public void setObstacles(ArrayList<Circle2D> obstacles) {
         setBound();
@@ -112,6 +86,76 @@ public class JPSPathFinder extends PathFinder {
                 }
             }
         }
+    }
+
+    /* Set area outside the boundaries as not walkable */
+    public void setBound() {
+        for (int col = 0; col < nodeList.get(0).size(); col++) {
+            for (int row = 0; row <= ul[1]; row++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+            for (int row = br[1]; row < nodeList.size(); row++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+        }
+
+        for (int row = ul[1]; row <= br[1]; row++) {
+            for (int col = 0; col <= ul[0]; col++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+            for (int col = br[0]; col < nodeList.get(0).size(); col++) {
+                nodeList.get(row).get(col).setWalkable(false);
+            }
+        }
+    }
+
+    public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
+        int[] startIdx = constrain(convert.fromPos(startPos));
+        int[] targetIdx = constrain(convert.fromPos(targetPos));
+
+        Node start, target;
+        try {
+            start = nodeList.get(startIdx[1]).get(startIdx[0]);
+            target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
+        } catch (IndexOutOfBoundsException e) {
+            return nullPath(startPos);
+        }
+
+        // find ways out
+        if (!start.isWalkable()) {
+            wayOut(startIdx[1], startIdx[0]);
+        }
+        if (!target.isWalkable()) {
+            if (!isOutOfBound(targetIdx[1], targetIdx[0])) { // Do nothing if ball is outside the field
+                wayOut(targetIdx[1], targetIdx[0]);
+            }
+        }
+
+        Future<Queue<Node>> futurePath = jps.findPath(start, target);
+        try {
+            Queue<Node> path = futurePath.get();
+            this.path = toVec2DPath(path);
+            return this.path;
+        } catch (Exception e) {
+            return nullPath(startPos);
+        }
+    }
+
+    private int[] constrain(int[] idx) {
+        idx[0] = Math.min(Math.max(idx[0], 0), numCols);
+        idx[1] = Math.min(Math.max(idx[1], 0), numRows);
+        return idx;
+    }
+
+    private ArrayList<Vec2D> nullPath(Vec2D startPos) {
+        ArrayList<Vec2D> empty = new ArrayList<>();
+        empty.add(startPos);
+        empty.add(startPos);
+        if (path != null) {
+            System.out.println("No valid path found; empty path returned");
+            path = null;
+        }
+        return empty;
     }
 
     /*
@@ -153,53 +197,9 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
-    public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
-        int[] startIdx = constrain(convert.fromPos(startPos));
-        int[] targetIdx = constrain(convert.fromPos(targetPos));
-
-        Node start, target;
-        try {
-            start = nodeList.get(startIdx[1]).get(startIdx[0]);
-            target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
-        } catch (IndexOutOfBoundsException e) {
-            return nullPath(startPos);
-        }
-
-        // find ways out
-        if (!start.isWalkable()) {
-            wayOut(startIdx[1], startIdx[0]);
-        }
-        if (!target.isWalkable()) {
-            if (!isOutOfBound(targetIdx[1], targetIdx[0])) { // Do nothing if ball is outside the field
-                wayOut(targetIdx[1], targetIdx[0]);
-            }
-        }
-
-        Future<Queue<Node>> futurePath = jps.findPath(start, target);
-        try {
-            Queue<Node> path = futurePath.get();
-            this.path = toVec2DPath(path);
-            return this.path;
-        } catch (Exception e) {
-            return nullPath(startPos);
-        }
-    }
-
-    private ArrayList<Vec2D> nullPath(Vec2D startPos) {
-        ArrayList<Vec2D> empty = new ArrayList<>();
-        empty.add(startPos);
-        empty.add(startPos);
-        if (path != null) {
-            System.out.println("No valid path found; empty path returned");
-            path = null;
-        }
-        return empty;
-    }
-
-    private int[] constrain(int[] idx) {
-        idx[0] = Math.min(Math.max(idx[0], 0), numCols);
-        idx[1] = Math.min(Math.max(idx[1], 0), numRows);
-        return idx;
+    /* Check if a point is in area outside the boundary */
+    public boolean isOutOfBound(int row, int col) {
+        return row <= ul[1] || row >= br[1] || col <= ul[0] || col >= br[0];
     }
 
     private ArrayList<Vec2D> toVec2DPath(Queue<Node> path) {
