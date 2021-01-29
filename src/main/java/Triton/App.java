@@ -51,10 +51,9 @@ public class App {
             switch (args[0]) {
                 case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
                 case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
-                case "TEST" -> isTestMode = true;
                 default -> {
                     System.out.println("Error: Invalid Team");
-                    return;
+                    sleepForever();
                 }
             }
 
@@ -63,7 +62,7 @@ public class App {
                     case "TEST" -> isTestMode = true;
                     default -> {
                         System.out.println("Error: Invalid Args");
-                        return;
+                        sleepForever();
                     }
                 }
             }
@@ -115,5 +114,19 @@ public class App {
 //        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
 //        display.setPaintOptions(paintOptions);
+
+        sleepForever();
     }
+
+    private static void sleepForever() {
+        while(true) {
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
