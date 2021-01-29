@@ -121,25 +121,25 @@ public class AI implements Module {
         return GameStates.START;
     }
 
-    private void printBallHolder() {
-        Robot bot = estimator.getBallHolder();
-
-        if (bot != null) {
-            System.out.println(bot.getTeam() + " " + bot.getID());
-        } else {
-            System.out.println("No bot holding ball");
-        }
-    }
-
-    private void printBallTraj() {
-        Vec2D ballTraj = estimator.getAimTrajectory();
-
-        if (ballTraj != null) {
-            System.out.println(ballTraj);
-        } else {
-            System.out.println("No bot holding ball");
-        }
-    }
+//    private void printBallHolder() {
+//        Robot bot = estimator.getBallHolder();
+//
+//        if (bot != null) {
+//            System.out.println(bot.getTeam() + " " + bot.getID());
+//        } else {
+//            System.out.println("No bot holding ball");
+//        }
+//    }
+//
+//    private void printBallTraj() {
+//        Vec2D ballTraj = estimator.getAimTrajectory();
+//
+//        if (ballTraj != null) {
+//            System.out.println(ballTraj);
+//        } else {
+//            System.out.println("No bot holding ball");
+//        }
+//    }
 }
 
 

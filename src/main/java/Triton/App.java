@@ -4,6 +4,7 @@ import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
+import Triton.ManualTests.TestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
@@ -46,6 +47,10 @@ public class App {
     // + 1(server tcp connection listener)
 
     public static void main(String[] args) {
+
+        boolean isTestMode = false;
+        String testName = "";
+
         if (args != null && args.length > 0) {
             switch (args[0]) {
                 case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
@@ -55,6 +60,10 @@ public class App {
                     return;
                 }
             }
+        }
+
+        if(isTestMode) {
+            /* get test name from stdin */
         }
 
         /* Prepare a Thread Pool*/
@@ -86,19 +95,23 @@ public class App {
             allies.runAll(threadPool);
             threadPool.submit(goalKeeper);
         }
-//        allies.runAll(threadPool);
-//        threadPool.submit(goalKeeper);
         foes.runAll(threadPool); // submit all to threadPool
 
-        /* Instantiate & Run the main AI module, which is the core of this software */
-        Runnable ai = new AI(allies, goalKeeper, foes, ball);
-        threadPool.submit(ai);
 
-        Display display = new Display();
-        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-        paintOptions.add(GEOMETRY);
-        paintOptions.add(OBJECTS);
-        paintOptions.add(INFO);
-        display.setPaintOptions(paintOptions);
+        if(!isTestMode) {
+            /* Instantiate & Run the main AI module, which is the core of this software */
+            threadPool.submit(new AI(allies, goalKeeper, foes, ball));
+        }
+        else {
+            threadPool.submit(new TestRunner(testName, allies, goalKeeper, foes, ball));
+        }
+
+
+//        Display display = new Display();
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
+//        paintOptions.add(INFO);
+//        display.setPaintOptions(paintOptions);
     }
 }
