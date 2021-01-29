@@ -1,5 +1,6 @@
 package Triton;
 
+import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
@@ -8,46 +9,32 @@ import Triton.ManualTests.TestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
+import org.javatuples.Pair;
 
-import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.SimConfig.TOTAL_THREADS;
+import static Triton.Config.ConnectionConfig.ROBOT_0_IP;
+import static Triton.Config.ConnectionConfig.ROBOT_1_IP;
+import static Triton.Config.ConnectionConfig.ROBOT_2_IP;
+import static Triton.Config.ConnectionConfig.ROBOT_3_IP;
+import static Triton.Config.ConnectionConfig.ROBOT_4_IP;
+import static Triton.Config.ConnectionConfig.ROBOT_5_IP;
+import static Triton.Config.ConnectionConfig.defaultPortBase;
+import static Triton.Config.ConnectionConfig.defaultPortOffset;
+
 
 /**
  * Main Program
  */
 public class App {
-
-    // TCP connection: listener, each robot connects to the listener, and the
-    // server keeps the robot's port information [for further udp command sending]
-    // and then the server send each robot the same geometry data through TCP
-    // we should write a geometry protobuf
-
-    // Multicast connection: broadcaster, use the data from the vision connection,
-    // broadcast it
-    // in our own vision protobuf format (processed vision)
-
-    // UDP connection: sender, we have the robot port info when the tcp connection
-    // is established
-
-    // Each robot: listen high-level command on a port, send UDP EKF data to the
-    // same port
-    // Server: listen UDP EFK data on a port, host a multicast Vision port, listen
-    // TCP on a port
-    // send high-level command to one of 12 ports
-
-    // 12(robot udp command listener) + 1(multicast vision) + 1(server udp ekf data
-    // listener)
-    // + 1(server tcp connection listener)
-
     public static void main(String[] args) {
-
         boolean isTestMode = false;
 
-        if (args != null && args.length > 0) {
+        /* processing command line arguments */
+        if (args != null && args.length >= 1) { // choose team
             switch (args[0]) {
                 case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
                 case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
@@ -57,8 +44,9 @@ public class App {
                 }
             }
 
-            if (args.length > 1) {
+            if (args.length >= 2) { // mode
                 switch (args[1]) {
+                    case "NORMAL" -> System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     case "TEST" -> isTestMode = true;
                     default -> {
                         System.out.println("Error: Invalid Args");
@@ -66,6 +54,27 @@ public class App {
                     }
                 }
             }
+
+            if(args.length >= 3) { // robot ip addr
+                ROBOT_0_IP = new Pair<>(args[2], defaultPortBase);
+                ROBOT_1_IP = new Pair<>(args[2], defaultPortBase + defaultPortOffset);
+                ROBOT_2_IP = new Pair<>(args[2], defaultPortBase + 2 * defaultPortOffset);
+                ROBOT_3_IP = new Pair<>(args[2], defaultPortBase + 3 * defaultPortOffset);
+                ROBOT_4_IP = new Pair<>(args[2], defaultPortBase + 4 * defaultPortOffset);
+                ROBOT_5_IP = new Pair<>(args[2], defaultPortBase + 5 * defaultPortOffset);
+
+            }
+
+            if(args.length > 3) { // robot ip port base value
+                ROBOT_0_IP = new Pair<>(args[2], Integer.parseInt(args[3]));
+                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + defaultPortOffset);
+                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * defaultPortOffset);
+                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * defaultPortOffset);
+                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * defaultPortOffset);
+                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * defaultPortOffset);
+
+            }
+
         }
 
         /* Prepare a Thread Pool*/
@@ -130,3 +139,27 @@ public class App {
     }
 
 }
+
+
+
+// TCP connection: listener, each robot connects to the listener, and the
+// server keeps the robot's port information [for further udp command sending]
+// and then the server send each robot the same geometry data through TCP
+// we should write a geometry protobuf
+
+// Multicast connection: broadcaster, use the data from the vision connection,
+// broadcast it
+// in our own vision protobuf format (processed vision)
+
+// UDP connection: sender, we have the robot port info when the tcp connection
+// is established
+
+// Each robot: listen high-level command on a port, send UDP EKF data to the
+// same port
+// Server: listen UDP EFK data on a port, host a multicast Vision port, listen
+// TCP on a port
+// send high-level command to one of 12 ports
+
+// 12(robot udp command listener) + 1(multicast vision) + 1(server udp ekf data
+// listener)
+// + 1(server tcp connection listener)
