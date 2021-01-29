@@ -124,7 +124,7 @@ public class App {
 //        paintOptions.add(INFO);
 //        display.setPaintOptions(paintOptions);
 
-        sleepForever();
+        // sleepForever();
     }
 
     private static void sleepForever() {

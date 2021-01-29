@@ -140,7 +140,7 @@ public class RobotTCPConnection implements Module {
 
                 while (true) {
                     String msg = tcpCommandSub.getMsg();
-                    System.out.println(msg);
+                    // System.out.println(msg);
                     out.println(msg);
                 }
             } catch (Exception e) {
@@ -171,7 +171,7 @@ public class RobotTCPConnection implements Module {
             try {
                 while (true) {
                     String line = in.readLine();
-                    System.out.printf("Ally %d TCP : %s\n", ID, line);
+                    //System.out.printf("Ally %d TCP : %s\n", ID, line);
 
                     switch (line) {
                         case "BallOnHold" -> dribStatPub.publish(true);

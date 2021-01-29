@@ -1,5 +1,6 @@
 package Triton.ManualTests;
 
+import Triton.CoreModules.AI.Formation;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -35,21 +36,30 @@ public class TestRunner implements Module {
     public void run() {
         try {
             Thread.sleep(1000);
+            while(!Formation.getInstance().testerFormation(allies));
 
+            String prevTestName = "";
             boolean quit = false;
             while (!quit) {
                 System.out.println(">> ENTER TEST NAME:");
                 testName = scanner.nextLine();
-
                 boolean rtn = false;
-                switch (testName) {
-                    case "PrimitiveMotion" -> rtn = new PrimitiveMotionTest(allies.get(0)).test();
-                    case "GetBall" -> rtn = new GetBallTest(scanner, allies.get(0)).test();
-                    case "Kick" -> rtn = new KickTest(scanner, allies.get(0)).test();
-                    case "Quit" -> quit = true;
-                    default -> System.out.println("Invalid Test Name");
-                }
-
+                int repeat = 0;
+                do {
+                    switch (testName) {
+                        case "pm" -> rtn = new PrimitiveMotionTest(allies.get(0)).test();
+                        case "getball" -> rtn = new GetBallTest(scanner, allies.get(0)).test();
+                        case "kick" -> rtn = new KickTest(scanner, allies.get(0)).test();
+                        case "quit" -> quit = true;
+                        case "" -> {
+                            repeat++;
+                            testName = prevTestName;
+                        }
+                        default -> System.out.println("Invalid Test Name");
+                    }
+                }while(repeat-- > 0);
+                repeat = 0;
+                prevTestName = testName;
                 System.out.println(rtn ? "Test Success" : "Test Fail");
             }
         } catch (Exception e) {

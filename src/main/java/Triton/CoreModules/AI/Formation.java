@@ -43,6 +43,24 @@ public class Formation {
         return moveToFormation(formationPoints, formationAngle, bots);
     }
 
+    public boolean testerFormation(ArrayList<Ally> bots) {
+        ArrayList<Vec2D> formationPoints = new ArrayList<Vec2D>(ObjectConfig.ROBOT_COUNT - 1);
+        formationPoints.add(new Vec2D(0.00, -3000));
+        formationPoints.add(new Vec2D(-1000.00, -3000));
+        formationPoints.add(new Vec2D(1000.00, -3000));
+        formationPoints.add(new Vec2D(-2000.00, -3000));
+        formationPoints.add(new Vec2D(2000.00, -3000));
+
+        ArrayList<Double> formationAngle = new ArrayList<Double>(ObjectConfig.ROBOT_COUNT - 1);
+        formationAngle.add(0.0);
+        formationAngle.add(0.0);
+        formationAngle.add(0.0);
+        formationAngle.add(0.0);
+        formationAngle.add(0.0);
+
+        return moveToFormation(formationPoints, formationAngle, bots);
+    }
+
     public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
         for (Ally ally : bots) {
             int botID = ally.getID();

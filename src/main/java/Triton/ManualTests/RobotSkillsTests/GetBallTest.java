@@ -16,11 +16,11 @@ public class GetBallTest extends RobotSkillsTest {
 
     @Override
     public boolean test() {
-        String line;
-        do {
-            System.out.println(">> ENTER \"start\" TO START:");
-            line = scanner.nextLine();
-        } while (!line.equals("start"));
+//        String line;
+//        do {
+//            System.out.println(">> ENTER \"start\" TO START:");
+//            line = scanner.nextLine();
+//        } while (!line.equals("start"));
 
         while (!bot.getDribblerStatus()) {
             bot.getBall();

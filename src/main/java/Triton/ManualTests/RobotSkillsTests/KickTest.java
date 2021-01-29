@@ -17,17 +17,17 @@ public class KickTest extends RobotSkillsTest {
     @Override
     public boolean test() {
         try {
-            String line;
-            do {
-                System.out.println(">> ENTER \"start\" TO START:");
-                line = scanner.nextLine();
-            } while (!line.equals("start"));
+//            String line;
+//            do {
+//                System.out.println(">> ENTER \"start\" TO START:");
+//                line = scanner.nextLine();
+//            } while (!line.equals("start"));
 
             while (!bot.getDribblerStatus()) {
                 bot.getBall();
             }
 
-            Thread.sleep(300);
+            //Thread.sleep(300);
             bot.stop();
 
             double absAngleDiff;
@@ -41,7 +41,7 @@ public class KickTest extends RobotSkillsTest {
                 absAngleDiff = Math.abs(targetAngle - botAngle);
             } while (absAngleDiff > 1);
 
-            Thread.sleep(100);
+            // Thread.sleep(100);
             bot.stop();
 
             System.out.println(">> ENTER FIRST SPEED AND SECOND SPEED TO KICK:");
@@ -50,6 +50,7 @@ public class KickTest extends RobotSkillsTest {
             scanner.nextLine();
             bot.kick(new Vec2D(kickSpeedHorizontal, kickSpeedVertical));
 
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
