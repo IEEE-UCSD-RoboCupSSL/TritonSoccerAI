@@ -5,6 +5,7 @@ import java.util.concurrent.TimeoutException;
 public abstract class Subscriber<T> {
     protected String topicName, msgName;
     protected MsgChannel<T> channel;
+    protected boolean subscriptionFlag = false;
 
     public Subscriber(String topicName, String msgName) {
         this.topicName = topicName;
@@ -15,6 +16,7 @@ public abstract class Subscriber<T> {
         do {
             channel = MsgChannel.getChannel(topicName, msgName);
         } while (channel == null);
+        subscriptionFlag = true;
         return true;
     }
 
@@ -26,8 +28,14 @@ public abstract class Subscriber<T> {
             }
             channel = MsgChannel.getChannel(topicName, msgName);
         } while (channel == null);
+        subscriptionFlag = true;
         return true;
     }
+
+    public boolean isSubscribed() {
+        return subscriptionFlag;
+    }
+
 
     public abstract T getMsg();
 }

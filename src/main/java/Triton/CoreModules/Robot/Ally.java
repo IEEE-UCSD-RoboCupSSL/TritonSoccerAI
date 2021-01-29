@@ -96,7 +96,9 @@ public class Ally extends Robot {
     }
 
     public boolean getDribblerStatus() {
-        subscribe();
+        if(!dribStatSub.isSubscribed()) {
+            return false;
+        }
         return dribStatSub.getMsg();
     }
 
@@ -243,6 +245,7 @@ public class Ally extends Robot {
     @Override
     public void run() {
         try {
+            subscribe();
             super.run();
             initPathfinder();
 
@@ -573,7 +576,8 @@ public class Ally extends Robot {
                 usingRD = true;
                 motionSetPoint.setZ(targetAngle);
             } else {
-                motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+                motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
+                                                          : Math.signum(angDiff) * 100);
             }
 
             if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -636,7 +640,8 @@ public class Ally extends Robot {
             motionSetPoint.setZ(targetAngle);
         } else {
             command.setMode(MoveMode.TVRV.ordinal());
-            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
+                                                      : Math.signum(angDiff) * 100);
         }
         command.setMotionSetPoint(motionSetPoint);
 
