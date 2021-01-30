@@ -2,6 +2,8 @@ package Triton.CoreModules.AI.Estimators;
 
 
 import Triton.Config.AIConfig;
+import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
+import Triton.CoreModules.AI.AI_Skills.PassStates;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -41,6 +43,35 @@ public class Estimator {
         return new Vec2D(bot.getData().getAngle());
     }
 
+
+    /* Ball under our control means more than just holding the ball,
+     * which includes the temporarily releasing the ball during pass,
+     * */
+    public boolean isBallUnderOurCtrl() {
+        boolean rtn = false;
+
+        Robot holder = getBallHolder();
+        if(holder instanceof Ally) {
+            rtn = true;
+        }
+
+        // Use getPassStates() in CoordinatedPass.java to deal with passing situation
+        if(CoordinatedPass.getPassState() != PassStates.FAILED
+        && CoordinatedPass.getPassState() != PassStates.FAILED) {
+            // during some valid pass states while ball is traveling, no body holds the ball
+            rtn = true;
+        }
+
+        return rtn;
+    }
+
+    /* if no one holds the ball, return true if t_ally_nearest_robot(ball_loc) < t_foe_nearest_robot(ball_loc)
+     * if an opponent holds the ball, return false */
+    public boolean isBallWithinOurReach() {
+        // To-do
+        return false;
+    }
+
     /*
      * return the reference of the robot currently holding/dribbling the ball,
      * if no robot is currently holding the ball, return null
@@ -70,13 +101,32 @@ public class Estimator {
         return null;
     }
 
-    /*
-     * under the premises of no robots is holding the ball,
-     * evaluate if Ally robots have a chance to get and hold
-     * the ball at the current timestamp
-     */
-    public boolean hasHoldBallChance() {
-        return true;
+
+
+    /* Estimates for Coordinated Passing */
+
+    public Vec2D getOptimalPassingLoc(Ally passer) {
+        // To-do
+        // don't for get to check passer.isMaxDispExceeded()
+        return new Vec2D(0, 0);
+    }
+
+    public Ally getOptimalReceiver() {
+        // To-do
+        return null;
+    }
+
+    public Vec2D getOptimalReceivingLoc(Ally receiver) {
+        // To-do
+        return new Vec2D(0, 0);
+    }
+
+    /* return true if slack time > 0 */
+    public boolean isGoodTimeToPass() {
+        return false;
+    }
+    public double getBallArrivalETA() {
+        return 0;
     }
 
 

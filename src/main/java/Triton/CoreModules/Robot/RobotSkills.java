@@ -48,5 +48,7 @@ public interface RobotSkills {
     /* getters */
     public boolean isHoldingBall();
     public double netDispSinceHoldBall();
-
+    public boolean isMaxDispExceeded();
+    public boolean isLocArrived(Vec2D loc);
+    public boolean isAngleAimed(double angle);
 }

@@ -25,7 +25,7 @@ import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
 
 
 
-/* Read RobotSkills Interface for a cleaner view */
+/* TL;DR, Instead, read RobotSkills Interface for a cleaner view !!!!!!! */
 public class Ally extends Robot implements RobotSkills {
     private final RobotConnection conn;
     /*** external pub sub ***/
@@ -108,6 +108,21 @@ public class Ally extends Robot implements RobotSkills {
     @Override
     public double netDispSinceHoldBall() {
         return 0;
+    }
+
+    @Override
+    public boolean isMaxDispExceeded() {
+        return false;
+    }
+
+    @Override
+    public boolean isLocArrived(Vec2D loc) {
+        return false;
+    }
+
+    @Override
+    public boolean isAngleAimed(double angle) {
+        return false;
     }
 
     /*** primitive control methods ***/

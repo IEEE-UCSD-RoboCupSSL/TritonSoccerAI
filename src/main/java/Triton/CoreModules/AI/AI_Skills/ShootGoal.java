@@ -1,4 +1,5 @@
 package Triton.CoreModules.AI.AI_Skills;
 
-public class ShootGoal {
+public class ShootGoal extends Skills{
+
 }

@@ -34,24 +34,32 @@ public class BasicPlay extends Strategies{
 
     @Override
     public void play() {
-        Robot ballHolder = estimator.getBallHolder();
-        if (ballHolder == null) {
-            // Eval & getBall
-            if (estimator.hasHoldBallChance()) {
-                // try to get the ball
-
-            } else {
-                // rally an defensive formation
-
-            }
+        if (estimator.isBallUnderOurCtrl()) {
+            // play offensive
+            attack();
         } else {
-            if (ballHolder instanceof Ally) {
-                // play offensive
-
-            } else if (ballHolder instanceof Foe) {
+            if(estimator.isBallWithinOurReach()) {
+                // Try to get ball & command remainder free bots to seek advantageous positions
+                getBallAndMoveRemainderBots();
+            }
+            else {
                 // play defense
-
+                defend();
             }
         }
     }
+
+    protected void attack() {
+
+    }
+
+    protected void defend() {
+
+    }
+
+    protected void getBallAndMoveRemainderBots() {
+
+    }
+
+
 }
