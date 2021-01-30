@@ -24,7 +24,9 @@ import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
 
 
-public class Ally extends Robot {
+
+/* Read RobotSkills Interface for a cleaner view */
+public class Ally extends Robot implements RobotSkills {
     private final RobotConnection conn;
     /*** external pub sub ***/
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
@@ -95,11 +97,17 @@ public class Ally extends Robot {
         // To-do
     }
 
-    public boolean getDribblerStatus() {
+    @Override
+    public boolean isHoldingBall() {
         if(!dribStatSub.isSubscribed()) {
             return false;
         }
         return dribStatSub.getMsg();
+    }
+
+    @Override
+    public double netDispSinceHoldBall() {
+        return 0;
     }
 
     /*** primitive control methods ***/
@@ -107,6 +115,7 @@ public class Ally extends Robot {
         statePub.publish(AUTO_CAPTURE);
     }
 
+    @Override
     public void stop() {
         moveAt(new Vec2D(0, 0));
         spinAt(0);
@@ -115,6 +124,7 @@ public class Ally extends Robot {
     /**
      * @param loc player perspective, millimeter
      */
+    @Override
     public void moveTo(Vec2D loc) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TVRD -> statePub.publish(MOVE_TDRD);
@@ -128,6 +138,7 @@ public class Ally extends Robot {
     /**
      * @param vel player perspective, vector with unit as percentage from -100 to 100
      */
+    @Override
     public void moveAt(Vec2D vel) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TVRD -> statePub.publish(MOVE_TVRD);
@@ -139,6 +150,7 @@ public class Ally extends Robot {
     /**
      * @param angle player perspective, degrees, starting from y-axis, positive is counter clockwise
      */
+    @Override
     public void spinTo(double angle) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TDRV -> statePub.publish(MOVE_TDRD);
@@ -150,6 +162,7 @@ public class Ally extends Robot {
     /**
      * @param angVel unit is percentage from -100 to 100, positive is counter clockwise
      */
+    @Override
     public void spinAt(double angVel) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TDRV -> statePub.publish(MOVE_TDRV);
@@ -159,6 +172,7 @@ public class Ally extends Robot {
     }
 
     // runs in the caller thread
+    @Override
     public void kick(Vec2D kickVel) {
         double mag = kickVel.mag();
         if (mag >= MAX_KICK_VEL) {
@@ -177,47 +191,62 @@ public class Ally extends Robot {
         });
     }
 
-    /*** path control methods ***/
+
+
+    /*** advanced control methods with path avoiding obstacles ***/
+    @Override
     public void strafeTo(Vec2D endPoint, double angle) {
         statePub.publish(STRAFE);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
 
-    /*** advanced control methods ***/
-
+    @Override
     public void sprintTo(Vec2D endPoint) {
         statePub.publish(SPRINT);
         pointPub.publish(endPoint);
     }
 
+    @Override
     public void sprintToAngle(Vec2D endPoint, double angle) {
         statePub.publish(SPRINT_ANGLE);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
 
+    @Override
     public void rotateTo(double angle) {
         statePub.publish(ROTATE);
         angPub.publish(angle);
     }
 
-    /*** Skills methods ***/
+    /*** Soccer Skills methods ***/
+    @Override
     public void getBall() {
         statePub.publish(GET_BALL);
     }
 
-    public void receiveBall(Vec2D receivePoint) {
-        statePub.publish(RECEIVE_BALL);
-        pointPub.publish(receivePoint);
+    // ETA: estimated arrival time, unit: milliseconds
+    @Override
+    public void pass(Vec2D landedLoc, double ETA) {
+
     }
 
+    @Override
+    public void receiveBall(Vec2D receiveLoc) {
+        statePub.publish(RECEIVE_BALL);
+        pointPub.publish(receiveLoc);
+    }
+
+    @Override
     public void intercept() {
         statePub.publish(INTERCEPT);
     }
 
-    public void pass() {
-        statePub.publish(PASS);
+
+    @Override
+    public void dribBallTo(Vec2D kickLoc) {
+
     }
 
     @Override
@@ -388,7 +417,7 @@ public class Ally extends Robot {
             usingRD = true;
             motionSetPoint.setZ(targetAngle);
         } else {
-            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+            motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
         }
 
         if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -485,7 +514,7 @@ public class Ally extends Robot {
                     usingRD = true;
                     motionSetPoint.setZ(targetAngle);
                 } else {
-                    motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+                    motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
                 }
 
                 if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -576,7 +605,7 @@ public class Ally extends Robot {
                 usingRD = true;
                 motionSetPoint.setZ(targetAngle);
             } else {
-                motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
+                motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
                                                           : Math.signum(angDiff) * 100);
             }
 
@@ -640,7 +669,7 @@ public class Ally extends Robot {
             motionSetPoint.setZ(targetAngle);
         } else {
             command.setMode(MoveMode.TVRV.ordinal());
-            motionSetPoint.setZ((getDribblerStatus()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
+            motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
                                                       : Math.signum(angDiff) * 100);
         }
         command.setMotionSetPoint(motionSetPoint);

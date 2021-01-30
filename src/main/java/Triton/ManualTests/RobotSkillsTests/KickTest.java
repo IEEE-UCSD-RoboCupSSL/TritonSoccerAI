@@ -23,7 +23,7 @@ public class KickTest extends RobotSkillsTest {
 //                line = scanner.nextLine();
 //            } while (!line.equals("start"));
 
-            while (!bot.getDribblerStatus()) {
+            while (!bot.isHoldingBall()) {
                 bot.getBall();
             }
 
