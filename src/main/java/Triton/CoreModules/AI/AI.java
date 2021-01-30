@@ -46,6 +46,9 @@ public class AI implements Module {
     @Override
     public void run() {
         try {
+
+            System.out.println("Right now, make run won't run anything meaningful yet, use make test instead and practice TDD (Test-Driven Development) ");
+
             while (true) {
                 GameStates currGameState = gameCtrl.getGameState();
 
