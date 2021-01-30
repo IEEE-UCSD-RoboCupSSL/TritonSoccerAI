@@ -1,5 +1,7 @@
 package Triton.CoreModules.AI.AI_Strategies;
 
+import Triton.CoreModules.AI.AI_Tactics.HugAttack;
+import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.Estimator;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
@@ -16,6 +18,7 @@ public class BasicPlay extends Strategies{
     private final Ball ball;
     private final Estimator estimator;
     private final GoalKeeping goalKeeping;
+    private final Tactics attack;
 
     public BasicPlay(RobotList<Ally> allies, Ally keeper,
                      RobotList<Foe> foes, Ball ball) {
@@ -30,13 +33,14 @@ public class BasicPlay extends Strategies{
 
         // construct tactics
         // ...
+        attack = new HugAttack();
     }
 
     @Override
     public void play() {
         if (estimator.isBallUnderOurCtrl()) {
             // play offensive
-            attack();
+            offense();
         } else {
             if(estimator.isBallWithinOurReach()) {
                 // Try to get ball & command remainder free bots to seek advantageous positions
@@ -44,16 +48,16 @@ public class BasicPlay extends Strategies{
             }
             else {
                 // play defense
-                defend();
+                defense();
             }
         }
     }
 
-    protected void attack() {
-
+    protected void offense() {
+        attack.exec(allies, foes, ball, estimator);
     }
 
-    protected void defend() {
+    protected void defense() {
 
     }
 

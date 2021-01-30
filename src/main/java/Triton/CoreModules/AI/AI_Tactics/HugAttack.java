@@ -9,10 +9,16 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 
-public class GuardedPass extends Tactics {
+public class HugAttack extends Tactics {
 
     protected Ally passer, receiver;
     protected Robot holder;
+
+    private void b4return() {
+        CoordinatedPass.setPending();
+        passer = null;
+        receiver = null;
+    }
 
     @Override
     /* Assumes ball is under our control
@@ -20,6 +26,7 @@ public class GuardedPass extends Tactics {
     public boolean exec(RobotList<Ally> allies, RobotList<Foe> foes, Ball ball, Estimator estimator) {
         while(true) {
             if (!estimator.isBallUnderOurCtrl()) {
+                b4return();
                 return false;
             }
 
@@ -29,29 +36,31 @@ public class GuardedPass extends Tactics {
                 if (holder instanceof Ally) {
                     passer = (Ally) holder;
                 } else {
-                    passer = null;
+                    b4return();
+                    return false;
                 }
                 receiver = estimator.getOptimalReceiver();
             }
-
-            /* delegate remainder bots to guard opponent robots */
-            if (passer == null) {
-                // include passer in delegation
-            }
-
-            // .......
 
             /* pass & receive */
             PassStates pState;
             pState = CoordinatedPass.basicPass(passer, receiver, estimator);
             if (pState == PassStates.FAILED) {
-                CoordinatedPass.setPending();
+                b4return();
                 return false;
             }
             if(pState == PassStates.RECEIVE_SUCCESS) {
-                CoordinatedPass.setPending();
+                b4return();
                 return true;
             }
+
+            /* delegate remainder bots to hug opponent robots */
+            if (pState == PassStates.PASSED) {
+                // include passer in delegation
+            }
+
+            // .......
+
 
 
             // add delay to prevent starving other threads

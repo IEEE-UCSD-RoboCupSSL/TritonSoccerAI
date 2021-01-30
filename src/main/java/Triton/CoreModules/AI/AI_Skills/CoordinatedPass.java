@@ -20,6 +20,7 @@ public class CoordinatedPass extends Skills {
 
     public static PassStates basicPass(Ally passer, Ally receiver, Estimator estimator) {
 
+
         //To-do: add if(timeout) ... -> FAILED
 
         /* State Machine */
