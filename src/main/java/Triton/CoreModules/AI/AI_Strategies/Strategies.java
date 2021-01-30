@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Strategies;
+package Triton.CoreModules.AI.AI_Strategies;
 
 public abstract class Strategies {
 

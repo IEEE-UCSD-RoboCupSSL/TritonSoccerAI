@@ -8,12 +8,16 @@ import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
+import Triton.PeriphModules.GameControl.GameCtrlModule;
+import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
 
+import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import Triton.Misc.ModulePubSubSystem.Module;
 
 import static Triton.Config.SimConfig.TOTAL_THREADS;
 import static Triton.Config.ConnectionConfig.ROBOT_0_IP;
@@ -46,7 +50,7 @@ public class App {
 
             if (args.length >= 2) { // mode
                 switch (args[1]) {
-                    case "NORMAL" -> System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    case "NORMAL" -> System.out.println("###########################################");
                     case "TEST" -> isTestMode = true;
                     default -> {
                         System.out.println("Error: Invalid Args");
@@ -82,9 +86,9 @@ public class App {
                 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        Runnable visionModule = new GrSimVisionModule();
-        Runnable geoModule = new FieldGeometryModule();
-        Runnable detectModule = new DetectionModule();
+        Module visionModule = new GrSimVisionModule();
+        Module geoModule = new FieldGeometryModule();
+        Module detectModule = new DetectionModule();
         threadPool.submit(visionModule);
         threadPool.submit(geoModule);
         threadPool.submit(detectModule);
@@ -110,8 +114,11 @@ public class App {
 
 
         if (!isTestMode) {
+            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+            threadPool.submit(gameCtrlModule);
+
             /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(allies, goalKeeper, foes, ball));
+            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
         } else {
             threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         }

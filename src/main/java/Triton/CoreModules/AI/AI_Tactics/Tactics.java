@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Tactics;
+package Triton.CoreModules.AI.AI_Tactics;
 
 public abstract class Tactics {
     abstract public boolean exec();

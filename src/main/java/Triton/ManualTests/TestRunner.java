@@ -47,7 +47,7 @@ public class TestRunner implements Module {
                 int repeat = 0;
                 do {
                     switch (testName) {
-                        case "pm" -> rtn = new PrimitiveMotionTest(allies.get(0)).test();
+                        case "pmotion" -> rtn = new PrimitiveMotionTest(allies.get(0)).test();
                         case "getball" -> rtn = new GetBallTest(scanner, allies.get(0)).test();
                         case "kick" -> rtn = new KickTest(scanner, allies.get(0)).test();
                         case "quit" -> quit = true;

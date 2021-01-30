@@ -1,11 +1,13 @@
 package Triton.CoreModules.AI;
 
 public enum GameStates {
-    START,
-    ACTIVE,
-    PAUSED,
-    KICK_OFF,
-    //...
-    DEBUG,
-    INACTIVE
+    UNKNOWN,
+    HALT,
+    STOP,
+    RUNNING,
+    FREE_KICK,
+    KICKOFF,
+    PENALTY,
+    TIMEOUT,
+    BALL_PLACEMENT
 }

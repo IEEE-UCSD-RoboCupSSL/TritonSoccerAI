@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Tactics;
+package Triton.CoreModules.AI.AI_Tactics;
 
 public class Siege extends Tactics {
     @Override
