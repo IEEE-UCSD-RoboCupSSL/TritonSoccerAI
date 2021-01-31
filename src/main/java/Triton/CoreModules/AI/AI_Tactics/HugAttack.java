@@ -44,7 +44,7 @@ public class HugAttack extends Tactics {
 
             /* pass & receive */
             PassStates pState;
-            pState = CoordinatedPass.basicPass(passer, receiver, estimator);
+            pState = CoordinatedPass.basicPass(passer, receiver, ball, estimator);
             if (pState == PassStates.FAILED) {
                 b4return();
                 return false;

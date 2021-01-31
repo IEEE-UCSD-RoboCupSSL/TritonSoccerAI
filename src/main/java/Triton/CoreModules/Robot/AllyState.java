@@ -10,8 +10,4 @@ public enum AllyState {
     SPRINT,
     SPRINT_ANGLE,
     ROTATE,
-    GET_BALL,
-    RECEIVE_BALL,
-    INTERCEPT,
-    PASS,
 }

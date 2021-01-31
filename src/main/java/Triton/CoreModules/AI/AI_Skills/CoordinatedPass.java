@@ -2,6 +2,7 @@ package Triton.CoreModules.AI.AI_Skills;
 
 
 import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.Misc.Coordinates.Vec2D;
@@ -18,7 +19,7 @@ public class CoordinatedPass extends Skills {
         currState = PassStates.PENDING;
     }
 
-    public static PassStates basicPass(Ally passer, Ally receiver, Estimator estimator) {
+    public static PassStates basicPass(Ally passer, Ally receiver, Ball ball, Estimator estimator) {
 
 
         //To-do: add if(timeout) ... -> FAILED
@@ -59,7 +60,7 @@ public class CoordinatedPass extends Skills {
                 else {
                     receiver.sprintToAngle(receiveLoc, receiveAngle);
                     if(estimator.isGoodTimeToPass()) {
-                        passer.passBall(receiveLoc, estimator.getBallArrivalETA());
+                        passer.passBall(ball, receiveLoc, estimator.getBallArrivalETA());
                         currState = PassStates.PASSED;
                     }
                 }
@@ -72,7 +73,7 @@ public class CoordinatedPass extends Skills {
                 Vec2D receiveLoc = estimator.getOptimalReceivingLoc(receiver);
                 double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
                 if(estimator.isGoodTimeToPass()) {
-                    passer.passBall(receiveLoc, estimator.getBallArrivalETA());
+                    passer.passBall(ball, receiveLoc, estimator.getBallArrivalETA());
                     currState = PassStates.PASSED;
                 }
                 else {
@@ -89,7 +90,7 @@ public class CoordinatedPass extends Skills {
                         currState = PassStates.FAILED;
                     }
                     else {
-                        receiver.intercept();
+                        receiver.intercept(ball);
                     }
                 }
             }

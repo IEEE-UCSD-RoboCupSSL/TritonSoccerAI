@@ -5,6 +5,7 @@ import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
+import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.Geometry.Circle2D;
@@ -237,30 +238,45 @@ public class Ally extends Robot implements RobotSkills {
 
     /*** Soccer Skills methods ***/
     @Override
-    public void getBall() {
-        statePub.publish(GET_BALL);
+    public void getBall(Ball ball) {
+        Vec2D ballLoc = ball.getData().getPos();
+        Vec2D currPos = getData().getPos();
+        Vec2D currPosToBall = ballLoc.sub(currPos);
+        if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
+            statePub.publish(AUTO_CAPTURE);
+        } else {
+            sprintToAngle(ballLoc, currPosToBall.toPlayerAngle());
+        }
     }
 
     @Override
-    public void passBall(Vec2D receiveLoc, double ETA) {
+    public void passBall(Ball ball, Vec2D receiveLoc, double ETA) {
 
-    }
-
-
-    @Override
-    public void receiveBall(Vec2D receiveLoc) {
-        statePub.publish(RECEIVE_BALL);
-        pointPub.publish(receiveLoc);
-    }
-
-    @Override
-    public void intercept() {
-        statePub.publish(INTERCEPT);
     }
 
 
     @Override
-    public void dribBallTo(Vec2D kickLoc) {
+    public void receiveBall(Ball ball, Vec2D receiveLoc) {
+        Vec2D currPos = getData().getPos();
+        Vec2D ballLoc = ball.getData().getPos();
+        double dist = ballLoc.sub(currPos).mag();
+        if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
+            getBall(ball);
+        } else {
+            double targetAngle = ballLoc.sub(currPos).toPlayerAngle();
+            sprintToAngle(receiveLoc, targetAngle);
+        }
+    }
+
+    @Override
+    public void intercept(Ball ball) {
+        /* ad hoc dealing, will upgrade it later */
+        getBall(ball);
+    }
+
+
+    @Override
+    public void dribBallTo(Ball ball, Vec2D kickLoc) {
 
     }
 
@@ -303,7 +319,24 @@ public class Ally extends Robot implements RobotSkills {
             conn.getTCPConnection().sendInit();
 
             while (true) { // delay added
-                publishCommand();
+                RemoteAPI.Commands command;
+                AllyState state = stateSub.getMsg();
+
+                switch (state) {
+                    case MOVE_TDRD -> command = createTDRDCmd();
+                    case MOVE_TDRV -> command = createTDRVCmd();
+                    case MOVE_TVRD -> command = createTVRDCmd();
+                    case MOVE_TVRV -> command = createTVRVCmd();
+                    case AUTO_CAPTURE -> command = createAutoCapCmd();
+                    case STRAFE -> command = createStrafeCmd();
+                    case SPRINT -> command = createSprintCmd();
+                    case SPRINT_ANGLE -> command = createSprintAngleCmd();
+                    case ROTATE -> command = createRotateCmd();
+                    default -> {
+                        command = createTVRVCmd();
+                    }
+                }
+                commandsPub.publish(command);
 
                 // avoid starving other threads
                 Thread.sleep(1);
@@ -330,31 +363,84 @@ public class Ally extends Robot implements RobotSkills {
         }
     }
 
-    /**
-     * Publishes the next node in the set path of the robot
-     */
-    private void publishCommand() {
-        RemoteAPI.Commands command;
-        AllyState state = stateSub.getMsg();
 
-        switch (state) {
-            case MOVE_TDRD -> command = createTDRDCmd();
-            case MOVE_TDRV -> command = createTDRVCmd();
-            case MOVE_TVRD -> command = createTVRDCmd();
-            case MOVE_TVRV -> command = createTVRVCmd();
-            case AUTO_CAPTURE -> command = createAutoCapCmd();
-            case STRAFE -> command = createStrafeCmd();
-            case SPRINT -> command = createSprintCmd();
-            case SPRINT_ANGLE -> command = createSprintAngleCmd();
-            case ROTATE -> command = createRotateCmd();
-            case GET_BALL -> command = createGetBallCmd();
-            case RECEIVE_BALL -> command = receiveBallCmd();
-            case INTERCEPT -> command = createInterceptCmd();
-            case PASS -> command = createPassCmd();
-            default -> command = createTVRVCmd();
+
+
+
+
+
+
+    public void displayPathFinder() {
+        if (pathFinder instanceof JPSPathFinder) {
+            ((JPSPathFinder) pathFinder).display();
         }
-        commandsPub.publish(command);
     }
+
+    /**
+     * Update the set path of the robot
+     */
+    private ArrayList<Vec2D> findPath(Vec2D endPoint) {
+        pathFinder.setObstacles(getObstacles());
+        return pathFinder.findPath(getData().getPos(), endPoint);
+    }
+
+    /**
+     * Returns an ArrayList of circles representing the obstacles for pathfinding
+     *
+     * @return an ArrayList of circles representing the obstacles for pathfinding
+     */
+    private ArrayList<Circle2D> getObstacles() {
+        ArrayList<RobotData> blueRobots = new ArrayList<>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            blueRobots.add(blueRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<RobotData> yellowRobots = new ArrayList<>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<Circle2D> obstacles = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.YELLOW && ID == i)
+                continue;
+            RobotData robot = yellowRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.BLUE && ID == i)
+                continue;
+            RobotData robot = blueRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+
+        return obstacles;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*** TL;DR ***/
 
     private RemoteAPI.Commands createPrimitiveCmdBuilder(MoveMode mode) {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
@@ -624,7 +710,7 @@ public class Ally extends Robot implements RobotSkills {
                 motionSetPoint.setZ(targetAngle);
             } else {
                 motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
-                                                          : Math.signum(angDiff) * 100);
+                        : Math.signum(angDiff) * 100);
             }
 
             if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -688,7 +774,7 @@ public class Ally extends Robot implements RobotSkills {
         } else {
             command.setMode(MoveMode.TVRV.ordinal());
             motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
-                                                      : Math.signum(angDiff) * 100);
+                    : Math.signum(angDiff) * 100);
         }
         command.setMotionSetPoint(motionSetPoint);
 
@@ -699,86 +785,5 @@ public class Ally extends Robot implements RobotSkills {
         command.setKickerSetPoint(kickerSetPoint);
 
         return command.build();
-    }
-
-    private RemoteAPI.Commands createGetBallCmd() {
-        Vec2D ballPos = ballSub.getMsg().getPos();
-        Vec2D currPos = getData().getPos();
-        Vec2D currPosToBall = ballPos.sub(currPos);
-        if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            return createAutoCapCmd();
-        } else {
-            pointPub.publish(ballPos);
-            angPub.publish(currPosToBall.toPlayerAngle());
-            return createSprintAngleCmd();
-        }
-    }
-
-    private RemoteAPI.Commands receiveBallCmd() {
-        Vec2D ballPos = ballSub.getMsg().getPos();
-        Vec2D currPos = getData().getPos();
-        double dist = ballPos.sub(currPos).mag();
-        if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            return createAutoCapCmd();
-        } else {
-            double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-            angPub.publish(targetAngle);
-            return createSprintAngleCmd();
-        }
-    }
-
-    private RemoteAPI.Commands createInterceptCmd() {
-        return null;
-    }
-
-    private RemoteAPI.Commands createPassCmd() {
-        return null;
-    }
-
-    public void displayPathFinder() {
-        if (pathFinder instanceof JPSPathFinder) {
-            ((JPSPathFinder) pathFinder).display();
-        }
-    }
-
-    /**
-     * Update the set path of the robot
-     */
-    private ArrayList<Vec2D> findPath(Vec2D endPoint) {
-        pathFinder.setObstacles(getObstacles());
-        return pathFinder.findPath(getData().getPos(), endPoint);
-    }
-
-    /**
-     * Returns an ArrayList of circles representing the obstacles for pathfinding
-     *
-     * @return an ArrayList of circles representing the obstacles for pathfinding
-     */
-    private ArrayList<Circle2D> getObstacles() {
-        ArrayList<RobotData> blueRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            blueRobots.add(blueRobotSubs.get(i).getMsg());
-        }
-
-        ArrayList<RobotData> yellowRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
-        }
-
-        ArrayList<Circle2D> obstacles = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            if (team == Team.YELLOW && ID == i)
-                continue;
-            RobotData robot = yellowRobots.get(i);
-            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-        }
-        for (int i = 0; i < 6; i++) {
-            if (team == Team.BLUE && ID == i)
-                continue;
-            RobotData robot = blueRobots.get(i);
-            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-        }
-
-        return obstacles;
     }
 }

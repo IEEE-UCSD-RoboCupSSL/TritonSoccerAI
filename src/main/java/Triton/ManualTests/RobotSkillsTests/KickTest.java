@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.Misc.Coordinates.Vec2D;
 
@@ -8,10 +9,12 @@ import java.util.Scanner;
 public class KickTest extends RobotSkillsTest {
     Scanner scanner;
     Ally bot;
+    Ball ball;
 
-    public KickTest(Scanner scanner, Ally bot) {
+    public KickTest(Scanner scanner, Ally bot, Ball ball) {
         this.scanner = scanner;
         this.bot = bot;
+        this.ball = ball;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class KickTest extends RobotSkillsTest {
 //            } while (!line.equals("start"));
 
             while (!bot.isHoldingBall()) {
-                bot.getBall();
+                bot.getBall(ball);
             }
 
             //Thread.sleep(300);

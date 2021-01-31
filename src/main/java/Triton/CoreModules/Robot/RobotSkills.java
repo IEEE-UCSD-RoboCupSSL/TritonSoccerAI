@@ -1,5 +1,6 @@
 package Triton.CoreModules.Robot;
 
+import Triton.CoreModules.Ball.Ball;
 import Triton.Misc.Coordinates.Vec2D;
 
 import static Triton.CoreModules.Robot.AllyState.*;
@@ -38,12 +39,12 @@ public interface RobotSkills {
 
 
     /*** Soccer Skills methods ***/
-    public void getBall();
-    public void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
+    public void getBall(Ball ball);
+    public void passBall(Ball ball, Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
     // To-do later: public void chipBall(/* parabola */) ...
-    public void dribBallTo(Vec2D kickLoc);
-    public void receiveBall(Vec2D receiveLoc);
-    public void intercept();
+    public void dribBallTo(Ball ball, Vec2D kickLoc);
+    public void receiveBall(Ball ball, Vec2D receiveLoc);
+    public void intercept(Ball ball);
 
 
     /* getters */
