@@ -56,8 +56,7 @@ public class Estimator {
         }
 
         // Use getPassStates() in CoordinatedPass.java to deal with passing situation
-        if(CoordinatedPass.getPassState() != PassStates.FAILED
-        && CoordinatedPass.getPassState() != PassStates.FAILED) {
+        if(CoordinatedPass.getPassState() != PassStates.FAILED) {
             // during some valid pass states while ball is traveling, no body holds the ball
             rtn = true;
         }
@@ -103,31 +102,6 @@ public class Estimator {
 
 
 
-    /* Estimates for Coordinated Passing */
-
-    public Vec2D getOptimalPassingLoc(Ally passer) {
-        // To-do
-        // don't for get to check passer.isMaxDispExceeded()
-        return new Vec2D(0, 0);
-    }
-
-    public Ally getOptimalReceiver() {
-        // To-do
-        return null;
-    }
-
-    public Vec2D getOptimalReceivingLoc(Ally receiver) {
-        // To-do
-        return new Vec2D(0, 0);
-    }
-
-    /* return true if slack time > 0 */
-    public boolean isGoodTimeToPass() {
-        return false;
-    }
-    public double getBallArrivalETA() {
-        return 0;
-    }
 
 
 }

@@ -1,13 +1,10 @@
 package Triton.CoreModules.AI;
 
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
-import Triton.CoreModules.AI.Estimators.Estimator;
-import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
-import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;

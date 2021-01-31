@@ -2,6 +2,7 @@ package Triton.CoreModules.AI.AI_Skills;
 
 
 import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -19,7 +20,8 @@ public class CoordinatedPass extends Skills {
         currState = PassStates.PENDING;
     }
 
-    public static PassStates basicPass(Ally passer, Ally receiver, Ball ball, Estimator estimator) {
+    public static PassStates basicPass(Ally passer, Ally receiver, Ball ball,
+                                       Estimator estimator, PassEstimator passEstimator) {
 
 
         //To-do: add if(timeout) ... -> FAILED
@@ -35,8 +37,8 @@ public class CoordinatedPass extends Skills {
                 if(!passer.isHoldingBall()) {
                     currState = PassStates.FAILED;
                 }
-                Vec2D passLoc = estimator.getOptimalPassingLoc(passer); // getOptimalxxxx methods might be time-consuming
-                Vec2D receiveLoc = estimator.getOptimalReceivingLoc(receiver);
+                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer); // getOptimalxxxx methods might be time-consuming
+                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
                 if(passer.isLocArrived(passLoc)) {
                     currState = PassStates.PASSER_IN_POSITION;
                 }
@@ -51,16 +53,16 @@ public class CoordinatedPass extends Skills {
                 if(!passer.isHoldingBall()) {
                     currState = PassStates.FAILED;
                 }
-                Vec2D passLoc = estimator.getOptimalPassingLoc(passer);
-                Vec2D receiveLoc = estimator.getOptimalReceivingLoc(receiver);
+                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer);
+                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
                 double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
                 if(receiver.isAngleAimed(receiveAngle) && receiver.isLocArrived(receiveLoc)) {
                     currState = PassStates.RECEIVER_IN_POSITION;
                 }
                 else {
                     receiver.sprintToAngle(receiveLoc, receiveAngle);
-                    if(estimator.isGoodTimeToPass()) {
-                        passer.passBall(ball, receiveLoc, estimator.getBallArrivalETA());
+                    if(passEstimator.isGoodTimeToPass()) {
+                        passer.passBall(ball, receiveLoc, passEstimator.getBallArrivalETA());
                         currState = PassStates.PASSED;
                     }
                 }
@@ -69,11 +71,11 @@ public class CoordinatedPass extends Skills {
                 if(!passer.isHoldingBall()) {
                     currState = PassStates.FAILED;
                 }
-                Vec2D passLoc = estimator.getOptimalPassingLoc(passer);
-                Vec2D receiveLoc = estimator.getOptimalReceivingLoc(receiver);
+                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer);
+                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
                 double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
-                if(estimator.isGoodTimeToPass()) {
-                    passer.passBall(ball, receiveLoc, estimator.getBallArrivalETA());
+                if(passEstimator.isGoodTimeToPass()) {
+                    passer.passBall(ball, receiveLoc, passEstimator.getBallArrivalETA());
                     currState = PassStates.PASSED;
                 }
                 else {

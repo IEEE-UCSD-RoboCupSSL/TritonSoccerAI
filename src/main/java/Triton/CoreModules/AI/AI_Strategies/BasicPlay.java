@@ -3,11 +3,11 @@ package Triton.CoreModules.AI.AI_Strategies;
 import Triton.CoreModules.AI.AI_Tactics.HugAttack;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
-import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 
 public class BasicPlay extends Strategies{
@@ -17,6 +17,7 @@ public class BasicPlay extends Strategies{
     private final Ally keeper;
     private final Ball ball;
     private final Estimator estimator;
+    private final PassEstimator passEstimator;
     private final GoalKeeping goalKeeping;
     private final Tactics attack;
 
@@ -29,11 +30,12 @@ public class BasicPlay extends Strategies{
         this.ball = ball;
 
         estimator = new Estimator(allies, keeper, foes, ball);
+        passEstimator = new PassEstimator(allies, keeper, foes, ball);
         goalKeeping = new GoalKeeping(keeper, ball, estimator);
 
         // construct tactics
         // ...
-        attack = new HugAttack();
+        attack = new HugAttack(allies, keeper, foes, ball, estimator, passEstimator);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class BasicPlay extends Strategies{
     }
 
     protected void offense() {
-        attack.exec(allies, foes, ball, estimator);
+        attack.exec();
     }
 
     protected void defense() {

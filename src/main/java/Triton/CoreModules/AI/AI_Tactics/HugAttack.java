@@ -3,6 +3,7 @@ package Triton.CoreModules.AI.AI_Tactics;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassStates;
 import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -14,6 +15,12 @@ public class HugAttack extends Tactics {
     protected Ally passer, receiver;
     protected Robot holder;
 
+    public HugAttack(RobotList<Ally> allies, Ally keeper, RobotList<Foe> foes,
+                     Ball ball, Estimator estimator, PassEstimator passEstimator) {
+        super(allies, keeper, foes, ball, estimator, passEstimator);
+    }
+
+
     private void b4return() {
         CoordinatedPass.setPending();
         passer = null;
@@ -23,7 +30,7 @@ public class HugAttack extends Tactics {
     @Override
     /* Assumes ball is under our control
      * */
-    public boolean exec(RobotList<Ally> allies, RobotList<Foe> foes, Ball ball, Estimator estimator) {
+    public boolean exec() {
         while(true) {
             if (!estimator.isBallUnderOurCtrl()) {
                 b4return();
@@ -39,12 +46,12 @@ public class HugAttack extends Tactics {
                     b4return();
                     return false;
                 }
-                receiver = estimator.getOptimalReceiver();
+                receiver = passEstimator.getOptimalReceiver();
             }
 
             /* pass & receive */
             PassStates pState;
-            pState = CoordinatedPass.basicPass(passer, receiver, ball, estimator);
+            pState = CoordinatedPass.basicPass(passer, receiver, ball, estimator, passEstimator);
             if (pState == PassStates.FAILED) {
                 b4return();
                 return false;
