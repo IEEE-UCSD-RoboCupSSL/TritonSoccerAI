@@ -49,7 +49,7 @@ public class AI implements Module {
 
             System.out.println("Right now, make run won't run anything meaningful yet, use make test instead and practice TDD (Test-Driven Development) ");
 
-            while (true) {
+            while (true) { // delay added
                 GameStates currGameState = gameCtrl.getGameState();
 
                 // Decision Tree
@@ -83,6 +83,13 @@ public class AI implements Module {
                         tmpPlaceHolder(">>>UNKNOWN<<<");
                     }
                 }
+
+                try { // avoid starving other threads
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();

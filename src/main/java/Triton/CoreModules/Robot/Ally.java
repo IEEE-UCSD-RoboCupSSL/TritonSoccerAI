@@ -241,11 +241,11 @@ public class Ally extends Robot implements RobotSkills {
         statePub.publish(GET_BALL);
     }
 
-    // ETA: estimated arrival time, unit: milliseconds
     @Override
-    public void pass(Vec2D landedLoc, double ETA) {
+    public void passBall(Vec2D receiveLoc, double ETA) {
 
     }
+
 
     @Override
     public void receiveBall(Vec2D receiveLoc) {
@@ -302,8 +302,11 @@ public class Ally extends Robot implements RobotSkills {
 
             conn.getTCPConnection().sendInit();
 
-            while (true) {
+            while (true) { // delay added
                 publishCommand();
+
+                // avoid starving other threads
+                Thread.sleep(1);
             }
         } catch (Exception e) {
             e.printStackTrace();

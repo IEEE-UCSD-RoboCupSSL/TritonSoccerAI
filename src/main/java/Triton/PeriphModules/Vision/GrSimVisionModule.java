@@ -60,8 +60,10 @@ public class GrSimVisionModule extends VisionModule {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (true) { // delay added
                 update();
+
+                Thread.sleep(1);
             }
         } catch (Exception e) {
             e.printStackTrace();

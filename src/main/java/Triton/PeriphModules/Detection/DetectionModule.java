@@ -55,8 +55,10 @@ public class DetectionModule implements Module {
         try {
             subscribe();
 
-            while (true) {
+            while (true) { // delay added
                 update(detectSub.getMsg());
+
+                Thread.sleep(1);
             }
         } catch (Exception e) {
             e.printStackTrace();

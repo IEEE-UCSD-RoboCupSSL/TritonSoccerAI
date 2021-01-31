@@ -34,8 +34,14 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
     @Override
     public void run() {
         subscribe();
-        while (true) {
+        while (true) { // delay added
             sendVision();
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

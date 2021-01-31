@@ -29,8 +29,14 @@ public class RobotCommandUDPStream extends RobotUDPStreamSend {
     @Override
     public void run() {
         subscribe();
-        while (true) {
+        while (true) { // delay added
             sendCommand();
+
+            try { // avoid starving other threads
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

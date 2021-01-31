@@ -59,7 +59,7 @@ public class CoordinatedPass extends Skills {
                 else {
                     receiver.sprintToAngle(receiveLoc, receiveAngle);
                     if(estimator.isGoodTimeToPass()) {
-                        passer.pass(receiveLoc, estimator.getBallArrivalETA());
+                        passer.passBall(receiveLoc, estimator.getBallArrivalETA());
                         currState = PassStates.PASSED;
                     }
                 }
@@ -72,7 +72,7 @@ public class CoordinatedPass extends Skills {
                 Vec2D receiveLoc = estimator.getOptimalReceivingLoc(receiver);
                 double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
                 if(estimator.isGoodTimeToPass()) {
-                    passer.pass(receiveLoc, estimator.getBallArrivalETA());
+                    passer.passBall(receiveLoc, estimator.getBallArrivalETA());
                     currState = PassStates.PASSED;
                 }
                 else {

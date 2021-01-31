@@ -27,9 +27,15 @@ public class RobotDataUDPStream extends RobotUDPStreamReceive {
      * Repeatedly receives robot EKF data
      */
     public void run() {
-        while (true) {
+        while (true) { // delay added
             receiveEKF();
             internalPub.publish(internalData);
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

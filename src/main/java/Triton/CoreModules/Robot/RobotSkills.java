@@ -39,7 +39,8 @@ public interface RobotSkills {
 
     /*** Soccer Skills methods ***/
     public void getBall();
-    public void pass(Vec2D landedLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
+    public void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
+    // To-do later: public void chipBall(/* parabola */) ...
     public void dribBallTo(Vec2D kickLoc);
     public void receiveBall(Vec2D receiveLoc);
     public void intercept();

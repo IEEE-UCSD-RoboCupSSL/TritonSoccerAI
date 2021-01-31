@@ -101,7 +101,7 @@ public class RobotTCPConnection implements Module {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (true) { // delay added
                 Thread.sleep(1000);
             }
         } catch (Exception e) {
@@ -138,10 +138,12 @@ public class RobotTCPConnection implements Module {
             try {
                 subscribe();
 
-                while (true) {
+                while (true) { // delay added
                     String msg = tcpCommandSub.getMsg();
                     // System.out.println(msg);
                     out.println(msg);
+
+                    Thread.sleep(1);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -169,7 +171,7 @@ public class RobotTCPConnection implements Module {
         @Override
         public void run() {
             try {
-                while (true) {
+                while (true) { // delay added
                     String line = in.readLine();
                     //System.out.printf("Ally %d TCP : %s\n", ID, line);
 
@@ -178,6 +180,8 @@ public class RobotTCPConnection implements Module {
                         case "BallOffHold" -> dribStatPub.publish(false);
                         case "Initialized" -> tcpInitPub.publish(true);
                     }
+
+                    Thread.sleep(1);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

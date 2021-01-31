@@ -50,6 +50,7 @@ public class KickTest extends RobotSkillsTest {
             scanner.nextLine();
             bot.kick(new Vec2D(kickSpeedHorizontal, kickSpeedVertical));
 
+
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();

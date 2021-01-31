@@ -82,12 +82,13 @@ public class Display extends JPanel {
     public void start() {
         subscribe();
 
-        while (true) {
+        while (true) { // no delay needed
             HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
 
             if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0
-                    || fieldSize.get("fullLength") == 0)
+                    || fieldSize.get("fullLength") == 0) {
                 continue;
+            }
 
             int fieldWidth = fieldSize.get("fieldWidth");
             int fieldLength = fieldSize.get("fieldLength");

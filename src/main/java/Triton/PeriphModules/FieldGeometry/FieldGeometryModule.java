@@ -35,8 +35,10 @@ public class FieldGeometryModule implements Module {
         try {
             subscribe();
 
-            while (true) {
+            while (true) { // delay added
                 processGeometry();
+
+                Thread.sleep(1);
             }
         } catch (Exception e) {
             e.printStackTrace();

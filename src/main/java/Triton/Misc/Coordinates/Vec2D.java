@@ -6,8 +6,8 @@ import Proto.RemoteAPI;
  * Represents a 2D vector
  */
 public class Vec2D {
-    public final double x;
-    public final double y;
+    public double x;
+    public double y;
     private String name;
 
     public Vec2D(double playerAngle) {
