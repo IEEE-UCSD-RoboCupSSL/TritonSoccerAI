@@ -68,7 +68,7 @@ public class RobotVisionUDPStream extends RobotUDPStreamSend {
         VisionData.Builder toSend = VisionData.newBuilder();
         toSend.setBotPos(allyData.getPos().toProto());
         toSend.setBotVel(allyData.getVel().toProto());
-        toSend.setBotAng(allyData.getAngle());
+        toSend.setBotAng(allyData.getDir());
         toSend.setBotAngVel(allyData.getAngleVel());
         toSend.setBallPos(ballData.getPos().toProto());
         toSend.setBallVel(ballData.getVel().toProto());

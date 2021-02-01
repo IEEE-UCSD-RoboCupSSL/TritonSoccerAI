@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.GoalKeeping;
 
-import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.Misc.Coordinates.Vec2D;
@@ -9,12 +9,12 @@ public class GoalKeeping {
 
     private final Ally keeper;
     private final Ball ball;
-    private final Estimator estimator;
+    private final BasicEstimator basicEstimator;
 
-    public GoalKeeping(Ally keeper, Ball ball, Estimator estimator) {
+    public GoalKeeping(Ally keeper, Ball ball, BasicEstimator basicEstimator) {
         this.keeper = keeper;
         this.ball = ball;
-        this.estimator = estimator;
+        this.basicEstimator = basicEstimator;
     }
 
     public void moveToStart() {
@@ -25,9 +25,9 @@ public class GoalKeeping {
 //        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
 //        }
 //        else {
-        Vec2D ballPos = ball.getData().getPos();
-        Vec2D ballTraj = estimator.getAimTrajectory();
-        Vec2D keeperPos = keeper.getLoc();
+        Vec2D ballPos = ball.getPos();
+        Vec2D ballTraj = basicEstimator.getAimTrajectory();
+        Vec2D keeperPos = keeper.getPos();
         double keeperY = -4200;
 
         if (Math.abs(ballTraj.y) <= 0.0001) {
@@ -53,7 +53,7 @@ public class GoalKeeping {
     }
 
     public void activeGuarding() {
-        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
+        if (basicEstimator.getBallHolder() == null || basicEstimator.getBallHolder() instanceof Ally) {
             // safer situation
         } else {
             // more dangerous situation

@@ -1,11 +1,11 @@
 package Triton;
 
-import Triton.Config.ConnectionConfig;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
+import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
@@ -17,17 +17,9 @@ import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import Triton.Misc.ModulePubSubSystem.Module;
 
+import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.SimConfig.TOTAL_THREADS;
-import static Triton.Config.ConnectionConfig.ROBOT_0_IP;
-import static Triton.Config.ConnectionConfig.ROBOT_1_IP;
-import static Triton.Config.ConnectionConfig.ROBOT_2_IP;
-import static Triton.Config.ConnectionConfig.ROBOT_3_IP;
-import static Triton.Config.ConnectionConfig.ROBOT_4_IP;
-import static Triton.Config.ConnectionConfig.ROBOT_5_IP;
-import static Triton.Config.ConnectionConfig.defaultPortBase;
-import static Triton.Config.ConnectionConfig.defaultPortOffset;
 
 
 /**
@@ -59,7 +51,7 @@ public class App {
                 }
             }
 
-            if(args.length >= 3) { // robot ip addr
+            if (args.length >= 3) { // robot ip addr
                 ROBOT_0_IP = new Pair<>(args[2], defaultPortBase);
                 ROBOT_1_IP = new Pair<>(args[2], defaultPortBase + defaultPortOffset);
                 ROBOT_2_IP = new Pair<>(args[2], defaultPortBase + 2 * defaultPortOffset);
@@ -69,7 +61,7 @@ public class App {
 
             }
 
-            if(args.length > 3) { // robot ip port base value
+            if (args.length > 3) { // robot ip port base value
                 ROBOT_0_IP = new Pair<>(args[2], Integer.parseInt(args[3]));
                 ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + defaultPortOffset);
                 ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * defaultPortOffset);
@@ -135,7 +127,7 @@ public class App {
     }
 
     private static void sleepForever() {
-        while(true) {
+        while (true) {
 
             try {
                 Thread.sleep(1000);
@@ -146,7 +138,6 @@ public class App {
     }
 
 }
-
 
 
 // TCP connection: listener, each robot connects to the listener, and the

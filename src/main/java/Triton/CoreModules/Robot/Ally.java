@@ -21,13 +21,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
 import static Triton.Config.ObjectConfig.*;
 import static Triton.CoreModules.Robot.AllyState.*;
+import static Triton.CoreModules.Robot.MoveMode.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
 
-
-
 /* TL;DR, Instead, read RobotSkills Interface for a cleaner view !!!!!!! */
-public class Ally extends Robot implements RobotSkills {
+public class Ally extends Robot implements AllySkills {
     private final RobotConnection conn;
     /*** external pub sub ***/
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
@@ -38,11 +37,10 @@ public class Ally extends Robot implements RobotSkills {
     private final Publisher<RemoteAPI.Commands> commandsPub;
 
     /*** internal pub sub ***/
-
     private final Publisher<AllyState> statePub;
     private final Subscriber<AllyState> stateSub;
-    private final Publisher<Vec2D> pointPub, kickVelPub;
-    private final Subscriber<Vec2D> pointSub, kickVelSub;
+    private final Publisher<Vec2D> pointPub, kickVelPub, holdBallPosPub;
+    private final Subscriber<Vec2D> pointSub, kickVelSub, holdBallPosSub;
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
@@ -50,7 +48,6 @@ public class Ally extends Robot implements RobotSkills {
     private PathFinder pathFinder;
 
     private boolean prevHoldBallStatus = false;
-    private Vec2D holdBallLoc = new Vec2D(0, 0);
 
     public Ally(Team team, int ID, ThreadPoolExecutor threadPool) {
         super(team, ID);
@@ -69,14 +66,16 @@ public class Ally extends Robot implements RobotSkills {
         ballSub = new FieldSubscriber<>("detection", "ball");
 
         statePub = new FieldPublisher<>("Ally state", "" + ID, MOVE_TVRV);
-        stateSub = new FieldSubscriber<>("Ally state", "" + ID);
-
         pointPub = new FieldPublisher<>("Ally point", "" + ID, new Vec2D(0, 0));
-        pointSub = new FieldSubscriber<>("Ally point", "" + ID);
         angPub = new FieldPublisher<>("Ally ang", "" + ID, 0.0);
-        angSub = new FieldSubscriber<>("Ally ang", "" + ID);
         kickVelPub = new FieldPublisher<>("Ally kickVel", "" + ID, new Vec2D(0, 0));
+        holdBallPosPub = new FieldPublisher<>("Ally holdBallPos", "" + ID, null);
+
+        stateSub = new FieldSubscriber<>("Ally state", "" + ID);
+        pointSub = new FieldSubscriber<>("Ally point", "" + ID);
+        angSub = new FieldSubscriber<>("Ally ang", "" + ID);
         kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + ID);
+        holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + ID);
 
         dribStatSub = new FieldSubscriber<>("Ally drib", "" + ID);
         commandsPub = new MQPublisher<>("commands", "" + ID);
@@ -102,34 +101,6 @@ public class Ally extends Robot implements RobotSkills {
         // To-do
     }
 
-    @Override
-    public boolean isHoldingBall() {
-        if(!dribStatSub.isSubscribed()) {
-            return false;
-        }
-        return dribStatSub.getMsg();
-    }
-
-    @Override
-    public double dispSinceHoldBall() {
-        return getLoc().sub(holdBallLoc).mag();
-    }
-
-    @Override
-    public boolean isMaxDispExceeded() {
-        return dispSinceHoldBall() > EXCESSIVE_DRIBBLING_DISTANCE;
-    }
-
-    @Override
-    public boolean isLocArrived(Vec2D loc) {
-        return Math.abs(loc.sub(getData().getPos()).mag()) < LOCATION_PRECISION;
-    }
-
-    @Override
-    public boolean isAngleAimed(double angle) {
-        return Math.abs(angle - getData().getAngle()) < DIRECTION_PRECISION;
-    }
-
     /*** primitive control methods ***/
     public void autoCap() {
         statePub.publish(AUTO_CAPTURE);
@@ -152,8 +123,6 @@ public class Ally extends Robot implements RobotSkills {
         }
         pointPub.publish(loc);
     }
-
-    // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
 
     /**
      * @param vel player perspective, vector with unit as percentage from -100 to 100
@@ -211,8 +180,6 @@ public class Ally extends Robot implements RobotSkills {
         });
     }
 
-
-
     /*** advanced control methods with path avoiding obstacles ***/
     @Override
     public void strafeTo(Vec2D endPoint, double angle) {
@@ -220,6 +187,8 @@ public class Ally extends Robot implements RobotSkills {
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
+
+    // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
 
     @Override
     public void sprintTo(Vec2D endPoint) {
@@ -243,8 +212,8 @@ public class Ally extends Robot implements RobotSkills {
     /*** Soccer Skills methods ***/
     @Override
     public void getBall(Ball ball) {
-        Vec2D ballLoc = ball.getData().getPos();
-        Vec2D currPos = getData().getPos();
+        Vec2D ballLoc = ball.getPos();
+        Vec2D currPos = getPos();
         Vec2D currPosToBall = ballLoc.sub(currPos);
         if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             statePub.publish(AUTO_CAPTURE);
@@ -254,21 +223,35 @@ public class Ally extends Robot implements RobotSkills {
     }
 
     @Override
-    public void passBall(Ball ball, Vec2D receiveLoc, double ETA) {
+    public void passBall(Vec2D receivePos, double ETA) {
+        Vec2D allyToReceivePos = receivePos.sub(getPos());
+        double distToTarget = allyToReceivePos.mag();
+        double targetBallVel = (distToTarget / ETA) / 1000.0;
+        System.out.println(targetBallVel);
+        kick(new Vec2D(targetBallVel, 2));
+    }
+
+    @Override
+    public void dribBallTo(Ball ball, Vec2D kickLoc) {
 
     }
 
-
     @Override
-    public void receiveBall(Ball ball, Vec2D receiveLoc) {
-        Vec2D currPos = getData().getPos();
-        Vec2D ballLoc = ball.getData().getPos();
-        double dist = ballLoc.sub(currPos).mag();
+    public void receive(Ball ball, Vec2D receivePos) {
+        Vec2D currPos = getPos();
+        Vec2D ballPos = ball.getPos();
+
+
+
+        Vec2D receiveToBall = receivePos.sub(ballPos);
+
+
+        double dist = ballPos.sub(currPos).mag();
         if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
         } else {
-            double targetAngle = ballLoc.sub(currPos).toPlayerAngle();
-            sprintToAngle(receiveLoc, targetAngle);
+            double targetAngle = ballPos.sub(currPos).toPlayerAngle();
+            sprintToAngle(receivePos, targetAngle);
         }
     }
 
@@ -278,33 +261,37 @@ public class Ally extends Robot implements RobotSkills {
         getBall(ball);
     }
 
-
-
-
     @Override
-    public void dribBallTo(Ball ball, Vec2D kickLoc) {
-
+    public boolean isHoldingBall() {
+        if (!dribStatSub.isSubscribed()) {
+            return false;
+        }
+        return dribStatSub.getMsg();
     }
 
     @Override
-    protected void subscribe() {
-        super.subscribe();
-        try {
-            fieldSizeSub.subscribe(1000);
-            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-                yellowRobotSubs.get(i).subscribe(1000);
-                blueRobotSubs.get(i).subscribe(1000);
-            }
-            ballSub.subscribe(1000);
+    public double dispSinceHoldBall() {
+        Vec2D holdBallPos = holdBallPosSub.getMsg();
 
-            dribStatSub.subscribe(1000);
-            stateSub.subscribe(1000);
-            pointSub.subscribe(1000);
-            angSub.subscribe(1000);
-            kickVelSub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (holdBallPos != null)
+            return getPos().sub(holdBallPos).mag();
+        else
+            return 0;
+    }
+
+    @Override
+    public boolean isMaxDispExceeded() {
+        return dispSinceHoldBall() > EXCESSIVE_DRIBBLING_DIST;
+    }
+
+    @Override
+    public boolean isPosArrived(Vec2D pos) {
+        return pos.sub(getPos()).mag() < POS_PRECISION;
+    }
+
+    @Override
+    public boolean isDirAimed(double angle) {
+        return Math.abs(calcAngDiff(angle, getDir())) < DIR_PRECISION;
     }
 
     // Everything in run() runs in the Ally Thread
@@ -319,7 +306,6 @@ public class Ally extends Robot implements RobotSkills {
             threadPool.submit(conn.getTCPConnection().getSendTCP());
             threadPool.submit(conn.getTCPConnection().getReceiveTCP());
             threadPool.submit(conn.getCommandStream());
-            // threadPool.execute(conn.getDataStream());
             threadPool.submit(conn.getVisionStream());
 
             conn.getTCPConnection().sendInit();
@@ -344,9 +330,11 @@ public class Ally extends Robot implements RobotSkills {
                 }
                 commandsPub.publish(command);
 
-                if(isHoldingBall() != prevHoldBallStatus) {
-                    if(isHoldingBall()) {
-                        holdBallLoc = getData().getPos();
+                if (isHoldingBall() != prevHoldBallStatus) {
+                    if (isHoldingBall()) {
+                        holdBallPosPub.publish(getPos());
+                    } else {
+                        holdBallPosPub.publish(null);
                     }
                 }
                 prevHoldBallStatus = isHoldingBall();
@@ -354,6 +342,28 @@ public class Ally extends Robot implements RobotSkills {
                 // avoid starving other threads
                 Thread.sleep(1);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void subscribe() {
+        super.subscribe();
+        try {
+            fieldSizeSub.subscribe(1000);
+            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+                yellowRobotSubs.get(i).subscribe(1000);
+                blueRobotSubs.get(i).subscribe(1000);
+            }
+            ballSub.subscribe(1000);
+
+            dribStatSub.subscribe(1000);
+            stateSub.subscribe(1000);
+            pointSub.subscribe(1000);
+            angSub.subscribe(1000);
+            kickVelSub.subscribe(1000);
+            holdBallPosSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -387,7 +397,7 @@ public class Ally extends Robot implements RobotSkills {
      */
     private ArrayList<Vec2D> findPath(Vec2D endPoint) {
         pathFinder.setObstacles(getObstacles());
-        return pathFinder.findPath(getData().getPos(), endPoint);
+        return pathFinder.findPath(getPos(), endPoint);
     }
 
     /**
@@ -424,28 +434,6 @@ public class Ally extends Robot implements RobotSkills {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /*** TL;DR ***/
 
     private RemoteAPI.Commands createPrimitiveCmdBuilder(MoveMode mode) {
@@ -472,26 +460,26 @@ public class Ally extends Robot implements RobotSkills {
     }
 
     private RemoteAPI.Commands createTDRDCmd() {
-        return createPrimitiveCmdBuilder(MoveMode.TDRD);
+        return createPrimitiveCmdBuilder(TDRD);
     }
 
     private RemoteAPI.Commands createTDRVCmd() {
-        return createPrimitiveCmdBuilder(MoveMode.TDRV);
+        return createPrimitiveCmdBuilder(TDRV);
     }
 
     private RemoteAPI.Commands createTVRDCmd() {
-        return createPrimitiveCmdBuilder(MoveMode.TVRD);
+        return createPrimitiveCmdBuilder(TVRD);
     }
 
     private RemoteAPI.Commands createTVRVCmd() {
-        return createPrimitiveCmdBuilder(MoveMode.TVRV);
+        return createPrimitiveCmdBuilder(TVRV);
     }
 
     private RemoteAPI.Commands createAutoCapCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(true);
-        command.setMode(MoveMode.TVRV.ordinal());
+        command.setMode(TVRV.ordinal());
 
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
         Vec2D point = pointSub.getMsg();
@@ -518,7 +506,7 @@ public class Ally extends Robot implements RobotSkills {
         RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
 
         double targetAngle = normAng(angSub.getMsg());
-        double currAngle = getData().getAngle();
+        double currAngle = getDir();
         double angDiff = calcAngDiff(targetAngle, currAngle);
 
         boolean usingRD = false;
@@ -547,32 +535,32 @@ public class Ally extends Robot implements RobotSkills {
 
                 if (path.size() <= 2) {
                     if (usingRD)
-                        command.setMode(MoveMode.TDRD.ordinal());
+                        command.setMode(TDRD.ordinal());
                     else
-                        command.setMode(MoveMode.TDRV.ordinal());
+                        command.setMode(TDRV.ordinal());
                 } else {
                     if (usingRD)
-                        command.setMode(MoveMode.NSTDRD.ordinal());
+                        command.setMode(NSTDRD.ordinal());
                     else
-                        command.setMode(MoveMode.NSTDRV.ordinal());
+                        command.setMode(NSTDRV.ordinal());
                 }
             } else {
                 motionSetPoint.setX(0);
                 motionSetPoint.setY(0);
 
                 if (usingRD)
-                    command.setMode(MoveMode.TVRD.ordinal());
+                    command.setMode(TVRD.ordinal());
                 else
-                    command.setMode(MoveMode.TVRV.ordinal());
+                    command.setMode(TVRV.ordinal());
             }
         } else {
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
 
             if (usingRD)
-                command.setMode(MoveMode.TVRD.ordinal());
+                command.setMode(TVRD.ordinal());
             else
-                command.setMode(MoveMode.TVRV.ordinal());
+                command.setMode(TVRV.ordinal());
         }
         command.setMotionSetPoint(motionSetPoint);
 
@@ -585,6 +573,85 @@ public class Ally extends Robot implements RobotSkills {
         return command.build();
     }
 
+//    private RemoteAPI.Commands createStrafeCmd2() {
+//        Vec2D motionSetPointPos;
+//        double motionSetPointAng;
+//        MoveMode mode;
+//
+//        String moveState = "INIT";
+//        ArrayList<Vec2D> path;
+//        Vec2D nextNode;
+//
+//        double targetAngle = normAng(angSub.getMsg());
+//        double currAngle = getDir();
+//        double angDiff = calcAngDiff(targetAngle, currAngle);
+//        double absAngleDiff = Math.abs(angDiff);
+//
+//        if (absAngleDiff > PathfinderConfig.MOVE_ANGLE_THRESH) {
+//            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+//                moveState = "ROTATING_RD";
+//            } else {
+//                moveState = "ROTATING_RV";
+//            }
+//        }
+//        else {
+//            path = findPath(pointSub.getMsg());
+//            if (path != null && path.size() > 0) {
+//                if (path.size() == 1) {
+//                    nextNode = path.get(0);
+//                } else if (path.size() == 2) {
+//                    nextNode = path.get(1);
+//                } else {
+//                    nextNode = path.get(1);
+//                }
+//
+//                if (path.size() <= 2) {
+//                    moveState = "MOVING";
+//                } else {
+//                    moveState = "MOVING_NO_STOP";
+//                }
+//            } else {
+//                moveState = "STOP";
+//            }
+//        }
+//
+//        switch (moveState) {
+//            case "ROTATING_RV":
+//                if (isHoldingBall())
+//                    motionSetPointAng = Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH;
+//                else
+//                    motionSetPointAng = Math.signum(angDiff) * 100;
+//                break;
+//            case "ROTATING_RD":
+//                break;
+//            case "MOVING":
+//                break;
+//            case "MOVING_NO_STOP":
+//                break;
+//            case "STOP":
+//                break;
+//        }
+//
+//        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
+//        command.setIsWorldFrame(true);
+//        command.setEnableBallAutoCapture(false);
+//
+//        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
+//        motionSetPoint.setX(motionSetPointPos.x);
+//        motionSetPoint.setY(motionSetPointPos.y);
+//        motionSetPoint.setZ(motionSetPointAng);
+//        command.setMotionSetPoint(motionSetPoint);
+//        command.setMode();
+//
+//        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
+//        Vec2D kickVel = kickVelSub.getMsg();
+//        kickerSetPoint.setX(kickVel.x);
+//        kickerSetPoint.setY(kickVel.y);
+//        command.setKickerSetPoint(kickerSetPoint);
+//
+//        return command.build();
+//    }
+
     private RemoteAPI.Commands createSprintCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
@@ -594,7 +661,7 @@ public class Ally extends Robot implements RobotSkills {
         ArrayList<Vec2D> path = findPath(pointSub.getMsg());
         if (path != null && path.size() > 0) {
             double targetAngle = 0;
-            Vec2D allyPos = getData().getPos();
+            Vec2D allyPos = getPos();
             boolean targetAngleFound = false;
             for (Vec2D node : path) {
                 double dist = node.sub(allyPos).mag();
@@ -614,7 +681,7 @@ public class Ally extends Robot implements RobotSkills {
                 nextNode = path.get(1);
 
             if (targetAngleFound) {
-                double currAngle = getData().getAngle();
+                double currAngle = getDir();
                 double angDiff = calcAngDiff(targetAngle, currAngle);
 
                 double absAngleDiff = Math.abs(angDiff);
@@ -633,32 +700,32 @@ public class Ally extends Robot implements RobotSkills {
 
                     if (path.size() <= 2) {
                         if (usingRD)
-                            command.setMode(MoveMode.TDRD.ordinal());
+                            command.setMode(TDRD.ordinal());
                         else
-                            command.setMode(MoveMode.TDRV.ordinal());
+                            command.setMode(TDRV.ordinal());
                     } else {
                         if (usingRD)
-                            command.setMode(MoveMode.NSTDRD.ordinal());
+                            command.setMode(NSTDRD.ordinal());
                         else
-                            command.setMode(MoveMode.NSTDRV.ordinal());
+                            command.setMode(NSTDRV.ordinal());
                     }
                 } else {
                     motionSetPoint.setX(0);
                     motionSetPoint.setY(0);
 
                     if (usingRD)
-                        command.setMode(MoveMode.TVRD.ordinal());
+                        command.setMode(TVRD.ordinal());
                     else
-                        command.setMode(MoveMode.TVRV.ordinal());
+                        command.setMode(TVRV.ordinal());
                 }
             } else {
-                command.setMode(MoveMode.TDRV.ordinal());
+                command.setMode(TDRV.ordinal());
                 motionSetPoint.setX(nextNode.x);
                 motionSetPoint.setY(nextNode.y);
                 motionSetPoint.setZ(0);
             }
         } else {
-            command.setMode(MoveMode.TVRV.ordinal());
+            command.setMode(TVRV.ordinal());
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
             motionSetPoint.setZ(0);
@@ -683,7 +750,7 @@ public class Ally extends Robot implements RobotSkills {
         ArrayList<Vec2D> path = findPath(pointSub.getMsg());
         if (path != null && path.size() > 0) {
             double targetAngle = 0;
-            Vec2D allyPos = getData().getPos();
+            Vec2D allyPos = getPos();
             boolean targetAngleFound = false;
             for (Vec2D node : path) {
                 double dist = node.sub(allyPos).mag();
@@ -706,7 +773,7 @@ public class Ally extends Robot implements RobotSkills {
             else
                 nextNode = path.get(1);
 
-            double currAngle = getData().getAngle();
+            double currAngle = getDir();
             double angDiff = calcAngDiff(targetAngle, currAngle);
             double absAngleDiff = Math.abs(angDiff);
 
@@ -725,26 +792,26 @@ public class Ally extends Robot implements RobotSkills {
 
                 if (path.size() <= 2) {
                     if (usingRD)
-                        command.setMode(MoveMode.TDRD.ordinal());
+                        command.setMode(TDRD.ordinal());
                     else
-                        command.setMode(MoveMode.TDRV.ordinal());
+                        command.setMode(TDRV.ordinal());
                 } else {
                     if (usingRD)
-                        command.setMode(MoveMode.NSTDRD.ordinal());
+                        command.setMode(NSTDRD.ordinal());
                     else
-                        command.setMode(MoveMode.NSTDRV.ordinal());
+                        command.setMode(NSTDRV.ordinal());
                 }
             } else {
                 motionSetPoint.setX(0);
                 motionSetPoint.setY(0);
 
                 if (usingRD)
-                    command.setMode(MoveMode.TVRD.ordinal());
+                    command.setMode(TVRD.ordinal());
                 else
-                    command.setMode(MoveMode.TVRV.ordinal());
+                    command.setMode(TVRV.ordinal());
             }
         } else {
-            command.setMode(MoveMode.TVRV.ordinal());
+            command.setMode(TVRV.ordinal());
             motionSetPoint.setX(0);
             motionSetPoint.setY(0);
             motionSetPoint.setZ(0);
@@ -770,15 +837,15 @@ public class Ally extends Robot implements RobotSkills {
         motionSetPoint.setY(0);
 
         double targetAngle = normAng(angSub.getMsg());
-        double currAngle = getData().getAngle();
+        double currAngle = getDir();
         double angDiff = calcAngDiff(targetAngle, currAngle);
 
         double absAngleDiff = Math.abs(angDiff);
         if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            command.setMode(MoveMode.TVRD.ordinal());
+            command.setMode(TVRD.ordinal());
             motionSetPoint.setZ(targetAngle);
         } else {
-            command.setMode(MoveMode.TVRV.ordinal());
+            command.setMode(TVRV.ordinal());
             motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
                     : Math.signum(angDiff) * 100);
         }

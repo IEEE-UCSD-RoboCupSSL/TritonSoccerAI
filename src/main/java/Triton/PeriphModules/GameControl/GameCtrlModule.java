@@ -1,4 +1,5 @@
 package Triton.PeriphModules.GameControl;
+
 import Triton.CoreModules.AI.GameStates;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
@@ -26,8 +27,8 @@ public abstract class GameCtrlModule implements Module {
     }
 
     public GameStates getGameState() {
-        if(gsSub.isSubscribed()) {
-            return  gsSub.getMsg();
+        if (gsSub.isSubscribed()) {
+            return gsSub.getMsg();
         }
         return null;
     }

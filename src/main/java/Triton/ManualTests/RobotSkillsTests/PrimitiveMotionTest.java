@@ -1,7 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.MoveMode;
 import Triton.Misc.Coordinates.Vec2D;
 
 import java.util.Scanner;
@@ -9,6 +8,7 @@ import java.util.Scanner;
 public class PrimitiveMotionTest extends RobotSkillsTest {
     Ally bot;
     Scanner scanner;
+
     public PrimitiveMotionTest(Scanner scanner, Ally bot) {
         this.scanner = scanner;
         this.bot = bot;
@@ -18,7 +18,7 @@ public class PrimitiveMotionTest extends RobotSkillsTest {
     public boolean test() {
         System.out.println("Testing Primitive Motion Commands, Modes: TDRD, TDRV, TVRD, TVRV (T=Translational, R=Rotational, D=Displacement, V=Velocity)");
         boolean toQuit = false;
-        while(!toQuit) {
+        while (!toQuit) {
             System.out.println(">> Please Enter [Mode] or quit to exit");
             String mode = scanner.nextLine();
             switch (mode) {

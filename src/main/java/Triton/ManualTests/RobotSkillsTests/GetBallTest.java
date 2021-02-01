@@ -7,12 +7,12 @@ import java.util.Scanner;
 
 public class GetBallTest extends RobotSkillsTest {
     Scanner scanner;
-    Ally bot;
+    Ally ally;
     Ball ball;
 
-    public GetBallTest(Scanner scanner, Ally bot, Ball ball) {
+    public GetBallTest(Scanner scanner, Ally ally, Ball ball) {
         this.scanner = scanner;
-        this.bot = bot;
+        this.ally = ally;
         this.ball = ball;
     }
 
@@ -24,11 +24,11 @@ public class GetBallTest extends RobotSkillsTest {
 //            line = scanner.nextLine();
 //        } while (!line.equals("start"));
 
-        while (!bot.isHoldingBall()) {
-            bot.getBall(ball);
+        while (!ally.isHoldingBall()) {
+            ally.getBall(ball);
         }
 
-        bot.stop();
+        ally.stop();
 
         return true;
     }

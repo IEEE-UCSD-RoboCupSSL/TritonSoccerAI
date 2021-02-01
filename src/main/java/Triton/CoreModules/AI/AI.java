@@ -13,7 +13,7 @@ import Triton.PeriphModules.GameControl.GameCtrlModule;
 public class AI implements Module {
     private static final double KICK_DIST = 100;
 
-    private final RobotList<Ally> allies;
+    private final RobotList<Ally> fielders;
     private final Ally keeper;
     private final RobotList<Foe> foes;
     private final Ball ball;
@@ -23,22 +23,21 @@ public class AI implements Module {
     private final GameCtrlModule gameCtrl;
 
 
-    public AI(RobotList<Ally> allies, Ally keeper,
+    public AI(RobotList<Ally> fielders, Ally keeper,
               RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {
-        this.allies = allies;
+        if (fielders == null || keeper == null || foes == null || ball == null || gameCtrl == null) {
+            throw new NullPointerException();
+        }
+
+        this.fielders = fielders;
         this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
         this.gameCtrl = gameCtrl;
 
-        // To-do: check nullptr for inputs
-
-
         // future upgrade: use SpringBoot IOC to apply dependency injection here
-        strategyToPlay = new BasicPlay(allies, keeper, foes, ball);
+        strategyToPlay = new BasicPlay(fielders, keeper, foes, ball);
     }
-    
-    private void tmpPlaceHolder(String s) {}
 
     @Override
     public void run() {
@@ -91,6 +90,9 @@ public class AI implements Module {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void tmpPlaceHolder(String s) {
     }
 
 

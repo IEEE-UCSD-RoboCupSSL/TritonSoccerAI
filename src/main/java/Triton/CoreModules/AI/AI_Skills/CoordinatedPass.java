@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.AI_Skills;
 
 
-import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
@@ -10,18 +10,18 @@ import Triton.Misc.Coordinates.Vec2D;
 
 public class CoordinatedPass extends Skills {
 
-    private static PassStates currState = PassStates.PENDING;
+    private static PassState currState = PassState.PENDING;
 
-    public static PassStates getPassState() {
+    public static PassState getPassState() {
         return currState;
     }
 
     public static void setPending() {
-        currState = PassStates.PENDING;
+        currState = PassState.PENDING;
     }
 
-    public static PassStates basicPass(Ally passer, Ally receiver, Ball ball,
-                                       Estimator estimator, PassEstimator passEstimator) {
+    public static PassState basicPass(Ally passer, Ally receiver, Ball ball,
+                                      BasicEstimator basicEstimator, PassEstimator passEstimator) {
 
 
         //To-do: add if(timeout) ... -> FAILED
@@ -29,69 +29,70 @@ public class CoordinatedPass extends Skills {
         /* State Machine */
         switch (currState) {
             case PENDING -> {
-                if(passer.isHoldingBall()) {
-                    currState = PassStates.PASSER_HOLDS_BALL;
+                if (passer.isHoldingBall()) {
+                    currState = PassState.PASSER_HOLDS_BALL;
                 }
             }
             case PASSER_HOLDS_BALL -> {
-                if(!passer.isHoldingBall()) {
-                    currState = PassStates.FAILED;
+                if (!passer.isHoldingBall()) {
+                    currState = PassState.FAILED;
                 }
-                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer); // getOptimalxxxx methods might be time-consuming
-                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
-                if(passer.isLocArrived(passLoc)) {
-                    currState = PassStates.PASSER_IN_POSITION;
-                }
-                else {
-                    double passAngle = receiveLoc.sub(passLoc).getAngle(); // To-do: check math
-                    double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
-                    passer.strafeTo(passLoc, passAngle);
+                Vec2D passLoc = passEstimator.getOptimalPassingPos(passer); // getOptimalxxxx methods might be time-consuming
+                Vec2D receiveLoc = passEstimator.getOptimalReceivingPos(receiver);
+                if (passer.isPosArrived(passLoc)) {
+                    currState = PassState.PASSER_IN_POSITION;
+                } else {
+                    double passAngle = receiveLoc.sub(passLoc).toPlayerAngle();
+                    double receiveAngle = passLoc.sub(receiveLoc).toPlayerAngle();
+                    passer.sprintToAngle(passLoc, passAngle);
                     receiver.sprintToAngle(receiveLoc, receiveAngle);
                 }
             }
             case PASSER_IN_POSITION -> {
-                if(!passer.isHoldingBall()) {
-                    currState = PassStates.FAILED;
+                if (!passer.isHoldingBall()) {
+                    currState = PassState.FAILED;
                 }
-                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer);
-                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
-                double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
-                if(receiver.isAngleAimed(receiveAngle) && receiver.isLocArrived(receiveLoc)) {
-                    currState = PassStates.RECEIVER_IN_POSITION;
-                }
-                else {
-                    receiver.sprintToAngle(receiveLoc, receiveAngle);
-                    if(passEstimator.isGoodTimeToPass()) {
-                        passer.passBall(ball, receiveLoc, passEstimator.getBallArrivalETA());
-                        currState = PassStates.PASSED;
+                Vec2D passPos = passEstimator.getOptimalPassingPos(passer);
+                Vec2D receivePos = passEstimator.getOptimalReceivingPos(receiver);
+                double passAngle = receivePos.sub(passPos).toPlayerAngle();
+                double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
+                passer.rotateTo(passAngle);
+                if (receiver.isDirAimed(receiveAngle) && receiver.isPosArrived(receivePos)) {
+                    currState = PassState.RECEIVER_IN_POSITION;
+                } else {
+                    receiver.sprintToAngle(receivePos, receiveAngle);
+                    if (passEstimator.isGoodTimeToPass() && passer.isDirAimed(passAngle)) {
+                        passer.passBall(receivePos, passEstimator.getBallArrivalETA());
+                        currState = PassState.PASSED;
                     }
                 }
             }
             case RECEIVER_IN_POSITION -> {
-                if(!passer.isHoldingBall()) {
-                    currState = PassStates.FAILED;
+                if (!passer.isHoldingBall()) {
+                    currState = PassState.FAILED;
                 }
-                Vec2D passLoc = passEstimator.getOptimalPassingLoc(passer);
-                Vec2D receiveLoc = passEstimator.getOptimalReceivingLoc(receiver);
-                double receiveAngle = passLoc.sub(receiveLoc).getAngle(); // To-do: check math
-                if(passEstimator.isGoodTimeToPass()) {
-                    passer.passBall(ball, receiveLoc, passEstimator.getBallArrivalETA());
-                    currState = PassStates.PASSED;
-                }
-                else {
-                    receiver.sprintToAngle(receiveLoc, receiveAngle);
+                Vec2D passPos = passEstimator.getOptimalPassingPos(passer);
+                Vec2D receivePos = passEstimator.getOptimalReceivingPos(receiver);
+                double passAngle = receivePos.sub(passPos).toPlayerAngle();
+                double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
+                passer.rotateTo(passAngle);
+                if (passEstimator.isGoodTimeToPass() && passer.isDirAimed(passAngle)) {
+                    passer.passBall(receivePos, passEstimator.getBallArrivalETA());
+                    currState = PassState.PASSED;
+                } else {
+                    receiver.sprintToAngle(receivePos, receiveAngle);
                 }
             }
             case PASSED -> {
+                Vec2D receivePos = passEstimator.getOptimalReceivingPos(receiver);
+
                 // in this state, passer will be null
-                if(receiver.isHoldingBall()) {
-                    currState = PassStates.RECEIVE_SUCCESS;
-                }
-                else {
-                    if(estimator.getBallHolder() instanceof Foe) {
-                        currState = PassStates.FAILED;
-                    }
-                    else {
+                if (receiver.isHoldingBall()) {
+                    currState = PassState.RECEIVE_SUCCESS;
+                } else {
+                    if (basicEstimator.getBallHolder() instanceof Foe) {
+                        currState = PassState.FAILED;
+                    } else {
                         receiver.intercept(ball);
                     }
                 }
@@ -99,22 +100,20 @@ public class CoordinatedPass extends Skills {
             case RECEIVE_SUCCESS -> {
                 // better to set pending outside for readability
                 // setPending();
-                return PassStates.RECEIVE_SUCCESS;
+                return PassState.RECEIVE_SUCCESS;
             }
             case FAILED -> {
                 // setPending();
-                return PassStates.FAILED;
+                return PassState.FAILED;
             }
         }
-
 
         return currState;
     }
 
 
-
-    public static PassStates passWithPasserDodging() {
-        /* To-Do Later */
+    public static PassState passWithPasserDodging() {
+        /* getPos Later */
 
 
         return currState;

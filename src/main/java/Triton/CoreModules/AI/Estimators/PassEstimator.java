@@ -23,19 +23,18 @@ public class PassEstimator {
 
     /* Estimates for Coordinated Passing */
 
-    public Vec2D getOptimalPassingLoc(Ally passer) {
-        // To-do
-        // don't for get to check passer.isMaxDispExceeded()
+    public Vec2D getOptimalPassingPos(Ally passer) {
+
         return new Vec2D(0, 0);
     }
 
     public Ally getOptimalReceiver() {
-        // To-do
+        // getPos
         return null;
     }
 
-    public Vec2D getOptimalReceivingLoc(Ally receiver) {
-        // To-do
+    public Vec2D getOptimalReceivingPos(Ally receiver) {
+        // getPos
         return new Vec2D(0, 0);
     }
 
@@ -43,6 +42,7 @@ public class PassEstimator {
     public boolean isGoodTimeToPass() {
         return false;
     }
+
     public double getBallArrivalETA() {
         return 0;
     }

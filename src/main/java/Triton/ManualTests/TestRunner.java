@@ -5,9 +5,9 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.RobotSkillsTests.GetBallTest;
-import Triton.ManualTests.RobotSkillsTests.KickTest;
-import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
+import Triton.ManualTests.AISkillsTests.CPassTest;
+import Triton.ManualTests.AISkillsTests.GroupToTest;
+import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.util.Scanner;
@@ -15,16 +15,16 @@ import java.util.Scanner;
 public class TestRunner implements Module {
 
     private final Scanner scanner;
-    private final RobotList<Ally> allies;
+    private final RobotList<Ally> fielders;
     private final Ally keeper;
     private final RobotList<Foe> foes;
     private final Ball ball;
 
     private String testName;
 
-    public TestRunner(RobotList<Ally> allies,
+    public TestRunner(RobotList<Ally> fielders,
                       Ally keeper, RobotList<Foe> foes, Ball ball) {
-        this.allies = allies;
+        this.fielders = fielders;
         this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
@@ -36,7 +36,9 @@ public class TestRunner implements Module {
     public void run() {
         try {
             Thread.sleep(1000);
-            while(!Formation.getInstance().testerFormation(allies));
+            while (!Formation.getInstance().testerFormation(fielders)) {
+                Thread.sleep(1);
+            }
 
             String prevTestName = "";
             boolean quit = false;
@@ -47,9 +49,13 @@ public class TestRunner implements Module {
                 int repeat = 0;
                 do {
                     switch (testName) {
-                        case "pmotion" -> rtn = new PrimitiveMotionTest(scanner, allies.get(0)).test();
-                        case "getball" -> rtn = new GetBallTest(scanner, allies.get(0), ball).test();
-                        case "kick" -> rtn = new KickTest(scanner, allies.get(0), ball).test();
+                        case "pmotion" -> rtn = new PrimitiveMotionTest(scanner, fielders.get(3)).test();
+                        case "getball" -> rtn = new GetBallTest(scanner, fielders.get(3), ball).test();
+                        case "kick" -> rtn = new KickTest(scanner, fielders.get(3), ball).test();
+                        case "misc" -> rtn = new MiscTest(scanner, fielders.get(3), ball).test();
+                        case "pass" -> rtn = new PassTest(scanner, fielders.get(3), ball).test();
+                        case "cpass" -> rtn = new CPassTest(scanner, fielders,  keeper, foes, ball).test();
+                        case "group" -> rtn = new GroupToTest(scanner, fielders).test();
                         case "quit" -> quit = true;
                         case "" -> {
                             repeat++;
@@ -57,7 +63,7 @@ public class TestRunner implements Module {
                         }
                         default -> System.out.println("Invalid Test Name");
                     }
-                }while(repeat-- > 0);
+                } while (repeat-- > 0);
                 repeat = 0;
                 prevTestName = testName;
                 System.out.println(rtn ? "Test Success" : "Test Fail");

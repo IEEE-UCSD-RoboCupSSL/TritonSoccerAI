@@ -32,12 +32,12 @@ public abstract class Robot implements Module {
     }
 
 
-    public Vec2D getLoc() {
+    public Vec2D getPos() {
         return getData().getPos();
     }
 
     public double getDir() {
-        return getData().getAngle();
+        return getData().getDir();
     }
 
     public int timeToPoint() {

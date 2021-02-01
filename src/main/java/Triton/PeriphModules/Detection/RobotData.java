@@ -171,7 +171,7 @@ public class RobotData {
         return accel;
     }
 
-    public double getAngle() {
+    public double getDir() {
         return angle;
     }
 

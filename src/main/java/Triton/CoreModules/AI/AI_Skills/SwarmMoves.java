@@ -2,15 +2,13 @@ package Triton.CoreModules.AI.AI_Skills;
 
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.AllyState;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Coordinates.Vec2D;
 import Triton.Misc.Geometry.Line2D;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
-public class SwarmMoves extends Skills{
+public class SwarmMoves extends Skills {
 
     /* Command a group of robots from the input botList
      * to go to each ones' nearest locations & designated directions(angles)
@@ -19,13 +17,13 @@ public class SwarmMoves extends Skills{
      * we only want some of the robots to go to certain locations while
      * leaving others controlled by other methods.
      *
-     * @contract: botList.size() == locList.size() == angList.size()
+     * @contract: botList.size() == posList.size() == dirList.size()
      * @return true when all bots from botList have arrived their corresponding locations
      * */
-    public static boolean groupTo(RobotList<Ally> botList, ArrayList<Vec2D> locList, ArrayList<Double> angList) {
-        if(botList.size() > ObjectConfig.ROBOT_COUNT - 1
-                || botList.size() != locList.size()
-                || locList.size() != angList.size()) {
+    public static boolean groupTo(RobotList<Ally> botList, ArrayList<Vec2D> posList, ArrayList<Double> dirList) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1
+                || botList.size() != posList.size()
+                || posList.size() != dirList.size()) {
             System.out.println("Inputs have invalid size(s)");
         }
 
@@ -33,27 +31,27 @@ public class SwarmMoves extends Skills{
         RobotList<Ally> bots = (RobotList<Ally>) botList.clone(); // shallow copy
         boolean rtn = true;
 
-        for(int i = 0; i < locList.size(); i++) {
-            Vec2D loc = locList.get(i);
-            Double ang = angList.get(i);
+        for (int i = 0; i < posList.size(); i++) {
+            Vec2D loc = posList.get(i);
+            Double ang = dirList.get(i);
             Ally nearestBot = null;
             double dist = Double.MAX_VALUE;
 
             /* find nearest bot */
-            for(Ally bot : bots) {
-                double newDist = loc.sub(bot.getLoc()).mag();
-                if(newDist < dist) {
+            for (Ally bot : bots) {
+                double newDist = loc.sub(bot.getPos()).mag();
+                if (newDist < dist) {
                     dist = newDist;
                     nearestBot = bot;
                 }
             }
-            if(nearestBot != null) {
+            if (nearestBot != null) {
                 bots.remove(nearestBot);
 
                 /* command nearest bot to the corresponding location */
                 nearestBot.sprintToAngle(loc, ang);
 
-                if(!nearestBot.isLocArrived(loc) || !nearestBot.isAngleAimed(ang)) {
+                if (!nearestBot.isPosArrived(loc) || !nearestBot.isDirAimed(ang)) {
                     rtn = false;
                 }
             }
@@ -64,7 +62,7 @@ public class SwarmMoves extends Skills{
 
     /* similar as above */
     public static boolean groupTo(RobotList<Ally> botList, ArrayList<Vec2D> locList) {
-        if(botList.size() > ObjectConfig.ROBOT_COUNT - 1 || botList.size() != locList.size()) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1 || botList.size() != locList.size()) {
             System.out.println("Inputs have invalid size(s)");
         }
 
@@ -72,25 +70,25 @@ public class SwarmMoves extends Skills{
         RobotList<Ally> bots = (RobotList<Ally>) botList.clone(); // shallow copy
         boolean rtn = true;
 
-        for(Vec2D loc : locList) {
+        for (Vec2D loc : locList) {
             Ally nearestBot = null;
             double dist = Double.MAX_VALUE;
 
             /* find nearest bot */
-            for(Ally bot : bots) {
-                double newDist = loc.sub(bot.getLoc()).mag();
-                if(newDist < dist) {
+            for (Ally bot : bots) {
+                double newDist = loc.sub(bot.getPos()).mag();
+                if (newDist < dist) {
                     dist = newDist;
                     nearestBot = bot;
                 }
             }
-            if(nearestBot != null) {
+            if (nearestBot != null) {
                 bots.remove(nearestBot);
 
                 /* command nearest bot to the corresponding location */
                 nearestBot.sprintTo(loc);
 
-                if(!nearestBot.isLocArrived(loc)) {
+                if (!nearestBot.isPosArrived(loc)) {
                     rtn = false;
                 }
             }
@@ -99,16 +97,17 @@ public class SwarmMoves extends Skills{
     }
 
 
-    public static void lineUp(RobotList<Ally> botList, Line2D line) {
-        if(botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+    public static void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
             System.out.println("botList has invalid size");
         }
+
 
     }
 
     // To-do: make Curve2D
     public static void CurveUp(RobotList<Ally> botList /*...*/) {
-        if(botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
             System.out.println("botList has invalid size");
         }
 

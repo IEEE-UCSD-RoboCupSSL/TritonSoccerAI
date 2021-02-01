@@ -257,7 +257,7 @@ public class Display extends JPanel {
                 img = ImgLoader.yellowRobot;
 
             int[] pos = convert.fromPos(robot.getPos());
-            double angle = Math.toRadians(robot.getAngle() + 90);
+            double angle = Math.toRadians(robot.getDir() + 90);
 
             AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
                     img.getWidth() / 2.0);

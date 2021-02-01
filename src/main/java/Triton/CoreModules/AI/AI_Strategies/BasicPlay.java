@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.AI_Strategies;
 
 import Triton.CoreModules.AI.AI_Tactics.HugAttack;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
-import Triton.CoreModules.AI.Estimators.Estimator;
+import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
@@ -10,13 +10,13 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 
-public class BasicPlay extends Strategies{
+public class BasicPlay extends Strategies {
 
     private final RobotList<Ally> allies;
     private final RobotList<Foe> foes;
     private final Ally keeper;
     private final Ball ball;
-    private final Estimator estimator;
+    private final BasicEstimator basicEstimator;
     private final PassEstimator passEstimator;
     private final GoalKeeping goalKeeping;
     private final Tactics attack;
@@ -29,26 +29,25 @@ public class BasicPlay extends Strategies{
         this.keeper = keeper;
         this.ball = ball;
 
-        estimator = new Estimator(allies, keeper, foes, ball);
+        basicEstimator = new BasicEstimator(allies, keeper, foes, ball);
         passEstimator = new PassEstimator(allies, keeper, foes, ball);
-        goalKeeping = new GoalKeeping(keeper, ball, estimator);
+        goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
 
         // construct tactics
         // ...
-        attack = new HugAttack(allies, keeper, foes, ball, estimator, passEstimator);
+        attack = new HugAttack(allies, keeper, foes, ball, basicEstimator, passEstimator);
     }
 
     @Override
     public void play() {
-        if (estimator.isBallUnderOurCtrl()) {
+        if (basicEstimator.isBallUnderOurCtrl()) {
             // play offensive
             offense();
         } else {
-            if(estimator.isBallWithinOurReach()) {
+            if (basicEstimator.isBallWithinOurReach()) {
                 // Try to get ball & command remainder free bots to seek advantageous positions
                 getBallAndMoveRemainderBots();
-            }
-            else {
+            } else {
                 // play defense
                 defense();
             }
@@ -59,11 +58,11 @@ public class BasicPlay extends Strategies{
         attack.exec();
     }
 
-    protected void defense() {
+    protected void getBallAndMoveRemainderBots() {
 
     }
 
-    protected void getBallAndMoveRemainderBots() {
+    protected void defense() {
 
     }
 

@@ -21,6 +21,10 @@ public class Ball implements Module {
         return dataSub.getMsg();
     }
 
+    public Vec2D getPos() {
+        return getData().getPos();
+    }
+
     public Vec2D predPosAtTime(double time) {
         BallData ballData = getData();
         Vec2D pos = ballData.getPos();

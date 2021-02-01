@@ -123,15 +123,6 @@ public class Vec2D {
     }
 
     /**
-     * Returns the angle between the vector and the x-axis
-     *
-     * @return the angle between the vecotr and the x-axis
-     */
-    public double getAngle() {
-        return Math.atan(this.y / this.x);
-    }
-
-    /**
      * Rotate vector by specified angle
      *
      * @param angle angle to rotate by

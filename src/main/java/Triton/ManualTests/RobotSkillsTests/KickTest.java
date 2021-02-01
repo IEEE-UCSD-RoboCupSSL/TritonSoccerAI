@@ -8,12 +8,12 @@ import java.util.Scanner;
 
 public class KickTest extends RobotSkillsTest {
     Scanner scanner;
-    Ally bot;
+    Ally ally;
     Ball ball;
 
-    public KickTest(Scanner scanner, Ally bot, Ball ball) {
+    public KickTest(Scanner scanner, Ally ally, Ball ball) {
         this.scanner = scanner;
-        this.bot = bot;
+        this.ally = ally;
         this.ball = ball;
     }
 
@@ -26,32 +26,32 @@ public class KickTest extends RobotSkillsTest {
 //                line = scanner.nextLine();
 //            } while (!line.equals("start"));
 
-            while (!bot.isHoldingBall()) {
-                bot.getBall(ball);
+            while (!ally.isHoldingBall()) {
+                ally.getBall(ball);
             }
 
             //Thread.sleep(300);
-            bot.stop();
+            ally.stop();
 
             double absAngleDiff;
             do {
                 Vec2D center = new Vec2D(0, 0);
-                Vec2D botToCenter = center.sub(bot.getLoc());
+                Vec2D botToCenter = center.sub(ally.getPos());
                 double targetAngle = botToCenter.toPlayerAngle();
-                bot.rotateTo(targetAngle);
+                ally.rotateTo(targetAngle);
 
-                double botAngle = bot.getDir();
+                double botAngle = ally.getDir();
                 absAngleDiff = Math.abs(targetAngle - botAngle);
             } while (absAngleDiff > 1);
 
             // Thread.sleep(100);
-            bot.stop();
+            ally.stop();
 
             System.out.println(">> ENTER FIRST SPEED AND SECOND SPEED TO KICK:");
             double kickSpeedHorizontal = scanner.nextDouble();
             double kickSpeedVertical = scanner.nextDouble();
             scanner.nextLine();
-            bot.kick(new Vec2D(kickSpeedHorizontal, kickSpeedVertical));
+            ally.kick(new Vec2D(kickSpeedHorizontal, kickSpeedVertical));
 
 
             Thread.sleep(100);

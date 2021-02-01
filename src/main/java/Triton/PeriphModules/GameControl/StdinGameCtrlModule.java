@@ -16,8 +16,8 @@ public class StdinGameCtrlModule extends GameCtrlModule {
     public void run() {
         super.subscribe();
 
-        while(true) {
-            System.out.println("");
+        while (true) {
+            System.out.println();
             System.out.println(">>> Enter new game state to update AI, Available game states are:");
             System.out.println("    [halt, stop, running, freekick, kickoff, penalty, timeout, ballplacement]");
 

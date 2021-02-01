@@ -43,6 +43,27 @@ public class Formation {
         return moveToFormation(formationPoints, formationAngle, bots);
     }
 
+    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
+        for (Ally ally : bots) {
+            int botID = ally.getID();
+            Vec2D targetPos = formationPoints.get(botID);
+            double targetAngle = formationAngle.get(botID);
+            ally.sprintToAngle(targetPos, targetAngle);
+        }
+
+        // return false when any robot is outside of their designated formation point
+        for (Ally ally : bots) {
+            int botID = ally.getID();
+            Vec2D targetPos = formationPoints.get(botID);
+            double targetAngle = formationAngle.get(botID);
+            if (!ally.isPosArrived(targetPos) || !ally.isDirAimed(targetAngle))
+                return false;
+        }
+
+        // return true when all our robots have arrived at their designated formation points
+        return true;
+    }
+
     public boolean testerFormation(ArrayList<Ally> bots) {
         ArrayList<Vec2D> formationPoints = new ArrayList<Vec2D>(ObjectConfig.ROBOT_COUNT - 1);
         formationPoints.add(new Vec2D(0.00, -3000));
@@ -59,29 +80,6 @@ public class Formation {
         formationAngle.add(0.0);
 
         return moveToFormation(formationPoints, formationAngle, bots);
-    }
-
-    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
-        for (Ally ally : bots) {
-            int botID = ally.getID();
-            Vec2D allyPos = ally.getLoc();
-            Vec2D targetPos = formationPoints.get(botID);
-            double targetAngle = formationAngle.get(botID);
-            ally.strafeTo(targetPos, targetAngle);
-        }
-
-        // return false when any robot is outside of their designated formation point
-        for (Ally ally : bots) {
-            int botID = ally.getID();
-            Vec2D allyPos = ally.getLoc();
-            Vec2D targetPos = formationPoints.get(botID);
-            double dist = Vec2D.dist(targetPos, allyPos);
-            if (dist > 200)
-                return false;
-        }
-
-        // return true when all our robots have arrived at their designated formation points
-        return true;
     }
 
     public boolean freeKickFormation(/*...*/) {
