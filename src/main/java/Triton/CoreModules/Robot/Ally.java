@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
-import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
+import static Triton.Config.ObjectConfig.*;
 import static Triton.CoreModules.Robot.AllyState.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
@@ -36,6 +36,7 @@ public class Ally extends Robot implements RobotSkills {
     private final Subscriber<BallData> ballSub;
     private final Subscriber<Boolean> dribStatSub;
     private final Publisher<RemoteAPI.Commands> commandsPub;
+
     /*** internal pub sub ***/
 
     private final Publisher<AllyState> statePub;
@@ -47,6 +48,9 @@ public class Ally extends Robot implements RobotSkills {
 
     protected ThreadPoolExecutor threadPool;
     private PathFinder pathFinder;
+
+    private boolean prevHoldBallStatus = false;
+    private Vec2D holdBallLoc = new Vec2D(0, 0);
 
     public Ally(Team team, int ID, ThreadPoolExecutor threadPool) {
         super(team, ID);
@@ -107,23 +111,23 @@ public class Ally extends Robot implements RobotSkills {
     }
 
     @Override
-    public double netDispSinceHoldBall() {
-        return 0;
+    public double dispSinceHoldBall() {
+        return getLoc().sub(holdBallLoc).mag();
     }
 
     @Override
     public boolean isMaxDispExceeded() {
-        return false;
+        return dispSinceHoldBall() > EXCESSIVE_DRIBBLING_DISTANCE;
     }
 
     @Override
     public boolean isLocArrived(Vec2D loc) {
-        return false;
+        return Math.abs(loc.sub(getData().getPos()).mag()) < LOCATION_PRECISION;
     }
 
     @Override
     public boolean isAngleAimed(double angle) {
-        return false;
+        return Math.abs(angle - getData().getAngle()) < DIRECTION_PRECISION;
     }
 
     /*** primitive control methods ***/
@@ -275,6 +279,8 @@ public class Ally extends Robot implements RobotSkills {
     }
 
 
+
+
     @Override
     public void dribBallTo(Ball ball, Vec2D kickLoc) {
 
@@ -338,6 +344,13 @@ public class Ally extends Robot implements RobotSkills {
                 }
                 commandsPub.publish(command);
 
+                if(isHoldingBall() != prevHoldBallStatus) {
+                    if(isHoldingBall()) {
+                        holdBallLoc = getData().getPos();
+                    }
+                }
+                prevHoldBallStatus = isHoldingBall();
+
                 // avoid starving other threads
                 Thread.sleep(1);
             }
@@ -362,13 +375,6 @@ public class Ally extends Robot implements RobotSkills {
             pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
         }
     }
-
-
-
-
-
-
-
 
     public void displayPathFinder() {
         if (pathFinder instanceof JPSPathFinder) {

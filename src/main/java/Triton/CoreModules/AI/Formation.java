@@ -64,7 +64,7 @@ public class Formation {
     public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
         for (Ally ally : bots) {
             int botID = ally.getID();
-            Vec2D allyPos = ally.getData().getPos();
+            Vec2D allyPos = ally.getLoc();
             Vec2D targetPos = formationPoints.get(botID);
             double targetAngle = formationAngle.get(botID);
             ally.strafeTo(targetPos, targetAngle);
@@ -73,7 +73,7 @@ public class Formation {
         // return false when any robot is outside of their designated formation point
         for (Ally ally : bots) {
             int botID = ally.getID();
-            Vec2D allyPos = ally.getData().getPos();
+            Vec2D allyPos = ally.getLoc();
             Vec2D targetPos = formationPoints.get(botID);
             double dist = Vec2D.dist(targetPos, allyPos);
             if (dist > 200)

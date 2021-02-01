@@ -36,11 +36,11 @@ public class KickTest extends RobotSkillsTest {
             double absAngleDiff;
             do {
                 Vec2D center = new Vec2D(0, 0);
-                Vec2D botToCenter = center.sub(bot.getData().getPos());
+                Vec2D botToCenter = center.sub(bot.getLoc());
                 double targetAngle = botToCenter.toPlayerAngle();
                 bot.rotateTo(targetAngle);
 
-                double botAngle = bot.getData().getAngle();
+                double botAngle = bot.getDir();
                 absAngleDiff = Math.abs(targetAngle - botAngle);
             } while (absAngleDiff > 1);
 

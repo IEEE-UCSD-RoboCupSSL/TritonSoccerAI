@@ -36,7 +36,7 @@ public class TestRunner implements Module {
     public void run() {
         try {
             Thread.sleep(1000);
-            // while(!Formation.getInstance().testerFormation(allies));
+            while(!Formation.getInstance().testerFormation(allies));
 
             String prevTestName = "";
             boolean quit = false;

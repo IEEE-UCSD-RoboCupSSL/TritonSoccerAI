@@ -40,7 +40,7 @@ public class Estimator {
         if (bot == null)
             return new Vec2D(0.00, 0.00);
 
-        return new Vec2D(bot.getData().getAngle());
+        return new Vec2D(bot.getDir());
     }
 
 
@@ -84,9 +84,8 @@ public class Estimator {
         bots.add(goalKeeper);
 
         for (Robot bot : bots) {
-            RobotData botData = bot.getData();
-            Vec2D botPos = botData.getPos();
-            double botAngle = botData.getAngle();
+            Vec2D botPos = bot.getLoc();
+            double botAngle = bot.getDir();
             double dist = Vec2D.dist(ballPos, botPos);
             double ballFaceAngle = ballPos.sub(botPos).toPlayerAngle();
             double angleDiff = PerspectiveConverter.calcAngDiff(ballFaceAngle, botAngle);

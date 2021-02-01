@@ -27,7 +27,7 @@ public class GoalKeeping {
 //        else {
         Vec2D ballPos = ball.getData().getPos();
         Vec2D ballTraj = estimator.getAimTrajectory();
-        Vec2D keeperPos = keeper.getData().getPos();
+        Vec2D keeperPos = keeper.getLoc();
         double keeperY = -4200;
 
         if (Math.abs(ballTraj.y) <= 0.0001) {

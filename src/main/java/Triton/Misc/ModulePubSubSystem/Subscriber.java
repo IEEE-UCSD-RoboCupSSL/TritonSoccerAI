@@ -26,6 +26,7 @@ public abstract class Subscriber<T> {
             if (System.currentTimeMillis() - curr > timeout) {
                 throw new TimeoutException();
             }
+
             channel = MsgChannel.getChannel(topicName, msgName);
         } while (channel == null);
         subscriptionFlag = true;

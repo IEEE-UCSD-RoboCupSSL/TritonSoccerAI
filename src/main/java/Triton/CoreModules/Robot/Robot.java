@@ -27,8 +27,17 @@ public abstract class Robot implements Module {
 //        return pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
     }
 
-    public RobotData getData() {
+    protected RobotData getData() {
         return dataSub.getMsg();
+    }
+
+
+    public Vec2D getLoc() {
+        return getData().getPos();
+    }
+
+    public double getDir() {
+        return getData().getAngle();
     }
 
     public int timeToPoint() {
