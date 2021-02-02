@@ -35,12 +35,26 @@ public interface AllySkills {
 
 
     /*** advanced control methods with path avoiding obstacles ***/
+    // Vocab Note: angle == direction
+
+    // fixed at current / specified direction and translationally move to a position
+    void strafeTo(Vec2D endPoint);
     void strafeTo(Vec2D endPoint, double angle);
 
+    // Simutaneously rotate and translate to a position in a smooth curve
+    void curveTo(Vec2D endPoint);
+    void curveTo(Vec2D endPoint, double angle);
+
+    // use explicitly for ball getting when front direction is prioritized
+    void sprintFrontTo(Vec2D endPoint);
+    void sprintFrontTo(Vec2D endPoint, double angle);
+
+
+    // exploit on the direction with maximal velocity vector (robot speed is not evenly distributed cross various direction of translational movement)
     void sprintTo(Vec2D endPoint);
+    void sprintTo(Vec2D endPoint, double angle);
 
-    void sprintToAngle(Vec2D endPoint, double angle);
-
+    // non-primitive rotate method that give a fast-repsonsive but also smoothly approaching target direction
     void rotateTo(double angle);
 
 
@@ -50,7 +64,9 @@ public interface AllySkills {
     void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
 
     // To-do later: public void chipBall(/* parabola */) ...
-    void dribBallTo(Ball ball, Vec2D kickLoc);
+
+    /* motion preventing dropping ball on the move */
+    void dribBallTo(Ball ball, Vec2D position, double direction);
 
     void receive(Ball ball, Vec2D receiveLoc);
 

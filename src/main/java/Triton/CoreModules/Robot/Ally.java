@@ -1,6 +1,7 @@
 package Triton.CoreModules.Robot;
 
 import Proto.RemoteAPI;
+import Triton.App;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -49,9 +50,9 @@ public class Ally extends Robot implements AllySkills {
 
     private boolean prevHoldBallStatus = false;
 
-    public Ally(Team team, int ID, ThreadPoolExecutor threadPool) {
+    public Ally(Team team, int ID) {
         super(team, ID);
-        this.threadPool = threadPool;
+        this.threadPool = App.threadPool;
 
         conn = new RobotConnection(ID);
 
@@ -98,7 +99,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     public void reinit() {
-        // To-do
+        // To-do for physical robots
     }
 
     /*** primitive control methods ***/
@@ -172,7 +173,7 @@ public class Ally extends Robot implements AllySkills {
 
         threadPool.submit(() -> {
             try {
-                Thread.sleep(300);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -181,6 +182,16 @@ public class Ally extends Robot implements AllySkills {
     }
 
     /*** advanced control methods with path avoiding obstacles ***/
+
+    // Note: (moveTo/At & spinTo/At] are mutually exclusive to advanced control methods
+
+    @Override
+    public void strafeTo(Vec2D endPoint) {
+        statePub.publish(STRAFE);
+        pointPub.publish(endPoint);
+        angPub.publish(getDir());
+    }
+
     @Override
     public void strafeTo(Vec2D endPoint, double angle) {
         statePub.publish(STRAFE);
@@ -188,17 +199,49 @@ public class Ally extends Robot implements AllySkills {
         angPub.publish(angle);
     }
 
-    // Note: (moveTo/At & spinTo/At] are mutually exclusive to [pathTo & rotateTo]
+    @Override
+    public void curveTo(Vec2D endPoint) {
+
+    }
 
     @Override
-    public void sprintTo(Vec2D endPoint) {
-        statePub.publish(SPRINT);
+    public void curveTo(Vec2D endPoint, double angle) {
+
+    }
+
+    @Override
+    public void sprintFrontTo(Vec2D endPoint) {
+        statePub.publish(SPRINT_FRONT);
         pointPub.publish(endPoint);
     }
 
     @Override
-    public void sprintToAngle(Vec2D endPoint, double angle) {
-        statePub.publish(SPRINT_ANGLE);
+    public void sprintFrontTo(Vec2D endPoint, double angle) {
+        statePub.publish(SPRINT_FRONT_ANGLE);
+        pointPub.publish(endPoint);
+        angPub.publish(angle);
+    }
+
+
+    @Override
+    public void sprintTo(Vec2D endPoint) {
+        /* To-do */
+
+        // include  -180 degree
+
+        // ad-hoc
+        statePub.publish(SPRINT_FRONT);
+        pointPub.publish(endPoint);
+    }
+
+    @Override
+    public void sprintTo(Vec2D endPoint, double angle) {
+        /* To-do */
+
+        // include  -180 degree
+
+        // ad-hoc
+        statePub.publish(SPRINT_FRONT_ANGLE);
         pointPub.publish(endPoint);
         angPub.publish(angle);
     }
@@ -218,7 +261,7 @@ public class Ally extends Robot implements AllySkills {
         if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             statePub.publish(AUTO_CAPTURE);
         } else {
-            sprintToAngle(ballLoc, currPosToBall.toPlayerAngle());
+            sprintTo(ballLoc, currPosToBall.toPlayerAngle());
         }
     }
 
@@ -232,12 +275,16 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void dribBallTo(Ball ball, Vec2D kickLoc) {
-
+    public void dribBallTo(Ball ball, Vec2D position, double direction) {
+        /* To-do */
     }
+
 
     @Override
     public void receive(Ball ball, Vec2D receivePos) {
+        /* To-do */
+
+
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
 
@@ -251,12 +298,15 @@ public class Ally extends Robot implements AllySkills {
             getBall(ball);
         } else {
             double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-            sprintToAngle(receivePos, targetAngle);
+            sprintTo(receivePos, targetAngle);
         }
     }
 
     @Override
     public void intercept(Ball ball) {
+
+        /* To-do */
+
         /* ad hoc dealing, will upgrade it later */
         getBall(ball);
     }
@@ -321,8 +371,8 @@ public class Ally extends Robot implements AllySkills {
                     case MOVE_TVRV -> command = createTVRVCmd();
                     case AUTO_CAPTURE -> command = createAutoCapCmd();
                     case STRAFE -> command = createStrafeCmd();
-                    case SPRINT -> command = createSprintCmd();
-                    case SPRINT_ANGLE -> command = createSprintAngleCmd();
+                    case SPRINT_FRONT -> command = createSprintFrontCmd();
+                    case SPRINT_FRONT_ANGLE -> command = createSprintFrontAngleCmd();
                     case ROTATE -> command = createRotateCmd();
                     default -> {
                         command = createTVRVCmd();
@@ -652,7 +702,7 @@ public class Ally extends Robot implements AllySkills {
 //        return command.build();
 //    }
 
-    private RemoteAPI.Commands createSprintCmd() {
+    private RemoteAPI.Commands createSprintFrontCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);
@@ -741,7 +791,7 @@ public class Ally extends Robot implements AllySkills {
         return command.build();
     }
 
-    private RemoteAPI.Commands createSprintAngleCmd() {
+    private RemoteAPI.Commands createSprintFrontAngleCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);

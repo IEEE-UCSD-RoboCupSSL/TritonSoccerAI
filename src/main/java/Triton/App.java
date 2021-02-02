@@ -19,13 +19,21 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.ConnectionConfig.*;
-import static Triton.Config.SimConfig.TOTAL_THREADS;
+import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 
 
 /**
  * Main Program
  */
 public class App {
+    public static ThreadPoolExecutor threadPool;
+
+    static {
+        /* Prepare a Thread Pool*/
+        threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS, 0,
+                TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+    }
+
     public static void main(String[] args) {
         boolean isTestMode = false;
 
@@ -73,9 +81,7 @@ public class App {
 
         }
 
-        /* Prepare a Thread Pool*/
-        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS,
-                0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         Module visionModule = new GrSimVisionModule();
@@ -94,15 +100,15 @@ public class App {
         Ball ball = new Ball();
         threadPool.submit(ball);
 
-        RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1, threadPool);
-        Ally goalKeeper = RobotFactory.createGoalKeeperBot(threadPool);
-        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT, threadPool);
+        RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
+        Ally goalKeeper = RobotFactory.createGoalKeeperBot();
+        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT);
         if (allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
                 && goalKeeper.connect()) {
-            allies.runAll(threadPool);
+            allies.runAll();
             threadPool.submit(goalKeeper);
         }
-        foes.runAll(threadPool); // submit all to threadPool
+        foes.runAll(); // submit all to threadPool
 
 
         if (!isTestMode) {

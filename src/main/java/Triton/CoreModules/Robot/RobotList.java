@@ -1,5 +1,7 @@
 package Triton.CoreModules.Robot;
 
+import Triton.App;
+
 import java.util.ArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -20,10 +22,10 @@ public class RobotList<T> extends ArrayList<T> {
         return numSuccessConnect;
     }
 
-    public void runAll(ThreadPoolExecutor threadPool) {
+    public void runAll() {
         for (T bot : this) {
             if (bot instanceof Robot) {
-                threadPool.submit((Robot) bot);
+                App.threadPool.submit((Robot) bot);
             } else {
                 System.out.println("Invalid Type");
             }

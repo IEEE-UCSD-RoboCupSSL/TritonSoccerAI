@@ -1,4 +1,4 @@
-package Triton.ManualTests.AISkillsTests;
+package Triton.ManualTests.AI_SkillsTests;
 
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
@@ -22,8 +22,7 @@ public class CPassTest extends RobotSkillsTest {
     Ball ball;
 
     BasicEstimator basicEstimator;
-    PassEstimatorMock passEstimator;
-    CoordinatedPass coordinatedPass;
+    PassEstimatorMock passEstimatorMock;
 
     public CPassTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.scanner = scanner;
@@ -32,7 +31,7 @@ public class CPassTest extends RobotSkillsTest {
         this.ball = ball;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passEstimator = new PassEstimatorMock();
+        passEstimatorMock = new PassEstimatorMock();
     }
 
     @Override
@@ -46,11 +45,11 @@ public class CPassTest extends RobotSkillsTest {
             Vec2D initPasserPos = passingPos.add(new Vec2D(0, 0));
             Vec2D initReceiverPos = receivingPos.add(new Vec2D(-1500, 0));
 
-            passEstimator.setPassingPos(passingPos);
-            passEstimator.setReceivingPos(receivingPos);
-            passEstimator.setOptimalReceiver(receiver);
-            passEstimator.setGoodTimeToPass(false);
-            passEstimator.setBallArrivalETA(0.8);
+            passEstimatorMock.setPassingPos(passingPos);
+            passEstimatorMock.setReceivingPos(receivingPos);
+            passEstimatorMock.setOptimalReceiver(receiver);
+            passEstimatorMock.setGoodTimeToPass(false);
+            passEstimatorMock.setBallArrivalETA(0.8);
 
             passer.kick(new Vec2D(0, 0));
 
@@ -71,9 +70,9 @@ public class CPassTest extends RobotSkillsTest {
             while (passState != PassState.RECEIVE_SUCCESS && passState != PassState.FAILED) {
                 double dist = receivingPos.sub(receiver.getPos()).mag();
                 if (dist <= 200)
-                    passEstimator.setGoodTimeToPass(true);
+                    passEstimatorMock.setGoodTimeToPass(true);
 
-                passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimator);
+                passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimatorMock);
                 System.out.println(passState);
             }
         } catch (Exception e) {

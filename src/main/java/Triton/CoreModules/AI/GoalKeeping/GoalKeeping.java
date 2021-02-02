@@ -18,7 +18,7 @@ public class GoalKeeping {
     }
 
     public void moveToStart() {
-        keeper.sprintToAngle(new Vec2D(0, -4200), 0);
+        keeper.sprintTo(new Vec2D(0, -4200), 0);
     }
 
     public void passiveGuarding() {

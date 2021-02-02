@@ -31,6 +31,8 @@ public class CoordinatedPass extends Skills {
             case PENDING -> {
                 if (passer.isHoldingBall()) {
                     currState = PassState.PASSER_HOLDS_BALL;
+                } else {
+                    return PassState.PENDING;
                 }
             }
             case PASSER_HOLDS_BALL -> {
@@ -44,8 +46,8 @@ public class CoordinatedPass extends Skills {
                 } else {
                     double passAngle = receiveLoc.sub(passLoc).toPlayerAngle();
                     double receiveAngle = passLoc.sub(receiveLoc).toPlayerAngle();
-                    passer.sprintToAngle(passLoc, passAngle);
-                    receiver.sprintToAngle(receiveLoc, receiveAngle);
+                    passer.sprintTo(passLoc, passAngle);
+                    receiver.sprintTo(receiveLoc, receiveAngle);
                 }
             }
             case PASSER_IN_POSITION -> {
@@ -60,7 +62,7 @@ public class CoordinatedPass extends Skills {
                 if (receiver.isDirAimed(receiveAngle) && receiver.isPosArrived(receivePos)) {
                     currState = PassState.RECEIVER_IN_POSITION;
                 } else {
-                    receiver.sprintToAngle(receivePos, receiveAngle);
+                    receiver.sprintTo(receivePos, receiveAngle);
                     if (passEstimator.isGoodTimeToPass() && passer.isDirAimed(passAngle)) {
                         passer.passBall(receivePos, passEstimator.getBallArrivalETA());
                         currState = PassState.PASSED;
@@ -80,13 +82,13 @@ public class CoordinatedPass extends Skills {
                     passer.passBall(receivePos, passEstimator.getBallArrivalETA());
                     currState = PassState.PASSED;
                 } else {
-                    receiver.sprintToAngle(receivePos, receiveAngle);
+                    receiver.sprintTo(receivePos, receiveAngle);
                 }
             }
             case PASSED -> {
                 Vec2D receivePos = passEstimator.getOptimalReceivingPos(receiver);
 
-                // in this state, passer will be null
+                // in this state, passer may be null
                 if (receiver.isHoldingBall()) {
                     currState = PassState.RECEIVE_SUCCESS;
                 } else {
