@@ -119,7 +119,7 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void moveTo(Vec2D loc) {
         switch (stateSub.getMsg()) {
-            case MOVE_TDRD, MOVE_TVRD -> statePub.publish(MOVE_TDRD);
+            case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_TDRD);
             default -> statePub.publish(MOVE_TDRV);
         }
         pointPub.publish(loc);
@@ -131,7 +131,7 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void moveAt(Vec2D vel) {
         switch (stateSub.getMsg()) {
-            case MOVE_TDRD, MOVE_TVRD -> statePub.publish(MOVE_TVRD);
+            case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_TVRD);
             default -> statePub.publish(MOVE_TVRV);
         }
         pointPub.publish(vel);
@@ -143,7 +143,7 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void spinTo(double angle) {
         switch (stateSub.getMsg()) {
-            case MOVE_TDRD, MOVE_TDRV -> statePub.publish(MOVE_TDRD);
+            case MOVE_TDRD, MOVE_TDRV, MOVE_NSTDRD, MOVE_NSTDRV -> statePub.publish(MOVE_TDRD);
             default -> statePub.publish(MOVE_TVRD);
         }
         angPub.publish(angle);
@@ -155,7 +155,7 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void spinAt(double angVel) {
         switch (stateSub.getMsg()) {
-            case MOVE_TDRD, MOVE_TDRV -> statePub.publish(MOVE_TDRV);
+            case MOVE_TDRD, MOVE_TDRV, MOVE_NSTDRD, MOVE_NSTDRV -> statePub.publish(MOVE_TDRV);
             default -> statePub.publish(MOVE_TVRV);
         }
         angPub.publish(angVel);
@@ -181,27 +181,76 @@ public class Ally extends Robot implements AllySkills {
         });
     }
 
+
+
+    private void moveToNoSlowDown(Vec2D loc) {
+        switch (stateSub.getMsg()) {
+            case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_NSTDRD);
+            default -> statePub.publish(MOVE_NSTDRV);
+        }
+        pointPub.publish(loc);
+    }
+
+
     /*** advanced control methods with path avoiding obstacles ***/
 
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to advanced control methods
 
     @Override
+    public void rotateTo(double angle) {
+        double targetAngle = normAng(angle);
+        double angDiff = calcAngDiff(targetAngle, getDir());
+
+        double absAngleDiff = Math.abs(angDiff);
+        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+            moveAt(new Vec2D(0, 0));
+            spinTo(targetAngle);
+        } else {
+            moveAt(new Vec2D(0, 0));
+            spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+        }
+    }
+
+    @Override
     public void strafeTo(Vec2D endPoint) {
-        statePub.publish(STRAFE);
-        pointPub.publish(endPoint);
-        angPub.publish(getDir());
+        strafeTo(endPoint, getDir());
     }
 
     @Override
     public void strafeTo(Vec2D endPoint, double angle) {
-        statePub.publish(STRAFE);
-        pointPub.publish(endPoint);
-        angPub.publish(angle);
+        double targetAngle = normAng(angle);
+        double currAngle = getDir();
+        double angDiff = calcAngDiff(targetAngle, currAngle);
+        double absAngleDiff = Math.abs(angDiff);
+
+        /*To-do: replace with rotateTo with hold ball rotate*/
+        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+            spinTo(targetAngle);
+        } else {
+            spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+        }
+
+        if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+            ArrayList<Vec2D> path = findPath(endPoint);
+            if (path != null && path.size() > 0) {
+                Vec2D nextNode;
+                if (path.size() == 1) nextNode = path.get(0);
+                else if (path.size() == 2) nextNode = path.get(1);
+                else nextNode = path.get(1);
+
+                if (path.size() <= 2) moveTo(nextNode);
+                else moveToNoSlowDown(nextNode);
+            } else {
+                moveAt(new Vec2D(0,0));
+            }
+        } else {
+            moveAt(new Vec2D(0, 0));
+        }
     }
 
     @Override
     public void curveTo(Vec2D endPoint) {
-
+        curveTo(endPoint, getDir());
     }
 
     @Override
@@ -211,15 +260,50 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public void sprintFrontTo(Vec2D endPoint) {
-        statePub.publish(SPRINT_FRONT);
-        pointPub.publish(endPoint);
+        sprintFrontTo(endPoint, getDir());
     }
 
     @Override
     public void sprintFrontTo(Vec2D endPoint, double angle) {
-        statePub.publish(SPRINT_FRONT_ANGLE);
-        pointPub.publish(endPoint);
-        angPub.publish(angle);
+        ArrayList<Vec2D> path = findPath(endPoint);
+        if (path != null && path.size() > 0) {
+            double fastestAngle = 0;
+            boolean fastestAngleFound = false;
+            for (Vec2D node : path) {
+                double dist = node.sub(getPos()).mag();
+                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
+                    fastestAngle = node.sub(getPos()).toPlayerAngle();
+                    fastestAngleFound = true;
+                    break;
+                }
+            }
+
+            Vec2D nextNode;
+            if (path.size() == 1) nextNode = path.get(0);
+            else if (path.size() == 2) nextNode = path.get(1);
+            else nextNode = path.get(1);
+
+            if (!fastestAngleFound) fastestAngle = angle;
+
+            double angDiff = calcAngDiff(fastestAngle, getDir());
+            double absAngleDiff = Math.abs(angDiff);
+
+            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+                spinTo(fastestAngle);
+            } else {
+                spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+            }
+
+            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+                if (path.size() <= 2) moveTo(nextNode);
+                else moveToNoSlowDown(nextNode);
+            } else {
+                moveAt(new Vec2D(0, 0));
+            }
+        } else {
+            moveAt(new Vec2D(0,0));
+            spinAt(0);
+        }
     }
 
 
@@ -230,8 +314,7 @@ public class Ally extends Robot implements AllySkills {
         // include  -180 degree
 
         // ad-hoc
-        statePub.publish(SPRINT_FRONT);
-        pointPub.publish(endPoint);
+        sprintFrontTo(endPoint);
     }
 
     @Override
@@ -241,16 +324,10 @@ public class Ally extends Robot implements AllySkills {
         // include  -180 degree
 
         // ad-hoc
-        statePub.publish(SPRINT_FRONT_ANGLE);
-        pointPub.publish(endPoint);
-        angPub.publish(angle);
+        sprintFrontTo(endPoint, angle);
     }
 
-    @Override
-    public void rotateTo(double angle) {
-        statePub.publish(ROTATE);
-        angPub.publish(angle);
-    }
+
 
     /*** Soccer Skills methods ***/
     @Override
@@ -272,11 +349,6 @@ public class Ally extends Robot implements AllySkills {
         double targetBallVel = (distToTarget / ETA) / 1000.0;
         System.out.println(targetBallVel);
         kick(new Vec2D(targetBallVel, 2));
-    }
-
-    @Override
-    public void dribBallTo(Ball ball, Vec2D position, double direction) {
-        /* To-do */
     }
 
 
@@ -369,11 +441,9 @@ public class Ally extends Robot implements AllySkills {
                     case MOVE_TDRV -> command = createTDRVCmd();
                     case MOVE_TVRD -> command = createTVRDCmd();
                     case MOVE_TVRV -> command = createTVRVCmd();
+                    case MOVE_NSTDRD -> command = createNSTDRDCmd();
+                    case MOVE_NSTDRV -> command = createNSTDRVCmd();
                     case AUTO_CAPTURE -> command = createAutoCapCmd();
-                    case STRAFE -> command = createStrafeCmd();
-                    case SPRINT_FRONT -> command = createSprintFrontCmd();
-                    case SPRINT_FRONT_ANGLE -> command = createSprintFrontAngleCmd();
-                    case ROTATE -> command = createRotateCmd();
                     default -> {
                         command = createTVRVCmd();
                     }
@@ -525,6 +595,14 @@ public class Ally extends Robot implements AllySkills {
         return createPrimitiveCmdBuilder(TVRV);
     }
 
+    private RemoteAPI.Commands createNSTDRDCmd() {
+        return createPrimitiveCmdBuilder(NSTDRD);
+    }
+
+    private RemoteAPI.Commands createNSTDRVCmd() {
+        return createPrimitiveCmdBuilder(NSTDRV);
+    }
+
     private RemoteAPI.Commands createAutoCapCmd() {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
@@ -548,365 +626,5 @@ public class Ally extends Robot implements AllySkills {
         return command.build();
     }
 
-    private RemoteAPI.Commands createStrafeCmd() {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setIsWorldFrame(true);
-        command.setEnableBallAutoCapture(false);
 
-        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-
-        double targetAngle = normAng(angSub.getMsg());
-        double currAngle = getDir();
-        double angDiff = calcAngDiff(targetAngle, currAngle);
-
-        boolean usingRD = false;
-        double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            usingRD = true;
-            motionSetPoint.setZ(targetAngle);
-        } else {
-            motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
-        }
-
-        if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-            ArrayList<Vec2D> path = findPath(pointSub.getMsg());
-            if (path != null && path.size() > 0) {
-                Vec2D nextNode;
-                if (path.size() == 1) {
-                    nextNode = path.get(0);
-                } else if (path.size() == 2) {
-                    nextNode = path.get(1);
-                } else {
-                    nextNode = path.get(1);
-                }
-
-                motionSetPoint.setX(nextNode.x);
-                motionSetPoint.setY(nextNode.y);
-
-                if (path.size() <= 2) {
-                    if (usingRD)
-                        command.setMode(TDRD.ordinal());
-                    else
-                        command.setMode(TDRV.ordinal());
-                } else {
-                    if (usingRD)
-                        command.setMode(NSTDRD.ordinal());
-                    else
-                        command.setMode(NSTDRV.ordinal());
-                }
-            } else {
-                motionSetPoint.setX(0);
-                motionSetPoint.setY(0);
-
-                if (usingRD)
-                    command.setMode(TVRD.ordinal());
-                else
-                    command.setMode(TVRV.ordinal());
-            }
-        } else {
-            motionSetPoint.setX(0);
-            motionSetPoint.setY(0);
-
-            if (usingRD)
-                command.setMode(TVRD.ordinal());
-            else
-                command.setMode(TVRV.ordinal());
-        }
-        command.setMotionSetPoint(motionSetPoint);
-
-        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        Vec2D kickVel = kickVelSub.getMsg();
-        kickerSetPoint.setX(kickVel.x);
-        kickerSetPoint.setY(kickVel.y);
-        command.setKickerSetPoint(kickerSetPoint);
-
-        return command.build();
-    }
-
-//    private RemoteAPI.Commands createStrafeCmd2() {
-//        Vec2D motionSetPointPos;
-//        double motionSetPointAng;
-//        MoveMode mode;
-//
-//        String moveState = "INIT";
-//        ArrayList<Vec2D> path;
-//        Vec2D nextNode;
-//
-//        double targetAngle = normAng(angSub.getMsg());
-//        double currAngle = getDir();
-//        double angDiff = calcAngDiff(targetAngle, currAngle);
-//        double absAngleDiff = Math.abs(angDiff);
-//
-//        if (absAngleDiff > PathfinderConfig.MOVE_ANGLE_THRESH) {
-//            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-//                moveState = "ROTATING_RD";
-//            } else {
-//                moveState = "ROTATING_RV";
-//            }
-//        }
-//        else {
-//            path = findPath(pointSub.getMsg());
-//            if (path != null && path.size() > 0) {
-//                if (path.size() == 1) {
-//                    nextNode = path.get(0);
-//                } else if (path.size() == 2) {
-//                    nextNode = path.get(1);
-//                } else {
-//                    nextNode = path.get(1);
-//                }
-//
-//                if (path.size() <= 2) {
-//                    moveState = "MOVING";
-//                } else {
-//                    moveState = "MOVING_NO_STOP";
-//                }
-//            } else {
-//                moveState = "STOP";
-//            }
-//        }
-//
-//        switch (moveState) {
-//            case "ROTATING_RV":
-//                if (isHoldingBall())
-//                    motionSetPointAng = Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH;
-//                else
-//                    motionSetPointAng = Math.signum(angDiff) * 100;
-//                break;
-//            case "ROTATING_RD":
-//                break;
-//            case "MOVING":
-//                break;
-//            case "MOVING_NO_STOP":
-//                break;
-//            case "STOP":
-//                break;
-//        }
-//
-//        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-//        command.setIsWorldFrame(true);
-//        command.setEnableBallAutoCapture(false);
-//
-//        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-//        motionSetPoint.setX(motionSetPointPos.x);
-//        motionSetPoint.setY(motionSetPointPos.y);
-//        motionSetPoint.setZ(motionSetPointAng);
-//        command.setMotionSetPoint(motionSetPoint);
-//        command.setMode();
-//
-//        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-//        Vec2D kickVel = kickVelSub.getMsg();
-//        kickerSetPoint.setX(kickVel.x);
-//        kickerSetPoint.setY(kickVel.y);
-//        command.setKickerSetPoint(kickerSetPoint);
-//
-//        return command.build();
-//    }
-
-    private RemoteAPI.Commands createSprintFrontCmd() {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setIsWorldFrame(true);
-        command.setEnableBallAutoCapture(false);
-
-        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
-        if (path != null && path.size() > 0) {
-            double targetAngle = 0;
-            Vec2D allyPos = getPos();
-            boolean targetAngleFound = false;
-            for (Vec2D node : path) {
-                double dist = node.sub(allyPos).mag();
-                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
-                    targetAngle = node.sub(allyPos).toPlayerAngle();
-                    targetAngleFound = true;
-                    break;
-                }
-            }
-
-            Vec2D nextNode;
-            if (path.size() == 1)
-                nextNode = path.get(0);
-            else if (path.size() == 2)
-                nextNode = path.get(1);
-            else
-                nextNode = path.get(1);
-
-            if (targetAngleFound) {
-                double currAngle = getDir();
-                double angDiff = calcAngDiff(targetAngle, currAngle);
-
-                double absAngleDiff = Math.abs(angDiff);
-                boolean usingRD = false;
-
-                if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-                    usingRD = true;
-                    motionSetPoint.setZ(targetAngle);
-                } else {
-                    motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
-                }
-
-                if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                    motionSetPoint.setX(nextNode.x);
-                    motionSetPoint.setY(nextNode.y);
-
-                    if (path.size() <= 2) {
-                        if (usingRD)
-                            command.setMode(TDRD.ordinal());
-                        else
-                            command.setMode(TDRV.ordinal());
-                    } else {
-                        if (usingRD)
-                            command.setMode(NSTDRD.ordinal());
-                        else
-                            command.setMode(NSTDRV.ordinal());
-                    }
-                } else {
-                    motionSetPoint.setX(0);
-                    motionSetPoint.setY(0);
-
-                    if (usingRD)
-                        command.setMode(TVRD.ordinal());
-                    else
-                        command.setMode(TVRV.ordinal());
-                }
-            } else {
-                command.setMode(TDRV.ordinal());
-                motionSetPoint.setX(nextNode.x);
-                motionSetPoint.setY(nextNode.y);
-                motionSetPoint.setZ(0);
-            }
-        } else {
-            command.setMode(TVRV.ordinal());
-            motionSetPoint.setX(0);
-            motionSetPoint.setY(0);
-            motionSetPoint.setZ(0);
-        }
-        command.setMotionSetPoint(motionSetPoint);
-
-        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        Vec2D kickVel = kickVelSub.getMsg();
-        kickerSetPoint.setX(kickVel.x);
-        kickerSetPoint.setY(kickVel.y);
-        command.setKickerSetPoint(kickerSetPoint);
-
-        return command.build();
-    }
-
-    private RemoteAPI.Commands createSprintFrontAngleCmd() {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setIsWorldFrame(true);
-        command.setEnableBallAutoCapture(false);
-
-        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        ArrayList<Vec2D> path = findPath(pointSub.getMsg());
-        if (path != null && path.size() > 0) {
-            double targetAngle = 0;
-            Vec2D allyPos = getPos();
-            boolean targetAngleFound = false;
-            for (Vec2D node : path) {
-                double dist = node.sub(allyPos).mag();
-                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
-                    targetAngle = node.sub(allyPos).toPlayerAngle();
-                    targetAngleFound = true;
-                    break;
-                }
-            }
-
-            if (!targetAngleFound) {
-                targetAngle = angSub.getMsg();
-            }
-
-            Vec2D nextNode;
-            if (path.size() == 1)
-                nextNode = path.get(0);
-            else if (path.size() == 2)
-                nextNode = path.get(1);
-            else
-                nextNode = path.get(1);
-
-            double currAngle = getDir();
-            double angDiff = calcAngDiff(targetAngle, currAngle);
-            double absAngleDiff = Math.abs(angDiff);
-
-            boolean usingRD = false;
-            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-                usingRD = true;
-                motionSetPoint.setZ(targetAngle);
-            } else {
-                motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
-                        : Math.signum(angDiff) * 100);
-            }
-
-            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                motionSetPoint.setX(nextNode.x);
-                motionSetPoint.setY(nextNode.y);
-
-                if (path.size() <= 2) {
-                    if (usingRD)
-                        command.setMode(TDRD.ordinal());
-                    else
-                        command.setMode(TDRV.ordinal());
-                } else {
-                    if (usingRD)
-                        command.setMode(NSTDRD.ordinal());
-                    else
-                        command.setMode(NSTDRV.ordinal());
-                }
-            } else {
-                motionSetPoint.setX(0);
-                motionSetPoint.setY(0);
-
-                if (usingRD)
-                    command.setMode(TVRD.ordinal());
-                else
-                    command.setMode(TVRV.ordinal());
-            }
-        } else {
-            command.setMode(TVRV.ordinal());
-            motionSetPoint.setX(0);
-            motionSetPoint.setY(0);
-            motionSetPoint.setZ(0);
-        }
-        command.setMotionSetPoint(motionSetPoint);
-
-        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        Vec2D kickVel = kickVelSub.getMsg();
-        kickerSetPoint.setX(kickVel.x);
-        kickerSetPoint.setY(kickVel.y);
-        command.setKickerSetPoint(kickerSetPoint);
-
-        return command.build();
-    }
-
-    private RemoteAPI.Commands createRotateCmd() {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setIsWorldFrame(true);
-        command.setEnableBallAutoCapture(false);
-
-        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        motionSetPoint.setX(0);
-        motionSetPoint.setY(0);
-
-        double targetAngle = normAng(angSub.getMsg());
-        double currAngle = getDir();
-        double angDiff = calcAngDiff(targetAngle, currAngle);
-
-        double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            command.setMode(TVRD.ordinal());
-            motionSetPoint.setZ(targetAngle);
-        } else {
-            command.setMode(TVRV.ordinal());
-            motionSetPoint.setZ((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH
-                    : Math.signum(angDiff) * 100);
-        }
-        command.setMotionSetPoint(motionSetPoint);
-
-        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        Vec2D kickVel = kickVelSub.getMsg();
-        kickerSetPoint.setX(kickVel.x);
-        kickerSetPoint.setY(kickVel.y);
-        command.setKickerSetPoint(kickerSetPoint);
-
-        return command.build();
-    }
 }

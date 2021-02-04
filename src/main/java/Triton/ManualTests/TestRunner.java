@@ -50,6 +50,7 @@ public class TestRunner implements Module {
                 do {
                     switch (testName) {
                         case "pmotion" -> rtn = new PrimitiveMotionTest(scanner, fielders.get(3)).test();
+                        case "amotion" -> rtn = new AdvancedMotionTest(scanner, fielders.get(1)).test();
                         case "getball" -> rtn = new GetBallTest(scanner, fielders.get(3), ball).test();
                         case "kick" -> rtn = new KickTest(scanner, fielders.get(3), ball).test();
                         case "misc" -> rtn = new MiscTest(scanner, fielders.get(3), ball).test();

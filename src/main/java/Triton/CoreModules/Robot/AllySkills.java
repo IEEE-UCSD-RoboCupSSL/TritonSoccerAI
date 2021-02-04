@@ -37,6 +37,10 @@ public interface AllySkills {
     /*** advanced control methods with path avoiding obstacles ***/
     // Vocab Note: angle == direction
 
+    // non-primitive rotate method that give a fast-repsonsive but also smoothly approaching target direction
+    // when holding the ball, calling this rotateTo will generate curved path to orient the bot without dropping the ball by rotating in place
+    void rotateTo(double angle);
+
     // fixed at current / specified direction and translationally move to a position
     void strafeTo(Vec2D endPoint);
     void strafeTo(Vec2D endPoint, double angle);
@@ -54,8 +58,7 @@ public interface AllySkills {
     void sprintTo(Vec2D endPoint);
     void sprintTo(Vec2D endPoint, double angle);
 
-    // non-primitive rotate method that give a fast-repsonsive but also smoothly approaching target direction
-    void rotateTo(double angle);
+
 
 
     /*** Soccer Skills methods ***/
@@ -64,9 +67,6 @@ public interface AllySkills {
     void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
 
     // To-do later: public void chipBall(/* parabola */) ...
-
-    /* motion preventing dropping ball on the move */
-    void dribBallTo(Ball ball, Vec2D position, double direction);
 
     void receive(Ball ball, Vec2D receiveLoc);
 

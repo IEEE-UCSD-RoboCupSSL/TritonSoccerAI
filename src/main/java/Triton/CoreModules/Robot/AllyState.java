@@ -5,9 +5,7 @@ public enum AllyState {
     MOVE_TDRV,
     MOVE_TVRD,
     MOVE_TVRV,
+    MOVE_NSTDRD,
+    MOVE_NSTDRV,
     AUTO_CAPTURE,
-    STRAFE,
-    SPRINT_FRONT,
-    SPRINT_FRONT_ANGLE,
-    ROTATE,
 }
