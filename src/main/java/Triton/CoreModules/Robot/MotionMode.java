@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot;
 
-public enum MoveMode {
+public enum MotionMode {
     TDRD,
     TDRV,
     TVRD,

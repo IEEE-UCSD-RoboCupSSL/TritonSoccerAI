@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot;
 
-public enum AllyState {
+public enum MotionState {
     MOVE_TDRD,
     MOVE_TDRV,
     MOVE_TVRD,

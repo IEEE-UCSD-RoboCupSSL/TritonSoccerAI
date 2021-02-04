@@ -48,13 +48,12 @@ public interface AllySkills {
     // Simutaneously rotate and translate to a position in a smooth curve
     void curveTo(Vec2D endPoint);
     void curveTo(Vec2D endPoint, double angle);
-
-    // use explicitly for ball getting when front direction is prioritized
-    void sprintFrontTo(Vec2D endPoint);
-    void sprintFrontTo(Vec2D endPoint, double angle);
-
+    void fastCurveTo(Vec2D endPoint); // sprint version of curveTo, produce intermediate speed between strafe & sprint
+    void fastCurveTo(Vec2D endPoint, double angle);
 
     // exploit on the direction with maximal velocity vector (robot speed is not evenly distributed cross various direction of translational movement)
+    void sprintFrontTo(Vec2D endPoint); // usually used for ball getting when front direction is prioritized
+    void sprintFrontTo(Vec2D endPoint, double angle);
     void sprintTo(Vec2D endPoint);
     void sprintTo(Vec2D endPoint, double angle);
 

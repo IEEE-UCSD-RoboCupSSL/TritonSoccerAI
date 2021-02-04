@@ -20,7 +20,7 @@ public class AdvancedMotionTest extends RobotSkillsTest {
         try {
             boolean toQuit = false;
             while (!toQuit) {
-                System.out.println(">>> Please Enter Method To Test: [strafe, curve, sprint, sprint-front] or quit");
+                System.out.println(">>> Please Enter Method To Test: [strafe, curve, fast-curve, sprint, sprint-front] or quit");
                 String mode = scanner.nextLine();
                 System.out.println(">> Please Enter Target Position and Direction(optional): [x, y]  [degree](optional)");
                 String inputTarget = scanner.nextLine();
@@ -61,6 +61,33 @@ public class AdvancedMotionTest extends RobotSkillsTest {
                             }
                         }
                     }
+                    case "curve" -> {
+                        if (targetDir == null) {
+                            while (!bot.isPosArrived(targetPos)) {
+                                bot.curveTo(targetPos);
+                                Thread.sleep(1);
+                            }
+                        } else {
+                            while (!bot.isPosArrived(targetPos) && !bot.isDirAimed(targetDir)) {
+                                bot.curveTo(targetPos, targetDir);
+                                Thread.sleep(1);
+                            }
+                        }
+                    }
+                    case "fast-curve" -> {
+                        if (targetDir == null) {
+                            while (!bot.isPosArrived(targetPos)) {
+                                bot.fastCurveTo(targetPos);
+                                Thread.sleep(1);
+                            }
+                        } else {
+                            while (!bot.isPosArrived(targetPos) && !bot.isDirAimed(targetDir)) {
+                                bot.fastCurveTo(targetPos, targetDir);
+                                Thread.sleep(1);
+                            }
+                        }
+                    }
+
                     case "sprint" -> {
                         if (targetDir == null) {
                             while (!bot.isPosArrived(targetPos)) {

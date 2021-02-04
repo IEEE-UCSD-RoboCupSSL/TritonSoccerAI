@@ -21,8 +21,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
 import static Triton.Config.ObjectConfig.*;
-import static Triton.CoreModules.Robot.AllyState.*;
-import static Triton.CoreModules.Robot.MoveMode.*;
+import static Triton.CoreModules.Robot.MotionState.*;
+import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
 
@@ -38,8 +38,8 @@ public class Ally extends Robot implements AllySkills {
     private final Publisher<RemoteAPI.Commands> commandsPub;
 
     /*** internal pub sub ***/
-    private final Publisher<AllyState> statePub;
-    private final Subscriber<AllyState> stateSub;
+    private final Publisher<MotionState> statePub;
+    private final Subscriber<MotionState> stateSub;
     private final Publisher<Vec2D> pointPub, kickVelPub, holdBallPosPub;
     private final Subscriber<Vec2D> pointSub, kickVelSub, holdBallPosSub;
     private final Publisher<Double> angPub;
@@ -219,8 +219,7 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void strafeTo(Vec2D endPoint, double angle) {
         double targetAngle = normAng(angle);
-        double currAngle = getDir();
-        double angDiff = calcAngDiff(targetAngle, currAngle);
+        double angDiff = calcAngDiff(targetAngle, getDir());
         double absAngleDiff = Math.abs(angDiff);
 
         /*To-do: replace with rotateTo with hold ball rotate*/
@@ -255,7 +254,59 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public void curveTo(Vec2D endPoint, double angle) {
+        double targetAngle = normAng(angle);
+        double angDiff = calcAngDiff(targetAngle, getDir());
+        double absAngleDiff = Math.abs(angDiff);
 
+        // To-do add hold ball condition
+        spinTo(targetAngle);
+
+        ArrayList<Vec2D> path = findPath(endPoint);
+        if (path != null && path.size() > 0) {
+            Vec2D nextNode;
+            if (path.size() == 1) nextNode = path.get(0);
+            else if (path.size() == 2) nextNode = path.get(1);
+            else nextNode = path.get(1);
+
+            if (path.size() <= 2) moveTo(nextNode);
+            else moveToNoSlowDown(nextNode);
+        } else {
+            moveAt(new Vec2D(0,0));
+        }
+    }
+
+    @Override
+    public void fastCurveTo(Vec2D endPoint) {
+        fastCurveTo(endPoint, getDir());
+    }
+
+    @Override
+    public void fastCurveTo(Vec2D endPoint, double endAngle) {
+        // included rear-prioritizing case
+        ArrayList<Vec2D> path = findPath(endPoint);
+        if (path != null && path.size() > 0) {
+            double fastestAngle = endPoint.sub(getPos()).toPlayerAngle();
+            Vec2D nextNode;
+            if (path.size() == 1) nextNode = path.get(0);
+            else if (path.size() == 2) nextNode = path.get(1);
+            else nextNode = path.get(1);
+
+            double angDiff = calcAngDiff(fastestAngle, getDir());
+            double absAngleDiff = Math.abs(angDiff);
+
+            if(endPoint.sub(getPos()).mag() < 300) { // To-do: name this magic number
+                spinTo(endAngle);
+            }
+            else {
+                if (absAngleDiff <= 90) spinTo(fastestAngle);
+                else spinTo(normAng(fastestAngle + 180));
+            }
+            if (path.size() <= 2) moveTo(nextNode);
+            else moveToNoSlowDown(nextNode);
+        } else {
+            moveAt(new Vec2D(0,0));
+            spinAt(0);
+        }
     }
 
     @Override
@@ -264,7 +315,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void sprintFrontTo(Vec2D endPoint, double angle) {
+    public void sprintFrontTo(Vec2D endPoint, double endAngle) {
         ArrayList<Vec2D> path = findPath(endPoint);
         if (path != null && path.size() > 0) {
             double fastestAngle = 0;
@@ -283,15 +334,15 @@ public class Ally extends Robot implements AllySkills {
             else if (path.size() == 2) nextNode = path.get(1);
             else nextNode = path.get(1);
 
-            if (!fastestAngleFound) fastestAngle = angle;
+            if (!fastestAngleFound) fastestAngle = endAngle;
 
             double angDiff = calcAngDiff(fastestAngle, getDir());
             double absAngleDiff = Math.abs(angDiff);
 
-            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+            if(absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
                 spinTo(fastestAngle);
             } else {
-                spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
+                spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 60);
             }
 
             if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
@@ -309,22 +360,57 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public void sprintTo(Vec2D endPoint) {
-        /* To-do */
-
-        // include  -180 degree
-
-        // ad-hoc
-        sprintFrontTo(endPoint);
+        sprintTo(endPoint, getDir());
     }
 
     @Override
-    public void sprintTo(Vec2D endPoint, double angle) {
-        /* To-do */
+    public void sprintTo(Vec2D endPoint, double endAngle) {
+        // included rear-prioritizing case
+        ArrayList<Vec2D> path = findPath(endPoint);
+        if (path != null && path.size() > 0) {
+            double fastestAngle = 0;
+            boolean fastestAngleFound = false;
+            for (Vec2D node : path) {
+                double dist = node.sub(getPos()).mag();
+                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
+                    fastestAngle = node.sub(getPos()).toPlayerAngle();
+                    fastestAngleFound = true;
+                    break;
+                }
+            }
 
-        // include  -180 degree
+            Vec2D nextNode;
+            if (path.size() == 1) nextNode = path.get(0);
+            else if (path.size() == 2) nextNode = path.get(1);
+            else nextNode = path.get(1);
 
-        // ad-hoc
-        sprintFrontTo(endPoint, angle);
+            if (!fastestAngleFound) fastestAngle = endAngle;
+
+            double angDiff = calcAngDiff(fastestAngle, getDir());
+            double absAngleDiff = Math.abs(angDiff);
+
+            if(absAngleDiff <= 90) {
+                spinTo(fastestAngle);
+                if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+                    if (path.size() <= 2) moveTo(nextNode);
+                    else moveToNoSlowDown(nextNode);
+                } else {
+                    moveAt(new Vec2D(0, 0));
+                }
+            }
+            else {
+                spinTo(normAng(fastestAngle + 180));
+                if (absAngleDiff >= 180 - PathfinderConfig.MOVE_ANGLE_THRESH) {
+                    if (path.size() <= 2) moveTo(nextNode);
+                    else moveToNoSlowDown(nextNode);
+                } else {
+                    moveAt(new Vec2D(0, 0));
+                }
+            }
+        } else {
+            moveAt(new Vec2D(0,0));
+            spinAt(0);
+        }
     }
 
 
@@ -338,7 +424,8 @@ public class Ally extends Robot implements AllySkills {
         if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             statePub.publish(AUTO_CAPTURE);
         } else {
-            sprintTo(ballLoc, currPosToBall.toPlayerAngle());
+            /* To-do: once intercept is ready, use it with sprintTo for 180 degree situation */
+            sprintFrontTo(ballLoc, currPosToBall.toPlayerAngle());
         }
     }
 
@@ -434,7 +521,7 @@ public class Ally extends Robot implements AllySkills {
 
             while (true) { // delay added
                 RemoteAPI.Commands command;
-                AllyState state = stateSub.getMsg();
+                MotionState state = stateSub.getMsg();
 
                 switch (state) {
                     case MOVE_TDRD -> command = createTDRDCmd();
@@ -556,7 +643,7 @@ public class Ally extends Robot implements AllySkills {
 
     /*** TL;DR ***/
 
-    private RemoteAPI.Commands createPrimitiveCmdBuilder(MoveMode mode) {
+    private RemoteAPI.Commands createPrimitiveCmdBuilder(MotionMode mode) {
         RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);

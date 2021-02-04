@@ -147,9 +147,9 @@ public class Swarm extends Skills {
                     /* command nearest bot to the corresponding location */
                 if (ang != null) {
                     /* To-do: upgrade to using curveTo */
-                    nearestBot.strafeTo(loc, ang);
+                    nearestBot.fastCurveTo(loc, ang);
                 } else {
-                    nearestBot.strafeTo(loc);
+                    nearestBot.fastCurveTo(loc);
                     // System.out.println(nearestBot.getID() + " " + loc);
                 }
                 //}
