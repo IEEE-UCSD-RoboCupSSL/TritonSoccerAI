@@ -57,6 +57,8 @@ public class TestRunner implements Module {
                         case "pass" -> rtn = new PassTest(scanner, fielders.get(3), ball).test();
                         case "cpass" -> rtn = new CPassTest(scanner, fielders,  keeper, foes, ball).test();
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
+                        case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
+                        case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
                         case "reset" -> {
                             while (!Formation.getInstance().testerFormation(fielders)) {
                                 Thread.sleep(1);

@@ -221,7 +221,6 @@ public class Display extends JPanel {
         BallData ballData = ballSub.getMsg();
         Vec2D pos = ballData.getPos();
         Vec2D vel = ballData.getVel();
-        Vec2D accel = ballData.getAccel();
 
         double time = 1;
         Vec2D predPos = pos.add(vel.mult(time));

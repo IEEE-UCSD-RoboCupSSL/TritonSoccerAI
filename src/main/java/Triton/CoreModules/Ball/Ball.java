@@ -25,16 +25,6 @@ public class Ball implements Module {
         return getData().getPos();
     }
 
-    public Vec2D predPosAtTime(double time) {
-        BallData ballData = getData();
-        Vec2D pos = ballData.getPos();
-        Vec2D vel = ballData.getVel();
-        Vec2D accel = ballData.getAccel();
-
-        return pos.add(vel.mult(time));
-//        return pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
-    }
-
     public int timeToPoint() {
         return 0;
     }

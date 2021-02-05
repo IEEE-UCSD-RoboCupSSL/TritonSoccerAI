@@ -56,11 +56,11 @@ public class CPassTest extends RobotSkillsTest {
             while (!passer.isHoldingBall()) {
                 while (!passer.isHoldingBall()) {
                     passer.getBall(ball);
-                    receiver.sprintTo(initReceiverPos);
+                    receiver.fastCurveTo(initReceiverPos);
                 }
                 while (!passer.isPosArrived(initPasserPos) || !receiver.isPosArrived(initReceiverPos)) {
-                    passer.sprintTo(initPasserPos);
-                    receiver.sprintTo(initReceiverPos);
+                    passer.fastCurveTo(initPasserPos);
+                    receiver.fastCurveTo(initReceiverPos);
                 }
             }
 

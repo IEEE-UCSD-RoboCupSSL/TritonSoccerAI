@@ -27,7 +27,7 @@ public class PassTest extends RobotSkillsTest {
             }
 
             while (!ally.isPosArrived(new Vec2D(0, 0)) || !ally.isDirAimed(0)) {
-                ally.sprintTo(new Vec2D(0, 0), 0);
+                ally.fastCurveTo(new Vec2D(0, 0), 0);
             }
 
             while (ally.isHoldingBall()) {

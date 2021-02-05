@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
 import static Triton.Config.ObjectConfig.*;
+import static Triton.Config.PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH;
 import static Triton.CoreModules.Robot.MotionState.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
@@ -258,7 +259,6 @@ public class Ally extends Robot implements AllySkills {
         double angDiff = calcAngDiff(targetAngle, getDir());
         double absAngleDiff = Math.abs(angDiff);
 
-        // To-do add hold ball condition
         spinTo(targetAngle);
 
         ArrayList<Vec2D> path = findPath(endPoint);
@@ -294,7 +294,7 @@ public class Ally extends Robot implements AllySkills {
             double angDiff = calcAngDiff(fastestAngle, getDir());
             double absAngleDiff = Math.abs(angDiff);
 
-            if(endPoint.sub(getPos()).mag() < 300) { // To-do: name this magic number
+            if(endPoint.sub(getPos()).mag() < SPRINT_TO_ROTATE_DIST_THRESH) {
                 spinTo(endAngle);
             }
             else {
@@ -322,7 +322,7 @@ public class Ally extends Robot implements AllySkills {
             boolean fastestAngleFound = false;
             for (Vec2D node : path) {
                 double dist = node.sub(getPos()).mag();
-                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
+                if (dist >= SPRINT_TO_ROTATE_DIST_THRESH) {
                     fastestAngle = node.sub(getPos()).toPlayerAngle();
                     fastestAngleFound = true;
                     break;
@@ -372,7 +372,7 @@ public class Ally extends Robot implements AllySkills {
             boolean fastestAngleFound = false;
             for (Vec2D node : path) {
                 double dist = node.sub(getPos()).mag();
-                if (dist >= PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH) {
+                if (dist >= SPRINT_TO_ROTATE_DIST_THRESH) {
                     fastestAngle = node.sub(getPos()).toPlayerAngle();
                     fastestAngleFound = true;
                     break;
@@ -399,7 +399,9 @@ public class Ally extends Robot implements AllySkills {
                 }
             }
             else {
-                spinTo(normAng(fastestAngle + 180));
+                if (!fastestAngleFound) spinTo(normAng(fastestAngle));
+                else spinTo(normAng(fastestAngle + 180));
+
                 if (absAngleDiff >= 180 - PathfinderConfig.MOVE_ANGLE_THRESH) {
                     if (path.size() <= 2) moveTo(nextNode);
                     else moveToNoSlowDown(nextNode);
@@ -412,8 +414,6 @@ public class Ally extends Robot implements AllySkills {
             spinAt(0);
         }
     }
-
-
 
     /*** Soccer Skills methods ***/
     @Override
@@ -430,6 +430,22 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
+    public void dribRotate(Ball ball, double angle) {
+        dribRotate(ball, angle, 0);
+    }
+
+    @Override
+    public void dribRotate(Ball ball, double angle, double offsetDist) {
+        Vec2D allyToBall = ball.getPos().sub(getPos());
+        double allyToBallDist = allyToBall.mag();
+
+        Vec2D angleUnitVec = new Vec2D(Math.cos(Math.toRadians(angle + 90)), Math.sin(Math.toRadians(angle + 90)));
+        Vec2D angleOffsetVec = angleUnitVec.mult(allyToBallDist + offsetDist);
+        Vec2D targetPos = ball.getPos().sub(angleOffsetVec);
+        curveTo(targetPos, angle);
+    }
+
+    @Override
     public void passBall(Vec2D receivePos, double ETA) {
         Vec2D allyToReceivePos = receivePos.sub(getPos());
         double distToTarget = allyToReceivePos.mag();
@@ -438,26 +454,55 @@ public class Ally extends Robot implements AllySkills {
         kick(new Vec2D(targetBallVel, 2));
     }
 
-
     @Override
-    public void receive(Ball ball, Vec2D receivePos) {
-        /* To-do */
-
-
+    public void receive(Ball ball, Vec2D anchorPos) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
-
-
-
-        Vec2D receiveToBall = receivePos.sub(ballPos);
-
 
         double dist = ballPos.sub(currPos).mag();
         if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
         } else {
-            double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-            sprintTo(receivePos, targetAngle);
+            Vec2D ballVel = ball.getData().getVel();
+            if (Math.abs(ballVel.x) <= 0.0001) {
+                Vec2D targetPos = new Vec2D(ballPos.x, anchorPos.y);
+                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
+                curveTo(targetPos, targetAngle);
+            } else if (Math.abs(ballVel.y) <= 0.0001) {
+                Vec2D targetPos = new Vec2D(anchorPos.x, ballPos.y);
+                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
+                curveTo(targetPos, targetAngle);
+            } else {
+                // lines in y = mx + b
+                // line of ball
+                double m1 = ballVel.y / ballVel.x;
+                double b1 = 0;
+                if (m1 != 0 && ballPos.x != 0)
+                    b1 = ballPos.y / (m1 * ballPos.x);
+
+                // line of anchorPos
+                double m2 = -1 / m1;
+                double b2 = 0;
+                if (m2 != 0 && anchorPos.x != 0)
+                    b2 = anchorPos.y / (m2 * anchorPos.x);
+
+                // point of intersection
+                double targetX = (b2 - b1) / (m1 - m2);
+                double targetY = m1 * targetX + b1;
+                Vec2D targetPos = new Vec2D(targetX, targetY);
+
+                // angle facing ball
+                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
+
+//                System.out.println("ballVel: " + ballVel);
+//                System.out.println("m1: " + m1);
+//                System.out.println("b1: " + b1);
+//                System.out.println("m2: " + m2);
+//                System.out.println("b2: " + b2);
+//                System.out.println("targetPos: " + targetPos);
+//                System.out.println("targetAngle: " + targetAngle);
+                curveTo(targetPos, targetAngle);
+            }
         }
     }
 

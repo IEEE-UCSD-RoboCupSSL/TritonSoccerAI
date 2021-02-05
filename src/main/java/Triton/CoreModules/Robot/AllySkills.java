@@ -63,9 +63,12 @@ public interface AllySkills {
     /*** Soccer Skills methods ***/
     void getBall(Ball ball);
 
+    void dribRotate(Ball ball, double angle);
+    void dribRotate(Ball ball, double angle, double offsetDist);
+
     void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
 
-    // To-do later: public void chipBall(/* parabola */) ...
+    //To-do void chipBall();
 
     void receive(Ball ball, Vec2D receiveLoc);
 

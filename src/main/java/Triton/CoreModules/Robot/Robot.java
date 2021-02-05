@@ -17,23 +17,16 @@ public abstract class Robot implements Module {
         dataSub = new FieldSubscriber<>("detection", team.name() + ID);
     }
 
-    public Vec2D predPosAtTime(double time) {
-        RobotData robotData = getData();
-        Vec2D pos = robotData.getPos();
-        Vec2D vel = robotData.getVel();
-        Vec2D accel = robotData.getAccel();
-
-        return pos.add(vel.mult(time));
-//        return pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
-    }
-
     protected RobotData getData() {
         return dataSub.getMsg();
     }
 
-
     public Vec2D getPos() {
         return getData().getPos();
+    }
+
+    public Vec2D getVel() {
+        return getData().getVel();
     }
 
     public double getDir() {

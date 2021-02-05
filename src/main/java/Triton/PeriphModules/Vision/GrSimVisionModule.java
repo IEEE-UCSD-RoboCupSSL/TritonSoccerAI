@@ -62,7 +62,6 @@ public class GrSimVisionModule extends VisionModule {
         try {
             while (true) { // delay added
                 update();
-
                 Thread.sleep(1);
             }
         } catch (Exception e) {

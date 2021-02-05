@@ -6,30 +6,27 @@ import Triton.Misc.Coordinates.PerspectiveConverter;
 import Triton.Misc.Coordinates.Vec2D;
 import org.javatuples.Pair;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Class to store information about the ball
  */
 public class BallData {
-    private final ArrayList<Pair<Vec2D, Double>> posArray, velArray;
-    private Vec2D pos, vel, accel;
+    private final LinkedList<Pair<Vec2D, Double>> posList;
+    private Vec2D pos, vel;
     private double time;
 
     public BallData() {
-        posArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
-        posArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
-        velArray = new ArrayList<Pair<Vec2D, Double>>(ObjectConfig.MAX_QUEUE_CAPACITY);
-        velArray.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
+        posList = new LinkedList<Pair<Vec2D, Double>>();
+        posList.add(new Pair<Vec2D, Double>(new Vec2D(0, 0), 0.0));
 
         pos = new Vec2D(0, 0);
         vel = new Vec2D(0, 0);
-        accel = new Vec2D(0, 0);
         time = 0.0;
     }
 
     /**
-     * Updates ArrayList of SortedDetections and calculates the current velocity of the ball
+     * Updates LinkedList of SortedDetections and calculates the current velocity of the ball
      *
      * @param detection SSL_Detection of the ball
      * @param time      time of detection
@@ -41,49 +38,28 @@ public class BallData {
 
         updatePos(posTimePair);
         updateVel();
-        updateAccel();
     }
 
     private void updatePos(Pair<Vec2D, Double> posTimePair) {
-        posArray.add(posTimePair);
-        posArray.sort(new TimePairComparator<Vec2D>());
-        if (posArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
-            posArray.remove(0);
+        posList.add(posTimePair);
+        posList.sort(new TimePairComparator<Vec2D>());
+        if (posList.size() >= ObjectConfig.MAX_POS_LIST_CAPACITY)
+            posList.removeFirst();
 
-        pos = posArray.get(posArray.size() - 1).getValue0();
-        time = posArray.get(posArray.size() - 1).getValue1();
+        pos = posList.getLast().getValue0();
+        time = posList.getLast().getValue1();
     }
 
     private void updateVel() {
-        Pair<Vec2D, Double> newestPosTimePair = posArray.get(posArray.size() - 1);
+        Pair<Vec2D, Double> newestPosTimePair = posList.getLast();
         Vec2D newestPos = newestPosTimePair.getValue0();
         double newestPosTime = newestPosTimePair.getValue1();
 
-        Pair<Vec2D, Double> oldestPosTimePair = posArray.get(0);
+        Pair<Vec2D, Double> oldestPosTimePair = posList.getFirst();
         Vec2D oldestPos = oldestPosTimePair.getValue0();
         double oldestPosTime = oldestPosTimePair.getValue1();
 
-        Vec2D newestVel = newestPos.sub(oldestPos).mult(1 / (newestPosTime - oldestPosTime));
-        Pair<Vec2D, Double> newestVelTimePair = new Pair<Vec2D, Double>(newestVel, newestPosTime);
-        velArray.add(newestVelTimePair);
-        velArray.sort(new TimePairComparator<Vec2D>());
-
-        if (velArray.size() >= ObjectConfig.MAX_QUEUE_CAPACITY)
-            velArray.remove(0);
-
-        vel = velArray.get(velArray.size() - 1).getValue0();
-    }
-
-    private void updateAccel() {
-        Pair<Vec2D, Double> newestVelTimePair = velArray.get(velArray.size() - 1);
-        Vec2D newestVel = newestVelTimePair.getValue0();
-        double newestVelTime = newestVelTimePair.getValue1();
-
-        Pair<Vec2D, Double> oldestVelTimePair = velArray.get(0);
-        Vec2D oldestVel = oldestVelTimePair.getValue0();
-        double oldestVelTime = oldestVelTimePair.getValue1();
-
-        accel = newestVel.sub(oldestVel).mult(1 / (newestVelTime - oldestVelTime));
+        vel = newestPos.sub(oldestPos).mult(1 / (newestPosTime - oldestPosTime));
     }
 
     public double getTime() {
@@ -96,9 +72,5 @@ public class BallData {
 
     public Vec2D getVel() {
         return vel;
-    }
-
-    public Vec2D getAccel() {
-        return accel;
     }
 }
