@@ -1,7 +1,8 @@
-package Triton.Misc.Coordinates;
+package Triton.Misc.Math.Coordinates;
 
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 public class PerspectiveConverter {
     public static Vec2D audienceToPlayer(Vec2D audienceVector) {

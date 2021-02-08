@@ -1,4 +1,6 @@
-package Triton.Misc.Coordinates;
+package Triton.Misc.Math.Coordinates;
+
+import Triton.Misc.Math.Matrix.Vec2D;
 
 /**
  * Class to convert world coordinates to a grid

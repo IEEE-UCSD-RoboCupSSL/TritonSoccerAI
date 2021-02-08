@@ -1,7 +1,7 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Robot.Ally;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 

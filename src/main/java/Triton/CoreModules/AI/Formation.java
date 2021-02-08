@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI;
 
 import Triton.CoreModules.Robot.Ally;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 import java.util.Arrays;

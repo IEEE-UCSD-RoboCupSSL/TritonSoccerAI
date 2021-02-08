@@ -8,8 +8,8 @@ import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
-import Triton.Misc.Coordinates.Vec2D;
-import Triton.Misc.Geometry.Circle2D;
+import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
@@ -24,8 +24,8 @@ import static Triton.Config.ObjectConfig.*;
 import static Triton.Config.PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH;
 import static Triton.CoreModules.Robot.MotionState.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
-import static Triton.Misc.Coordinates.PerspectiveConverter.calcAngDiff;
-import static Triton.Misc.Coordinates.PerspectiveConverter.normAng;
+import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
+import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 /* TL;DR, Instead, read RobotSkills Interface for a cleaner view !!!!!!! */
 public class Ally extends Robot implements AllySkills {
@@ -167,7 +167,7 @@ public class Ally extends Robot implements AllySkills {
     public void kick(Vec2D kickVel) {
         double mag = kickVel.mag();
         if (mag >= MAX_KICK_VEL) {
-            kickVel = kickVel.norm().mult(MAX_KICK_VEL);
+            kickVel = kickVel.norm().scale(MAX_KICK_VEL);
         }
 
         kickVelPub.publish(kickVel);
@@ -440,7 +440,7 @@ public class Ally extends Robot implements AllySkills {
         double allyToBallDist = allyToBall.mag();
 
         Vec2D angleUnitVec = new Vec2D(Math.cos(Math.toRadians(angle + 90)), Math.sin(Math.toRadians(angle + 90)));
-        Vec2D angleOffsetVec = angleUnitVec.mult(allyToBallDist + offsetDist);
+        Vec2D angleOffsetVec = angleUnitVec.scale(allyToBallDist + offsetDist);
         Vec2D targetPos = ball.getPos().sub(angleOffsetVec);
         curveTo(targetPos, angle);
     }
@@ -458,51 +458,17 @@ public class Ally extends Robot implements AllySkills {
     public void receive(Ball ball, Vec2D anchorPos) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
+        Vec2D ballVelDir = ball.getVel().norm();
+        Vec2D ballToAnchor = anchorPos.sub(ballPos);
+        Vec2D receivePoint = ballPos.add(ballVelDir.scale(ballToAnchor.dot(ballVelDir)));
+        // Vec2 receiveHoriVec = (Vec2) Mat2.rotation(90).mult(ballVelDir);
 
-        double dist = ballPos.sub(currPos).mag();
-        if (dist <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
+        if(currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
-        } else {
-            Vec2D ballVel = ball.getData().getVel();
-            if (Math.abs(ballVel.x) <= 0.0001) {
-                Vec2D targetPos = new Vec2D(ballPos.x, anchorPos.y);
-                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-                curveTo(targetPos, targetAngle);
-            } else if (Math.abs(ballVel.y) <= 0.0001) {
-                Vec2D targetPos = new Vec2D(anchorPos.x, ballPos.y);
-                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-                curveTo(targetPos, targetAngle);
-            } else {
-                // lines in y = mx + b
-                // line of ball
-                double m1 = ballVel.y / ballVel.x;
-                double b1 = 0;
-                if (m1 != 0 && ballPos.x != 0)
-                    b1 = ballPos.y / (m1 * ballPos.x);
-
-                // line of anchorPos
-                double m2 = -1 / m1;
-                double b2 = 0;
-                if (m2 != 0 && anchorPos.x != 0)
-                    b2 = anchorPos.y / (m2 * anchorPos.x);
-
-                // point of intersection
-                double targetX = (b2 - b1) / (m1 - m2);
-                double targetY = m1 * targetX + b1;
-                Vec2D targetPos = new Vec2D(targetX, targetY);
-
-                // angle facing ball
-                double targetAngle = ballPos.sub(currPos).toPlayerAngle();
-
-//                System.out.println("ballVel: " + ballVel);
-//                System.out.println("m1: " + m1);
-//                System.out.println("b1: " + b1);
-//                System.out.println("m2: " + m2);
-//                System.out.println("b2: " + b2);
-//                System.out.println("targetPos: " + targetPos);
-//                System.out.println("targetAngle: " + targetAngle);
-                curveTo(targetPos, targetAngle);
-            }
+        }
+        else {
+            // To-do: if(ball.getVel().mag() < )
+            strafeTo(receivePoint, normAng(ballVelDir.toPlayerAngle() + 180));
         }
     }
 

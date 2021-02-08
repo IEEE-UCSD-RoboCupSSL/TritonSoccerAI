@@ -1,6 +1,6 @@
-package Triton.Misc.Geometry;
+package Triton.Misc.Math.Geometry;
 
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 /**
  * Abstract point to represent various 2D shapes

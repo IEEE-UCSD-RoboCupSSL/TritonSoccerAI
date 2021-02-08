@@ -1,22 +1,14 @@
 package Triton.CoreModules.AI.AI_Skills;
 
-import Triton.App;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Coordinates.Vec2D;
-import Triton.Misc.Geometry.Line2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Publisher;
-import Triton.Misc.ModulePubSubSystem.Subscriber;
+import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.Geometry.Line2D;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.TimeoutException;
 
 public class Swarm extends Skills {
 

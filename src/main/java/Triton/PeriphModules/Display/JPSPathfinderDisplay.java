@@ -4,7 +4,7 @@ import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.Node;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.awt.*;
 import java.util.ArrayList;

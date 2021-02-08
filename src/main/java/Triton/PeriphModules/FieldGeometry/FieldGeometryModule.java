@@ -3,9 +3,9 @@ package Triton.PeriphModules.FieldGeometry;
 import Proto.MessagesRobocupSslGeometry;
 import Proto.MessagesRobocupSslGeometry.SSL_FieldLineSegment;
 import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
-import Triton.Misc.Coordinates.Vec2D;
-import Triton.Misc.Geometry.Circle2D;
-import Triton.Misc.Geometry.Line2D;
+import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.Geometry.Circle2D;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
 

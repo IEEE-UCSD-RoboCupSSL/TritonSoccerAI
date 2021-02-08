@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 public interface AllySkills {
     /*** primitive control methods ***/

@@ -8,6 +8,8 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.AI_SkillsTests.CPassTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.RobotSkillsTests.*;
+import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.util.Scanner;
@@ -59,6 +61,10 @@ public class TestRunner implements Module {
                         case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
                         case "reset" -> rtn = new FormationTest("tester", fielders).test();
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
+                        case "math" -> {
+                            miscMathTests();
+                            rtn = true;
+                        }
                         case "quit" -> {
                             quit = true;
                             rtn = true;
@@ -78,4 +84,16 @@ public class TestRunner implements Module {
             e.printStackTrace();
         }
     }
+
+
+    private void miscMathTests() {
+        System.out.println(Mat2D.rotation(90).mult(new Vec2D(1, 0)));
+        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, 1)));
+        System.out.println(Mat2D.rotation(90).mult(new Vec2D(-1, 0)));
+        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, -1)));
+
+        System.out.println(Mat2D.rotation(90).mult(new Vec2D(10, 10)));
+    }
+
+
 }
