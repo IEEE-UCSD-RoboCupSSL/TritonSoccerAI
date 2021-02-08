@@ -184,12 +184,12 @@ public class Vec2D {
     /* dot product */
     public double dot(Vec2D vec) {
         SimpleMatrix a = new SimpleMatrix(new double[][]{
-                new double[] {this.x},
-                new double[] {this.y}
+                new double[]{this.x},
+                new double[]{this.y}
         });
         SimpleMatrix b = new SimpleMatrix(new double[][]{
-                new double[] {vec.x},
-                new double[] {vec.y}
+                new double[]{vec.x},
+                new double[]{vec.y}
         });
 
         return a.dot(b);
@@ -198,8 +198,8 @@ public class Vec2D {
 
     public SimpleMatrix toEJML() {
         return new SimpleMatrix(new double[][]{
-                new double[] {x},
-                new double[] {y}
+                new double[]{x},
+                new double[]{y}
         });
     }
 

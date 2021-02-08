@@ -5,9 +5,9 @@ import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
@@ -224,7 +224,6 @@ public class Display extends JPanel {
 
         double time = 1;
         Vec2D predPos = pos.add(vel.scale(time));
-//        Vec2D predPos = pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
 
         int[] screenPos = convert.fromPos(pos);
         int[] screenPredPos = convert.fromPos(predPos);

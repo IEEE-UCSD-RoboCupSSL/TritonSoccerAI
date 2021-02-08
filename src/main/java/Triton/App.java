@@ -7,12 +7,15 @@ import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
+import static Triton.PeriphModules.Display.PaintOption.*;
 
 
 /**
@@ -60,22 +64,22 @@ public class App {
             }
 
             if (args.length >= 3) { // robot ip addr
-                ROBOT_0_IP = new Pair<>(args[2], defaultPortBase);
-                ROBOT_1_IP = new Pair<>(args[2], defaultPortBase + defaultPortOffset);
-                ROBOT_2_IP = new Pair<>(args[2], defaultPortBase + 2 * defaultPortOffset);
-                ROBOT_3_IP = new Pair<>(args[2], defaultPortBase + 3 * defaultPortOffset);
-                ROBOT_4_IP = new Pair<>(args[2], defaultPortBase + 4 * defaultPortOffset);
-                ROBOT_5_IP = new Pair<>(args[2], defaultPortBase + 5 * defaultPortOffset);
+                ROBOT_0_IP = new Pair<>(args[2], DEFAULT_PORT_BASE);
+                ROBOT_1_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + DEFAULT_PORT_OFFSET);
+                ROBOT_2_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 2 * DEFAULT_PORT_OFFSET);
+                ROBOT_3_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 3 * DEFAULT_PORT_OFFSET);
+                ROBOT_4_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 4 * DEFAULT_PORT_OFFSET);
+                ROBOT_5_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 5 * DEFAULT_PORT_OFFSET);
 
             }
 
             if (args.length > 3) { // robot ip port base value
                 ROBOT_0_IP = new Pair<>(args[2], Integer.parseInt(args[3]));
-                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + defaultPortOffset);
-                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * defaultPortOffset);
-                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * defaultPortOffset);
-                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * defaultPortOffset);
-                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * defaultPortOffset);
+                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + DEFAULT_PORT_OFFSET);
+                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * DEFAULT_PORT_OFFSET);
+                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * DEFAULT_PORT_OFFSET);
+                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * DEFAULT_PORT_OFFSET);
+                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * DEFAULT_PORT_OFFSET);
 
             }
 
@@ -122,12 +126,13 @@ public class App {
         }
 
 
-//        Display display = new Display();
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
-//        paintOptions.add(INFO);
-//        display.setPaintOptions(paintOptions);
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        paintOptions.add(PREDICTION);
+        display.setPaintOptions(paintOptions);
 
         // sleepForever();
     }

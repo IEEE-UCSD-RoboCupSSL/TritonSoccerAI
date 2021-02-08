@@ -43,27 +43,33 @@ public interface AllySkills {
 
     // fixed at current / specified direction and translationally move to a position
     void strafeTo(Vec2D endPoint);
+
     void strafeTo(Vec2D endPoint, double angle);
 
     // Simutaneously rotate and translate to a position in a smooth curve
     void curveTo(Vec2D endPoint);
+
     void curveTo(Vec2D endPoint, double angle);
+
     void fastCurveTo(Vec2D endPoint); // sprint version of curveTo, produce intermediate speed between strafe & sprint
+
     void fastCurveTo(Vec2D endPoint, double angle);
 
     // exploit on the direction with maximal velocity vector (robot speed is not evenly distributed cross various direction of translational movement)
     void sprintFrontTo(Vec2D endPoint); // usually used for ball getting when front direction is prioritized
+
     void sprintFrontTo(Vec2D endPoint, double angle);
+
     void sprintTo(Vec2D endPoint);
+
     void sprintTo(Vec2D endPoint, double angle);
-
-
 
 
     /*** Soccer Skills methods ***/
     void getBall(Ball ball);
 
     void dribRotate(Ball ball, double angle);
+
     void dribRotate(Ball ball, double angle, double offsetDist);
 
     void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
@@ -72,7 +78,7 @@ public interface AllySkills {
 
     void receive(Ball ball, Vec2D receiveLoc);
 
-    void intercept(Ball ball);
+    void intercept(Ball ball, double faceDir);
 
 
     /* getters */

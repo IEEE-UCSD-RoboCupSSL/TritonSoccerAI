@@ -1,8 +1,8 @@
 package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
 
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Geometry.Circle2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.*;
 
