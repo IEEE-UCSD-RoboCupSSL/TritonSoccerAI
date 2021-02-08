@@ -1,6 +1,5 @@
 package Triton.ManualTests;
 
-import Triton.CoreModules.AI.Formation;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -59,6 +58,7 @@ public class TestRunner implements Module {
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
                         case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
                         case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
+                        case "collect" -> rtn = new DataCollector(scanner, fielders, keeper, ball).test();
                         case "reset" -> rtn = new FormationTest("tester", fielders).test();
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
                         case "math" -> {

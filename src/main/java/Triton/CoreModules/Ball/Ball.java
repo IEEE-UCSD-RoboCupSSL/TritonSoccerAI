@@ -29,6 +29,10 @@ public class Ball implements Module {
         return getData().getPos();
     }
 
+    public double getTime() {
+        return getData().getTime();
+    }
+
     public int timeToPoint() {
         return 0;
     }

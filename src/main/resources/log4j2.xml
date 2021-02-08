@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="TritonRCSC" packages="">
+    <Properties>
+        <Property name="csvLog.fileName">application</Property>
+    </Properties>
+
+    <Appenders>
+        <File name="csvAppender" fileName="src/main/resources/${csvLog.fileName}.tmp">
+            <CsvParameterLayout delimiter="," header=""/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="csvAppender" />
+        </Root>
+    </Loggers>
+</Configuration>

@@ -3,4 +3,5 @@ Server
 *.idea
 target
 TritonSoccerAI.iml
-
+*.tmp
+*.csv
