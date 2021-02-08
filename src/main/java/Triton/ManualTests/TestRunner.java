@@ -36,9 +36,7 @@ public class TestRunner implements Module {
     public void run() {
         try {
             Thread.sleep(1000);
-            while (!Formation.getInstance().testerFormation(fielders)) {
-                Thread.sleep(1);
-            }
+            new FormationTest("tester", fielders).test();
 
             String prevTestName = "";
             boolean quit = false;
@@ -59,12 +57,8 @@ public class TestRunner implements Module {
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
                         case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
                         case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
-                        case "reset" -> {
-                            while (!Formation.getInstance().testerFormation(fielders)) {
-                                Thread.sleep(1);
-                            }
-                            rtn = true;
-                        }
+                        case "reset" -> rtn = new FormationTest("tester", fielders).test();
+                        case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
                         case "quit" -> {
                             quit = true;
                             rtn = true;
