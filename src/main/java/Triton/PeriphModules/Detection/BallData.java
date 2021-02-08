@@ -2,8 +2,8 @@ package Triton.PeriphModules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.Config.ObjectConfig;
-import Triton.Misc.Coordinates.PerspectiveConverter;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
 import java.util.LinkedList;
@@ -59,7 +59,7 @@ public class BallData {
         Vec2D oldestPos = oldestPosTimePair.getValue0();
         double oldestPosTime = oldestPosTimePair.getValue1();
 
-        vel = newestPos.sub(oldestPos).mult(1 / (newestPosTime - oldestPosTime));
+        vel = newestPos.sub(oldestPos).scale(1 / (newestPosTime - oldestPosTime));
     }
 
     public double getTime() {

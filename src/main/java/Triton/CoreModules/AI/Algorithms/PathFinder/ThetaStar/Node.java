@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
 
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 public class Node {
     private final Vec2D worldPos;

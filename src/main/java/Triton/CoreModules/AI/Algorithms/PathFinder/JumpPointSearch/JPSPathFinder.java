@@ -2,10 +2,10 @@ package Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch;
 
 import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
-import Triton.Misc.Coordinates.Gridify;
-import Triton.Misc.Coordinates.Vec2D;
-import Triton.Misc.Geometry.Circle2D;
-import Triton.Misc.Geometry.Line2D;
+import Triton.Misc.Math.Coordinates.Gridify;
+import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.Geometry.Circle2D;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.PeriphModules.Display.JPSPathfinderDisplay;
 
 import java.util.ArrayList;
@@ -233,7 +233,7 @@ public class JPSPathFinder extends PathFinder {
         double totalDist = line.length();
         int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
         Vec2D dir = line.getDir();
-        Vec2D moveAdd = dir.mult(PathfinderConfig.NODE_RADIUS);
+        Vec2D moveAdd = dir.scale(PathfinderConfig.NODE_RADIUS);
 
         Vec2D currentPos = new Vec2D(pointA);
         for (int i = 0; i < moveCount; i++) {

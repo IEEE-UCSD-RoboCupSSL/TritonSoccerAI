@@ -1,6 +1,8 @@
-package Triton.Misc.Coordinates;
+package Triton.Misc.Math.Matrix;
 
 import Proto.RemoteAPI;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * Represents a 2D vector
@@ -36,6 +38,13 @@ public class Vec2D {
         this.x = x;
         this.y = y;
     }
+
+
+    public Vec2D(SimpleMatrix mat) {
+        this.x = mat.get(0, 0);
+        this.y = mat.get(1, 0);
+    }
+
 
     /**
      * Returns the distance between two vectors
@@ -104,7 +113,7 @@ public class Vec2D {
      * @param z value to multiply by
      * @return a new vector multiplied by the scalar
      */
-    public Vec2D mult(double z) {
+    public Vec2D scale(double z) {
         return new Vec2D(this.x * z, this.y * z);
     }
 
@@ -170,6 +179,28 @@ public class Vec2D {
         }
 
         return Math.toDegrees(Math.atan2(y, x));
+    }
+
+    /* dot product */
+    public double dot(Vec2D vec) {
+        SimpleMatrix a = new SimpleMatrix(new double[][]{
+                new double[] {this.x},
+                new double[] {this.y}
+        });
+        SimpleMatrix b = new SimpleMatrix(new double[][]{
+                new double[] {vec.x},
+                new double[] {vec.y}
+        });
+
+        return a.dot(b);
+    }
+
+
+    public SimpleMatrix toEJML() {
+        return new SimpleMatrix(new double[][]{
+                new double[] {x},
+                new double[] {y}
+        });
     }
 
     /**

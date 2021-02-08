@@ -1,6 +1,6 @@
 package Triton.CoreModules.Ball;
 
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.BallData;
@@ -17,8 +17,12 @@ public class Ball implements Module {
         return getData().getVel().norm();
     }
 
-    public BallData getData() {
+    protected BallData getData() {
         return dataSub.getMsg();
+    }
+
+    public Vec2D getVel() {
+        return getData().getVel();
     }
 
     public Vec2D getPos() {

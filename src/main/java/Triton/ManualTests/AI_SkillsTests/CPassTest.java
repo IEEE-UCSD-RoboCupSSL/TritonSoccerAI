@@ -9,7 +9,7 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 
@@ -49,7 +49,7 @@ public class CPassTest extends RobotSkillsTest {
             passEstimatorMock.setReceivingPos(receivingPos);
             passEstimatorMock.setOptimalReceiver(receiver);
             passEstimatorMock.setGoodTimeToPass(false);
-            passEstimatorMock.setBallArrivalETA(0.8);
+            passEstimatorMock.setBallArrivalETA(0.6);
 
             passer.kick(new Vec2D(0, 0));
 

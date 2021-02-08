@@ -3,7 +3,7 @@ package Triton.CoreModules.AI.GoalKeeping;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 
 public class GoalKeeping {
 
@@ -47,7 +47,7 @@ public class GoalKeeping {
 
         Vec2D targetPos = new Vec2D(targetX, b2);
 
-        double targetAngle = ballTraj.mult(-1).toPlayerAngle();
+        double targetAngle = ballTraj.scale(-1).toPlayerAngle();
         keeper.strafeTo(targetPos, targetAngle);
 //        }
     }

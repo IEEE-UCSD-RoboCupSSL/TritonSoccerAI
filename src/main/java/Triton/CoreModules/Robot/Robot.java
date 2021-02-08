@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot;
 
-import Triton.Misc.Coordinates.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.RobotData;

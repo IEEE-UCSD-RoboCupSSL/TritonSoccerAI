@@ -81,6 +81,7 @@
       <artifactId>grpc-stub</artifactId>
       <version>1.29.0</version>
     </dependency>
+
     <dependency>
       <!-- necessary for Java 9+ -->
       <groupId>org.apache.tomcat</groupId>
@@ -88,12 +89,21 @@
       <version>6.0.53</version>
       <scope>provided</scope>
     </dependency>
-      <dependency>
+
+
+    <dependency>
           <groupId>org.jetbrains</groupId>
           <artifactId>annotations</artifactId>
           <version>RELEASE</version>
           <scope>compile</scope>
-      </dependency>
+    </dependency>
+
+    <!-- Linear Algebra Library -->
+    <dependency>
+      <groupId>org.ejml</groupId>
+      <artifactId>ejml-all</artifactId>
+      <version>0.40</version>
+    </dependency>
   </dependencies>
 
   <properties>
