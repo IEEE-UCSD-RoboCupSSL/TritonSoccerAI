@@ -37,6 +37,7 @@ public class PassEstimatorMock extends PassEstimator {
         this.ballArrivalETA = ballArrivalETA;
     }
 
+
     /* Estimates for Coordinated Passing */
     @Override
     public Vec2D getOptimalPassingPos(Ally passer) {
@@ -59,9 +60,14 @@ public class PassEstimatorMock extends PassEstimator {
         return isGoodTimeToPass;
     }
 
+    public void setGoodTimeToPass(boolean goodTimeToPass) {
+        isGoodTimeToPass = goodTimeToPass;
+    }
+
     @Override
     public double getBallArrivalETA() {
         return ballArrivalETA;
     }
+
 
 }

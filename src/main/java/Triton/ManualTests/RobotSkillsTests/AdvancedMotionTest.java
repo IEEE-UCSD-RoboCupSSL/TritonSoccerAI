@@ -40,7 +40,7 @@ public class AdvancedMotionTest extends RobotSkillsTest {
                 switch (mode) {
                     case "quit" -> toQuit = true;
                     case "rotate" -> {
-                        if(target == null) {
+                        if (target == null) {
                             System.out.println("Invalid Input");
                         }
                         while (!bot.isDirAimed(targetDir)) {

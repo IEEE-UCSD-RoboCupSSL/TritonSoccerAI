@@ -30,7 +30,7 @@ public class GroupToTest extends RobotSkillsTest {
 
             /* To-do: fix sprintTo */
             ArrayList<Double> dirList = new ArrayList<>();
-            for(int i = 0; i < 5; i++) dirList.add(0.0);
+            for (int i = 0; i < 5; i++) dirList.add(0.0);
 
 
             System.out.println("Test center prioritized");
@@ -62,7 +62,7 @@ public class GroupToTest extends RobotSkillsTest {
 
 
             System.out.println("Test BallPosition prioritized");
-            while(ball.getPos().y < 4500) {
+            while (ball.getPos().y < 4500) {
                 do {
                     Thread.sleep(1);
                     posList = new ArrayList<>();
@@ -71,9 +71,8 @@ public class GroupToTest extends RobotSkillsTest {
                     posList.add(ball.getPos().add(new Vec2D(0, -900)));
                     posList.add(ball.getPos().add(new Vec2D(501, -1200)));
                     posList.add(ball.getPos().add(new Vec2D(-500, -1200)));
-                }while (!swarm.groupTo(posList, dirList, ball.getPos()));
+                } while (!swarm.groupTo(posList, dirList, ball.getPos()));
             }
-
 
 
         } catch (InterruptedException e) {
@@ -82,7 +81,6 @@ public class GroupToTest extends RobotSkillsTest {
 
         return true;
     }
-
 
 
 }

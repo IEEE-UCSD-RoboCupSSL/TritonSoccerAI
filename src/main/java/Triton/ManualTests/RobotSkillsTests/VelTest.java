@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class VelTest extends RobotSkillsTest {
     Scanner scanner;
     Ally ally;
+
     public VelTest(Scanner scanner, Ally ally) {
         this.scanner = scanner;
         this.ally = ally;

@@ -7,8 +7,8 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.AI_SkillsTests.CPassTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.RobotSkillsTests.*;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Matrix.Mat2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.util.Scanner;
@@ -58,6 +58,7 @@ public class TestRunner implements Module {
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
                         case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
                         case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
+                        case "inter" -> rtn = new InterceptBallTest(scanner, fielders.get(1), ball).test();
                         case "collect" -> rtn = new DataCollector(scanner, fielders, keeper, ball).test();
                         case "reset" -> rtn = new FormationTest("tester", fielders).test();
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();

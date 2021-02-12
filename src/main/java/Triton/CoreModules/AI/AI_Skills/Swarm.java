@@ -3,8 +3,8 @@ package Triton.CoreModules.AI.AI_Skills;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
@@ -48,13 +48,29 @@ public class Swarm extends Skills {
 //    }
 
 
-
-
-
     public Swarm(RobotList<Ally> botList) {
         this.botList = botList;
     }
 
+    public static void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+
+
+    }
+
+    // To-do: make Curve2D
+    public static void CurveUp(RobotList<Ally> botList /*...*/) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+
+    }
+
+    public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
+        return groupTo(locList, null, priorityRefPoint);
+    }
 
     /*
      * Command a group of robots from the input botList
@@ -80,7 +96,7 @@ public class Swarm extends Skills {
      * @return true when all bots from botList have arrived their corresponding positions
      * */
     public boolean groupTo(ArrayList<Vec2D> posList,
-                                  ArrayList<Double> dirList, Vec2D priorityRefPoint) {
+                           ArrayList<Double> dirList, Vec2D priorityRefPoint) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1 || botList.size() != posList.size()
                 || (dirList != null && posList.size() != dirList.size())) {
             System.out.println("Inputs have invalid size(s)");
@@ -89,11 +105,10 @@ public class Swarm extends Skills {
         /* sort posList(or posDirList) based on priorityRefPoint */
         ArrayList<Pair<Vec2D, Double>> posDirList;
         posDirList = new ArrayList<>();
-        for(int i = 0; i < posList.size(); i++) {
-            if(dirList != null) {
+        for (int i = 0; i < posList.size(); i++) {
+            if (dirList != null) {
                 posDirList.add(new Pair<>(posList.get(i), dirList.get(i)));
-            }
-            else {
+            } else {
                 posDirList.add(new Pair<>(posList.get(i), null));
             }
         }
@@ -136,7 +151,7 @@ public class Swarm extends Skills {
                 bots.remove(nearestBot);
 
                 // if(Swarm.delaySub.getMsg()) { // only update command after having delayed for a bit to avoid robotic parkinson behavior :)
-                    /* command nearest bot to the corresponding location */
+                /* command nearest bot to the corresponding location */
                 if (ang != null) {
                     /* To-do: upgrade to using curveTo */
                     nearestBot.fastCurveTo(loc, ang);
@@ -156,10 +171,6 @@ public class Swarm extends Skills {
         return rtn;
     }
 
-    public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
-        return groupTo(locList, null, priorityRefPoint);
-    }
-
     public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
         return groupTo(locList, dirList, new Vec2D(0, 0));
     }
@@ -167,25 +178,6 @@ public class Swarm extends Skills {
     /* default priorityRefPoint would be center (0, 0), i.e. robots tend to arrive at locations near the center first*/
     public boolean groupTo(ArrayList<Vec2D> locList) {
         return groupTo(locList, null, new Vec2D(0, 0));
-    }
-
-
-
-
-    public static void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
-            System.out.println("botList has invalid size");
-        }
-
-
-    }
-
-    // To-do: make Curve2D
-    public static void CurveUp(RobotList<Ally> botList /*...*/) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
-            System.out.println("botList has invalid size");
-        }
-
     }
 
 }
