@@ -13,39 +13,7 @@ import java.util.Comparator;
 public class Swarm extends Skills {
 
     private final RobotList<Ally> botList;
-//    private static Publisher<Boolean> delayPub;
-//    private static Subscriber<Boolean> delaySub;
-//    private static int defaultUpdatePeriod = 100; // milliseconds
-//
-//    static { // static block only runs once during the first time this class is used
-//        /* these steps take time, don't put them in constructors because constructor for
-//        * this class is meant to repeatedly called whenever a new subset of robots
-//        * are assigned as a swarm group */
-//        delayPub = new FieldPublisher<>("Swarm", "DelayFinished", false);
-//        delaySub = new FieldSubscriber<>("Swarm", "DelayFinished");
-//        try {
-//            delaySub.subscribe(1000);
-//        } catch (TimeoutException e) {
-//            e.printStackTrace();
-//        }
-//
-//        App.threadPool.submit(new Runnable() {
-//            @Override
-//            public void run() {
-//                if(delaySub.getMsg()) {
-//                    delayPub.publish(false);
-//                } else {
-//                    delayPub.publish(true);
-//                }
-//
-//                try {
-//                    Thread.sleep(defaultUpdatePeriod);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
+
 
 
     public Swarm(RobotList<Ally> botList) {
@@ -71,6 +39,16 @@ public class Swarm extends Skills {
     public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
         return groupTo(locList, null, priorityRefPoint);
     }
+
+    public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
+        return groupTo(locList, dirList, new Vec2D(0, 0));
+    }
+
+    /* default priorityRefPoint would be center (0, 0), i.e. robots tend to arrive at locations near the center first*/
+    public boolean groupTo(ArrayList<Vec2D> locList) {
+        return groupTo(locList, null, new Vec2D(0, 0));
+    }
+
 
     /*
      * Command a group of robots from the input botList
@@ -140,7 +118,7 @@ public class Swarm extends Skills {
             /* find nearest bot */
             for (Ally bot : bots) {
 
-                /* upgrade to using path distance instead of eucledian distance*/
+                /* To-do: upgrade to using path distance instead of eucledian distance*/
                 double newDist = loc.sub(bot.getPos()).mag();
                 if (newDist < dist) {
                     dist = newDist;
@@ -171,13 +149,5 @@ public class Swarm extends Skills {
         return rtn;
     }
 
-    public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
-        return groupTo(locList, dirList, new Vec2D(0, 0));
-    }
-
-    /* default priorityRefPoint would be center (0, 0), i.e. robots tend to arrive at locations near the center first*/
-    public boolean groupTo(ArrayList<Vec2D> locList) {
-        return groupTo(locList, null, new Vec2D(0, 0));
-    }
 
 }
