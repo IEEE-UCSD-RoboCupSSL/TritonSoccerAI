@@ -29,7 +29,7 @@ public class PassEstimatorMock extends PassEstimator {
         this.optimalReceiver = optimalReceiver;
     }
 
-    public void setGoodTimeToPass(boolean goodTimeToPass) {
+    public void setGoodTimeToKick(boolean goodTimeToPass) {
         isGoodTimeToPass = goodTimeToPass;
     }
 
@@ -55,7 +55,7 @@ public class PassEstimatorMock extends PassEstimator {
 
     /* return true if slack time > 0 */
     @Override
-    public boolean isGoodTimeToPass() {
+    public boolean isGoodTimeToKick() {
         return isGoodTimeToPass;
     }
 

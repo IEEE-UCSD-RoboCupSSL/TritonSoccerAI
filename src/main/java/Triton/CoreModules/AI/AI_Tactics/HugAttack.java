@@ -73,7 +73,7 @@ public class HugAttack extends Tactics {
     }
 
     private void b4return() {
-        CoordinatedPass.setPending();
+        // CoordinatedPass.resetPassStateToPending();
         passer = null;
         receiver = null;
     }

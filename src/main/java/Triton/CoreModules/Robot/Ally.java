@@ -223,7 +223,6 @@ public class Ally extends Robot implements AllySkills {
         double angDiff = calcAngDiff(targetAngle, getDir());
         double absAngleDiff = Math.abs(angDiff);
 
-        /*To-do: replace with rotateTo with hold ball rotate*/
         if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
             spinTo(targetAngle);
         } else {

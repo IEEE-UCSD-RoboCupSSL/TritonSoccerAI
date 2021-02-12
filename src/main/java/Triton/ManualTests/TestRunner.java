@@ -53,7 +53,7 @@ public class TestRunner implements Module {
                         case "getball" -> rtn = new GetBallTest(scanner, fielders.get(3), ball).test();
                         case "kick" -> rtn = new KickTest(scanner, fielders.get(3), ball).test();
                         case "misc" -> rtn = new MiscTest(scanner, fielders.get(3), ball).test();
-                        case "pass" -> rtn = new PassTest(scanner, fielders.get(3), ball).test();
+                        case "pkick" -> rtn = new PassTest(scanner, fielders.get(3), ball).test();
                         case "cpass" -> rtn = new CPassTest(scanner, fielders,  keeper, foes, ball).test();
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
                         case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();

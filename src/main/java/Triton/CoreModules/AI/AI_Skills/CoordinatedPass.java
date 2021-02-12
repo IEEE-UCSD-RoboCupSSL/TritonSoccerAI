@@ -16,7 +16,7 @@ public class CoordinatedPass extends Skills {
         return currState;
     }
 
-    public static void setPending() {
+    private static void resetPassStateToPending() {
         currState = PassState.PENDING;
     }
 
@@ -32,7 +32,7 @@ public class CoordinatedPass extends Skills {
                 if (passer.isHoldingBall()) {
                     currState = PassState.PASSER_HOLDS_BALL;
                 } else {
-                    return PassState.PENDING;
+                    currState = PassState.PENDING;
                 }
             }
             case PASSER_HOLDS_BALL -> {
@@ -62,10 +62,10 @@ public class CoordinatedPass extends Skills {
                 if (receiver.isDirAimed(receiveAngle) && receiver.isPosArrived(receivePos)) {
                     currState = PassState.RECEIVER_IN_POSITION;
                 } else {
-                    receiver.curveTo(receivePos, receiveAngle);
-                    if (passEstimator.isGoodTimeToPass() && passer.isDirAimed(passAngle)) {
+                    receiver.strafeTo(receivePos, receiveAngle);
+                    if (passEstimator.isGoodTimeToKick() && passer.isDirAimed(passAngle)) {
                         passer.passBall(receivePos, passEstimator.getBallArrivalETA());
-                        currState = PassState.PASSED;
+                        currState = PassState.PASSED; // set next state directly to the PASSED state
                     }
                 }
             }
@@ -76,13 +76,13 @@ public class CoordinatedPass extends Skills {
                 Vec2D passPos = passEstimator.getOptimalPassingPos(passer);
                 Vec2D receivePos = passEstimator.getOptimalReceivingPos(receiver);
                 double passAngle = receivePos.sub(passPos).toPlayerAngle();
-//                double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
+                double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
                 passer.rotateTo(passAngle);
-                if (passEstimator.isGoodTimeToPass() && passer.isDirAimed(passAngle)) {
+                if (passEstimator.isGoodTimeToKick() && passer.isDirAimed(passAngle)) {
                     passer.passBall(receivePos, passEstimator.getBallArrivalETA());
                     currState = PassState.PASSED;
                 } else {
-                    receiver.receive(ball, receivePos);
+                    receiver.strafeTo(receivePos, receiveAngle);
                 }
             }
             case PASSED -> {
@@ -99,14 +99,8 @@ public class CoordinatedPass extends Skills {
                     }
                 }
             }
-            case RECEIVE_SUCCESS -> {
-                // better to set pending outside for readability
-                // setPending();
-                return PassState.RECEIVE_SUCCESS;
-            }
-            case FAILED -> {
-                // setPending();
-                return PassState.FAILED;
+            case RECEIVE_SUCCESS, FAILED -> {
+                currState = PassState.PENDING;
             }
         }
 
