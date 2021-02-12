@@ -27,7 +27,7 @@ public class InterceptBallTest extends RobotSkillsTest {
 //                faceDir = ball.getVel().scale(-1).toPlayerAngle();
 //            }
 
-            ally.intercept(ball, 90);
+            ally.dynamicIntercept(ball, 90);
         }
 
         ally.stop();

@@ -126,15 +126,15 @@ public class App {
         }
 
 
-        Display display = new Display();
-        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-        paintOptions.add(GEOMETRY);
-        paintOptions.add(OBJECTS);
-        paintOptions.add(INFO);
-        paintOptions.add(PREDICTION);
-        display.setPaintOptions(paintOptions);
+//        Display display = new Display();
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
+//        paintOptions.add(INFO);
+//        paintOptions.add(PREDICTION);
+//        display.setPaintOptions(paintOptions);
 
-        // sleepForever();
+        sleepForever();
     }
 
     private static void sleepForever() {

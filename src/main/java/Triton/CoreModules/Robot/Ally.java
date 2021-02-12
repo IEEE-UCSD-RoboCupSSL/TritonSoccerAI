@@ -436,11 +436,13 @@ public class Ally extends Robot implements AllySkills {
         double distToTarget = allyToReceivePos.mag();
         double targetBallVel = (distToTarget / ETA) / 1000.0;
         System.out.println(targetBallVel);
-        kick(new Vec2D(targetBallVel, 2));
+        kick(new Vec2D(targetBallVel, 0));
     }
 
     @Override
-    public void receive(Ball ball, Vec2D anchorPos) {
+    public void staticIntercept(Ball ball, Vec2D anchorPos) {
+        // To-do (future) : edge case: ball going opposite dir
+
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
         Vec2D ballVelDir = ball.getVel().norm();
@@ -450,7 +452,7 @@ public class Ally extends Robot implements AllySkills {
         if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
         } else {
-            if (ball.getVel().mag() < 1) {
+            if (ball.getVel().mag() < 1000) { // To-do: magic number && comment vel unit
                 getBall(ball);
             } else {
                 strafeTo(receivePoint, normAng(ballVelDir.toPlayerAngle() + 180));
@@ -459,7 +461,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void intercept(Ball ball, double faceDir) {
+    public void dynamicIntercept(Ball ball, double faceDir) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
 
@@ -474,6 +476,12 @@ public class Ally extends Robot implements AllySkills {
 
             strafeTo(interceptPoint, ball.getPos().sub(getPos()).toPlayerAngle());
         }
+    }
+
+    @Override
+    public void receive(Ball ball, Vec2D receivePos) {
+        // To-do: devise new implementation or choose the better between the two intercept impl
+        staticIntercept(ball, receivePos);
     }
 
     @Override

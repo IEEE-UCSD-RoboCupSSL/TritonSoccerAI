@@ -76,10 +76,11 @@ public interface AllySkills {
 
     //To-do void chipBall();
 
-    void receive(Ball ball, Vec2D receiveLoc);
+    void staticIntercept(Ball ball, Vec2D anchorPos);
 
-    void intercept(Ball ball, double faceDir);
+    void dynamicIntercept(Ball ball, double faceDir);
 
+    void receive(Ball ball, Vec2D receivePos);
 
     /* getters */
     boolean isHoldingBall();
