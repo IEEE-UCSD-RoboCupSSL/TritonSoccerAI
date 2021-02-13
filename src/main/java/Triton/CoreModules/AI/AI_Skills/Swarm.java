@@ -20,19 +20,31 @@ public class Swarm extends Skills {
         this.botList = botList;
     }
 
-    public static void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+    public void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
             System.out.println("botList has invalid size");
         }
-
+        // To-do
 
     }
 
-    // To-do: make Curve2D
-    public static void CurveUp(RobotList<Ally> botList /*...*/) {
+    public void roundUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
             System.out.println("botList has invalid size");
         }
+        // To-do
+
+    }
+
+
+
+    // To-do: make Curve2D
+    public void CurveUp(RobotList<Ally> botList /*...*/) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+
+        // To-do
 
     }
 
