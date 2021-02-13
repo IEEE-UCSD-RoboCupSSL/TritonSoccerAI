@@ -452,7 +452,7 @@ public class Ally extends Robot implements AllySkills {
         if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
         } else {
-            if (ball.getVel().mag() < 1000) { // To-do: magic number && comment vel unit
+            if (ball.getVel().mag() < 750) { // To-do: magic number && comment vel unit
                 getBall(ball);
             } else {
                 strafeTo(receivePoint, normAng(ballVelDir.toPlayerAngle() + 180));
@@ -517,55 +517,6 @@ public class Ally extends Robot implements AllySkills {
         return Math.abs(calcAngDiff(angle, getDir())) < DIR_PRECISION;
     }
 
-    /**
-     * Update the set path of the robot
-     */
-    private ArrayList<Vec2D> findPath(Vec2D endPoint) {
-        pathFinder.setObstacles(getObstacles());
-        return pathFinder.findPath(getPos(), endPoint);
-    }
-
-    private void moveToNoSlowDown(Vec2D loc) {
-        switch (stateSub.getMsg()) {
-            case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_NSTDRD);
-            default -> statePub.publish(MOVE_NSTDRV);
-        }
-        pointPub.publish(loc);
-    }
-
-    /**
-     * Returns an ArrayList of circles representing the obstacles for pathfinding
-     *
-     * @return an ArrayList of circles representing the obstacles for pathfinding
-     */
-    private ArrayList<Circle2D> getObstacles() {
-        ArrayList<RobotData> blueRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            blueRobots.add(blueRobotSubs.get(i).getMsg());
-        }
-
-        ArrayList<RobotData> yellowRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
-            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
-        }
-
-        ArrayList<Circle2D> obstacles = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            if (team == Team.YELLOW && ID == i)
-                continue;
-            RobotData robot = yellowRobots.get(i);
-            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-        }
-        for (int i = 0; i < 6; i++) {
-            if (team == Team.BLUE && ID == i)
-                continue;
-            RobotData robot = blueRobots.get(i);
-            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
-        }
-
-        return obstacles;
-    }
-
     public ArrayList<Vec2D> getCircleCenters(Vec2D ballPos, Vec2D targetPos, Vec2D faceVec, double ballTargetDist, double circRad) {
         Vec2D circCentersVec = new Vec2D(faceVec.y, -faceVec.x);
         Vec2D ballTargetMidpoint = ballPos.add(targetPos).scale(0.5);
@@ -620,6 +571,55 @@ public class Ally extends Robot implements AllySkills {
 
     private boolean isOutsideCircles(ArrayList<Vec2D> circCenters, double circRad, Vec2D allyPos) {
         return Vec2D.dist(allyPos, circCenters.get(0)) > circRad && Vec2D.dist(allyPos, circCenters.get(1)) > circRad;
+    }
+
+    /**
+     * Update the set path of the robot
+     */
+    private ArrayList<Vec2D> findPath(Vec2D endPoint) {
+        pathFinder.setObstacles(getObstacles());
+        return pathFinder.findPath(getPos(), endPoint);
+    }
+
+    /**
+     * Returns an ArrayList of circles representing the obstacles for pathfinding
+     *
+     * @return an ArrayList of circles representing the obstacles for pathfinding
+     */
+    private ArrayList<Circle2D> getObstacles() {
+        ArrayList<RobotData> blueRobots = new ArrayList<>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            blueRobots.add(blueRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<RobotData> yellowRobots = new ArrayList<>();
+        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            yellowRobots.add(yellowRobotSubs.get(i).getMsg());
+        }
+
+        ArrayList<Circle2D> obstacles = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.YELLOW && ID == i)
+                continue;
+            RobotData robot = yellowRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+        for (int i = 0; i < 6; i++) {
+            if (team == Team.BLUE && ID == i)
+                continue;
+            RobotData robot = blueRobots.get(i);
+            obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
+        }
+
+        return obstacles;
+    }
+
+    private void moveToNoSlowDown(Vec2D loc) {
+        switch (stateSub.getMsg()) {
+            case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_NSTDRD);
+            default -> statePub.publish(MOVE_NSTDRV);
+        }
+        pointPub.publish(loc);
     }
 
     // Everything in run() runs in the Ally Thread
@@ -716,6 +716,31 @@ public class Ally extends Robot implements AllySkills {
         return createPrimitiveCmdBuilder(TDRD);
     }
 
+    /*** TL;DR ***/
+
+    private RemoteAPI.Commands createPrimitiveCmdBuilder(MotionMode mode) {
+        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
+        command.setIsWorldFrame(true);
+        command.setEnableBallAutoCapture(false);
+        command.setMode(mode.ordinal());
+
+        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
+        Vec2D point = pointSub.getMsg();
+        motionSetPoint.setX(point.x);
+        motionSetPoint.setY(point.y);
+        double angle = normAng(angSub.getMsg());
+        motionSetPoint.setZ(angle);
+        command.setMotionSetPoint(motionSetPoint);
+
+        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
+        Vec2D kickVel = kickVelSub.getMsg();
+        kickerSetPoint.setX(kickVel.x);
+        kickerSetPoint.setY(kickVel.y);
+        command.setKickerSetPoint(kickerSetPoint);
+
+        return command.build();
+    }
+
     private RemoteAPI.Commands createTDRVCmd() {
         return createPrimitiveCmdBuilder(TDRV);
     }
@@ -746,31 +771,6 @@ public class Ally extends Robot implements AllySkills {
         motionSetPoint.setX(0);
         motionSetPoint.setY(0);
         motionSetPoint.setZ(0);
-        command.setMotionSetPoint(motionSetPoint);
-
-        RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();
-        Vec2D kickVel = kickVelSub.getMsg();
-        kickerSetPoint.setX(kickVel.x);
-        kickerSetPoint.setY(kickVel.y);
-        command.setKickerSetPoint(kickerSetPoint);
-
-        return command.build();
-    }
-
-    /*** TL;DR ***/
-
-    private RemoteAPI.Commands createPrimitiveCmdBuilder(MotionMode mode) {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
-        command.setIsWorldFrame(true);
-        command.setEnableBallAutoCapture(false);
-        command.setMode(mode.ordinal());
-
-        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
-        Vec2D point = pointSub.getMsg();
-        motionSetPoint.setX(point.x);
-        motionSetPoint.setY(point.y);
-        double angle = normAng(angSub.getMsg());
-        motionSetPoint.setZ(angle);
         command.setMotionSetPoint(motionSetPoint);
 
         RemoteAPI.Vec2D.Builder kickerSetPoint = RemoteAPI.Vec2D.newBuilder();

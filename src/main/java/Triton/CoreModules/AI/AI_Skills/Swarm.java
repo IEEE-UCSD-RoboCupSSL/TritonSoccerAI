@@ -15,7 +15,6 @@ public class Swarm extends Skills {
     private final RobotList<Ally> botList;
 
 
-
     public Swarm(RobotList<Ally> botList) {
         this.botList = botList;
     }
@@ -37,7 +36,6 @@ public class Swarm extends Skills {
     }
 
 
-
     // To-do: make Curve2D
     public void CurveUp(RobotList<Ally> botList /*...*/) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
@@ -51,16 +49,6 @@ public class Swarm extends Skills {
     public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
         return groupTo(locList, null, priorityRefPoint);
     }
-
-    public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
-        return groupTo(locList, dirList, new Vec2D(0, 0));
-    }
-
-    /* default priorityRefPoint would be center (0, 0), i.e. robots tend to arrive at locations near the center first*/
-    public boolean groupTo(ArrayList<Vec2D> locList) {
-        return groupTo(locList, null, new Vec2D(0, 0));
-    }
-
 
     /*
      * Command a group of robots from the input botList
@@ -159,6 +147,15 @@ public class Swarm extends Skills {
         }
 
         return rtn;
+    }
+
+    public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
+        return groupTo(locList, dirList, new Vec2D(0, 0));
+    }
+
+    /* default priorityRefPoint would be center (0, 0), i.e. robots tend to arrive at locations near the center first*/
+    public boolean groupTo(ArrayList<Vec2D> locList) {
+        return groupTo(locList, null, new Vec2D(0, 0));
     }
 
 

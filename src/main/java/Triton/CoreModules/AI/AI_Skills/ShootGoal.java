@@ -10,10 +10,10 @@ import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
 
 public class ShootGoal extends Skills {
 
-    private Ally shooter;
-    private RobotList<Foe> foes;
     Ball ball;
-    private double precisionTolerance = 15; // mm
+    private final Ally shooter;
+    private final RobotList<Foe> foes;
+    private final double precisionTolerance = 15; // mm
 
     // Gridify
 
@@ -35,8 +35,8 @@ public class ShootGoal extends Skills {
         double shootAngle = 0; // To-do
 
 
-        if(shooter.isPosArrived(shootPos)) {
-            if(shooter.isDirAimed(shootAngle)) {
+        if (shooter.isPosArrived(shootPos)) {
+            if (shooter.isDirAimed(shootAngle)) {
                 shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
                 hasKicked = true;
             } else {
@@ -47,8 +47,7 @@ public class ShootGoal extends Skills {
         }
 
 
-
-        return  hasKicked;
+        return hasKicked;
     }
 
     public boolean trickFoeShoot(RobotList<Foe> foes) {
@@ -60,8 +59,8 @@ public class ShootGoal extends Skills {
         double shootAngle = 0; // To-do
 
 
-        if(shooter.isPosArrived(shootPos)) {
-            if(shooter.isDirAimed(shootAngle)) {
+        if (shooter.isPosArrived(shootPos)) {
+            if (shooter.isDirAimed(shootAngle)) {
                 shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
                 hasKicked = true;
             } else {
@@ -71,7 +70,7 @@ public class ShootGoal extends Skills {
             shooter.curveTo(shootPos); // don't rotate yet
         }
 
-        return  hasKicked;
+        return hasKicked;
     }
 
 

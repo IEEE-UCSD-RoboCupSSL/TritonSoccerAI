@@ -2,11 +2,13 @@ package Triton.PeriphModules.Display;
 
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
@@ -38,12 +40,12 @@ public class Display extends JPanel {
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
     protected Gridify convert;
+    GapFinder gapFinder;
     private HashMap<String, Line2D> fieldLines;
     private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
-
 
     /* Construct a display with robot, ball, and field */
     public Display() {
@@ -143,20 +145,23 @@ public class Display extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        Graphics2D g2d = (Graphics2D) g;
 
-        if (paintOptions.contains(GEOMETRY))
-            paintGeo(g2d);
-        if (paintOptions.contains(OBJECTS))
-            paintObjects(g2d);
-        if (paintOptions.contains(PROBABILITY))
-            paintProbability(g2d);
-        if (paintOptions.contains(PREDICTION))
-            paintPrediction(g2d);
-        if (paintOptions.contains(INFO))
-            paintInfo(g2d);
+        try {
+            Graphics2D g2d = (Graphics2D) g;
 
-        lastPaint = System.currentTimeMillis();
+            if (paintOptions.contains(PROBABILITY))
+                paintProbability(g2d);
+            if (paintOptions.contains(PREDICTION))
+                paintPrediction(g2d);
+            if (paintOptions.contains(GEOMETRY))
+                paintGeo(g2d);
+            if (paintOptions.contains(OBJECTS))
+                paintObjects(g2d);
+            if (paintOptions.contains(INFO))
+                paintInfo(g2d);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -202,17 +207,52 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
     }
 
+    private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
+        for (RobotData robot : robots) {
+            BufferedImage img;
+            if (robot.getTeam() == Team.BLUE)
+                img = ImgLoader.blueRobot;
+            else
+                img = ImgLoader.yellowRobot;
+
+            int[] pos = convert.fromPos(robot.getPos());
+            double angle = Math.toRadians(robot.getDir() + 90);
+
+            AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
+                    img.getWidth() / 2.0);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+            int imgX = pos[0] - img.getWidth() / 2;
+            int imgY = pos[1] - img.getHeight() / 2;
+            g2d.drawImage(op.filter(img, null), imgX, imgY, null);
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
+        }
+    }
+
     private void paintProbability(Graphics2D g2d) {
-        int checkDist = 10;
-        Vec2D pos = blueRobotSubs.get(0).getMsg().getPos();
-        for (int x = 0; x < windowWidth; x += checkDist) {
-            for (int y = 0; y < windowHeight; y += checkDist) {
+        if (gapFinder == null)
+            return;
+
+        HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
+        double fieldWidth = fieldSize.get("fieldWidth");
+        double fieldLength = fieldSize.get("fieldLength");
+        Vec2D anchor = new Vec2D(-fieldWidth / 2, -fieldLength / 2);
+        double[][] probs = gapFinder.getProb(new Rect2D(anchor, fieldWidth, fieldLength));
+        for (int x = 0; x < windowWidth; x++) {
+            for (int y = 0; y < windowHeight; y++) {
                 int[] displayPos = {x, y};
                 Vec2D worldPos = convert.fromInd(displayPos);
-                double prob = exampleProbabilityFunc(worldPos, pos);
+                double clampedX = worldPos.x < -fieldWidth / 2 ? -fieldWidth / 2 : worldPos.x;
+                clampedX = clampedX > fieldWidth / 2 ? fieldWidth / 2 : clampedX;
+                double clampedY = worldPos.y < -fieldLength / 2 ? -fieldLength / 2 : worldPos.y;
+                clampedY = clampedY > fieldLength / 2 ? fieldLength / 2 : clampedY;
+                Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
+
+                double prob = gapFinder.getDensity(probs, clampedWorldPos);
 
                 g2d.setColor(new Color((float) prob, (float) prob, (float) prob, 1.0f));
-                g2d.fillRect(x, y, checkDist, checkDist);
+                g2d.fillRect(x, y, 1, 1);
             }
         }
     }
@@ -246,37 +286,8 @@ public class Display extends JPanel {
                 windowHeight - 50);
     }
 
-    private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
-        for (RobotData robot : robots) {
-            BufferedImage img;
-            if (robot.getTeam() == Team.BLUE)
-                img = ImgLoader.blueRobot;
-            else
-                img = ImgLoader.yellowRobot;
-
-            int[] pos = convert.fromPos(robot.getPos());
-            double angle = Math.toRadians(robot.getDir() + 90);
-
-            AffineTransform tx = AffineTransform.getRotateInstance(-angle, img.getWidth() / 2.0,
-                    img.getWidth() / 2.0);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-            int imgX = pos[0] - img.getWidth() / 2;
-            int imgY = pos[1] - img.getHeight() / 2;
-            g2d.drawImage(op.filter(img, null), imgX, imgY, null);
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(Integer.toString(robot.getID()), pos[0] - 5, pos[1] - 25);
-        }
-    }
-
-    private double exampleProbabilityFunc(Vec2D point, Vec2D pos) {
-//        return sigmoid((point.x + point.y) / 2000);
-        double dist = point.sub(pos).mag();
-        return sigmoid(dist / 250 - 10 + (Math.random() - 0.5));
-    }
-
-    private double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
+    public void setGapFinder(GapFinder gapFinder) {
+        this.gapFinder = gapFinder;
     }
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {

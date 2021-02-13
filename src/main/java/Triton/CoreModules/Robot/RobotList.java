@@ -1,7 +1,6 @@
 package Triton.CoreModules.Robot;
 
 import Triton.App;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
@@ -34,7 +33,7 @@ public class RobotList<T> extends ArrayList<T> {
 
     public void stopAll() {
         for (T bot : this) {
-            if(bot instanceof Ally) {
+            if (bot instanceof Ally) {
                 ((Ally) bot).stop();
             } else {
                 System.out.println("Invalid Type");

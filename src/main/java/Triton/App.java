@@ -5,19 +5,14 @@ import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
-import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
-import static Triton.PeriphModules.Display.PaintOption.*;
 
 
 /**
@@ -133,6 +127,7 @@ public class App {
 //        paintOptions.add(GEOMETRY);
 //        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
+//        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
 //        display.setPaintOptions(paintOptions);
 

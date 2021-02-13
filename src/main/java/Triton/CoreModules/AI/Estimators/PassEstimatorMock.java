@@ -25,19 +25,6 @@ public class PassEstimatorMock extends PassEstimator {
         this.receivingPos = receivingPos;
     }
 
-    public void setOptimalReceiver(Ally optimalReceiver) {
-        this.optimalReceiver = optimalReceiver;
-    }
-
-    public void setGoodTimeToKick(boolean goodTimeToPass) {
-        isGoodTimeToPass = goodTimeToPass;
-    }
-
-    public void setBallArrivalETA(double ballArrivalETA) {
-        this.ballArrivalETA = ballArrivalETA;
-    }
-
-
     /* Estimates for Coordinated Passing */
     @Override
     public Vec2D getOptimalPassingPos(Ally passer) {
@@ -47,6 +34,10 @@ public class PassEstimatorMock extends PassEstimator {
     @Override
     public Ally getOptimalReceiver() {
         return optimalReceiver;
+    }
+
+    public void setOptimalReceiver(Ally optimalReceiver) {
+        this.optimalReceiver = optimalReceiver;
     }
 
     @Override
@@ -60,13 +51,21 @@ public class PassEstimatorMock extends PassEstimator {
         return isGoodTimeToPass;
     }
 
-    public void setGoodTimeToPass(boolean goodTimeToPass) {
+    public void setGoodTimeToKick(boolean goodTimeToPass) {
         isGoodTimeToPass = goodTimeToPass;
     }
 
     @Override
     public double getBallArrivalETA() {
         return ballArrivalETA;
+    }
+
+    public void setBallArrivalETA(double ballArrivalETA) {
+        this.ballArrivalETA = ballArrivalETA;
+    }
+
+    public void setGoodTimeToPass(boolean goodTimeToPass) {
+        isGoodTimeToPass = goodTimeToPass;
     }
 
 

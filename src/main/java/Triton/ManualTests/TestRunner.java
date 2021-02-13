@@ -6,6 +6,7 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.AI_SkillsTests.CPassTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
+import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -54,14 +55,15 @@ public class TestRunner implements Module {
                         case "kick" -> rtn = new KickTest(scanner, fielders.get(3), ball).test();
                         case "misc" -> rtn = new MiscTest(scanner, fielders.get(3), ball).test();
                         case "pkick" -> rtn = new PassTest(scanner, fielders.get(3), ball).test();
-                        case "cpass" -> rtn = new CPassTest(scanner, fielders,  keeper, foes, ball).test();
+                        case "cpass" -> rtn = new CPassTest(scanner, fielders, keeper, foes, ball).test();
                         case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
                         case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
                         case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
-                        case "inter" -> rtn = new InterceptBallTest(scanner, fielders.get(1), ball).test();
+                        case "inter" -> rtn = new DynamicInterceptBallTest(scanner, fielders.get(1), ball).test();
                         case "collect" -> rtn = new DataCollector(scanner, fielders, keeper, ball).test();
                         case "reset" -> rtn = new FormationTest("tester", fielders).test();
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
+                        case "gap" -> rtn = new GapFinderTest(fielders, foes, ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;

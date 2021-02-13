@@ -9,31 +9,6 @@ import java.util.Map;
 
 public class Formation {
 
-    public static final class FormationType {
-        public final ArrayList<Vec2D> points;
-        public final ArrayList<Double> angles;
-        public final boolean keeper; // whether specify keeper position; optional
-        public final Vec2D keeperPoint;
-        public final Double keeperAngle;
-
-        public FormationType(ArrayList<Vec2D> points, ArrayList<Double> angles) {
-            this.points = points;
-            this.angles = angles;
-            keeper = false;
-            keeperPoint = null;
-            keeperAngle = null;
-        }
-
-        public FormationType(ArrayList<Vec2D> points, ArrayList<Double> angles,
-                             Vec2D keeperPoint, Double keeperAngle) {
-            this.points = points;
-            this.angles = angles;
-            keeper = true;
-            this.keeperPoint = keeperPoint;
-            this.keeperAngle = keeperAngle;
-        }
-    }
-
     public static final Map<String, FormationType> preset = Map.of(
             "default", new FormationType(
                     new ArrayList<>(Arrays.asList(
@@ -70,7 +45,6 @@ public class Formation {
                     0.0
             )
     );
-
     private static Formation formation = null;
 
     private Formation() {
@@ -84,14 +58,12 @@ public class Formation {
         return formation;
     }
 
-    public static boolean xxxFormation(/*...*/) { return false; }
+    public static boolean xxxFormation(/*...*/) {
+        return false;
+    }
 
     public boolean moveToFormation(String str, ArrayList<Ally> bots) {
         return moveToFormation(preset.get(str), bots);
-    }
-
-    public boolean moveToFormation(String str, ArrayList<Ally> bots, Ally keeper) {
-        return moveToFormation(preset.get(str), bots, keeper);
     }
 
     public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots) {
@@ -100,25 +72,6 @@ public class Formation {
             return false;
         }
         return moveToFormation(formation.points, formation.angles, bots);
-    }
-
-    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots, Ally keeper) {
-        if (!formation.keeper || keeper == null) {
-            return moveToFormation(formation.points, formation.angles, bots);
-        }
-        return moveToFormation(formation.points, formation.angles, bots,
-                formation.keeperPoint, formation.keeperAngle, keeper);
-    }
-
-    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots,
-                                   Vec2D keeperPoint, Double keeperAngle, Ally keeper) {
-        if (!moveToFormation(formationPoints, formationAngle, bots)) {
-            return false;
-        }
-        keeper.sprintTo(keeperPoint, keeperAngle);
-        if (!keeper.isPosArrived(keeperPoint) || !keeper.isDirAimed(keeperAngle))
-            return false;
-        return true;
     }
 
     public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
@@ -142,11 +95,57 @@ public class Formation {
         return true;
     }
 
+    public boolean moveToFormation(String str, ArrayList<Ally> bots, Ally keeper) {
+        return moveToFormation(preset.get(str), bots, keeper);
+    }
+
+    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots, Ally keeper) {
+        if (!formation.keeper || keeper == null) {
+            return moveToFormation(formation.points, formation.angles, bots);
+        }
+        return moveToFormation(formation.points, formation.angles, bots,
+                formation.keeperPoint, formation.keeperAngle, keeper);
+    }
+
+    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots,
+                                   Vec2D keeperPoint, Double keeperAngle, Ally keeper) {
+        if (!moveToFormation(formationPoints, formationAngle, bots)) {
+            return false;
+        }
+        keeper.sprintTo(keeperPoint, keeperAngle);
+        return keeper.isPosArrived(keeperPoint) && keeper.isDirAimed(keeperAngle);
+    }
+
     public boolean freeKickFormation(/*...*/) {
         return false;
     }
 
     public boolean penaltyFormation(/*...*/) {
         return false;
+    }
+
+    public static final class FormationType {
+        public final ArrayList<Vec2D> points;
+        public final ArrayList<Double> angles;
+        public final boolean keeper; // whether specify keeper position; optional
+        public final Vec2D keeperPoint;
+        public final Double keeperAngle;
+
+        public FormationType(ArrayList<Vec2D> points, ArrayList<Double> angles) {
+            this.points = points;
+            this.angles = angles;
+            keeper = false;
+            keeperPoint = null;
+            keeperAngle = null;
+        }
+
+        public FormationType(ArrayList<Vec2D> points, ArrayList<Double> angles,
+                             Vec2D keeperPoint, Double keeperAngle) {
+            this.points = points;
+            this.angles = angles;
+            keeper = true;
+            this.keeperPoint = keeperPoint;
+            this.keeperAngle = keeperAngle;
+        }
     }
 }

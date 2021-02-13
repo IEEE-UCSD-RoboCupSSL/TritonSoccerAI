@@ -11,14 +11,12 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
-import org.ejml.All;
-import org.ejml.data.Matrix;
 
 import java.util.ArrayList;
 
 public class DefendPlanA extends Tactics {
 
-    private double guardGoalGap = 300; // mm
+    private final double guardGoalGap = 300; // mm
 
     public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
         super(fielders, keeper, foes, ball, basicEstimator, passEstimator);
@@ -32,8 +30,8 @@ public class DefendPlanA extends Tactics {
         Line2D middleLine = new Line2D(new Vec2D(0, 0), new Vec2D(0, 0)); // To-do:
 
         RobotList<Foe> attackingFoes = new RobotList<>();
-        for(Foe foe : foes) {
-            if(foe.getPos().y < middleLine.p1.y) {
+        for (Foe foe : foes) {
+            if (foe.getPos().y < middleLine.p1.y) {
                 attackingFoes.add(foe);
             }
         }
@@ -41,10 +39,10 @@ public class DefendPlanA extends Tactics {
         RobotList<Ally> guardFoeFielders = new RobotList<>();
         RobotList<Ally> guardGoalFielders = new RobotList<>();
 
-        for(Foe foe : attackingFoes) {
+        for (Foe foe : attackingFoes) {
             Ally nearestFielder = fielders.get(0);
             for (Ally fielder : fielders) {
-                if(foe.getPos().sub(fielder.getPos()).mag()
+                if (foe.getPos().sub(fielder.getPos()).mag()
                         < foe.getPos().sub(nearestFielder.getPos()).mag()) {
                     nearestFielder = fielder;
                 }
@@ -52,15 +50,15 @@ public class DefendPlanA extends Tactics {
             guardFoeFielders.add(nearestFielder);
         }
 
-        for(Ally fielder : fielders) {
-            if(!guardFoeFielders.contains(fielder)) {
+        for (Ally fielder : fielders) {
+            if (!guardFoeFielders.contains(fielder)) {
                 guardGoalFielders.add(fielder);
             }
         }
 
         /* Delegate some of fielders to Hug-Guard Attacking Foes */
         ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
-        for(Foe foe : attackingFoes) {
+        for (Foe foe : attackingFoes) {
             attackingFoePos.add(foe.getPos());
         }
         new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
@@ -68,8 +66,8 @@ public class DefendPlanA extends Tactics {
 
         /* Delegate the rest of fielders to lineup in the midpoint of foe shoot line*/
         Robot holder = basicEstimator.getBallHolder();
-        if(holder == null) {
-            return  false;
+        if (holder == null) {
+            return false;
         }
         Line2D foeShootLine = new Line2D(holder.getPos(), keeper.getPos());
         Vec2D foeShootLineMidPoint = foeShootLine.midpoint();

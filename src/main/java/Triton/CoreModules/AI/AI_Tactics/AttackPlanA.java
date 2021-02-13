@@ -9,8 +9,6 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Math.Matrix.Vec2D;
-import org.ejml.All;
 
 public class AttackPlanA extends Tactics {
 
@@ -29,7 +27,7 @@ public class AttackPlanA extends Tactics {
 
 
         holder = basicEstimator.getBallHolder();
-        if(!(holder instanceof Ally)) {
+        if (!(holder instanceof Ally)) {
             return false;
         }
 

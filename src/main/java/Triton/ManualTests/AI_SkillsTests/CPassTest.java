@@ -46,8 +46,6 @@ public class CPassTest extends RobotSkillsTest {
             __receiver.kick(new Vec2D(0, 0));
 
 
-
-
             Vec2D passingPos = new Vec2D(-1000, -1000);
             Vec2D secondReceivingPos = new Vec2D(-1500, 2000);
 
@@ -83,10 +81,10 @@ public class CPassTest extends RobotSkillsTest {
             boolean toQuit = false;
             boolean firstTestCompleted = false;
             passEstimator.setOptimalReceiver(__receiver);
-            while(!toQuit) {
-                if(basicEstimator.isBallUnderOurCtrl()) {
-                    if(CoordinatedPass.getPassState() == PassState.PENDING) {
-                        if(firstTestCompleted) {
+            while (!toQuit) {
+                if (basicEstimator.isBallUnderOurCtrl()) {
+                    if (CoordinatedPass.getPassState() == PassState.PENDING) {
+                        if (firstTestCompleted) {
                             passEstimator.setOptimalReceiver(__passer);
                             passEstimator.setReceivingPos(secondReceivingPos);
                             passEstimator.setPassingPos(secondPassingPos);
@@ -98,7 +96,7 @@ public class CPassTest extends RobotSkillsTest {
                     System.out.println(passState);
                     switch (passState) {
                         case PASSED -> {
-                            if(passer == null) {
+                            if (passer == null) {
                                 toQuit = true;
                             } else {
                                 if (!firstTestCompleted) {
@@ -109,7 +107,7 @@ public class CPassTest extends RobotSkillsTest {
                             }
                         }
                         case RECEIVE_SUCCESS -> {
-                            if(!firstTestCompleted) {
+                            if (!firstTestCompleted) {
                                 firstTestCompleted = true;
                             } else {
                                 toQuit = true;
@@ -121,7 +119,7 @@ public class CPassTest extends RobotSkillsTest {
                         }
                     }
 
-                    if(receiver != null) {
+                    if (receiver != null) {
                         double dist = receivingPos.sub(receiver.getPos()).mag();
                         if (dist <= 500) {
                             passEstimator.setGoodTimeToKick(true);

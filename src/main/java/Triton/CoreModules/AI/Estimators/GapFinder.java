@@ -20,13 +20,13 @@ public class GapFinder {
 
     private final Gridify grid;
 
-    private double foeVariance = 500.0;
+    private double foeVariance = 100.0;
 
-    public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball, Vec2D gridSize, Vec2D offset) {
+    public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball, Vec2D stepSize, Vec2D offset) {
         this.foes = foes;
         this.ball = ball;
         this.fielders = fielders;
-        grid = new Gridify(gridSize, offset, false, false);
+        grid = new Gridify(stepSize, offset, false, false);
     }
 
     public void setFoeVariance(double variance) {
@@ -44,70 +44,74 @@ public class GapFinder {
      * the pdf returned are indexed by gridIdx instead of coordinates
      *   */
     public double[][] getProb(Rect2D region) {
-
         ArrayList<MultivariateNormalDistribution> normalList = new ArrayList<>();
-        for(Foe foe : foes) {
+        for (Foe foe : foes) {
             MultivariateNormalDistribution normal =
                     new MultivariateNormalDistribution(foe.getPos().toDoubleArray(), new double[][]{
                             new double[]{foeVariance, 0},
-                            new double[]{0 , foeVariance}}
+                            new double[]{0, foeVariance}}
                     );
             normalList.add(normal);
         }
 
         int[] gridPos = grid.fromPos(region.anchor);
-        int width = grid.numCols(region.width);
-        int height = grid.numRows(region.height);
+        int width = grid.numCols(region.width) + 1;
+        int height = grid.numRows(region.height) + 1;
         double[][] pdf = new double[width][height];
 
-        for(int gridX = gridPos[0]; gridX < width; gridX++) {
-            for(int gridY = gridPos[1]; gridY < height; gridY++) {
+        ArrayList<Vec2D> fielderPosList = new ArrayList<>();
+        for (int i = 0; i < fielders.size(); i++) {
+            fielderPosList.add(fielders.get(i).getPos());
+        }
+
+        ArrayList<Vec2D> foePosList = new ArrayList<>();
+        for (int i = 0; i < foes.size(); i++) {
+            foePosList.add(foes.get(i).getPos());
+        }
+
+        Vec2D ballPos = ball.getPos();
+
+        for (int gridX = gridPos[0]; gridX < width; gridX++) {
+            for (int gridY = gridPos[1]; gridY < height; gridY++) {
                 Vec2D pos = grid.fromInd(gridX, gridY);
                 double prob = 1.0;
                 /* away from foe bots */
-                for(MultivariateNormalDistribution normal : normalList) {
+                for (MultivariateNormalDistribution normal : normalList) {
                     prob *= (1 - normal.density(new double[]{pos.x, pos.y}));
                 }
                 prob *= 1; // To-do: make this a tunable coefficient/parameter
 
-
-
-                /* make it harder to be intercept between every pair of ally bots */
-                for(Ally fielder : fielders) {
-                    double distFoeToIntercept = Double.MAX_VALUE;
-                    /* find nearest foe dist to the potential passing line */
-                    for(Foe foe : foes) {
-                        double dist = foe.getPos().distToLine(new Line2D(pos, fielder.getPos()));
-                        if(dist < distFoeToIntercept) {
-                            distFoeToIntercept = dist;
-                        }
-                    }
-                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
-                    if(distFoeToIntercept < foeVariance) {
-                        prob *= distFoeToIntercept / foeVariance;
-                    }
-                }
-                prob *= 1; // To-do: make this a tunable coefficient/parameter
-
-
-
-                /* make it harder to be intercept between this grid pos and ball pos */
-                double distFoeToIntercept = Double.MAX_VALUE;
-                /* find nearest foe dist to the potential passing line */
-                for(Foe foe : foes) {
-                    double dist = foe.getPos().distToLine(new Line2D(pos, ball.getPos()));
-                    if(dist < distFoeToIntercept) {
-                        distFoeToIntercept = dist;
-                    }
-                }
-                /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
-                if(distFoeToIntercept < foeVariance) {
-                    prob *= distFoeToIntercept / foeVariance;
-                }
-                prob *= 1; // To-do: make this a tunable coefficient/parameter
-
-
-
+//                /* make it harder to be intercept between every pair of ally bots */
+//                for (Vec2D fielderPos : fielderPosList) {
+//                    double distFoeToIntercept = Double.MAX_VALUE;
+//                    /* find nearest foe dist to the potential passing line */
+//                    for (Vec2D foePos : foePosList) {
+//                        double dist = foePos.distToLine(new Line2D(pos, fielderPos));
+//                        if (dist < distFoeToIntercept) {
+//                            distFoeToIntercept = dist;
+//                        }
+//                    }
+//                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
+//                    if (distFoeToIntercept < foeVariance) {
+//                        prob *= distFoeToIntercept / foeVariance;
+//                    }
+//                }
+//                prob *= 1; // To-do: make this a tunable coefficient/parameter
+//
+//                /* make it harder to be intercept between this grid pos and ball pos */
+//                double distFoeToIntercept = Double.MAX_VALUE;
+//                /* find nearest foe dist to the potential passing line */
+//                for (Vec2D foePos : foePosList) {
+//                    double dist = foePos.distToLine(new Line2D(pos, ballPos));
+//                    if (dist < distFoeToIntercept) {
+//                        distFoeToIntercept = dist;
+//                    }
+//                }
+//                /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
+//                if (distFoeToIntercept < foeVariance) {
+//                    prob *= distFoeToIntercept / foeVariance;
+//                }
+//                prob *= 1; // To-do: make this a tunable coefficient/parameter
                 pdf[gridX][gridY] = prob;
             }
         }
@@ -115,11 +119,8 @@ public class GapFinder {
         /* mask forbidden and unlikely regions */
         // To-do
 
-
-
         return pdf;
     }
-
 
 
     public void display() {
