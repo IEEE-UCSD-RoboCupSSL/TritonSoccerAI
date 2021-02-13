@@ -25,7 +25,7 @@ public class PerspectiveConverter {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
             return audienceAngle;
         } else {
-            return audienceAngle + 180;
+            return normAng(audienceAngle + 180);
         }
     }
 
@@ -49,7 +49,7 @@ public class PerspectiveConverter {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
             return playerAngle;
         } else {
-            return playerAngle - 180;
+            return normAng(playerAngle - 180);
         }
     }
 
