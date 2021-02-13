@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch;
+package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
 /**
  * @author Kevin

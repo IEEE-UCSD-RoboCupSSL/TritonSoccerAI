@@ -4,8 +4,8 @@ import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
-import Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch.JPSPathFinder;
-import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
+import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
+import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Math.Geometry.Circle2D;
@@ -167,7 +167,7 @@ public class Ally extends Robot implements AllySkills {
     public void kick(Vec2D kickVel) {
         double mag = kickVel.mag();
         if (mag >= MAX_KICK_VEL) {
-            kickVel = kickVel.norm().scale(MAX_KICK_VEL);
+            kickVel = kickVel.normalized().scale(MAX_KICK_VEL);
         }
 
         kickVelPub.publish(kickVel);
@@ -445,7 +445,7 @@ public class Ally extends Robot implements AllySkills {
 
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
-        Vec2D ballVelDir = ball.getVel().norm();
+        Vec2D ballVelDir = ball.getVel().normalized();
         Vec2D ballToAnchor = anchorPos.sub(ballPos);
         Vec2D receivePoint = ballPos.add(ballVelDir.scale(ballToAnchor.dot(ballVelDir)));
 
@@ -582,7 +582,7 @@ public class Ally extends Robot implements AllySkills {
 
         Vec2D vel;
         if (isCloserToFaceVec(faceVec, targetPos, allyPos, alpha)) {
-            vel = targetPos.sub(allyPos).norm();
+            vel = targetPos.sub(allyPos).normalized();
         } else {
             // Determine which circle is closer to the robot
             double dist0 = Vec2D.dist(allyPos, circCenters.get(0));
@@ -594,7 +594,7 @@ public class Ally extends Robot implements AllySkills {
             if (isOutsideCircles(circCenters, circRad, allyPos)) {
                 // Find the tangent direction and the point of tangency
                 double tangentLength = Math.pow(centerDist * centerDist - circRad * circRad, 0.5);
-                Vec2D allyToCenter = center.sub(allyPos).norm();
+                Vec2D allyToCenter = center.sub(allyPos).normalized();
                 double tangentAngle = Math.atan(circRad / tangentLength);
                 Vec2D tangentVec = allyToCenter.rotate(tangentAngle);
                 vel = tangentVec;
@@ -602,12 +602,12 @@ public class Ally extends Robot implements AllySkills {
                 Vec2D awayCenterVec = allyPos.sub(center);
                 double invMag = INTERCEPT_COEF_MAX_AWAY_CENTER / awayCenterVec.mag();
                 double awayCenterScl = invMag <= INTERCEPT_COEF_MAX_AWAY_CENTER ? invMag : INTERCEPT_COEF_MAX_AWAY_CENTER;
-                Vec2D awayCenterPart = awayCenterVec.norm().scale(awayCenterScl);
+                Vec2D awayCenterPart = awayCenterVec.normalized().scale(awayCenterScl);
 
                 Vec2D closestTangentVec = new Vec2D(awayCenterVec.y, -awayCenterVec.x);
-                Vec2D closestTangentPart = closestTangentVec.norm().scale(INTERCEPT_COEF_MAX_TANGENT_CIRC);
+                Vec2D closestTangentPart = closestTangentVec.normalized().scale(INTERCEPT_COEF_MAX_TANGENT_CIRC);
 
-                vel = awayCenterPart.add(closestTangentPart).norm();
+                vel = awayCenterPart.add(closestTangentPart).normalized();
             }
         }
         return allyPos.add(vel.scale(1000));

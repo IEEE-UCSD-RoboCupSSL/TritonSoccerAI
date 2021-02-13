@@ -1,7 +1,7 @@
-package Triton.CoreModules.AI.Algorithms.PathFinder.JumpPointSearch;
+package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
 import Triton.Config.PathfinderConfig;
-import Triton.CoreModules.AI.Algorithms.PathFinder.PathFinder;
+import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;

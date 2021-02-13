@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
+package Triton.CoreModules.AI.PathFinder.ThetaStar;
 
 import Triton.Config.PathfinderConfig;
 import Triton.Misc.Math.Coordinates.Gridify;

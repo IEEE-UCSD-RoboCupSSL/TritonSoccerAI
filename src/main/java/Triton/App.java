@@ -5,6 +5,8 @@ import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
+import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;

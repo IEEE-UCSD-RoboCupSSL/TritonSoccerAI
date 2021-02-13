@@ -2,6 +2,7 @@ package Triton.Misc.Math.Matrix;
 
 import Proto.RemoteAPI;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.Misc.Math.Geometry.Line2D;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -148,7 +149,7 @@ public class Vec2D {
      *
      * @return the unit vector
      */
-    public Vec2D norm() {
+    public Vec2D normalized() {
         double mag = mag();
         return new Vec2D(x / mag, y / mag);
     }
@@ -202,6 +203,27 @@ public class Vec2D {
                 new double[]{y}
         });
     }
+
+
+
+
+
+    public double distToLine(Line2D line) {
+        Vec2D vecA = line.p2.sub(line.p1).normalized();
+        Vec2D vecB = this.sub(line.p1);
+        Vec2D perpenPoint = line.p1.add(vecA.scale(vecB.dot(vecA)));
+        Vec2D vecC = this.sub(perpenPoint).normalized();
+        return vecB.dot(vecC);
+    }
+
+    public double[] toDoubleArray() {
+        return new double[]{this.x, this.y};
+    }
+
+
+
+
+
 
     /**
      * Returns current vector as a RemoteAPI Vec2D
