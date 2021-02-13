@@ -12,20 +12,22 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Matrix.Vec2D;
 import org.ejml.All;
 
-public class BasicAttack extends Tactics {
+public class AttackPlanA extends Tactics {
 
     protected Ally passer, receiver;
     protected Robot holder;
 
-    public BasicAttack(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
+    public AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
                        Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
         super(fielders, keeper, foes, ball, basicEstimator, passEstimator);
     }
 
     @Override
-    /* Assumes ball is under our control
-     * */
     public boolean exec() {
+        // should be invoked within a loop
+        // invoking contract: ball is under our control
+
+
         holder = basicEstimator.getBallHolder();
         if(!(holder instanceof Ally)) {
             return false;

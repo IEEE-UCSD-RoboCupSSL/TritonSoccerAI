@@ -213,7 +213,7 @@ public class Vec2D {
         Vec2D vecB = this.sub(line.p1);
         Vec2D perpenPoint = line.p1.add(vecA.scale(vecB.dot(vecA)));
         Vec2D vecC = this.sub(perpenPoint).normalized();
-        return vecB.dot(vecC);
+        return Math.abs(vecB.dot(vecC));
     }
 
     public double[] toDoubleArray() {

@@ -10,16 +10,16 @@ import Triton.CoreModules.Robot.RobotList;
 
 public abstract class Tactics {
 
-    protected final RobotList<Ally> allies;
+    protected final RobotList<Ally> fielders;
     protected final RobotList<Foe> foes;
     protected final Ally keeper;
     protected final Ball ball;
     protected final BasicEstimator basicEstimator;
     protected final PassEstimator passEstimator;
 
-    public Tactics(RobotList<Ally> allies, Ally keeper, RobotList<Foe> foes,
+    public Tactics(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
                    Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
-        this.allies = allies;
+        this.fielders = fielders;
         this.foes = foes;
         this.ball = ball;
         this.keeper = keeper;

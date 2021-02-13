@@ -31,8 +31,9 @@ public class Mat2D {
         return this.mat;
     }
 
-    public Mat2D mult(Vec2D vec2) {
-        return new Mat2D(mat.mult(vec2.toEJML()));
+    public Vec2D mult(Vec2D vec2) {
+        SimpleMatrix rtn = new Mat2D(mat.mult(vec2.toEJML())).getEJMLmat();
+        return new Vec2D(rtn.get(0, 0), rtn.get(0, 1));
     }
 
     public Mat2D add(Mat2D mat2) {
