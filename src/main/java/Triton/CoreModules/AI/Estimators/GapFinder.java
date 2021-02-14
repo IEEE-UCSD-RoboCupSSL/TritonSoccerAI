@@ -7,6 +7,7 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
@@ -17,11 +18,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
+import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class GapFinder {
 
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
+    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 
     private final RobotList<Ally> fielders;
     private final RobotList<Foe> foes;
@@ -36,6 +39,7 @@ public class GapFinder {
 
     private int[] gridOrigin;
     private int width, height;
+    private Rect2D allyPenalityRegion, foePenalityRegion;
 
     private final Publisher<double[][]> pmfPub;
     private final Subscriber<double[][]> pmfSub;
@@ -67,9 +71,11 @@ public class GapFinder {
 
         /* external pub-sub */
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
 
         try {
             fieldSizeSub.subscribe(1000);
+            fieldLinesSub.subscribe(1000);
 
             fielderPosListSub.subscribe(1000);
             foePosListSub.subscribe(1000);
@@ -88,6 +94,45 @@ public class GapFinder {
         gridOrigin = grid.fromPos(new Vec2D(-worldWidth / 2, -worldLength / 2));
         width = grid.numCols(worldWidth) + 1;
         height = grid.numRows(worldLength) + 1;
+
+
+
+        HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
+        Line2D leftPenalty = fieldLines.get("LeftPenaltyStretch");
+        Line2D rightPenalty = fieldLines.get("RightPenaltyStretch");
+        Vec2D lpA = audienceToPlayer(leftPenalty.p1);
+        Vec2D lpB = audienceToPlayer(leftPenalty.p2);
+        Vec2D rpA = audienceToPlayer(rightPenalty.p1);
+        Vec2D rpB = audienceToPlayer(rightPenalty.p2);
+        if(lpA.x > lpB.x) {
+            Vec2D tmp = lpA;
+            lpA = lpB;
+            lpB = tmp;
+        }
+        if(rpA.x > rpB.x) {
+            Vec2D tmp = rpA;
+            rpA = rpB;
+            rpB = tmp;
+        }
+        double penaltyWidth = lpA.sub(lpB).mag();
+        double penaltyHeight;
+        if(lpA.y < 0) {
+            penaltyHeight = (new Vec2D(lpA.x, -worldLength / 2)).sub(lpA).mag();
+        } else {
+            penaltyHeight = (new Vec2D(lpA.x, worldLength / 2)).sub(lpA).mag();
+        }
+        if(lpA.y < rpA.y) {
+            Vec2D lpC = new Vec2D(lpA.x, -worldLength / 2);
+            allyPenalityRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
+            foePenalityRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
+        } else {
+            Vec2D rpC = new Vec2D(rpA.x, -worldLength / 2);
+            allyPenalityRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
+            foePenalityRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
+        }
+
+        System.out.println(allyPenalityRegion.anchor + " " + allyPenalityRegion.width + " " + allyPenalityRegion.height);
+        System.out.println(foePenalityRegion.anchor + " " + foePenalityRegion.width + " " + foePenalityRegion.height);
 
         App.threadPool.submit(new Runnable() {
             @Override
@@ -159,6 +204,14 @@ public class GapFinder {
                 Vec2D pos = grid.fromInd(gridX, gridY);
                 double prob = 1.0;
 
+                /* mask forbidden and unlikely regions */
+                // Penalty Region
+                if(allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
+                    pmf[gridX][gridY] = 0.0;
+                    continue;
+                }
+
+
                 /* away from foe bots */
                 double minDist = Double.MAX_VALUE;
                 for (Vec2D foePos : foePosList) {
@@ -195,14 +248,9 @@ public class GapFinder {
                     }
                 }
 
-
                 pmf[gridX][gridY] = prob;
             }
         }
-
-        /* mask forbidden and unlikely regions */
-        // To-do
-
         pmfPub.publish(pmf);
 
         // System.out.println(System.currentTimeMillis() - t0);
