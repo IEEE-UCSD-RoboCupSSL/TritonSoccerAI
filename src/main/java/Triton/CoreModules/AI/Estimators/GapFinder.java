@@ -15,6 +15,7 @@ import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -31,18 +32,23 @@ public class GapFinder {
     private final Ball ball;
 
     private final Gridify grid;
-    double worldWidth, worldLength;
-    int  resolutionStepSize = 100;
+    private final Gridify evalGrid;
+    private int[] gridOrigin;
+    private int[] evalOrigin;
+    private int width, height;
+    private int evalWidth, evalHeight;
+
+    private double worldWidth, worldLength;
+    private Rect2D allyPenalityRegion, foePenalityRegion;
 
     private double responseRange = 1000.0;
     private double interceptRange = 500.0;
 
-    private int[] gridOrigin;
-    private int width, height;
-    private Rect2D allyPenalityRegion, foePenalityRegion;
 
     private final Publisher<double[][]> pmfPub;
     private final Subscriber<double[][]> pmfSub;
+    private final Publisher<double[][]> evalPub;
+    private final Subscriber<double[][]> evalSub;
     private final Publisher<ArrayList<Vec2D>> fielderPosListPub;
     private final Subscriber<ArrayList<Vec2D>> fielderPosListSub;
     private final Publisher<ArrayList<Vec2D>> foePosListPub;
@@ -51,6 +57,11 @@ public class GapFinder {
     private final Subscriber<Vec2D> ballPosSub;
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
+        this(fielders, foes, ball, 100, 10);
+    }
+
+    public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
+                     int resolutionStepSize, int evalWindowSize) {
         this.foes = foes;
         this.ball = ball;
         this.fielders = fielders;
@@ -58,6 +69,9 @@ public class GapFinder {
         /* internal pub-sub */
         pmfPub = new FieldPublisher<>("GapFinder", "PDF", null);
         pmfSub = new FieldSubscriber<>("GapFinder", "PDF");
+
+        evalPub = new FieldPublisher<>("GapFinder", "EVAL", null);
+        evalSub = new FieldSubscriber<>("GapFinder", "EVAL");
 
         fielderPosListPub = new FieldPublisher<>("GapFinder", "FielderPositions", null);
         fielderPosListSub = new FieldSubscriber<>("GapFinder", "FielderPositions");
@@ -81,21 +95,30 @@ public class GapFinder {
             foePosListSub.subscribe(1000);
             ballPosSub.subscribe(1000);
             pmfSub.subscribe(1000);
+            evalSub.subscribe(1000);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
+
         HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
         while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0);
         worldWidth = fieldSize.get("fieldWidth");
         worldLength = fieldSize.get("fieldLength");
         grid = new Gridify(new Vec2D(resolutionStepSize, resolutionStepSize),
-                            new Vec2D(-worldWidth / 2, -worldLength / 2), false, false);
-
+                new Vec2D(-worldWidth / 2, -worldLength / 2), false, false);
         gridOrigin = grid.fromPos(new Vec2D(-worldWidth / 2, -worldLength / 2));
         width = grid.numCols(worldWidth) + 1;
         height = grid.numRows(worldLength) + 1;
+//        System.out.println(Arrays.toString(gridOrigin));
+//        System.out.println(width + " " + height);
 
-
+        evalGrid = new Gridify(new Vec2D(evalWindowSize, evalWindowSize),
+                new Vec2D(0, 0), false, false);
+        evalOrigin = evalGrid.fromPos(new Vec2D(0, 0));
+        evalWidth = evalGrid.numCols(width) + 1;
+        evalHeight = evalGrid.numRows(height) + 1;
+//        System.out.println(Arrays.toString(evalOrigin));
+//        System.out.println(evalWidth + " " + evalHeight);
 
         HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
         Line2D leftPenalty = fieldLines.get("LeftPenaltyStretch");
@@ -130,9 +153,8 @@ public class GapFinder {
             allyPenalityRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
             foePenalityRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
         }
-
-        System.out.println(allyPenalityRegion.anchor + " " + allyPenalityRegion.width + " " + allyPenalityRegion.height);
-        System.out.println(foePenalityRegion.anchor + " " + foePenalityRegion.width + " " + foePenalityRegion.height);
+//        System.out.println(allyPenalityRegion.anchor + " " + allyPenalityRegion.width + " " + allyPenalityRegion.height);
+//        System.out.println(foePenalityRegion.anchor + " " + foePenalityRegion.width + " " + foePenalityRegion.height);
 
         App.threadPool.submit(new Runnable() {
             @Override
@@ -147,14 +169,21 @@ public class GapFinder {
                 }
             }
         });
-
-
     }
+
+
 
     public void setResponseRange(double responseRange) {
         this.responseRange = responseRange;
     }
+    public void setInterceptRange(double interceptRange) {
+        this.interceptRange = interceptRange;
+    }
 
+    public double[][] getEval() {
+        getPMF();
+        return evalSub.getMsg();
+    }
 
     public double getProb(double[][] pmf, Vec2D pos) {
         int[] idx = grid.fromPos(pos);
@@ -190,6 +219,7 @@ public class GapFinder {
         // long t0 = System.currentTimeMillis();
 
         double[][] pmf = new double[width][height];
+        double[][] eval = new double[evalWidth][evalHeight];
 
         ArrayList<Vec2D> fielderPosList = fielderPosListSub.getMsg();
         ArrayList<Vec2D> foePosList = foePosListSub.getMsg();
@@ -202,6 +232,8 @@ public class GapFinder {
         for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
             for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
                 Vec2D pos = grid.fromInd(gridX, gridY);
+                int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
+
                 double prob = 1.0;
 
                 /* mask forbidden and unlikely regions */
@@ -248,10 +280,25 @@ public class GapFinder {
                     }
                 }
 
+                double distToFrontEnd = worldLength / 2 - pos.y;
+                if(pos.y > ballPos.y) {
+                    /* make it keep a balanced position between ball and frontEndLine */
+                    double distToBall = pos.sub(ballPos).mag();
+                    double midDist = (distToFrontEnd + distToBall) / 2;
+                    prob *= Math.min(distToFrontEnd, distToBall) / midDist;
+                } else {
+                    /* make it go as front as possible */
+                    prob *= (worldLength - distToFrontEnd) / worldLength;
+                }
+
+
+
                 pmf[gridX][gridY] = prob;
+                eval[evalIdx[0]][evalIdx[1]] += prob;
             }
         }
         pmfPub.publish(pmf);
+        evalPub.publish(eval);
 
         // System.out.println(System.currentTimeMillis() - t0);
     }

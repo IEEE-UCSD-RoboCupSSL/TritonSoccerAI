@@ -12,6 +12,7 @@ import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -36,6 +37,18 @@ public class GapFinderTest {
         display.setPaintOptions(paintOptions);
 
         display.setGapFinder(gapFinder);
+
+//        while(true) {
+//
+//            double[][] eval = gapFinder.getEval();
+//            System.out.println(Arrays.deepToString(eval));
+//
+//            try {
+//                Thread.sleep(1);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         return true;
     }
