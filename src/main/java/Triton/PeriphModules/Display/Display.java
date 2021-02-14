@@ -8,7 +8,6 @@ import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
@@ -150,7 +149,7 @@ public class Display extends JPanel {
             Graphics2D g2d = (Graphics2D) g;
 
             if (paintOptions.contains(PROBABILITY))
-                paintProbability(g2d);
+                paintGapFinder(g2d);
             if (paintOptions.contains(PREDICTION))
                 paintPrediction(g2d);
             if (paintOptions.contains(GEOMETRY))
@@ -230,7 +229,10 @@ public class Display extends JPanel {
         }
     }
 
-    private void paintProbability(Graphics2D g2d) {
+    public void setGapFinder(GapFinder gapFinder) {
+        this.gapFinder = gapFinder;
+    }
+    private void paintGapFinder(Graphics2D g2d) {
         if (gapFinder == null)
             return;
 
@@ -238,6 +240,7 @@ public class Display extends JPanel {
         double fieldWidth = fieldSize.get("fieldWidth");
         double fieldLength = fieldSize.get("fieldLength");
         double[][] pmf = gapFinder.getPMF();
+        if(pmf == null) return;
         for (int x = 0; x < windowWidth; x++) {
             for (int y = 0; y < windowHeight; y++) {
                 int[] displayPos = {x, y};
@@ -256,6 +259,21 @@ public class Display extends JPanel {
                 g2d.fillRect(x, y, 1, 1);
             }
         }
+
+        ArrayList<Vec2D> topMaxPos = gapFinder.getTopNMaxPos(5);
+        // System.out.println(topMaxPos);
+
+        for(Vec2D maxPos : topMaxPos) {
+            double clampedX = Math.max(maxPos.x, -fieldWidth / 2);
+            clampedX = Math.min(clampedX, fieldWidth / 2);
+            double clampedY = Math.max(maxPos.y, -fieldLength / 2);
+            clampedY = Math.min(clampedY, fieldLength / 2);
+            Vec2D clampedPos = new Vec2D(clampedX, clampedY);
+            int[] displayPos = convert.fromPos(clampedPos);
+            g2d.setColor(new Color(0, 0.5F, 0.9F));
+            g2d.fillRect(displayPos[0], displayPos[1], 10, 10);
+        }
+
     }
 
     private void paintPrediction(Graphics2D g2d) {
@@ -287,9 +305,6 @@ public class Display extends JPanel {
                 windowHeight - 50);
     }
 
-    public void setGapFinder(GapFinder gapFinder) {
-        this.gapFinder = gapFinder;
-    }
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {
         this.paintOptions = paintOptions;
