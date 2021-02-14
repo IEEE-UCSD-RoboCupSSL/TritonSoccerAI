@@ -23,14 +23,16 @@ public class KeeperTest extends RobotSkillsTest {
         this.foes = foes;
         this.ball = ball;
 
-        basicEstimator = new BasicEstimator();
-        goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
+        // basicEstimator = new BasicEstimator();
+        // goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
     }
 
     @Override
     public boolean test() {
-        while (true) {
-            keeper.
-        }
+//        while (true) {
+//            keeper.
+//
+//        }
+        return false;
     }
 }
