@@ -5,10 +5,9 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,45 +15,6 @@ import java.nio.charset.Charset;
 import java.util.Scanner;
 
 public class DataCollector extends RobotSkillsTest {
-
-    private static class BallLogger implements Runnable {
-
-        private final Logger logger = LogManager.getLogger(BallLogger.class);
-        private final Ball ball;
-        private volatile boolean running = true;
-
-        public BallLogger(Ball ball) {
-            this.ball = ball;
-        }
-
-        public void terminate() {
-            running = false;
-        }
-
-        @Override
-        public void run() {
-            double lastPos = Double.MAX_VALUE;
-            while (running) {
-                try {
-                    Vec2D pos = ball.getPos();
-                    if(lastPos != pos.y) {
-                        logger.info("Ignored", pos.x, pos.y, ball.getTime());
-                    }
-                    lastPos = pos.y;
-                    Thread.sleep(TIME_INTERVAL);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    /* Automated test for data collection */
-    Scanner scanner;
-    RobotList<Ally> fielders;
-    Ally keeper;
-    Ball ball;
-    BallLogger logger;
 
     public static final double POS_THRESHOLD = 50;
     public static final double POS_PRECISION = 0.3;
@@ -64,7 +24,12 @@ public class DataCollector extends RobotSkillsTest {
     public static final long STOP_INTERVAL = 500;
     public static final String LOG_DIR = "src/main/resources/log/";
     public static final String LOG_CACHE = "src/main/resources/application.tmp";
-
+    /* Automated test for data collection */
+    Scanner scanner;
+    RobotList<Ally> fielders;
+    Ally keeper;
+    Ball ball;
+    BallLogger logger;
     public DataCollector(Scanner scanner, RobotList<Ally> fielders, Ally keeper, Ball ball) {
         this.scanner = scanner;
         this.fielders = fielders;
@@ -115,7 +80,7 @@ public class DataCollector extends RobotSkillsTest {
             Vec2D ballPos = ball.getPos();
             double mag;
 
-            while (ball.getPos().sub(ballPos).mag() < POS_THRESHOLD);
+            while (ball.getPos().sub(ballPos).mag() < POS_THRESHOLD) ;
             do {
                 ballPos = ball.getPos();
                 try {
@@ -141,7 +106,7 @@ public class DataCollector extends RobotSkillsTest {
 
             /* Save the log */
             File directory = new File(LOG_DIR);
-            if (!directory.exists()){
+            if (!directory.exists()) {
                 directory.mkdir();
             }
             try {
@@ -174,7 +139,7 @@ public class DataCollector extends RobotSkillsTest {
             }
             ally.strafeTo(targetPos, targetAng);
         } while (Math.abs(PerspectiveConverter.calcAngDiff(ally.getDir(), angle)) > ANG_PRECISION ||
-            ally.getPos().sub(pos).mag() > POS_PRECISION);
+                ally.getPos().sub(pos).mag() > POS_PRECISION);
     }
 
     /* Rotate dribbling robot to an angle, with high precision */
@@ -193,5 +158,37 @@ public class DataCollector extends RobotSkillsTest {
             ally.dribRotate(ball, targetAng);
         }
         while (Math.abs(PerspectiveConverter.calcAngDiff(ally.getDir(), angle)) > ANG_PRECISION);
+    }
+
+    private static class BallLogger implements Runnable {
+
+        private final Logger logger = LogManager.getLogger(BallLogger.class);
+        private final Ball ball;
+        private volatile boolean running = true;
+
+        public BallLogger(Ball ball) {
+            this.ball = ball;
+        }
+
+        public void terminate() {
+            running = false;
+        }
+
+        @Override
+        public void run() {
+            double lastPos = Double.MAX_VALUE;
+            while (running) {
+                try {
+                    Vec2D pos = ball.getPos();
+                    if (lastPos != pos.y) {
+                        logger.info("Ignored", pos.x, pos.y, ball.getTime());
+                    }
+                    lastPos = pos.y;
+                    Thread.sleep(TIME_INTERVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

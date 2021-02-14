@@ -109,7 +109,7 @@ public class GapFinder {
         }
 
         HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-        while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0);
+        while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0) ;
         worldWidth = fieldSize.get("fieldWidth");
         worldLength = fieldSize.get("fieldLength");
         grid = new Gridify(new Vec2D(resolutionStepSize, resolutionStepSize),
@@ -135,24 +135,24 @@ public class GapFinder {
         Vec2D lpB = audienceToPlayer(leftPenalty.p2);
         Vec2D rpA = audienceToPlayer(rightPenalty.p1);
         Vec2D rpB = audienceToPlayer(rightPenalty.p2);
-        if(lpA.x > lpB.x) {
+        if (lpA.x > lpB.x) {
             Vec2D tmp = lpA;
             lpA = lpB;
             lpB = tmp;
         }
-        if(rpA.x > rpB.x) {
+        if (rpA.x > rpB.x) {
             Vec2D tmp = rpA;
             rpA = rpB;
             rpB = tmp;
         }
         double penaltyWidth = lpA.sub(lpB).mag();
         double penaltyHeight;
-        if(lpA.y < 0) {
+        if (lpA.y < 0) {
             penaltyHeight = (new Vec2D(lpA.x, -worldLength / 2)).sub(lpA).mag();
         } else {
             penaltyHeight = (new Vec2D(lpA.x, worldLength / 2)).sub(lpA).mag();
         }
-        if(lpA.y < rpA.y) {
+        if (lpA.y < rpA.y) {
             Vec2D lpC = new Vec2D(lpA.x, -worldLength / 2);
             allyPenalityRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
             foePenalityRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
@@ -167,7 +167,7 @@ public class GapFinder {
         App.threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     calcProb();
                     try {
                         Thread.sleep(1);
@@ -271,7 +271,7 @@ public class GapFinder {
         ArrayList<Vec2D> foePosList = foePosListSub.getMsg();
         Vec2D ballPos = ballPosSub.getMsg();
 
-        if(fielderPosList == null || foePosList == null || ballPos == null) {
+        if (fielderPosList == null || foePosList == null || ballPos == null) {
             return;
         }
 
@@ -282,7 +282,7 @@ public class GapFinder {
 
                 /* mask forbidden and unlikely regions */
                 // Penalty Region
-                if(allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
+                if (allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
                     pmf[gridX][gridY] = 0.0;
                     continue;
                 }
@@ -297,7 +297,7 @@ public class GapFinder {
                     }
                 }
                 double ratio = minDist / responseRange;
-                if(ratio < 1.0) {
+                if (ratio < 1.0) {
                     prob *= ratio;
                 }
 
@@ -314,7 +314,7 @@ public class GapFinder {
                     }
                 }
 
-                if(nearestFoePos != null &&
+                if (nearestFoePos != null &&
                         Math.abs(normAng(nearestFoePos.sub(ballPos).toPlayerAngle()
                                 - pos.sub(ballPos).toPlayerAngle())) < 60) // To-do: magic number
                 {
@@ -325,7 +325,7 @@ public class GapFinder {
                 }
 
                 double distToFrontEnd = worldLength / 2 - pos.y;
-                if(pos.y > ballPos.y) {
+                if (pos.y > ballPos.y) {
                     /* make it keep a balanced position between ball and frontEndLine */
                     double distToBall = pos.sub(ballPos).mag();
                     double midDist = (distToFrontEnd + distToBall) / 2;
@@ -353,6 +353,4 @@ public class GapFinder {
 
         // System.out.println(System.currentTimeMillis() - t0);
     }
-
-
 }

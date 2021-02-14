@@ -1,14 +1,15 @@
 package Triton.CoreModules.AI.Estimators.TimeEstimator;
 
 import org.ejml.simple.SimpleMatrix;
+
 import java.util.function.Function;
 
 public class BallMovement {
 
-    private static final SimpleMatrix PARAM = Util.vector(new double[]{317.27728641, -652.73594375,  -52.47000213,
+    private static final SimpleMatrix PARAM = Util.vector(new double[]{317.27728641, -652.73594375, -52.47000213,
             1246.28027845, -145.80701525, -152.98079373, -456.35983333,
-              42.78419844,   11.30341907,   55.88504885,   57.48939017,
-             -13.63537183,   25.42496705,  -33.2416606 ,    7.06778388}).transpose();
+            42.78419844, 11.30341907, 55.88504885, 57.48939017,
+            -13.63537183, 25.42496705, -33.2416606, 7.06778388}).transpose();
 
     /**
      * A safe way to calculate distance.
@@ -30,8 +31,8 @@ public class BallMovement {
      * @return distance
      */
     public static double calcDistFast(double s, double t) {
-        SimpleMatrix poly = Util.vector(new double[]{t, s*t, t*t, s*s*t, s*t*t, t*t*t, s*s*s*t, s*s*t*t,
-                s*t*t*t, t*t*t*t, s*s*s*s*t, s*s*s*t*t, s*s*t*t*t, s*t*t*t*t, t*t*t*t*t});
+        SimpleMatrix poly = Util.vector(new double[]{t, s * t, t * t, s * s * t, s * t * t, t * t * t, s * s * s * t, s * s * t * t,
+                s * t * t * t, t * t * t * t, s * s * s * s * t, s * s * s * t * t, s * s * t * t * t, s * t * t * t * t, t * t * t * t * t});
         return poly.mult(PARAM).get(0, 0);
     }
 
@@ -41,8 +42,8 @@ public class BallMovement {
      * @return distance gradient w.r.t time
      */
     private static double calcGrad(double s, double t) {
-        SimpleMatrix poly = Util.vector(new double[]{1, s, t*2, s*s, s*t*2, t*t*3, s*s*s, s*s*t*2,
-                s*t*t*3, t*t*t*4, s*s*s*s, s*s*s*t*2, s*s*t*t*3, s*t*t*t*4, t*t*t*t*5});
+        SimpleMatrix poly = Util.vector(new double[]{1, s, t * 2, s * s, s * t * 2, t * t * 3, s * s * s, s * s * t * 2,
+                s * t * t * 3, t * t * t * 4, s * s * s * s, s * s * s * t * 2, s * s * t * t * 3, s * t * t * t * 4, t * t * t * t * 5});
         return poly.mult(PARAM).get(0, 0);
     }
 
@@ -53,7 +54,7 @@ public class BallMovement {
     public static double[] calcMaxDist(double s) {
         Function<Double, Double> f = (t) -> calcGrad(s, t);
         double maximizer = Util.gradDescent(f, 0.0);
-        return new double[] {calcDistFast(s, maximizer), maximizer};
+        return new double[]{calcDistFast(s, maximizer), maximizer};
     }
 
 

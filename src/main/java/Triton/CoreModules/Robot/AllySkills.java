@@ -80,6 +80,8 @@ public interface AllySkills {
 
     void dynamicIntercept(Ball ball, double faceDir);
 
+    void keep(Ball ball, double y, Vec2D aimTraj);
+
     void receive(Ball ball, Vec2D receivePos);
 
     /* getters */
@@ -91,5 +93,9 @@ public interface AllySkills {
 
     boolean isPosArrived(Vec2D loc);
 
+    boolean isPosArrived(Vec2D loc, double dist);
+
     boolean isDirAimed(double angle);
+
+    boolean isDirAimed(double angle, double angleDiff);
 }

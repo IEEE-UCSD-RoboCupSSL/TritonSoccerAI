@@ -8,6 +8,7 @@ import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
@@ -479,6 +480,40 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
+    public void keep(Ball ball, double y, Vec2D aimTraj) {
+        try {
+            if (Math.abs(aimTraj.x) < 0.1 && Math.abs(aimTraj.y) < 0.1) {
+                aimTraj = new Vec2D(0, -1);
+            }
+
+            Vec2D currPos = getPos();
+            Vec2D ballPos = ball.getPos();
+            double angleDiff = PerspectiveConverter.normAng(Math.toDegrees(Vec2D.angleDiff(aimTraj, new Vec2D(0, -1))));
+
+//            double b = ballToAnchor.dot(ballVelDir);
+//            double a = anchorPos.sub(ballPos.add(ballVelDir.scale(b))).mag();
+//            double B = ballToAnchor.mag();
+//            double A = (B * a) / b * Math.signum(ballVelDir.x);
+//            Vec2D receivePoint = new Vec2D(A, y);
+
+            Vec2D receivePoint = new Vec2D(ballPos.x + (ballPos.y - y) * Math.tan(angleDiff), y);
+            System.out.println(receivePoint);
+
+            if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
+                getBall(ball);
+            } else {
+//                if (ball.getVel().mag() < 1) {
+//                    stop();
+//                } else {
+                strafeTo(receivePoint, normAng(ballPos.sub(currPos).toPlayerAngle()));
+//                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void receive(Ball ball, Vec2D receivePos) {
         // To-do: devise new implementation or choose the better between the two intercept impl
         staticIntercept(ball, receivePos);
@@ -509,12 +544,22 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isPosArrived(Vec2D pos) {
-        return pos.sub(getPos()).mag() < POS_PRECISION;
+        return isPosArrived(pos, POS_PRECISION);
+    }
+
+    @Override
+    public boolean isPosArrived(Vec2D pos, double dist) {
+        return pos.sub(getPos()).mag() < dist;
     }
 
     @Override
     public boolean isDirAimed(double angle) {
-        return Math.abs(calcAngDiff(angle, getDir())) < DIR_PRECISION;
+        return isDirAimed(angle, DIR_PRECISION);
+    }
+
+    @Override
+    public boolean isDirAimed(double angle, double angleDiff) {
+        return Math.abs(calcAngDiff(angle, getDir())) < angleDiff;
     }
 
     public ArrayList<Vec2D> getCircleCenters(Vec2D ballPos, Vec2D targetPos, Vec2D faceVec, double ballTargetDist, double circRad) {

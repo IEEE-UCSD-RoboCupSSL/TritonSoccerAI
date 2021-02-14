@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 public class KeeperTest extends RobotSkillsTest {
     Scanner scanner;
+    RobotList<Ally> fielders;
     Ally keeper;
     RobotList<Foe> foes;
     Ball ball;
@@ -18,21 +19,20 @@ public class KeeperTest extends RobotSkillsTest {
     BasicEstimator basicEstimator;
     GoalKeeping goalKeeping;
 
-    public KeeperTest(Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public KeeperTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+        this.fielders = fielders;
         this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
 
-        // basicEstimator = new BasicEstimator();
-        // goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+        goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
     }
 
     @Override
     public boolean test() {
-//        while (true) {
-//            keeper.
-//
-//        }
-        return false;
+        while (true) {
+            goalKeeping.passiveGuarding();
+        }
     }
 }

@@ -29,6 +29,12 @@ public class PerspectiveConverter {
         }
     }
 
+    public static double normAng(double ang) {
+        ang = (ang > 180) ? ang - 360 : ang;
+        ang = (ang < -180) ? ang + 360 : ang;
+        return ang;
+    }
+
     public static Vec2D playerToAudience(Vec2D playerVector) {
         if (ObjectConfig.MY_TEAM == Team.BLUE) {
             return new Vec2D(playerVector.y, -playerVector.x);
@@ -55,11 +61,5 @@ public class PerspectiveConverter {
 
     public static double calcAngDiff(double angA, double angB) {
         return normAng(angA - angB);
-    }
-
-    public static double normAng(double ang) {
-        ang = (ang > 180) ? ang - 360 : ang;
-        ang = (ang < -180) ? ang + 360 : ang;
-        return ang;
     }
 }
