@@ -237,19 +237,20 @@ public class Display extends JPanel {
         HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
         double fieldWidth = fieldSize.get("fieldWidth");
         double fieldLength = fieldSize.get("fieldLength");
-        Vec2D anchor = new Vec2D(-fieldWidth / 2, -fieldLength / 2);
-        double[][] probs = gapFinder.getProb(new Rect2D(anchor, fieldWidth, fieldLength));
+        double[][] pmf = gapFinder.getPMF();
         for (int x = 0; x < windowWidth; x++) {
             for (int y = 0; y < windowHeight; y++) {
                 int[] displayPos = {x, y};
                 Vec2D worldPos = convert.fromInd(displayPos);
-                double clampedX = worldPos.x < -fieldWidth / 2 ? -fieldWidth / 2 : worldPos.x;
-                clampedX = clampedX > fieldWidth / 2 ? fieldWidth / 2 : clampedX;
-                double clampedY = worldPos.y < -fieldLength / 2 ? -fieldLength / 2 : worldPos.y;
-                clampedY = clampedY > fieldLength / 2 ? fieldLength / 2 : clampedY;
+                double clampedX = Math.max(worldPos.x, -fieldWidth / 2);
+                clampedX = Math.min(clampedX, fieldWidth / 2);
+                double clampedY = Math.max(worldPos.y, -fieldLength / 2);
+                clampedY = Math.min(clampedY, fieldLength / 2);
                 Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
 
-                double prob = gapFinder.getDensity(probs, clampedWorldPos);
+                double prob = gapFinder.getProb(pmf, clampedWorldPos);
+
+                prob *= 0.8; // to prevent completely white out
 
                 g2d.setColor(new Color((float) prob, (float) prob, (float) prob, 1.0f));
                 g2d.fillRect(x, y, 1, 1);
