@@ -61,34 +61,35 @@ public class ShootGoalTest extends RobotSkillsTest {
             if (MY_TEAM == BLUE) {
                 goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p2).x;
                 goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p1).x;
-                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalLine").p1).y;
+                goalY = worldSizeY / 2;
             } else {
                 goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p1).x;
                 goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p2).x;
-                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalLine").p1).y;
+                goalY = -worldSizeY / 2;
             }
 
             Vec2D goalLeft = new Vec2D(goalXLeft, goalY);
             Vec2D goalRight = new Vec2D(goalXRight, goalY);
             shootGoal = new ShootGoal(shooter, foes, ball, worldSizeX, worldSizeY,
-                    goalLeft.sub(new Vec2D(200, 0)), goalRight.sub(new Vec2D(-200, 0)));
+                    goalLeft.add(new Vec2D(200, 0)), goalRight.add(new Vec2D(-200, 0)));
         }
     }
 
     @Override
     public boolean test() {
         try {
-            while (!shooter.isHoldingBall()) {
-                shooter.getBall(ball);
-            }
-            Vec2D startPos = new Vec2D(0, 2500);
-
-            while (shooter.isHoldingBall()) {
-                ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
-                if (!shooter.isPosArrived(startPos)) {
-                    shooter.curveTo(startPos);
+            while (true) {
+                while (!shooter.isHoldingBall()) {
+                    shooter.getBall(ball);
                 }
-                shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
+                Vec2D startPos = shooter.getPos();
+                while (shooter.isHoldingBall()) {
+                    ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
+                    if (!shooter.isPosArrived(startPos)) {
+                        shooter.curveTo(startPos);
+                    }
+                    shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

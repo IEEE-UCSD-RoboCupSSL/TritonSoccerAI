@@ -67,6 +67,7 @@ public class TestRunner implements Module {
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
                         case "gap" -> rtn = new GapFinderTest(fielders, foes, ball).test();
                         case "shoot" -> rtn = new ShootGoalTest(scanner, fielders.get(0), foes, ball).test();
+                        case "keep" -> rtn = new KeeperTest(keeper, foes, ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;

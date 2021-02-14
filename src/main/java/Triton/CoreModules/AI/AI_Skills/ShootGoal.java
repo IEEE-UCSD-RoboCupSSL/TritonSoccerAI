@@ -40,15 +40,15 @@ public class ShootGoal extends Skills {
     }
 
     public ArrayList<Vec2D> findOptimalShootPos(Vec2D ballCapPos) {
-        Rect2D field = new Rect2D(new Vec2D(-worldSizeX / 2, -worldWizeY / 2), worldSizeX / 2, worldWizeY / 2);
+        Rect2D field = new Rect2D(new Vec2D(-worldSizeX / 2, -worldWizeY / 2), worldSizeX, worldWizeY);
         double shooterStepSize = 150;
         ArrayList<Vec2D> shootPosList = new ArrayList<>();
         for (double x = ballCapPos.x - EXCESSIVE_DRIBBLING_DIST; x < ballCapPos.x + EXCESSIVE_DRIBBLING_DIST; x += shooterStepSize) {
             for (double y = ballCapPos.y - EXCESSIVE_DRIBBLING_DIST; y < ballCapPos.y + EXCESSIVE_DRIBBLING_DIST; y += shooterStepSize) {
                 Vec2D potentialShootPos = new Vec2D(x, y);
-//                if (field.isInside(potentialShootPos)) {
-                shootPosList.add(potentialShootPos);
-//                }
+                if (field.isInside(potentialShootPos)) {
+                    shootPosList.add(potentialShootPos);
+                }
             }
         }
 
@@ -92,15 +92,22 @@ public class ShootGoal extends Skills {
         boolean hasKicked = false;
         double shootAngle = target.sub(shootPos).toPlayerAngle();
 
-        if (shooter.isPosArrived(shootPos)) {
-            if (shooter.isDirAimed(shootAngle)) {
-                shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
-                hasKicked = true;
-            } else {
-                shooter.dribRotate(ball, shootAngle, 0);
-            }
+//        if (shooter.isPosArrived(shootPos)) {
+//            if (shooter.isDirAimed(shootAngle)) {
+//                shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
+//                hasKicked = true;
+//            } else {
+//                shooter.dribRotate(ball, shootAngle, 10);
+//            }
+//        } else {
+//            shooter.curveTo(shootPos); // don't rotate yet
+//        }
+
+        if (shooter.isPosArrived(shootPos) && shooter.isDirAimed(shootAngle)) {
+            shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
+            hasKicked = true;
         } else {
-            shooter.curveTo(shootPos); // don't rotate yet
+            shooter.curveTo(shootPos, shootAngle);
         }
 
         return hasKicked;
