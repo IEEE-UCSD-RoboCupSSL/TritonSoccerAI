@@ -5,16 +5,10 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Math.Matrix.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.concurrent.TimeoutException;
 
 import static Triton.PeriphModules.Display.PaintOption.*;
 

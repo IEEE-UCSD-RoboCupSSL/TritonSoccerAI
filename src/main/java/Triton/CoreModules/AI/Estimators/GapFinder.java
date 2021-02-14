@@ -6,6 +6,7 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.Gridify;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
@@ -14,7 +15,6 @@ import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
@@ -32,18 +32,6 @@ public class GapFinder {
 
     private final Gridify grid;
     private final Gridify evalGrid;
-    private int[] gridOrigin;
-    private int[] evalOrigin;
-    private int width, height;
-    private int evalWidth, evalHeight;
-
-    private double worldWidth, worldLength;
-    private Rect2D allyPenalityRegion, foePenalityRegion;
-
-    private double responseRange = 1000.0;
-    private double interceptRange = 500.0;
-
-
     private final Publisher<double[][]> pmfPub;
     private final Subscriber<double[][]> pmfSub;
     private final Publisher<double[][]> evalPub;
@@ -54,6 +42,18 @@ public class GapFinder {
     private final Subscriber<ArrayList<Vec2D>> foePosListSub;
     private final Publisher<Vec2D> ballPosPub;
     private final Subscriber<Vec2D> ballPosSub;
+    private final int[] gridOrigin;
+    private final int[] evalOrigin;
+    private final int width;
+    private final int height;
+    private final int evalWidth;
+    private final int evalHeight;
+    private final double worldWidth;
+    private final double worldLength;
+    private final Rect2D allyPenalityRegion;
+    private final Rect2D foePenalityRegion;
+    private double responseRange = 1000.0;
+    private double interceptRange = 500.0;
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 100, 10);
@@ -100,7 +100,7 @@ public class GapFinder {
         }
 
         HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-        while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0);
+        while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0) ;
         worldWidth = fieldSize.get("fieldWidth");
         worldLength = fieldSize.get("fieldLength");
         grid = new Gridify(new Vec2D(resolutionStepSize, resolutionStepSize),
@@ -126,24 +126,24 @@ public class GapFinder {
         Vec2D lpB = audienceToPlayer(leftPenalty.p2);
         Vec2D rpA = audienceToPlayer(rightPenalty.p1);
         Vec2D rpB = audienceToPlayer(rightPenalty.p2);
-        if(lpA.x > lpB.x) {
+        if (lpA.x > lpB.x) {
             Vec2D tmp = lpA;
             lpA = lpB;
             lpB = tmp;
         }
-        if(rpA.x > rpB.x) {
+        if (rpA.x > rpB.x) {
             Vec2D tmp = rpA;
             rpA = rpB;
             rpB = tmp;
         }
         double penaltyWidth = lpA.sub(lpB).mag();
         double penaltyHeight;
-        if(lpA.y < 0) {
+        if (lpA.y < 0) {
             penaltyHeight = (new Vec2D(lpA.x, -worldLength / 2)).sub(lpA).mag();
         } else {
             penaltyHeight = (new Vec2D(lpA.x, worldLength / 2)).sub(lpA).mag();
         }
-        if(lpA.y < rpA.y) {
+        if (lpA.y < rpA.y) {
             Vec2D lpC = new Vec2D(lpA.x, -worldLength / 2);
             allyPenalityRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
             foePenalityRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
@@ -158,7 +158,7 @@ public class GapFinder {
         App.threadPool.submit(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     calcProb();
                     try {
                         Thread.sleep(1);
@@ -170,11 +170,100 @@ public class GapFinder {
         });
     }
 
+    /* calculate the pmf of optimal gap region for passing and attacking,
+     * the pmf are indexed by gridIdx instead of coordinates
+     *   */
+    private void calcProb() {
 
+        // long t0 = System.currentTimeMillis();
+
+        double[][] pmf = new double[width][height];
+        double[][] eval = new double[evalWidth][evalHeight];
+
+        ArrayList<Vec2D> fielderPosList = fielderPosListSub.getMsg();
+        ArrayList<Vec2D> foePosList = foePosListSub.getMsg();
+        Vec2D ballPos = ballPosSub.getMsg();
+
+        if (fielderPosList == null || foePosList == null || ballPos == null) {
+            return;
+        }
+
+        for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
+            for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
+                Vec2D pos = grid.fromInd(gridX, gridY);
+                int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
+
+                double prob = 1.0;
+
+                /* mask forbidden and unlikely regions */
+                // Penalty Region
+                if (allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
+                    pmf[gridX][gridY] = 0.0;
+                    continue;
+                }
+
+
+                /* away from foe bots */
+                double minDist = Double.MAX_VALUE;
+                for (Vec2D foePos : foePosList) {
+                    double dist = pos.sub(foePos).mag();
+                    if (dist < minDist) {
+                        minDist = dist;
+                    }
+                }
+                double ratio = minDist / responseRange;
+                if (ratio < 1.0) {
+                    prob *= ratio;
+                }
+
+                /* make it harder to be intercept between foe and ball */
+                double distFoeToIntercept = Double.MAX_VALUE;
+                Vec2D nearestFoePos = null;
+                /* find nearest foe dist to the potential passing line */
+                for (Vec2D foePos : foePosList) {
+                    // enforce correct direction
+                    double dist = foePos.distToLine(new Line2D(pos, ballPos));
+                    if (dist < distFoeToIntercept) {
+                        distFoeToIntercept = dist;
+                        nearestFoePos = foePos;
+                    }
+                }
+
+                if (nearestFoePos != null &&
+                        Math.abs(normAng(nearestFoePos.sub(ballPos).toPlayerAngle()
+                                - pos.sub(ballPos).toPlayerAngle())) < 60) {
+                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
+                    if (distFoeToIntercept < interceptRange) {
+                        prob *= distFoeToIntercept / interceptRange;
+                    }
+                }
+
+                double distToFrontEnd = worldLength / 2 - pos.y;
+                if (pos.y > ballPos.y) {
+                    /* make it keep a balanced position between ball and frontEndLine */
+                    double distToBall = pos.sub(ballPos).mag();
+                    double midDist = (distToFrontEnd + distToBall) / 2;
+                    prob *= Math.min(distToFrontEnd, distToBall) / midDist;
+                } else {
+                    /* make it go as front as possible */
+                    prob *= (worldLength - distToFrontEnd) / worldLength;
+                }
+
+
+                pmf[gridX][gridY] = prob;
+                eval[evalIdx[0]][evalIdx[1]] += prob;
+            }
+        }
+        pmfPub.publish(pmf);
+        evalPub.publish(eval);
+
+        // System.out.println(System.currentTimeMillis() - t0);
+    }
 
     public void setResponseRange(double responseRange) {
         this.responseRange = responseRange;
     }
+
     public void setInterceptRange(double interceptRange) {
         this.interceptRange = interceptRange;
     }
@@ -182,12 +271,6 @@ public class GapFinder {
     public double[][] getEval() {
         getPMF();
         return evalSub.getMsg();
-    }
-
-    public double getProb(double[][] pmf, Vec2D pos) {
-        int[] idx = grid.fromPos(pos);
-        if(pmf == null) return 0.0;
-        return pmf[idx[0]][idx[1]];
     }
 
     public double[][] getPMF() {
@@ -208,98 +291,10 @@ public class GapFinder {
         return pmfSub.getMsg();
     }
 
-
-
-    /* calculate the pmf of optimal gap region for passing and attacking,
-     * the pmf are indexed by gridIdx instead of coordinates
-     *   */
-    private void calcProb() {
-
-        // long t0 = System.currentTimeMillis();
-
-        double[][] pmf = new double[width][height];
-        double[][] eval = new double[evalWidth][evalHeight];
-
-        ArrayList<Vec2D> fielderPosList = fielderPosListSub.getMsg();
-        ArrayList<Vec2D> foePosList = foePosListSub.getMsg();
-        Vec2D ballPos = ballPosSub.getMsg();
-
-        if(fielderPosList == null || foePosList == null || ballPos == null) {
-            return;
-        }
-
-        for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
-            for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
-                Vec2D pos = grid.fromInd(gridX, gridY);
-                int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
-
-                double prob = 1.0;
-
-                /* mask forbidden and unlikely regions */
-                // Penalty Region
-                if(allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
-                    pmf[gridX][gridY] = 0.0;
-                    continue;
-                }
-
-
-                /* away from foe bots */
-                double minDist = Double.MAX_VALUE;
-                for (Vec2D foePos : foePosList) {
-                    double dist = pos.sub(foePos).mag();
-                    if (dist < minDist) {
-                        minDist = dist;
-                    }
-                }
-                double ratio = minDist / responseRange;
-                if(ratio < 1.0) {
-                    prob *= ratio;
-                }
-
-                /* make it harder to be intercept between foe and ball */
-                double distFoeToIntercept = Double.MAX_VALUE;
-                Vec2D nearestFoePos = null;
-                /* find nearest foe dist to the potential passing line */
-                for (Vec2D foePos : foePosList) {
-                    // enforce correct direction
-                    double dist = foePos.distToLine(new Line2D(pos, ballPos));
-                    if (dist < distFoeToIntercept) {
-                        distFoeToIntercept = dist;
-                        nearestFoePos = foePos;
-                    }
-                }
-
-                if(nearestFoePos != null &&
-                        Math.abs(normAng(nearestFoePos.sub(ballPos).toPlayerAngle()
-                                - pos.sub(ballPos).toPlayerAngle())) < 60)
-                {
-                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
-                    if (distFoeToIntercept < interceptRange) {
-                        prob *= distFoeToIntercept / interceptRange;
-                    }
-                }
-
-                double distToFrontEnd = worldLength / 2 - pos.y;
-                if(pos.y > ballPos.y) {
-                    /* make it keep a balanced position between ball and frontEndLine */
-                    double distToBall = pos.sub(ballPos).mag();
-                    double midDist = (distToFrontEnd + distToBall) / 2;
-                    prob *= Math.min(distToFrontEnd, distToBall) / midDist;
-                } else {
-                    /* make it go as front as possible */
-                    prob *= (worldLength - distToFrontEnd) / worldLength;
-                }
-
-
-
-                pmf[gridX][gridY] = prob;
-                eval[evalIdx[0]][evalIdx[1]] += prob;
-            }
-        }
-        pmfPub.publish(pmf);
-        evalPub.publish(eval);
-
-        // System.out.println(System.currentTimeMillis() - t0);
+    public double getProb(double[][] pmf, Vec2D pos) {
+        int[] idx = grid.fromPos(pos);
+        if (pmf == null) return 0.0;
+        return pmf[idx[0]][idx[1]];
     }
 
 

@@ -8,7 +8,6 @@ import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;

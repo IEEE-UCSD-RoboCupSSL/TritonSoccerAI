@@ -18,11 +18,11 @@ public class ShootGoal extends Skills {
     private final Ally shooter;
     private final RobotList<Foe> foes;
     private final double precisionTolerance = 15; // mm
-    Ball ball;
     private final double worldSizeX;
     private final double worldWizeY;
     private final Vec2D goalLeft;
     private final Vec2D goalRight;
+    Ball ball;
 
     // Gridify
 
