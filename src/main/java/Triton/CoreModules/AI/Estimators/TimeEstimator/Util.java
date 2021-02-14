@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.Estimators.TimeEstimator;
 
 import org.ejml.simple.SimpleMatrix;
+
 import java.util.function.Function;
 
 public class Util {
@@ -19,7 +20,7 @@ public class Util {
     /**
      * Finding minimizer using gradient descent method
      *
-     * @param f objective function
+     * @param f  objective function
      * @param x0 the initial x
      * @return minimizer
      */
@@ -50,6 +51,7 @@ public class Util {
 
     /**
      * Perform bisection method to find the root
+     *
      * @param f objective function
      * @param a f(a) and f(b) have different signs
      * @param b ...
@@ -59,12 +61,12 @@ public class Util {
         double c = a;
         while ((b - a) >= PRECISION) {
             // Find middle point
-            c = (a+b) / 2;
+            c = (a + b) / 2;
             // Check if middle point is root
             if (f.apply(c) == 0.0) {
                 break;
             } else if (f.apply(c) * f.apply(a) < 0) {
-            // Decide the side to repeat the steps
+                // Decide the side to repeat the steps
                 b = c;
             } else {
                 a = c;

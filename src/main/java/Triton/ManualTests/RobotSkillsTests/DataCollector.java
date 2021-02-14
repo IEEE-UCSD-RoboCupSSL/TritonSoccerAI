@@ -28,6 +28,7 @@ public class DataCollector extends RobotSkillsTest {
     Ally keeper;
     Ball ball;
     BallLogger logger;
+
     public DataCollector(Scanner scanner, RobotList<Ally> fielders, Ally keeper, Ball ball) {
         this.scanner = scanner;
         this.fielders = fielders;
