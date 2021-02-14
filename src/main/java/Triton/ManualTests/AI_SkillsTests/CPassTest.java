@@ -13,72 +13,130 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 
-import static Triton.CoreModules.AI.AI_Skills.PassState.PENDING;
-
 public class CPassTest extends RobotSkillsTest {
     Scanner scanner;
-    Ally passer;
-    Ally receiver;
+    Ally __passer;
+    Ally __receiver;
+    RobotList<Ally> fielders;
     Ball ball;
 
     BasicEstimator basicEstimator;
-    PassEstimatorMock passEstimatorMock;
+    PassEstimatorMock passEstimator;
 
     public CPassTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.scanner = scanner;
-        this.passer = fielders.get(0);
-        this.receiver = fielders.get(1);
+        this.__passer = fielders.get(0);
+        this.__receiver = fielders.get(1);
         this.ball = ball;
+        this.fielders = fielders;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passEstimatorMock = new PassEstimatorMock();
+        passEstimator = new PassEstimatorMock();
     }
 
     @Override
     public boolean test() {
+
+        boolean testRtn = true;
         try {
-            passer.kick(new Vec2D(2, 2));
-            receiver.kick(new Vec2D(2, 2));
+            __passer.kick(new Vec2D(2, 2));
+            __receiver.kick(new Vec2D(2, 2));
+            Thread.sleep(500);
+            __passer.kick(new Vec2D(0, 0));
+            __receiver.kick(new Vec2D(0, 0));
+
 
             Vec2D passingPos = new Vec2D(-1000, -1000);
+            Vec2D secondReceivingPos = new Vec2D(-1500, 2000);
+
             Vec2D receivingPos = new Vec2D(1000, 1000);
+            Vec2D secondPassingPos = new Vec2D(1500, 3000);
+
+
             Vec2D initPasserPos = passingPos.add(new Vec2D(0, 0));
             Vec2D initReceiverPos = receivingPos.add(new Vec2D(-1500, 0));
 
-            passEstimatorMock.setPassingPos(passingPos);
-            passEstimatorMock.setReceivingPos(receivingPos);
-            passEstimatorMock.setOptimalReceiver(receiver);
-            passEstimatorMock.setGoodTimeToPass(false);
-            passEstimatorMock.setBallArrivalETA(0.6);
+            /* preparation */
+            passEstimator.setPassingPos(passingPos);
+            passEstimator.setReceivingPos(receivingPos);
+            passEstimator.setGoodTimeToKick(false);
+            passEstimator.setBallArrivalETA(1.1);
 
-            passer.kick(new Vec2D(0, 0));
-
-            while (!passer.isHoldingBall()) {
-                while (!passer.isHoldingBall()) {
-                    passer.getBall(ball);
-                    receiver.fastCurveTo(initReceiverPos);
+            while (!__passer.isHoldingBall()) {
+                while (!__passer.isHoldingBall()) {
+                    __passer.getBall(ball);
+                    __receiver.fastCurveTo(initReceiverPos);
                 }
-                while (!passer.isPosArrived(initPasserPos) || !receiver.isPosArrived(initReceiverPos)) {
-                    passer.fastCurveTo(initPasserPos);
-                    receiver.fastCurveTo(initReceiverPos);
+                while (!__passer.isPosArrived(initPasserPos) || !__receiver.isPosArrived(initReceiverPos)) {
+                    __passer.fastCurveTo(initPasserPos);
+                    __receiver.fastCurveTo(initReceiverPos);
                 }
             }
 
-            receiver.kick(new Vec2D(0, 0));
-            PassState passState = PENDING;
-            CoordinatedPass.setPending();
-            while (passState != PassState.RECEIVE_SUCCESS && passState != PassState.FAILED) {
-                double dist = receivingPos.sub(receiver.getPos()).mag();
-                if (dist <= 200)
-                    passEstimatorMock.setGoodTimeToPass(true);
 
-                passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimatorMock);
-                System.out.println(passState);
+            /* Begin test */
+            PassState passState;
+            Ally passer = null;
+            Ally receiver = null;
+            boolean toQuit = false;
+            boolean firstTestCompleted = false;
+            passEstimator.setOptimalReceiver(__receiver);
+            while (!toQuit) {
+                if (basicEstimator.isBallUnderOurCtrl()) {
+                    if (CoordinatedPass.getPassState() == PassState.PENDING) {
+                        if (firstTestCompleted) {
+                            passEstimator.setOptimalReceiver(__passer);
+                            passEstimator.setReceivingPos(secondReceivingPos);
+                            passEstimator.setPassingPos(secondPassingPos);
+                        }
+                        passer = (Ally) basicEstimator.getBallHolder();
+                        receiver = passEstimator.getOptimalReceiver();
+                    }
+                    passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimator);
+                    System.out.println(passState);
+                    switch (passState) {
+                        case PASSED -> {
+                            if (passer == null) {
+                                toQuit = true;
+                            } else {
+                                if (!firstTestCompleted) {
+                                    passer.fastCurveTo(secondReceivingPos);
+                                } else {
+                                    passer.fastCurveTo(new Vec2D(0, 0));
+                                }
+                            }
+                        }
+                        case RECEIVE_SUCCESS -> {
+                            if (!firstTestCompleted) {
+                                firstTestCompleted = true;
+                            } else {
+                                toQuit = true;
+                            }
+                        }
+                        case FAILED -> {
+                            toQuit = true;
+                            testRtn = false;
+                        }
+                    }
+
+                    if (receiver != null) {
+                        double dist = receivingPos.sub(receiver.getPos()).mag();
+                        if (dist <= 500) {
+                            passEstimator.setGoodTimeToKick(true);
+                        }
+                    }
+
+                } else {
+                    System.out.println("Ball Out of Our Control");
+                }
             }
+
+            fielders.stopAll();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return true;
+        return testRtn;
     }
 }

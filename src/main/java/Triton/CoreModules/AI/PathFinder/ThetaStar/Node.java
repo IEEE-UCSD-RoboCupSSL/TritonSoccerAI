@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Algorithms.PathFinder.ThetaStar;
+package Triton.CoreModules.AI.PathFinder.ThetaStar;
 
 import Triton.Misc.Math.Matrix.Vec2D;
 

@@ -17,5 +17,6 @@ public final class ObjectConfig {
 
 
     public static Team MY_TEAM = Team.BLUE;
-    public static int MAX_POS_LIST_CAPACITY = 10;
+    public static int MAX_POS_LIST_CAPACITY = 50;
+    public static double DRIBBLER_OFFSET = 105;
 }

@@ -57,7 +57,7 @@ public class RobotData {
 
     private void updatePos(Pair<Vec2D, Double> posTimePair) {
         posList.add(posTimePair);
-        posList.sort(new TimePairComparator<Vec2D>());
+        posList.sort(new TimePairComparator<>());
         if (posList.size() >= ObjectConfig.MAX_POS_LIST_CAPACITY)
             posList.removeFirst();
 
@@ -79,7 +79,7 @@ public class RobotData {
 
     private void updateAngle(Pair<Double, Double> angleTimePair) {
         angleList.add(angleTimePair);
-        angleList.sort(new TimePairComparator<Double>());
+        angleList.sort(new TimePairComparator<>());
         if (angleList.size() >= ObjectConfig.MAX_POS_LIST_CAPACITY)
             angleList.removeFirst();
 

@@ -3,7 +3,6 @@ package Triton.CoreModules.Robot;
 import Triton.App;
 
 import java.util.ArrayList;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class RobotList<T> extends ArrayList<T> {
 
@@ -26,6 +25,16 @@ public class RobotList<T> extends ArrayList<T> {
         for (T bot : this) {
             if (bot instanceof Robot) {
                 App.threadPool.submit((Robot) bot);
+            } else {
+                System.out.println("Invalid Type");
+            }
+        }
+    }
+
+    public void stopAll() {
+        for (T bot : this) {
+            if (bot instanceof Ally) {
+                ((Ally) bot).stop();
             } else {
                 System.out.println("Invalid Type");
             }

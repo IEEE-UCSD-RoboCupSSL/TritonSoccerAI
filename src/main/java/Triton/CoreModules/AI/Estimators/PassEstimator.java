@@ -39,7 +39,7 @@ public class PassEstimator {
     }
 
     /* return true if slack time > 0 */
-    public boolean isGoodTimeToPass() {
+    public boolean isGoodTimeToKick() {
         return false;
     }
 

@@ -3,8 +3,8 @@ package Triton.CoreModules.AI.AI_Skills;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
@@ -13,48 +13,42 @@ import java.util.Comparator;
 public class Swarm extends Skills {
 
     private final RobotList<Ally> botList;
-//    private static Publisher<Boolean> delayPub;
-//    private static Subscriber<Boolean> delaySub;
-//    private static int defaultUpdatePeriod = 100; // milliseconds
-//
-//    static { // static block only runs once during the first time this class is used
-//        /* these steps take time, don't put them in constructors because constructor for
-//        * this class is meant to repeatedly called whenever a new subset of robots
-//        * are assigned as a swarm group */
-//        delayPub = new FieldPublisher<>("Swarm", "DelayFinished", false);
-//        delaySub = new FieldSubscriber<>("Swarm", "DelayFinished");
-//        try {
-//            delaySub.subscribe(1000);
-//        } catch (TimeoutException e) {
-//            e.printStackTrace();
-//        }
-//
-//        App.threadPool.submit(new Runnable() {
-//            @Override
-//            public void run() {
-//                if(delaySub.getMsg()) {
-//                    delayPub.publish(false);
-//                } else {
-//                    delayPub.publish(true);
-//                }
-//
-//                try {
-//                    Thread.sleep(defaultUpdatePeriod);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
-
-
-
 
 
     public Swarm(RobotList<Ally> botList) {
         this.botList = botList;
     }
 
+    public void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+        // To-do
+
+    }
+
+    public void roundUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+        // To-do
+
+    }
+
+
+    // To-do: make Curve2D
+    public void CurveUp(RobotList<Ally> botList /*...*/) {
+        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+            System.out.println("botList has invalid size");
+        }
+
+        // To-do
+
+    }
+
+    public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
+        return groupTo(locList, null, priorityRefPoint);
+    }
 
     /*
      * Command a group of robots from the input botList
@@ -80,7 +74,7 @@ public class Swarm extends Skills {
      * @return true when all bots from botList have arrived their corresponding positions
      * */
     public boolean groupTo(ArrayList<Vec2D> posList,
-                                  ArrayList<Double> dirList, Vec2D priorityRefPoint) {
+                           ArrayList<Double> dirList, Vec2D priorityRefPoint) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1 || botList.size() != posList.size()
                 || (dirList != null && posList.size() != dirList.size())) {
             System.out.println("Inputs have invalid size(s)");
@@ -89,11 +83,10 @@ public class Swarm extends Skills {
         /* sort posList(or posDirList) based on priorityRefPoint */
         ArrayList<Pair<Vec2D, Double>> posDirList;
         posDirList = new ArrayList<>();
-        for(int i = 0; i < posList.size(); i++) {
-            if(dirList != null) {
+        for (int i = 0; i < posList.size(); i++) {
+            if (dirList != null) {
                 posDirList.add(new Pair<>(posList.get(i), dirList.get(i)));
-            }
-            else {
+            } else {
                 posDirList.add(new Pair<>(posList.get(i), null));
             }
         }
@@ -125,7 +118,7 @@ public class Swarm extends Skills {
             /* find nearest bot */
             for (Ally bot : bots) {
 
-                /* upgrade to using path distance instead of eucledian distance*/
+                /* To-do: upgrade to using path distance instead of eucledian distance*/
                 double newDist = loc.sub(bot.getPos()).mag();
                 if (newDist < dist) {
                     dist = newDist;
@@ -136,7 +129,7 @@ public class Swarm extends Skills {
                 bots.remove(nearestBot);
 
                 // if(Swarm.delaySub.getMsg()) { // only update command after having delayed for a bit to avoid robotic parkinson behavior :)
-                    /* command nearest bot to the corresponding location */
+                /* command nearest bot to the corresponding location */
                 if (ang != null) {
                     /* To-do: upgrade to using curveTo */
                     nearestBot.fastCurveTo(loc, ang);
@@ -156,10 +149,6 @@ public class Swarm extends Skills {
         return rtn;
     }
 
-    public boolean groupTo(ArrayList<Vec2D> locList, Vec2D priorityRefPoint) {
-        return groupTo(locList, null, priorityRefPoint);
-    }
-
     public boolean groupTo(ArrayList<Vec2D> locList, ArrayList<Double> dirList) {
         return groupTo(locList, dirList, new Vec2D(0, 0));
     }
@@ -169,23 +158,5 @@ public class Swarm extends Skills {
         return groupTo(locList, null, new Vec2D(0, 0));
     }
 
-
-
-
-    public static void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
-            System.out.println("botList has invalid size");
-        }
-
-
-    }
-
-    // To-do: make Curve2D
-    public static void CurveUp(RobotList<Ally> botList /*...*/) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
-            System.out.println("botList has invalid size");
-        }
-
-    }
 
 }

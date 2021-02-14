@@ -2,12 +2,14 @@ package Triton.PeriphModules.Display;
 
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
+import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Geometry.Rect2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
@@ -38,12 +40,12 @@ public class Display extends JPanel {
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
     protected Gridify convert;
+    GapFinder gapFinder;
     private HashMap<String, Line2D> fieldLines;
     private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
-
 
     /* Construct a display with robot, ball, and field */
     public Display() {
@@ -143,20 +145,23 @@ public class Display extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        Graphics2D g2d = (Graphics2D) g;
 
-        if (paintOptions.contains(GEOMETRY))
-            paintGeo(g2d);
-        if (paintOptions.contains(OBJECTS))
-            paintObjects(g2d);
-        if (paintOptions.contains(PROBABILITY))
-            paintProbability(g2d);
-        if (paintOptions.contains(PREDICTION))
-            paintPrediction(g2d);
-        if (paintOptions.contains(INFO))
-            paintInfo(g2d);
+        try {
+            Graphics2D g2d = (Graphics2D) g;
 
-        lastPaint = System.currentTimeMillis();
+            if (paintOptions.contains(PROBABILITY))
+                paintProbability(g2d);
+            if (paintOptions.contains(PREDICTION))
+                paintPrediction(g2d);
+            if (paintOptions.contains(GEOMETRY))
+                paintGeo(g2d);
+            if (paintOptions.contains(OBJECTS))
+                paintObjects(g2d);
+            if (paintOptions.contains(INFO))
+                paintInfo(g2d);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -202,51 +207,6 @@ public class Display extends JPanel {
         g2d.drawImage(ImgLoader.ball, pos[0], pos[1], null);
     }
 
-    private void paintProbability(Graphics2D g2d) {
-        int checkDist = 10;
-        Vec2D pos = blueRobotSubs.get(0).getMsg().getPos();
-        for (int x = 0; x < windowWidth; x += checkDist) {
-            for (int y = 0; y < windowHeight; y += checkDist) {
-                int[] displayPos = {x, y};
-                Vec2D worldPos = convert.fromInd(displayPos);
-                double prob = exampleProbabilityFunc(worldPos, pos);
-
-                g2d.setColor(new Color((float) prob, (float) prob, (float) prob, 1.0f));
-                g2d.fillRect(x, y, checkDist, checkDist);
-            }
-        }
-    }
-
-    private void paintPrediction(Graphics2D g2d) {
-        BallData ballData = ballSub.getMsg();
-        Vec2D pos = ballData.getPos();
-        Vec2D vel = ballData.getVel();
-
-        double time = 1;
-        Vec2D predPos = pos.add(vel.scale(time));
-//        Vec2D predPos = pos.add(vel.mult(time)).add(accel.mult(time * time * 0.5));
-
-        int[] screenPos = convert.fromPos(pos);
-        int[] screenPredPos = convert.fromPos(predPos);
-        g2d.setColor(Color.WHITE);
-        g2d.setStroke(new BasicStroke(5));
-        g2d.drawLine(screenPos[0], screenPos[1], screenPredPos[0], screenPredPos[1]);
-    }
-
-    /**
-     * Paints additional information like FPS
-     *
-     * @param g2d Graphics2D object to paint to
-     */
-    private void paintInfo(Graphics2D g2d) {
-        g2d.setColor(Color.WHITE);
-
-        g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
-                windowHeight - 70);
-        g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
-                windowHeight - 50);
-    }
-
     private void paintRobots(Graphics2D g2d, ArrayList<RobotData> robots) {
         for (RobotData robot : robots) {
             BufferedImage img;
@@ -270,14 +230,65 @@ public class Display extends JPanel {
         }
     }
 
-    private double exampleProbabilityFunc(Vec2D point, Vec2D pos) {
-//        return sigmoid((point.x + point.y) / 2000);
-        double dist = point.sub(pos).mag();
-        return sigmoid(dist / 250 - 10 + (Math.random() - 0.5));
+    private void paintProbability(Graphics2D g2d) {
+        if (gapFinder == null)
+            return;
+
+        HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
+        double fieldWidth = fieldSize.get("fieldWidth");
+        double fieldLength = fieldSize.get("fieldLength");
+        double[][] pmf = gapFinder.getPMF();
+        for (int x = 0; x < windowWidth; x++) {
+            for (int y = 0; y < windowHeight; y++) {
+                int[] displayPos = {x, y};
+                Vec2D worldPos = convert.fromInd(displayPos);
+                double clampedX = Math.max(worldPos.x, -fieldWidth / 2);
+                clampedX = Math.min(clampedX, fieldWidth / 2);
+                double clampedY = Math.max(worldPos.y, -fieldLength / 2);
+                clampedY = Math.min(clampedY, fieldLength / 2);
+                Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
+
+                double prob = gapFinder.getProb(pmf, clampedWorldPos);
+
+                prob *= 0.8; // to prevent completely white out
+
+                g2d.setColor(new Color((float) prob, (float) prob, (float) prob, 1.0f));
+                g2d.fillRect(x, y, 1, 1);
+            }
+        }
     }
 
-    private double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
+    private void paintPrediction(Graphics2D g2d) {
+        BallData ballData = ballSub.getMsg();
+        Vec2D pos = ballData.getPos();
+        Vec2D vel = ballData.getVel();
+
+        double time = 1;
+        Vec2D predPos = pos.add(vel.scale(time));
+
+        int[] screenPos = convert.fromPos(pos);
+        int[] screenPredPos = convert.fromPos(predPos);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(5));
+        g2d.drawLine(screenPos[0], screenPos[1], screenPredPos[0], screenPredPos[1]);
+    }
+
+    /**
+     * Paints additional information like FPS
+     *
+     * @param g2d Graphics2D object to paint to
+     */
+    private void paintInfo(Graphics2D g2d) {
+        g2d.setColor(Color.WHITE);
+
+        g2d.drawString(String.format("LAST UPDATE: %d ms", System.currentTimeMillis() - lastPaint), 50,
+                windowHeight - 70);
+        g2d.drawString(String.format("FPS: %.1f", 1000.0 / (System.currentTimeMillis() - lastPaint)), 50,
+                windowHeight - 50);
+    }
+
+    public void setGapFinder(GapFinder gapFinder) {
+        this.gapFinder = gapFinder;
     }
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {

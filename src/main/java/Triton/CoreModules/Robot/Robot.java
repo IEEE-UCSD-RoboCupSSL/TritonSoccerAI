@@ -17,12 +17,12 @@ public abstract class Robot implements Module {
         dataSub = new FieldSubscriber<>("detection", team.name() + ID);
     }
 
-    protected RobotData getData() {
-        return dataSub.getMsg();
-    }
-
     public Vec2D getPos() {
         return getData().getPos();
+    }
+
+    protected RobotData getData() {
+        return dataSub.getMsg();
     }
 
     public Vec2D getVel() {

@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.AI_Strategies;
 
-import Triton.CoreModules.AI.AI_Tactics.HugAttack;
+import Triton.CoreModules.AI.AI_Tactics.AttackPlanA;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassEstimator;
@@ -35,7 +35,7 @@ public class BasicPlay extends Strategies {
 
         // construct tactics
         // ...
-        attack = new HugAttack(allies, keeper, foes, ball, basicEstimator, passEstimator);
+        attack = new AttackPlanA(allies, keeper, foes, ball, basicEstimator, passEstimator);
     }
 
     @Override

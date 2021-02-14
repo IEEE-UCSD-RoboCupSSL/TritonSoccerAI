@@ -18,8 +18,8 @@ public class ConnectionConfig {
     public static final int MC_PORT = 10020;
     public static final long MC_INTERVAL = 5; // 5 ms
     // IP Addr & Port Base: Port Base + Offset = TCP Port/3 diff UDP Port
-    public static Integer defaultPortBase = 6000;
-    public static Integer defaultPortOffset = 100;
+    public static Integer DEFAULT_PORT_BASE = 6000;
+    public static Integer DEFAULT_PORT_OFFSET = 100;
     public static Pair<String, Integer> ROBOT_0_IP = new Pair<>("localhost", 6000);
     public static Pair<String, Integer> ROBOT_1_IP = new Pair<>("localhost", 6100);
     public static Pair<String, Integer> ROBOT_2_IP = new Pair<>("localhost", 6200);

@@ -11,6 +11,7 @@ import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
+import org.apache.commons.math3.distribution.MultivariateNormalDistribution;
 import org.javatuples.Pair;
 
 import java.util.Scanner;
@@ -60,22 +61,22 @@ public class App {
             }
 
             if (args.length >= 3) { // robot ip addr
-                ROBOT_0_IP = new Pair<>(args[2], defaultPortBase);
-                ROBOT_1_IP = new Pair<>(args[2], defaultPortBase + defaultPortOffset);
-                ROBOT_2_IP = new Pair<>(args[2], defaultPortBase + 2 * defaultPortOffset);
-                ROBOT_3_IP = new Pair<>(args[2], defaultPortBase + 3 * defaultPortOffset);
-                ROBOT_4_IP = new Pair<>(args[2], defaultPortBase + 4 * defaultPortOffset);
-                ROBOT_5_IP = new Pair<>(args[2], defaultPortBase + 5 * defaultPortOffset);
+                ROBOT_0_IP = new Pair<>(args[2], DEFAULT_PORT_BASE);
+                ROBOT_1_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + DEFAULT_PORT_OFFSET);
+                ROBOT_2_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 2 * DEFAULT_PORT_OFFSET);
+                ROBOT_3_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 3 * DEFAULT_PORT_OFFSET);
+                ROBOT_4_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 4 * DEFAULT_PORT_OFFSET);
+                ROBOT_5_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 5 * DEFAULT_PORT_OFFSET);
 
             }
 
             if (args.length > 3) { // robot ip port base value
                 ROBOT_0_IP = new Pair<>(args[2], Integer.parseInt(args[3]));
-                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + defaultPortOffset);
-                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * defaultPortOffset);
-                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * defaultPortOffset);
-                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * defaultPortOffset);
-                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * defaultPortOffset);
+                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + DEFAULT_PORT_OFFSET);
+                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * DEFAULT_PORT_OFFSET);
+                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * DEFAULT_PORT_OFFSET);
+                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * DEFAULT_PORT_OFFSET);
+                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * DEFAULT_PORT_OFFSET);
 
             }
 
@@ -112,11 +113,12 @@ public class App {
 
 
         if (!isTestMode) {
-            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-            threadPool.submit(gameCtrlModule);
+//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+//            threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+//            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+            threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         } else {
             threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         }
@@ -127,9 +129,11 @@ public class App {
 //        paintOptions.add(GEOMETRY);
 //        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
+//        paintOptions.add(PROBABILITY);
+//        paintOptions.add(PREDICTION);
 //        display.setPaintOptions(paintOptions);
 
-        // sleepForever();
+        sleepForever();
     }
 
     private static void sleepForever() {

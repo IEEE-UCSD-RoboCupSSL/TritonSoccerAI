@@ -44,7 +44,7 @@ public class Rect2D extends Geometry2D {
      */
     @Override
     public boolean isInside(Vec2D point) {
-        return !(point.x < anchor.x) && !(point.x > anchor.x + width) && !(point.y < anchor.y) && !(point.y > anchor.y + height);
+        return (point.x >= anchor.x) && (point.x <= anchor.x + width) && (point.y >= anchor.y) && (point.y <= anchor.y + height);
     }
 
     /**

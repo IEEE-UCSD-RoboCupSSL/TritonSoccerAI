@@ -2,6 +2,7 @@ package Triton.Misc.Math.Matrix;
 
 import Proto.RemoteAPI;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.Misc.Math.Geometry.Line2D;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -77,16 +78,6 @@ public class Vec2D {
     }
 
     /**
-     * Add another vector to current vector
-     *
-     * @param toAdd vector to add
-     * @return a new vector after addition
-     */
-    public Vec2D add(Vec2D toAdd) {
-        return new Vec2D(this.x + toAdd.x, this.y + toAdd.y);
-    }
-
-    /**
      * Add x and y to current vector
      *
      * @param x x value to add
@@ -95,26 +86,6 @@ public class Vec2D {
      */
     public Vec2D add(double x, double y) {
         return new Vec2D(this.x + x, this.y + y);
-    }
-
-    /**
-     * Subtract another vector from current vector
-     *
-     * @param toSubtract vector to subtract by
-     * @return a new vector after subtraction
-     */
-    public Vec2D sub(Vec2D toSubtract) {
-        return new Vec2D(this.x - toSubtract.x, this.y - toSubtract.y);
-    }
-
-    /**
-     * Multiply current vector by a scalar
-     *
-     * @param z value to multiply by
-     * @return a new vector multiplied by the scalar
-     */
-    public Vec2D scale(double z) {
-        return new Vec2D(this.x * z, this.y * z);
     }
 
     /**
@@ -144,25 +115,6 @@ public class Vec2D {
     }
 
     /**
-     * Returns the unit vector (vector with length 1)
-     *
-     * @return the unit vector
-     */
-    public Vec2D norm() {
-        double mag = mag();
-        return new Vec2D(x / mag, y / mag);
-    }
-
-    /**
-     * Returns the length of the vector
-     *
-     * @return the length of the vector
-     */
-    public double mag() {
-        return Math.pow(Math.pow(x, 2) + Math.pow(y, 2), 0.5);
-    }
-
-    /**
      * @return angle starting from y-axis, positive is counter clockwise, between -180 to 180
      */
     public double toPlayerAngle() {
@@ -181,27 +133,88 @@ public class Vec2D {
         return Math.toDegrees(Math.atan2(y, x));
     }
 
+    public SimpleMatrix toEJML() {
+        return new SimpleMatrix(new double[][]{
+                new double[]{x},
+                new double[]{y}
+        });
+    }
+
+    public double distToLine(Line2D line) {
+        Vec2D vecA = line.p2.sub(line.p1).normalized();
+        Vec2D vecB = this.sub(line.p1);
+        Vec2D perpenPoint = line.p1.add(vecA.scale(vecB.dot(vecA)));
+        Vec2D vecC = this.sub(perpenPoint).normalized();
+        return Math.abs(vecB.dot(vecC));
+    }
+
+    /**
+     * Add another vector to current vector
+     *
+     * @param toAdd vector to add
+     * @return a new vector after addition
+     */
+    public Vec2D add(Vec2D toAdd) {
+        return new Vec2D(this.x + toAdd.x, this.y + toAdd.y);
+    }
+
+    /**
+     * Subtract another vector from current vector
+     *
+     * @param toSubtract vector to subtract by
+     * @return a new vector after subtraction
+     */
+    public Vec2D sub(Vec2D toSubtract) {
+        return new Vec2D(this.x - toSubtract.x, this.y - toSubtract.y);
+    }
+
+    /**
+     * Multiply current vector by a scalar
+     *
+     * @param z value to multiply by
+     * @return a new vector multiplied by the scalar
+     */
+    public Vec2D scale(double z) {
+        return new Vec2D(this.x * z, this.y * z);
+    }
+
+    /**
+     * Returns the unit vector (vector with length 1)
+     *
+     * @return the unit vector
+     */
+    public Vec2D normalized() {
+        double mag = mag();
+        return new Vec2D(x / mag, y / mag);
+    }
+
+    /**
+     * Returns the length of the vector
+     *
+     * @return the length of the vector
+     */
+    public double mag() {
+        return Math.pow(Math.pow(x, 2) + Math.pow(y, 2), 0.5);
+    }
+
     /* dot product */
     public double dot(Vec2D vec) {
         SimpleMatrix a = new SimpleMatrix(new double[][]{
-                new double[] {this.x},
-                new double[] {this.y}
+                new double[]{this.x},
+                new double[]{this.y}
         });
         SimpleMatrix b = new SimpleMatrix(new double[][]{
-                new double[] {vec.x},
-                new double[] {vec.y}
+                new double[]{vec.x},
+                new double[]{vec.y}
         });
 
         return a.dot(b);
     }
 
-
-    public SimpleMatrix toEJML() {
-        return new SimpleMatrix(new double[][]{
-                new double[] {x},
-                new double[] {y}
-        });
+    public double[] toDoubleArray() {
+        return new double[]{this.x, this.y};
     }
+
 
     /**
      * Returns current vector as a RemoteAPI Vec2D

@@ -14,7 +14,7 @@ public class Ball implements Module {
     }
 
     public Vec2D getTrajectoryConstraint() {
-        return getData().getVel().norm();
+        return getData().getVel().normalized();
     }
 
     protected BallData getData() {

@@ -54,7 +54,7 @@ public class Line2D {
      * @return the direction from point 1 to point 2
      */
     public Vec2D getDir() {
-        return p2.sub(p1).norm();
+        return p2.sub(p1).normalized();
     }
 
     /**
