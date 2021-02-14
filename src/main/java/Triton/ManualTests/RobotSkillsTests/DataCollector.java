@@ -33,10 +33,14 @@ public class DataCollector extends RobotSkillsTest {
 
         @Override
         public void run() {
+            double lastPos = Double.MAX_VALUE;
             while (running) {
                 try {
                     Vec2D pos = ball.getPos();
-                    logger.info("Ignored", pos.x, pos.y, ball.getTime());
+                    if(lastPos != pos.y) {
+                        logger.info("Ignored", pos.x, pos.y, ball.getTime());
+                    }
+                    lastPos = pos.y;
                     Thread.sleep(TIME_INTERVAL);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -53,9 +57,11 @@ public class DataCollector extends RobotSkillsTest {
     BallLogger logger;
 
     public static final double POS_THRESHOLD = 50;
-    public static final double POS_PRECISION = 1;
+    public static final double POS_PRECISION = 0.3;
     public static final double ANG_PRECISION = 0.1;
+    public static final double EPSILON = 1e-5;
     public static final long TIME_INTERVAL = 13;
+    public static final long STOP_INTERVAL = 500;
     public static final String LOG_DIR = "src/main/resources/log/";
     public static final String LOG_CACHE = "src/main/resources/application.tmp";
 
@@ -71,7 +77,7 @@ public class DataCollector extends RobotSkillsTest {
         new FormationTest("out", fielders, keeper).test();
         Ally ally = fielders.get(0);
 
-        for (double kickSpeed = 1; kickSpeed < 4; kickSpeed += 0.01) {
+        for (double kickSpeed = 3.99; kickSpeed <= 4; kickSpeed += 0.01) {
             /* Robot 0 dribble ball */
 
             while (!ally.isHoldingBall()) {
@@ -99,23 +105,36 @@ public class DataCollector extends RobotSkillsTest {
             thread.start();
 
             /* Kick, wait until ball stops */
+            try {
+                Thread.sleep(STOP_INTERVAL);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             ally.kick(new Vec2D(kickSpeed, 0));
             Vec2D ballPos = ball.getPos();
+            double mag;
 
             while (ball.getPos().sub(ballPos).mag() < POS_THRESHOLD);
-            while (ball.getPos().sub(ballPos).mag() > POS_PRECISION) {
+            do {
                 ballPos = ball.getPos();
                 try {
                     Thread.sleep(TIME_INTERVAL);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
+            } while ((mag = ball.getPos().sub(ballPos).mag()) > POS_PRECISION || mag < EPSILON);
 
             /* Close the logger */
             logger.terminate();
             try {
                 thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Thread.sleep(STOP_INTERVAL);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
