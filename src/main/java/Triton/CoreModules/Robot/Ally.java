@@ -409,9 +409,7 @@ public class Ally extends Robot implements AllySkills {
         if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
             statePub.publish(AUTO_CAPTURE);
         } else {
-            /* To-do: once intercept is ready, use it with sprintTo for 180 degree situation */
-            moveTo(ballLoc);
-            spinTo(currPosToBall.toPlayerAngle());
+            fastCurveTo(ballLoc, currPosToBall.toPlayerAngle());
         }
     }
 

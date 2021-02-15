@@ -7,6 +7,7 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.AI_SkillsTests.CPassTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
+import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.Misc.Math.Matrix.Mat2D;
@@ -65,6 +66,7 @@ public class TestRunner implements Module {
                         case "reset" -> rtn = new FormationTest("tester", fielders).test();
                         case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
                         case "gap" -> rtn = new GapFinderTest(fielders, foes, ball).test();
+                        case "gapgetball" -> rtn = new GapGetBallTest(fielders, keeper, foes, ball).test();
                         case "shoot" -> rtn = new ShootGoalTest(scanner, fielders.get(0), foes, ball).test();
                         case "keep" -> rtn = new KeeperTest(fielders, keeper, foes, ball).test();
                         case "math" -> {

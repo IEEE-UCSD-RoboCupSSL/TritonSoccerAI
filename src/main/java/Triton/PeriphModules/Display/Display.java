@@ -260,7 +260,7 @@ public class Display extends JPanel {
             }
         }
 
-        ArrayList<Vec2D> topMaxPos = probFinder.getTopNMaxPos(20);
+        ArrayList<Vec2D> topMaxPos = probFinder.getTopNMaxPosWithClearance(5, 300);
         // System.out.println(topMaxPos);
 
         for(Vec2D maxPos : topMaxPos) {

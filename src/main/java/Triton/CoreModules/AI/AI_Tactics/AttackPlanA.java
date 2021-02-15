@@ -14,10 +14,15 @@ public class AttackPlanA extends Tactics {
 
     protected Ally passer, receiver;
     protected Robot holder;
+    protected final BasicEstimator basicEstimator;
+    protected final PassEstimator passEstimator;
 
     public AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
-                       Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
-        super(fielders, keeper, foes, ball, basicEstimator, passEstimator);
+                       Ball ball) {
+        super(fielders, keeper, foes, ball);
+
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+        passEstimator = new PassEstimator(fielders, keeper, foes, ball);
     }
 
     @Override

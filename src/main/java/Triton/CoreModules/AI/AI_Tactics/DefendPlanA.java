@@ -17,9 +17,13 @@ import java.util.ArrayList;
 public class DefendPlanA extends Tactics {
 
     private final double guardGoalGap = 300; // mm
+    protected final BasicEstimator basicEstimator;
+    protected final PassEstimator passEstimator;
 
-    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
-        super(fielders, keeper, foes, ball, basicEstimator, passEstimator);
+    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+        super(fielders, keeper, foes, ball);
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+        passEstimator = new PassEstimator(fielders, keeper, foes, ball);
     }
 
     @Override

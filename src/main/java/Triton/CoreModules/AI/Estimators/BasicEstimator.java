@@ -82,7 +82,8 @@ public class BasicEstimator {
         }
 
         // Use getPassStates() in CoordinatedPass.java to deal with passing situation
-        if (CoordinatedPass.getPassState() != PassState.FAILED) {
+        if (CoordinatedPass.getPassState() != PassState.FAILED
+            && CoordinatedPass.getPassState() != PassState.PENDING) {
             // during some valid pass states while ball is traveling, no body holds the ball
             rtn = true;
         }
