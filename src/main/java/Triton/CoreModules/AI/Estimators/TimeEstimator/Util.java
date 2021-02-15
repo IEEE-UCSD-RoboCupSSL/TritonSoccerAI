@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 public class Util {
 
-    private static final double PRECISION = 0.0001;
+    private static final double PRECISION = 0.01;
 
     /**
      * Convert a double array to a N*1 double vector
@@ -58,7 +58,7 @@ public class Util {
      * @return root
      */
     public static double bisection(Function<Double, Double> f, double a, double b) {
-        double c = a;
+        double c = b;
         while ((b - a) >= PRECISION) {
             // Find middle point
             c = (a + b) / 2;

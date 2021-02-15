@@ -11,6 +11,7 @@ public class BallMovement {
             42.78419844, 11.30341907, 55.88504885, 57.48939017,
             -13.63537183, 25.42496705, -33.2416606, 7.06778388}).transpose();
 
+    private static final double MAX_TIME = 10.0;
     /**
      * A safe way to calculate distance.
      *
@@ -64,7 +65,19 @@ public class BallMovement {
      * @return estimated time for reaching the distance
      */
     public static double calcETA(double s, double d) {
-        Function<Double, Double> f = (t) -> calcDist(s, t) - d;
-        return Util.bisection(f, 0.0, calcMaxDist(s)[1]);
+        double[] temp = calcMaxDist(s);
+        return calcETAFast(s, d, temp);
+    }
+
+    /**
+     * fast ETA with precomputed max dist and time
+     */
+    public static double calcETAFast(double s, double d, double[] maxPair) {
+        if (d <= 0.0) return 0.0;
+        double maxDist = maxPair[0];
+        double maxTime = maxPair[1];
+        if (d > maxDist) return MAX_TIME;
+        Function<Double, Double> f = (t) -> calcDistFast(s, t) - d;
+        return Util.bisection(f, 0.0, maxTime);
     }
 }

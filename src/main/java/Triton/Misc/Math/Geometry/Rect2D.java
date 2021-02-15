@@ -56,5 +56,11 @@ public class Rect2D extends Geometry2D {
         s += "[" + anchor + ", " + width + ", " + height + "]";
         return s;
     }
+
+    public double distTo(Vec2D pos) {
+        double dx = Math.max(Math.max(anchor.x - pos.x, pos.x - (anchor.x + width)), 0.0);
+        double dy = Math.max(Math.max(anchor.y - pos.y, pos.y - (anchor.y + height)), 0.0);
+        return Math.sqrt(dx*dx + dy*dy);
+    }
 }
         

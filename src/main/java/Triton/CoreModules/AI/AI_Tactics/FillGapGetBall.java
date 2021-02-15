@@ -25,6 +25,7 @@ public class FillGapGetBall extends Tactics {
     public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         super(fielders, keeper, foes, ball);
         gapFinder = new GapFinder(fielders, foes, ball);
+        gapFinder.run();
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         state = 0;
     }
