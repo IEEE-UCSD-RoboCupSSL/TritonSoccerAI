@@ -2,7 +2,7 @@ package Triton.PeriphModules.Display;
 
 import Triton.Config.DisplayConfig;
 import Triton.Config.ObjectConfig;
-import Triton.CoreModules.AI.Estimators.GapFinder;
+import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
@@ -39,7 +39,7 @@ public class Display extends JPanel {
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
     protected Gridify convert;
-    GapFinder gapFinder;
+    ProbFinder probFinder;
     private HashMap<String, Line2D> fieldLines;
     private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
@@ -149,7 +149,7 @@ public class Display extends JPanel {
             Graphics2D g2d = (Graphics2D) g;
 
             if (paintOptions.contains(PROBABILITY))
-                paintGapFinder(g2d);
+                paintProbFinder(g2d);
             if (paintOptions.contains(PREDICTION))
                 paintPrediction(g2d);
             if (paintOptions.contains(GEOMETRY))
@@ -229,17 +229,17 @@ public class Display extends JPanel {
         }
     }
 
-    public void setGapFinder(GapFinder gapFinder) {
-        this.gapFinder = gapFinder;
+    public void setProbFinder(ProbFinder probFinder) {
+        this.probFinder = probFinder;
     }
-    private void paintGapFinder(Graphics2D g2d) {
-        if (gapFinder == null)
+    private void paintProbFinder(Graphics2D g2d) {
+        if (probFinder == null)
             return;
 
         HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
         double fieldWidth = fieldSize.get("fieldWidth");
         double fieldLength = fieldSize.get("fieldLength");
-        double[][] pmf = gapFinder.getPMF();
+        double[][] pmf = probFinder.getPMF();
         if(pmf == null) return;
         for (int x = 0; x < windowWidth; x++) {
             for (int y = 0; y < windowHeight; y++) {
@@ -251,7 +251,7 @@ public class Display extends JPanel {
                 clampedY = Math.min(clampedY, fieldLength / 2);
                 Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
 
-                double prob = gapFinder.getProb(pmf, clampedWorldPos);
+                double prob = probFinder.getProb(pmf, clampedWorldPos);
 
                 prob *= 0.8; // to prevent completely white out
 
@@ -260,7 +260,7 @@ public class Display extends JPanel {
             }
         }
 
-        ArrayList<Vec2D> topMaxPos = gapFinder.getTopNMaxPos(20);
+        ArrayList<Vec2D> topMaxPos = probFinder.getTopNMaxPos(20);
         // System.out.println(topMaxPos);
 
         for(Vec2D maxPos : topMaxPos) {
