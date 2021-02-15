@@ -94,9 +94,16 @@ public class FillGapGetBall extends Tactics {
             return false;
         }
 
+        Vec2D ballPos = ball.getPos();
+
         ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
         if(gapPos != null) {
-            new Swarm(restFielders).groupTo(gapPos, ball.getPos());
+            ArrayList<Double> gapPosDir = new ArrayList<>();
+            for(Vec2D pos : gapPos) {
+                gapPosDir.add(ballPos.sub(pos).toPlayerAngle());
+            }
+
+            new Swarm(restFielders).groupTo(gapPos, gapPosDir, ballPos); // ballPos used as priorityAnchor
         }
 
         if(basicEstimator.getBallHolder() instanceof Ally) {
