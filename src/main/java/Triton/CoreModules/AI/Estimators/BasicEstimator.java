@@ -100,4 +100,15 @@ public class BasicEstimator {
     }
 
 
+    public Ally getNearestFielderToBall() {
+        Ally nearestFielder = null;
+        for (Ally fielder : fielders) {
+            if (nearestFielder == null ||
+                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
+                nearestFielder = fielder;
+            }
+        }
+        return nearestFielder;
+    }
+
 }

@@ -3,12 +3,19 @@ package Triton.CoreModules.AI;
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
+import Triton.CoreModules.AI.AI_Tactics.Tactics;
+import Triton.CoreModules.AI.Estimators.BasicEstimator;
+import Triton.CoreModules.AI.Estimators.GapFinder;
+import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
+
+import static Triton.Config.ObjectConfig.DRIBBLER_OFFSET;
 
 
 public class AI implements Module {
@@ -23,6 +30,9 @@ public class AI implements Module {
     private final Strategies strategyToPlay;
     private final GameCtrlModule gameCtrl;
 
+    private final GapFinder gapFinder;
+    private final PassFinder passFinder;
+
 
     public AI(RobotList<Ally> fielders, Ally keeper,
               RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {
@@ -36,7 +46,11 @@ public class AI implements Module {
         this.ball = ball;
         this.gameCtrl = gameCtrl;
 
-        strategyToPlay = new BasicPlay(fielders, keeper, foes, ball);
+        gapFinder = new GapFinder(fielders, foes, ball);
+        passFinder = new PassFinder(fielders, foes, ball);
+
+        strategyToPlay = new BasicPlay(fielders, keeper, foes, ball,
+                                gapFinder, passFinder);
     }
 
     @Override
@@ -53,22 +67,11 @@ public class AI implements Module {
                     }
                     case FREE_KICK -> {
                         tmpPlaceHolder(">>>FREE_KICK<<<");
-
-                        // To-do: problem
-                        FillGapGetBall getball = new FillGapGetBall(fielders, keeper, foes, ball);
-                        while(!getball.exec()) {
-                            Thread.sleep(1);
-                        }
-
-                        fielders.stopAll();
-
-
+                        freeKick();
                     }
                     case KICKOFF -> {
                         tmpPlaceHolder(">>>KICKOFF<<<");
-
-                        Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
-
+                        kickOff();
                     }
                     case PENALTY -> {
                         tmpPlaceHolder(">>>PENALTY<<<");
@@ -90,7 +93,7 @@ public class AI implements Module {
                     }
                     case BALL_PLACEMENT -> {
                         tmpPlaceHolder(">>>BALL_PLACEMENT<<<");
-                        // to-do
+                        ballPlacement();
                     }
                     default -> {
                         tmpPlaceHolder(">>>UNKNOWN<<<");
@@ -111,6 +114,49 @@ public class AI implements Module {
 
     private void tmpPlaceHolder(String s) {
     }
+
+    private void kickOff() {
+        // To-do: kicking vs defending side
+        Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
+    }
+
+    private void freeKick() throws InterruptedException {
+        Tactics getball = strategyToPlay.getGetBallTactics();
+        while(!getball.exec()) {
+            Thread.sleep(1);
+        }
+
+        fielders.stopAll();
+        long t0 = System.currentTimeMillis();
+        while(System.currentTimeMillis() - t0 < 1000) {
+            getball.exec();
+        }
+        fielders.stopAll();
+    }
+
+    private void ballPlacement() throws InterruptedException {
+
+        BasicEstimator basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+
+        Ally ally = basicEstimator.getNearestFielderToBall();
+
+        Vec2D targetPos = new Vec2D(0, 0); // To-do
+
+        while(!ball.isPosArrived(targetPos)) {
+            if (ally.isHoldingBall()) {
+                ally.curveTo(targetPos.add(new Vec2D(0, -DRIBBLER_OFFSET)), 0);
+            } else {
+                ally.getBall(ball);
+            }
+            Thread.sleep(1);
+        }
+
+        ally.stop();
+        Thread.sleep(500);
+        ally.kick(new Vec2D(0.000, 0.01));
+
+    }
+
 }
 
 

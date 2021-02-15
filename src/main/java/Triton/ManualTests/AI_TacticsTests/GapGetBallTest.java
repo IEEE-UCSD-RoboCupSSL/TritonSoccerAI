@@ -24,7 +24,8 @@ public class GapGetBallTest {
 
     public GapGetBallTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        fillGapGetBall = new FillGapGetBall(fielders, keeper, foes, ball);
+        fillGapGetBall = new FillGapGetBall(fielders, keeper, foes, ball,
+                new GapFinder(fielders, foes, ball));
     }
 
     public boolean test() {

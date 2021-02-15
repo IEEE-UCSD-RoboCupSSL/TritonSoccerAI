@@ -70,17 +70,17 @@ public class PassFinder extends GapFinder {
 
         String topicName = this.getClass().getSimpleName();
 
-        fielderVelListPub = new FieldPublisher<>(topicName, "FielderVelocities", null);
-        fielderVelListSub = new FieldSubscriber<>(topicName, "FielderVelocities");
+        fielderVelListPub = new FieldPublisher<>(topicName, "FielderVelocities" + this.toString(), null);
+        fielderVelListSub = new FieldSubscriber<>(topicName, "FielderVelocities" + this.toString());
 
-        foeVelListPub = new FieldPublisher<>(topicName, "FoeVelocities", null);
-        foeVelListSub = new FieldSubscriber<>(topicName, "FoeVelocities");
+        foeVelListPub = new FieldPublisher<>(topicName, "FoeVelocities" + this.toString(), null);
+        foeVelListSub = new FieldSubscriber<>(topicName, "FoeVelocities" + this.toString());
 
-        fielderAngListPub = new FieldPublisher<>(topicName, "FielderAngles", null);
-        fielderAngListSub = new FieldSubscriber<>(topicName, "FielderAngles");
+        fielderAngListPub = new FieldPublisher<>(topicName, "FielderAngles" + this.toString(), null);
+        fielderAngListSub = new FieldSubscriber<>(topicName, "FielderAngles" + this.toString());
 
-        foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles", null);
-        foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles");
+        foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles" + this.toString(), null);
+        foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles" + this.toString());
 
         try {
             fielderVelListSub.subscribe(TIMEOUT);

@@ -75,22 +75,22 @@ public class GapFinder extends ProbFinder {
         String topicName = this.getClass().getSimpleName();
 
         /* internal pub-sub */
-        pmfPub = new FieldPublisher<>(topicName, "PDF", null);
-        pmfSub = new FieldSubscriber<>(topicName, "PDF");
+        pmfPub = new FieldPublisher<>(topicName, "PDF" + this.toString(), null);
+        pmfSub = new FieldSubscriber<>(topicName, "PDF" + this.toString());
 
-        localMaxScorePub = new FieldPublisher<>(topicName, "Max", null);
-        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max");
-        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
-        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
+        localMaxScorePub = new FieldPublisher<>(topicName, "Max" + this.toString(), null);
+        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max" + this.toString());
+        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos" + this.toString(), null);
+        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos" + this.toString());
 
-        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions", null);
-        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions");
+        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions" + this.toString(), null);
+        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions" + this.toString());
 
-        foePosListPub = new FieldPublisher<>(topicName, "FoePositions", null);
-        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions");
+        foePosListPub = new FieldPublisher<>(topicName, "FoePositions" + this.toString(), null);
+        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions" + this.toString());
 
-        ballPosPub = new FieldPublisher<>(topicName, "BallPosition", null);
-        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition");
+        ballPosPub = new FieldPublisher<>(topicName, "BallPosition" + this.toString(), null);
+        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition" + this.toString());
 
         /* external pub-sub */
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
