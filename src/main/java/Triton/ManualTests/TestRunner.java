@@ -10,6 +10,7 @@ import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
 import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
+import Triton.ManualTests.GameProceduresTests.BallPlacementTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -70,7 +71,8 @@ public class TestRunner implements Module {
                         case "gapgetball" -> rtn = new GapGetBallTest(fielders, keeper, foes, ball).test();
                         case "shoot" -> rtn = new ShootGoalTest(scanner, fielders.get(0), foes, ball).test();
                         case "keep" -> rtn = new KeeperTest(fielders, keeper, foes, ball).test();
-                        case "defendA" -> new DefendPlanATest(fielders, keeper, foes, ball).test();
+                        case "defendA" -> rtn = new DefendPlanATest(fielders, keeper, foes, ball).test();
+                        case "placeball" -> rtn = new BallPlacementTest(fielders.get(0), ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;

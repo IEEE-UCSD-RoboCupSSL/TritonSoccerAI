@@ -9,6 +9,7 @@ import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
+import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
@@ -19,7 +20,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static Triton.Config.ConnectionConfig.*;
+import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
+import static Triton.CoreModules.Robot.Team.BLUE;
 
 
 /**
@@ -40,8 +43,8 @@ public class App {
         /* processing command line arguments */
         if (args != null && args.length >= 1) { // choose team
             switch (args[0]) {
-                case "BLUE" -> ObjectConfig.MY_TEAM = Team.BLUE;
-                case "YELLOW" -> ObjectConfig.MY_TEAM = Team.YELLOW;
+                case "BLUE" -> MY_TEAM = BLUE;
+                case "YELLOW" -> MY_TEAM = Team.YELLOW;
                 default -> {
                     System.out.println("Error: Invalid Team");
                     sleepForever();
@@ -112,7 +115,9 @@ public class App {
 
 
         if (!isTestMode) {
-            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+            int port = (MY_TEAM == BLUE) ? 6543 : 6544;
+
+            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
             threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */

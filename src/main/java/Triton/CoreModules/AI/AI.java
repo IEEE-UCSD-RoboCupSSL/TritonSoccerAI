@@ -41,8 +41,6 @@ public class AI implements Module {
     @Override
     public void run() {
         try {
-
-
             while (true) { // delay added
                 GameStates currGameState = gameCtrl.getGameState();
 

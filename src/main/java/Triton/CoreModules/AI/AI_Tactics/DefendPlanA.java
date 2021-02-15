@@ -9,21 +9,22 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
 public class DefendPlanA extends Tactics {
 
-    private final double guardGoalGap = 300; // mm
+    private final double foeBlockOffset;
+    private final double GUARD_GOAL_GAP = 300; // mm
     protected final BasicEstimator basicEstimator;
     protected final PassEstimator passEstimator;
 
-    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, double foeBlockOffset) {
         super(fielders, keeper, foes, ball);
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passEstimator = new PassEstimator(fielders, keeper, foes, ball);
+        this.foeBlockOffset = foeBlockOffset;
     }
 
     @Override
@@ -61,7 +62,10 @@ public class DefendPlanA extends Tactics {
         /* Delegate some of fielders to Hug-Guard Attacking Foes */
         ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
         for (Foe foe : attackingFoes) {
-            attackingFoePos.add(foe.getPos().add(0, -250));
+            Vec2D foePos = foe.getPos();
+            Vec2D goalPos = new Vec2D(0, -4500);
+            Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
+            attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(250)));
         }
 
         new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
@@ -87,7 +91,7 @@ public class DefendPlanA extends Tactics {
         Line2D holderShootLine = new Line2D(holderPos, new Vec2D(x, y));
         Vec2D holderShootLineMidPoint = holderShootLine.midpoint();
         Vec2D defenseVec = holderFaceVec.rotate(90);
-        new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseVec, guardGoalGap, holderShootLineMidPoint);
+        new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseVec, GUARD_GOAL_GAP, holderShootLineMidPoint);
         return true;
     }
 
