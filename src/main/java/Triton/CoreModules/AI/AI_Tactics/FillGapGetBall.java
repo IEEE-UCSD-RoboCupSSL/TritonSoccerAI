@@ -29,15 +29,19 @@ public class FillGapGetBall extends Tactics {
         state = 0;
     }
 
+    public GapFinder getGapFinder() {
+        return gapFinder;
+    }
+
     @Override
     public boolean exec() {
         // should be invoked within a loop
         // invoking contract: no robot is holding the ball
 
-        if(basicEstimator.isBallUnderOurCtrl()) {
-            state = 0;
-            return true;
-        }
+//        if(basicEstimator.isBallUnderOurCtrl()) {
+//            state = 0;
+//            return true;
+//        }
 
 //        switch (state) {
 //            case 0 -> {
@@ -74,27 +78,31 @@ public class FillGapGetBall extends Tactics {
 
 
 
-            /* find nearest ally to the ball */
-            for (Ally fielder : fielders) {
-                if (nearestFielder == null ||
-                        fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
-                    nearestFielder = fielder;
-                }
+        /* find nearest ally to the ball */
+        for (Ally fielder : fielders) {
+            if (nearestFielder == null ||
+                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
+                nearestFielder = fielder;
             }
-            restFielders = (RobotList<Ally>) fielders.clone();
-            if(nearestFielder != null) {
-                restFielders.remove(nearestFielder);
-                nearestFielder.getBall(ball);
-            }
+        }
+        restFielders = (RobotList<Ally>) fielders.clone();
+        if(nearestFielder != null) {
+            restFielders.remove(nearestFielder);
+        }
 
-            if(nearestFielder == null || restFielders == null) {
-                return false;
-            }
-            nearestFielder.getBall(ball);
-            ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
-            if(gapPos != null) {
-                new Swarm(restFielders).groupTo(gapPos);
-            }
+        if(nearestFielder == null || restFielders == null) {
+            return false;
+        }
+
+        ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
+        if(gapPos != null) {
+            new Swarm(restFielders).groupTo(gapPos, ball.getPos());
+        }
+
+        if(basicEstimator.getBallHolder() instanceof Ally) {
+            return true;
+        }
+        nearestFielder.getBall(ball);
 
         return false;
     }

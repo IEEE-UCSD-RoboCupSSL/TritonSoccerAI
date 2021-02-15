@@ -28,6 +28,20 @@ public class GapGetBallTest {
     }
 
     public boolean test() {
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        paintOptions.add(PROBABILITY);
+        display.setPaintOptions(paintOptions);
+
+        display.setGapFinder(fillGapGetBall.getGapFinder());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         while(true) {
            boolean rtn = fillGapGetBall.exec();
@@ -37,11 +51,11 @@ public class GapGetBallTest {
                ((Ally) holder).stop();
            }
 
-            try {
+           try {
                 Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+           }
         }
 
 
