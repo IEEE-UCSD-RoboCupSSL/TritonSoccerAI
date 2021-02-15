@@ -24,8 +24,15 @@ public class DefendPlanATest {
     }
 
     public boolean test() {
-        while(true) {
-            defendPlanA.exec();
+        try {
+            while (true) {
+                defendPlanA.exec();
+                Thread.sleep(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return true;
     }
 }
