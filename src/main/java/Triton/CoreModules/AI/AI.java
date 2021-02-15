@@ -35,16 +35,12 @@ public class AI implements Module {
         this.ball = ball;
         this.gameCtrl = gameCtrl;
 
-        // future upgrade: use SpringBoot IOC to apply dependency injection here
         strategyToPlay = new BasicPlay(fielders, keeper, foes, ball);
     }
 
     @Override
     public void run() {
         try {
-
-            System.out.println("Right now, make run won't run anything meaningful yet, use make test instead and practice TDD (Test-Driven Development) ");
-
             while (true) { // delay added
                 GameStates currGameState = gameCtrl.getGameState();
 
@@ -94,40 +90,6 @@ public class AI implements Module {
 
     private void tmpPlaceHolder(String s) {
     }
-
-
-//    private void startBranch() {
-//        goalKeeping.passiveGuarding();
-//
-//        Ally shooter = allies.get(0);
-//
-//        if (shooter.getDribblerStatus()) {
-//            shooter.sprintToAngle(new Vec2D(1000, -2000), 170);
-//        } else {
-//            shooter.getBall();
-//        }
-//    }
-
-
-//    private void printBallHolder() {
-//        Robot bot = estimator.getBallHolder();
-//
-//        if (bot != null) {
-//            tmpPlaceHolder(bot.getTeam() + " " + bot.getID());
-//        } else {
-//            tmpPlaceHolder("No bot holding ball");
-//        }
-//    }
-//
-//    private void printBallTraj() {
-//        Vec2D ballTraj = estimator.getAimTrajectory();
-//
-//        if (ballTraj != null) {
-//            tmpPlaceHolder(ballTraj);
-//        } else {
-//            tmpPlaceHolder("No bot holding ball");
-//        }
-//    }
 }
 
 

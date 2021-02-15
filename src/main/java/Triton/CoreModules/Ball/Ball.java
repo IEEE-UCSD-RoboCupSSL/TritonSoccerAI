@@ -5,6 +5,8 @@ import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.BallData;
 
+import static Triton.Config.ObjectConfig.POS_PRECISION;
+
 public class Ball implements Module {
 
     private final FieldSubscriber<BallData> dataSub;
@@ -52,5 +54,13 @@ public class Ball implements Module {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isPosArrived(Vec2D pos) {
+        return isPosArrived(pos, POS_PRECISION);
+    }
+
+    public boolean isPosArrived(Vec2D pos, double dist) {
+        return pos.sub(getPos()).mag() < dist;
     }
 }

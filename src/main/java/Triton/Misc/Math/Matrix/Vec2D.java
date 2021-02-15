@@ -109,8 +109,9 @@ public class Vec2D {
      * @return a new vector after rotation
      */
     public Vec2D rotate(double angle) {
-        double newX = Math.cos(angle) * x + -Math.sin(angle) * y;
-        double newY = Math.sin(angle) * x + Math.cos(angle) * y;
+        double convertedAngle = Math.toRadians(angle);
+        double newX = Math.cos(convertedAngle) * x + -Math.sin(convertedAngle) * y;
+        double newY = Math.sin(convertedAngle) * x + Math.cos(convertedAngle) * y;
         return new Vec2D(newX, newY);
     }
 

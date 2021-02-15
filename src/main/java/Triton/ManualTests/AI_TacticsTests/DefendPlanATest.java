@@ -20,12 +20,19 @@ public class DefendPlanATest {
     private final DefendPlanA defendPlanA;
 
     public DefendPlanATest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
-        defendPlanA = new DefendPlanA(fielders, keeper, foes, ball);
+        defendPlanA = new DefendPlanA(fielders, keeper, foes, ball, 250);
     }
 
     public boolean test() {
-        while(true) {
-            defendPlanA.exec();
+        try {
+            while (true) {
+                defendPlanA.exec();
+                Thread.sleep(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return true;
     }
 }

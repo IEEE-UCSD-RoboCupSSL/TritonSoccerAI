@@ -9,21 +9,22 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
 public class DefendPlanA extends Tactics {
 
-    private final double guardGoalGap = 300; // mm
+    private final double foeBlockOffset;
+    private final double GUARD_GOAL_GAP = 300; // mm
     protected final BasicEstimator basicEstimator;
     protected final PassEstimator passEstimator;
 
-    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, double foeBlockOffset) {
         super(fielders, keeper, foes, ball);
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passEstimator = new PassEstimator(fielders, keeper, foes, ball);
+        this.foeBlockOffset = foeBlockOffset;
     }
 
     @Override
@@ -31,11 +32,9 @@ public class DefendPlanA extends Tactics {
         // should be invoked within a loop
         // invoking contract: ball is hold by an opponent bot
 
-        Line2D middleLine = new Line2D(new Vec2D(0, 0), new Vec2D(0, 0)); // To-do:
-
         RobotList<Foe> attackingFoes = new RobotList<>();
         for (Foe foe : foes) {
-            if (foe.getPos().y < middleLine.p1.y) {
+            if (foe.getPos().y < 0) {
                 attackingFoes.add(foe);
             }
         }
@@ -46,8 +45,8 @@ public class DefendPlanA extends Tactics {
         for (Foe foe : attackingFoes) {
             Ally nearestFielder = fielders.get(0);
             for (Ally fielder : fielders) {
-                if (foe.getPos().sub(fielder.getPos()).mag()
-                        < foe.getPos().sub(nearestFielder.getPos()).mag()) {
+                if (!guardFoeFielders.contains(fielder) &&
+                        foe.getPos().sub(fielder.getPos()).mag() < foe.getPos().sub(nearestFielder.getPos()).mag()) {
                     nearestFielder = fielder;
                 }
             }
@@ -63,8 +62,12 @@ public class DefendPlanA extends Tactics {
         /* Delegate some of fielders to Hug-Guard Attacking Foes */
         ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
         for (Foe foe : attackingFoes) {
-            attackingFoePos.add(foe.getPos());
+            Vec2D foePos = foe.getPos();
+            Vec2D goalPos = new Vec2D(0, -4500);
+            Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
+            attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(250)));
         }
+
         new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
 
         /* Delegate the rest of fielders to lineup in the midpoint of foe shoot line*/
@@ -72,13 +75,23 @@ public class DefendPlanA extends Tactics {
         if (holder == null) {
             return false;
         }
-        Line2D foeShootLine = new Line2D(holder.getPos(), keeper.getPos());
-        Vec2D foeShootLineMidPoint = foeShootLine.midpoint();
-        Vec2D foeShootVec = keeper.getPos().sub(holder.getPos());
-        Vec2D defenseVec = Mat2D.rotation(90).mult(foeShootVec);
-        Line2D defenseLine = new Line2D(foeShootLineMidPoint, foeShootLineMidPoint.add(defenseVec));
-        new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseLine, guardGoalGap, foeShootLineMidPoint);
 
+        Vec2D holderPos = holder.getPos();
+        Vec2D holderFaceVec = new Vec2D(holder.getDir());
+
+        double x;
+        double y = -4500;
+        if (Math.abs(holderFaceVec.y) <= 0.0001 || Math.abs(holderFaceVec.x) <= 0.0001) {
+            x = holderPos.x;
+        } else {
+            double m = holderFaceVec.y / holderFaceVec.x;
+            double b = holderPos.y - (holderPos.x * m);
+            x = (y - b) / m;
+        }
+        Line2D holderShootLine = new Line2D(holderPos, new Vec2D(x, y));
+        Vec2D holderShootLineMidPoint = holderShootLine.midpoint();
+        Vec2D defenseVec = holderFaceVec.rotate(90);
+        new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseVec, GUARD_GOAL_GAP, holderShootLineMidPoint);
         return true;
     }
 

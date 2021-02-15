@@ -14,17 +14,24 @@ public class Swarm extends Skills {
 
     private final RobotList<Ally> botList;
 
-
     public Swarm(RobotList<Ally> botList) {
         this.botList = botList;
     }
 
-    public void lineUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
+    public void lineUp(RobotList<Ally> botList, Vec2D dir, double gap, Vec2D center) {
         if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
             System.out.println("botList has invalid size");
         }
-        // To-do
+        ArrayList<Vec2D> locList = new ArrayList<>();
 
+        locList.add(center);
+        int mult = 1;
+        for (int i = 1; i < botList.size(); i++) {
+            locList.add(center.add(dir.scale(mult * ((i + 1) / 2) * gap)));
+            mult *= -1;
+        }
+
+        groupTo(locList, center);
     }
 
     public void roundUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
