@@ -17,7 +17,6 @@ public class BasicPlay extends Strategies {
     private final Ally keeper;
     private final Ball ball;
     private final BasicEstimator basicEstimator;
-    private final PassEstimator passEstimator;
     private final GoalKeeping goalKeeping;
     private final Tactics attack;
 
@@ -30,12 +29,11 @@ public class BasicPlay extends Strategies {
         this.ball = ball;
 
         basicEstimator = new BasicEstimator(allies, keeper, foes, ball);
-        passEstimator = new PassEstimator(allies, keeper, foes, ball);
         goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
 
         // construct tactics
         // ...
-        attack = new AttackPlanA(allies, keeper, foes, ball, basicEstimator, passEstimator);
+        attack = new AttackPlanA(allies, keeper, foes, ball);
     }
 
     @Override

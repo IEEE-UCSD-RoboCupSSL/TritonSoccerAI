@@ -189,6 +189,38 @@ public class GapFinder {
     }
 
 
+    public ArrayList<Vec2D> getTopNMaxPosWithClearance(int n, double interAllyClearance) {
+        ArrayList<Vec2D> potentialMaxPos = getTopNMaxPos(n * 3);
+        ArrayList<Vec2D> maxPos = new ArrayList<>();
+        ArrayList<Vec2D> backupPos = new ArrayList<>();
+        if(potentialMaxPos == null) {
+            return null;
+        }
+
+        Vec2D prevCandPos = null;
+        for(Vec2D candidatePos : potentialMaxPos) {
+            if(prevCandPos == null) {
+                prevCandPos = candidatePos;
+                maxPos.add(candidatePos);
+            } else {
+                if(candidatePos.sub(prevCandPos).mag() > interAllyClearance) {
+                    maxPos.add(candidatePos);
+                } else {
+                    backupPos.add(candidatePos);
+                }
+            }
+            if(maxPos.size() >= n) break;
+        }
+
+        if(maxPos.size() < n) {
+            for(Vec2D pos : backupPos) {
+                maxPos.add(pos);
+                if(maxPos.size() >= n) break;
+            }
+        }
+        return maxPos;
+    }
+
     public ArrayList<Vec2D> getTopNMaxPos(int n) {
         Vec2D[][] localMaxPosArr = getLocalMaxPosArr();
         double[][] localMaxScoreArr = localMaxScoreSub.getMsg();

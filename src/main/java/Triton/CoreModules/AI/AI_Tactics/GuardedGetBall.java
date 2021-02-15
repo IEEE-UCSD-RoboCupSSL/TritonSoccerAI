@@ -9,8 +9,13 @@ import Triton.CoreModules.Robot.RobotList;
 
 public class GuardedGetBall extends Tactics {
 
-    public GuardedGetBall(RobotList<Ally> allies, Ally keeper, RobotList<Foe> foes, Ball ball, BasicEstimator basicEstimator, PassEstimator passEstimator) {
-        super(allies, keeper, foes, ball, basicEstimator, passEstimator);
+    protected final BasicEstimator basicEstimator;
+    protected final PassEstimator passEstimator;
+
+    public GuardedGetBall(RobotList<Ally> allies, Ally keeper, RobotList<Foe> foes, Ball ball) {
+        super(allies, keeper, foes, ball);
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+        passEstimator = new PassEstimator(fielders, keeper, foes, ball);
     }
 
     @Override
