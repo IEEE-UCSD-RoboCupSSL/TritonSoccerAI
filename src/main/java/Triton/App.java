@@ -117,7 +117,8 @@ public class App {
         if (!isTestMode) {
             int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
-            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+            //GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
             threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */

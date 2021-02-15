@@ -2,6 +2,7 @@ package Triton.CoreModules.AI;
 
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
+import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -52,24 +53,44 @@ public class AI implements Module {
                     }
                     case FREE_KICK -> {
                         tmpPlaceHolder(">>>FREE_KICK<<<");
+
+                        // To-do: problem
+                        FillGapGetBall getball = new FillGapGetBall(fielders, keeper, foes, ball);
+                        while(!getball.exec()) {
+                            Thread.sleep(1);
+                        }
+
+                        fielders.stopAll();
+
+
                     }
                     case KICKOFF -> {
                         tmpPlaceHolder(">>>KICKOFF<<<");
+
+                        Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
+
                     }
                     case PENALTY -> {
                         tmpPlaceHolder(">>>PENALTY<<<");
                     }
                     case TIMEOUT -> {
                         tmpPlaceHolder(">>>TIMEOUT<<<");
+                        fielders.stopAll();
+                        keeper.stop();
                     }
                     case HALT -> {
                         tmpPlaceHolder(">>>HALT<<<");
+                        fielders.stopAll();
+                        keeper.stop();
                     }
                     case STOP -> {
                         tmpPlaceHolder(">>>STOP<<<");
+                        fielders.stopAll();
+                        keeper.stop();
                     }
                     case BALL_PLACEMENT -> {
                         tmpPlaceHolder(">>>BALL_PLACEMENT<<<");
+                        // to-do
                     }
                     default -> {
                         tmpPlaceHolder(">>>UNKNOWN<<<");
