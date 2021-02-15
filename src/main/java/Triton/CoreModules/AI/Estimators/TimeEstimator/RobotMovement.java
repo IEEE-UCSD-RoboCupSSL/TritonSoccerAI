@@ -30,6 +30,11 @@ public class RobotMovement {
     private static final double K = 1.2626501190020936;
     private static final double W = 0.16288194277448656;
 
+    public static double calcETA(double initial_angle, Vec2D initial_vel, Vec2D dest, Vec2D curr) {
+        Vec2D path = dest.sub(curr);
+        return calcETA(initial_angle, initial_vel.mag(), path.toPlayerAngle(), dest, curr);
+    }
+
     /**
      * @param initial_angle current robot facing angle, in player perspective
      * @param end_angle     intended final facing angle, in player perspective

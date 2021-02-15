@@ -18,7 +18,7 @@ public class GapFinderTest {
 
     public GapFinderTest(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         gapFinder = new GapFinder(fielders, foes, ball);
-
+        gapFinder.run();
     }
 
     public boolean test() {

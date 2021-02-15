@@ -23,41 +23,42 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class GapFinder extends ProbFinder {
 
-    private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
-    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
+    protected final Subscriber<HashMap<String, Integer>> fieldSizeSub;
+    protected final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
 
-    private final RobotList<Ally> fielders;
-    private final RobotList<Foe> foes;
-    private final Ball ball;
+    protected final RobotList<Ally> fielders;
+    protected final RobotList<Foe> foes;
+    protected final Ball ball;
 
-    private final Gridify grid;
-    private final Gridify evalGrid;
-    private int[] gridOrigin;
-    private int[] evalOrigin;
-    private int width, height;
-    private int evalWidth, evalHeight;
+    protected final Gridify grid;
+    protected final Gridify evalGrid;
+    protected int[] gridOrigin;
+    protected int[] evalOrigin;
+    protected int width, height;
+    protected int evalWidth, evalHeight;
     int evalWindowSize;
     int resolutionStepSize;
 
-    private double worldWidth, worldLength;
-    private Rect2D allyPenalityRegion, foePenalityRegion;
+    protected double worldWidth, worldLength;
+    protected Rect2D allyPenaltyRegion, foePenaltyRegion;
+    protected double goalLength;
 
-    private double responseRange = 1000.0;
-    private double interceptRange = 500.0;
+    protected double responseRange = 1000.0;
+    protected double interceptRange = 500.0;
+    protected long TIMEOUT = 1000;
 
-
-    private final Publisher<double[][]> pmfPub;
-    private final Subscriber<double[][]> pmfSub;
-    private final Publisher<Vec2D[][]> localMaxPosPub;
-    private final Subscriber<Vec2D[][]> localMaxPosSub;
-    private final Publisher<double[][]> localMaxScorePub;
-    private final Subscriber<double[][]> localMaxScoreSub;
-    private final Publisher<ArrayList<Vec2D>> fielderPosListPub;
-    private final Subscriber<ArrayList<Vec2D>> fielderPosListSub;
-    private final Publisher<ArrayList<Vec2D>> foePosListPub;
-    private final Subscriber<ArrayList<Vec2D>> foePosListSub;
-    private final Publisher<Vec2D> ballPosPub;
-    private final Subscriber<Vec2D> ballPosSub;
+    protected final Publisher<double[][]> pmfPub;
+    protected final Subscriber<double[][]> pmfSub;
+    protected final Publisher<Vec2D[][]> localMaxPosPub;
+    protected final Subscriber<Vec2D[][]> localMaxPosSub;
+    protected final Publisher<double[][]> localMaxScorePub;
+    protected final Subscriber<double[][]> localMaxScoreSub;
+    protected final Publisher<ArrayList<Vec2D>> fielderPosListPub;
+    protected final Subscriber<ArrayList<Vec2D>> fielderPosListSub;
+    protected final Publisher<ArrayList<Vec2D>> foePosListPub;
+    protected final Subscriber<ArrayList<Vec2D>> foePosListSub;
+    protected final Publisher<Vec2D> ballPosPub;
+    protected final Subscriber<Vec2D> ballPosSub;
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 100, 10);
@@ -71,39 +72,39 @@ public class GapFinder extends ProbFinder {
         this.evalWindowSize = evalWindowSize;
         this.resolutionStepSize = resolutionStepSize;
 
+        String topicName = this.getClass().getSimpleName();
+
         /* internal pub-sub */
-        pmfPub = new FieldPublisher<>("GapFinder", "PDF", null);
-        pmfSub = new FieldSubscriber<>("GapFinder", "PDF");
+        pmfPub = new FieldPublisher<>(topicName, "PDF", null);
+        pmfSub = new FieldSubscriber<>(topicName, "PDF");
 
-        localMaxScorePub = new FieldPublisher<>("GapFinder", "Max", null);
-        localMaxScoreSub = new FieldSubscriber<>("GapFinder", "Max");
-        localMaxPosPub = new FieldPublisher<>("GapFinder", "MaxPos", null);
-        localMaxPosSub = new FieldSubscriber<>("GapFinder", "MaxPos");
+        localMaxScorePub = new FieldPublisher<>(topicName, "Max", null);
+        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max");
+        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
+        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
 
-        fielderPosListPub = new FieldPublisher<>("GapFinder", "FielderPositions", null);
-        fielderPosListSub = new FieldSubscriber<>("GapFinder", "FielderPositions");
+        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions", null);
+        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions");
 
-        foePosListPub = new FieldPublisher<>("GapFinder", "FoePositions", null);
-        foePosListSub = new FieldSubscriber<>("GapFinder", "FoePositions");
+        foePosListPub = new FieldPublisher<>(topicName, "FoePositions", null);
+        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions");
 
-        ballPosPub = new FieldPublisher<>("GapFinder", "BallPosition", null);
-        ballPosSub = new FieldSubscriber<>("GapFinder", "BallPosition");
-
+        ballPosPub = new FieldPublisher<>(topicName, "BallPosition", null);
+        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition");
 
         /* external pub-sub */
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
         fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
 
         try {
-            fieldSizeSub.subscribe(1000);
-            fieldLinesSub.subscribe(1000);
-
-            fielderPosListSub.subscribe(1000);
-            foePosListSub.subscribe(1000);
-            ballPosSub.subscribe(1000);
-            pmfSub.subscribe(1000);
-            localMaxPosSub.subscribe(1000);
-            localMaxScoreSub.subscribe(1000);
+            fieldSizeSub.subscribe(TIMEOUT);
+            fieldLinesSub.subscribe(TIMEOUT);
+            fielderPosListSub.subscribe(TIMEOUT);
+            foePosListSub.subscribe(TIMEOUT);
+            ballPosSub.subscribe(TIMEOUT);
+            pmfSub.subscribe(TIMEOUT);
+            localMaxPosSub.subscribe(TIMEOUT);
+            localMaxScoreSub.subscribe(TIMEOUT);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -131,6 +132,9 @@ public class GapFinder extends ProbFinder {
         HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
         Line2D leftPenalty = fieldLines.get("LeftPenaltyStretch");
         Line2D rightPenalty = fieldLines.get("RightPenaltyStretch");
+        Line2D leftGoal = fieldLines.get("LeftGoalDepthLine");
+        goalLength = Math.abs(leftGoal.p1.y - leftGoal.p2.y);
+
         Vec2D lpA = audienceToPlayer(leftPenalty.p1);
         Vec2D lpB = audienceToPlayer(leftPenalty.p2);
         Vec2D rpA = audienceToPlayer(rightPenalty.p1);
@@ -154,29 +158,15 @@ public class GapFinder extends ProbFinder {
         }
         if (lpA.y < rpA.y) {
             Vec2D lpC = new Vec2D(lpA.x, -worldLength / 2);
-            allyPenalityRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
-            foePenalityRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
+            allyPenaltyRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
+            foePenaltyRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
         } else {
             Vec2D rpC = new Vec2D(rpA.x, -worldLength / 2);
-            allyPenalityRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
-            foePenalityRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
+            allyPenaltyRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
+            foePenaltyRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
         }
 //        System.out.println(allyPenalityRegion.anchor + " " + allyPenalityRegion.width + " " + allyPenalityRegion.height);
 //        System.out.println(foePenalityRegion.anchor + " " + foePenalityRegion.width + " " + foePenalityRegion.height);
-
-        App.threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    calcProb();
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
 
@@ -285,7 +275,7 @@ public class GapFinder extends ProbFinder {
     /* calculate the pmf of optimal gap region for passing and attacking,
      * the pmf are indexed by gridIdx instead of coordinates
      *   */
-    private void calcProb() {
+    protected void calcProb() {
 
         long t0 = System.currentTimeMillis();
 
@@ -314,7 +304,7 @@ public class GapFinder extends ProbFinder {
 
                 /* mask forbidden and unlikely regions */
                 // Penalty Region
-                if (allyPenalityRegion.isInside(pos) || foePenalityRegion.isInside(pos)) {
+                if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos)) {
                     pmf[gridX][gridY] = 0.0;
                     continue;
                 }
@@ -384,5 +374,21 @@ public class GapFinder extends ProbFinder {
         localMaxScorePub.publish(localMax);
 
         // System.out.println(System.currentTimeMillis() - t0);
+    }
+
+    public void run() {
+        App.threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    calcProb();
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 }
