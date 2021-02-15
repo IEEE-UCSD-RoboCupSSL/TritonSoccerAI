@@ -21,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
-public class GapFinder {
+public class GapFinder extends ProbFinder {
 
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;

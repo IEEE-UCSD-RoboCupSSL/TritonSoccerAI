@@ -30,7 +30,7 @@ public class GapFinderTest {
         paintOptions.add(PROBABILITY);
         display.setPaintOptions(paintOptions);
 
-        display.setGapFinder(gapFinder);
+        display.setProbFinder(gapFinder);
 
 //        while(true) {
 //

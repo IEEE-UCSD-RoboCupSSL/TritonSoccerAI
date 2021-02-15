@@ -36,7 +36,7 @@ public class GapGetBallTest {
         paintOptions.add(PROBABILITY);
         display.setPaintOptions(paintOptions);
 
-        display.setGapFinder(fillGapGetBall.getGapFinder());
+        display.setProbFinder(fillGapGetBall.getGapFinder());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
