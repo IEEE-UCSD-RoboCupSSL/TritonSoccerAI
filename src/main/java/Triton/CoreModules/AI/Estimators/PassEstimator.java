@@ -23,6 +23,11 @@ public class PassEstimator {
 
     /* Estimates for Coordinated Passing */
 
+    public boolean isReadyToStartPass() {
+        return false;
+    }
+
+
     public Vec2D getOptimalPassingPos(Ally passer) {
 
         return new Vec2D(0, 0);

@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.AI_Strategies;
 
 import Triton.CoreModules.AI.AI_Tactics.AttackPlanA;
+import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassEstimator;
@@ -19,6 +20,7 @@ public class BasicPlay extends Strategies {
     private final BasicEstimator basicEstimator;
     private final GoalKeeping goalKeeping;
     private final Tactics attack;
+    private final Tactics getBall;
 
     public BasicPlay(RobotList<Ally> allies, Ally keeper,
                      RobotList<Foe> foes, Ball ball) {
@@ -34,35 +36,23 @@ public class BasicPlay extends Strategies {
         // construct tactics
         // ...
         attack = new AttackPlanA(allies, keeper, foes, ball);
+        getBall = new FillGapGetBall(allies, keeper, foes, ball);
     }
 
     @Override
     public void play() {
         if (basicEstimator.isBallUnderOurCtrl()) {
             // play offensive
-            offense();
+            System.out.println("Ready To Attack");
         } else {
-            if (basicEstimator.isBallWithinOurReach()) {
-                // Try to get ball & command remainder free bots to seek advantageous positions
-                getBallAndMoveRemainderBots();
-            } else {
+            if(basicEstimator.getBallHolder() instanceof Foe) {
                 // play defense
-                defense();
+                System.out.println("Time To Defend");
+            } else {
+                // Try to get ball & command remainder free bots to seek advantageous positions
+                getBall.exec();
             }
         }
     }
-
-    protected void offense() {
-        attack.exec();
-    }
-
-    protected void getBallAndMoveRemainderBots() {
-
-    }
-
-    protected void defense() {
-
-    }
-
 
 }

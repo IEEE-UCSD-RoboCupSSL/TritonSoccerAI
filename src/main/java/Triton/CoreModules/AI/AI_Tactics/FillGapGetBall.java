@@ -38,6 +38,45 @@ public class FillGapGetBall extends Tactics {
         // should be invoked within a loop
         // invoking contract: no robot is holding the ball
 
+        /* find nearest ally to the ball */
+        for (Ally fielder : fielders) {
+            if (nearestFielder == null ||
+                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
+                nearestFielder = fielder;
+            }
+        }
+        restFielders = (RobotList<Ally>) fielders.clone();
+        if(nearestFielder != null) {
+            restFielders.remove(nearestFielder);
+        }
+
+        if(nearestFielder == null || restFielders == null) {
+            return false;
+        }
+
+        Vec2D ballPos = ball.getPos();
+
+        ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
+        if(gapPos != null) {
+            ArrayList<Double> gapPosDir = new ArrayList<>();
+            for(Vec2D pos : gapPos) {
+                gapPosDir.add(ballPos.sub(pos).toPlayerAngle());
+            }
+
+            new Swarm(restFielders).groupTo(gapPos, gapPosDir, ballPos); // ballPos used as priorityAnchor
+        }
+
+        if(basicEstimator.getBallHolder() instanceof Ally) {
+            return true;
+        }
+        nearestFielder.getBall(ball);
+
+        return false;
+    }
+}
+
+
+// state machine method
 //        if(basicEstimator.isBallUnderOurCtrl()) {
 //            state = 0;
 //            return true;
@@ -75,42 +114,3 @@ public class FillGapGetBall extends Tactics {
 //                state = 0;
 //            }
 //        }
-
-
-
-        /* find nearest ally to the ball */
-        for (Ally fielder : fielders) {
-            if (nearestFielder == null ||
-                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
-                nearestFielder = fielder;
-            }
-        }
-        restFielders = (RobotList<Ally>) fielders.clone();
-        if(nearestFielder != null) {
-            restFielders.remove(nearestFielder);
-        }
-
-        if(nearestFielder == null || restFielders == null) {
-            return false;
-        }
-
-        Vec2D ballPos = ball.getPos();
-
-        ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
-        if(gapPos != null) {
-            ArrayList<Double> gapPosDir = new ArrayList<>();
-            for(Vec2D pos : gapPos) {
-                gapPosDir.add(ballPos.sub(pos).toPlayerAngle());
-            }
-
-            new Swarm(restFielders).groupTo(gapPos, gapPosDir, ballPos); // ballPos used as priorityAnchor
-        }
-
-        if(basicEstimator.getBallHolder() instanceof Ally) {
-            return true;
-        }
-        nearestFielder.getBall(ball);
-
-        return false;
-    }
-}
