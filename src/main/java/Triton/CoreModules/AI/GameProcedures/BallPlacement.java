@@ -11,7 +11,13 @@ public class BallPlacement {
     public static boolean placeBall(Ally ally, Ball ball, Vec2D targetPos) {
         if (ball.isPosArrived(targetPos)) {
             if (ally.isHoldingBall()) {
-                ally.kick(new Vec2D(0.1, 0.1));
+                ally.stop();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ally.kick(new Vec2D(0.000, 0.01));
                 return true;
             }
         } else {

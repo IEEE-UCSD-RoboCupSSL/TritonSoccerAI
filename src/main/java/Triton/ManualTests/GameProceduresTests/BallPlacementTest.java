@@ -24,7 +24,22 @@ public class BallPlacementTest {
     }
 
     public boolean test() {
-        while (!BallPlacement.placeBall(fielder, ball, new Vec2D(0, 0)));
+        while (!BallPlacement.placeBall(fielder, ball, new Vec2D(0, 0))) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        fielder.moveAt(new Vec2D(0, -10));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        fielder.stop();
         return true;
     }
 }
