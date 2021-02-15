@@ -22,35 +22,7 @@ public class GoalKeeping {
     }
 
     public void passiveGuarding() {
-        keeper.keep(ball, -4200, basicEstimator.getAimTrajectory());
-////        if (estimator.getBallHolder() == null || estimator.getBallHolder() instanceof Ally) {
-////        }
-////        else {
-//        Vec2D ballPos = ball.getPos();
-//        Vec2D ballTraj = basicEstimator.getAimTrajectory();
-//        Vec2D keeperPos = keeper.getPos();
-//        double keeperY = -4200;
-//
-//        if (Math.abs(ballTraj.y) <= 0.0001) {
-//            return;
-//        } else if (Math.abs(ballTraj.x) <= 0.0001) {
-//            keeper.strafeTo(new Vec2D(ballPos.x, keeperPos.y), 0);
-//            return;
-//        }
-//
-//        double m1 = ballTraj.y / ballTraj.x;
-//        double b1 = ballPos.y - (ballPos.x * m1);
-//
-//        double m2 = 0;
-//        double b2 = keeperY;
-//
-//        double targetX = (b2 - b1) / m1;
-//
-//        Vec2D targetPos = new Vec2D(targetX, b2);
-//
-//        double targetAngle = ballTraj.scale(-1).toPlayerAngle();
-//        keeper.strafeTo(targetPos, targetAngle);
-////        }
+        keeper.keep(ball, basicEstimator.getAimTrajectory());
     }
 
     public void activeGuarding() {

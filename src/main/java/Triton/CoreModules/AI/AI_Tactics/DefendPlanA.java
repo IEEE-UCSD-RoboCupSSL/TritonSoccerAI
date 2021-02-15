@@ -67,7 +67,6 @@ public class DefendPlanA extends Tactics {
         }
         new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
 
-
         /* Delegate the rest of fielders to lineup in the midpoint of foe shoot line*/
         Robot holder = basicEstimator.getBallHolder();
         if (holder == null) {
@@ -79,7 +78,6 @@ public class DefendPlanA extends Tactics {
         Vec2D defenseVec = Mat2D.rotation(90).mult(foeShootVec);
         Line2D defenseLine = new Line2D(foeShootLineMidPoint, foeShootLineMidPoint.add(defenseVec));
         new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseLine, guardGoalGap, foeShootLineMidPoint);
-
 
         return true;
     }

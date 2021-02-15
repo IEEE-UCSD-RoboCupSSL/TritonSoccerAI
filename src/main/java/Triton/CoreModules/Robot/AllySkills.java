@@ -80,7 +80,7 @@ public interface AllySkills {
 
     void dynamicIntercept(Ball ball, double faceDir);
 
-    void keep(Ball ball, double y, Vec2D aimTraj);
+    void keep(Ball ball, Vec2D aimTraj);
 
     void receive(Ball ball, Vec2D receivePos);
 

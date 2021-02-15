@@ -79,11 +79,11 @@ public class ShootGoalTest extends RobotSkillsTest {
     public boolean test() {
         try {
             while (true) {
-                while (!shooter.isHoldingBall()) {
+                if  (!shooter.isHoldingBall()) {
                     shooter.getBall(ball);
                 }
-                Vec2D startPos = shooter.getPos();
-                while (shooter.isHoldingBall()) {
+                else {
+                    Vec2D startPos = shooter.getPos();
                     ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
                     if (!shooter.isPosArrived(startPos)) {
                         shooter.curveTo(startPos);

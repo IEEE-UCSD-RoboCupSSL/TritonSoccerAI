@@ -185,7 +185,12 @@ public class Vec2D {
      */
     public Vec2D normalized() {
         double mag = mag();
-        return new Vec2D(x / mag, y / mag);
+
+        if (mag < 0.01) {
+            return new Vec2D(0, 0);
+        } else {
+            return new Vec2D(x / mag, y / mag);
+        }
     }
 
     /**

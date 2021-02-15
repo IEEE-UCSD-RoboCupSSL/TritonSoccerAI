@@ -36,8 +36,9 @@ public class BasicEstimator {
      */
     public Vec2D getAimTrajectory() {
         Robot bot = getBallHolder();
-        if (bot == null)
-            return new Vec2D(0.00, 0.00);
+        if (bot == null) {
+            return ball.getVel().normalized();
+        }
 
         return new Vec2D(bot.getDir());
     }

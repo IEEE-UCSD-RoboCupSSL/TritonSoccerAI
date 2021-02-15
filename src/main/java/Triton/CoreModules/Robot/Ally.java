@@ -4,12 +4,14 @@ import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
+import Triton.CoreModules.AI.AI_Skills.ShootGoal;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
@@ -25,6 +27,7 @@ import static Triton.Config.ObjectConfig.*;
 import static Triton.Config.PathfinderConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.CoreModules.Robot.MotionState.*;
+import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
@@ -32,6 +35,7 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 public class Ally extends Robot implements AllySkills {
     private final RobotConnection conn;
     /*** external pub sub ***/
+    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
     private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
@@ -50,6 +54,10 @@ public class Ally extends Robot implements AllySkills {
     protected ThreadPoolExecutor threadPool;
     private PathFinder pathFinder;
 
+    double goalXLeft;
+    double goalXRight;
+    double goalY;
+
     private boolean prevHoldBallStatus = false;
 
     public Ally(Team team, int ID) {
@@ -59,6 +67,7 @@ public class Ally extends Robot implements AllySkills {
         conn = new RobotConnection(ID);
 
         fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
+        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
@@ -478,36 +487,27 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void keep(Ball ball, double y, Vec2D aimTraj) {
-        try {
-            if (Math.abs(aimTraj.x) < 0.1 && Math.abs(aimTraj.y) < 0.1) {
-                aimTraj = new Vec2D(0, -1);
-            }
+    public void keep(Ball ball, Vec2D aimTraj) {
+        Vec2D currPos = getPos();
+        Vec2D ballPos = ball.getPos();
+        double y = goalY + 150;
 
-            Vec2D currPos = getPos();
-            Vec2D ballPos = ball.getPos();
-            double angleDiff = PerspectiveConverter.normAng(Math.toDegrees(Vec2D.angleDiff(aimTraj, new Vec2D(0, -1))));
-
-//            double b = ballToAnchor.dot(ballVelDir);
-//            double a = anchorPos.sub(ballPos.add(ballVelDir.scale(b))).mag();
-//            double B = ballToAnchor.mag();
-//            double A = (B * a) / b * Math.signum(ballVelDir.x);
-//            Vec2D receivePoint = new Vec2D(A, y);
-
-            Vec2D receivePoint = new Vec2D(ballPos.x + (ballPos.y - y) * Math.tan(angleDiff), y);
-            System.out.println(receivePoint);
-
-            if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
-                getBall(ball);
+        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
+            getBall(ball);
+        } else {
+            double x;
+            if (Math.abs(aimTraj.y) <= 0.0001 || Math.abs(aimTraj.x) <= 0.0001) {
+                x = ballPos.x;
             } else {
-//                if (ball.getVel().mag() < 1) {
-//                    stop();
-//                } else {
-                strafeTo(receivePoint, normAng(ballPos.sub(currPos).toPlayerAngle()));
-//                }
+                double m = aimTraj.y / aimTraj.x;
+                double b = ballPos.y - (ballPos.x * m);
+                x = (y - b) / m;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            x = Math.max(x, goalXLeft);
+            x = Math.min(x, goalXRight);
+            Vec2D targetPos = new Vec2D(x, y);
+            fastCurveTo(targetPos);
         }
     }
 
@@ -595,7 +595,7 @@ public class Ally extends Robot implements AllySkills {
             } else { // Inside of either circle
                 Vec2D awayCenterVec = allyPos.sub(center);
                 double invMag = INTERCEPT_COEF_MAX_AWAY_CENTER / awayCenterVec.mag();
-                double awayCenterScl = invMag <= INTERCEPT_COEF_MAX_AWAY_CENTER ? invMag : INTERCEPT_COEF_MAX_AWAY_CENTER;
+                double awayCenterScl = Math.min(invMag, INTERCEPT_COEF_MAX_AWAY_CENTER);
                 Vec2D awayCenterPart = awayCenterVec.normalized().scale(awayCenterScl);
 
                 Vec2D closestTangentVec = new Vec2D(awayCenterVec.y, -awayCenterVec.x);
@@ -721,6 +721,7 @@ public class Ally extends Robot implements AllySkills {
         super.subscribe();
         try {
             fieldSizeSub.subscribe(1000);
+            fieldLinesSub.subscribe(1000);
             for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
                 yellowRobotSubs.get(i).subscribe(1000);
                 blueRobotSubs.get(i).subscribe(1000);
@@ -744,12 +745,23 @@ public class Ally extends Robot implements AllySkills {
     private void initPathfinder() {
         while (pathFinder == null) {
             HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
+            HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
 
             if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0)
                 continue;
 
             double worldSizeX = fieldSize.get("fieldWidth");
             double worldSizeY = fieldSize.get("fieldLength");
+
+            if (MY_TEAM == BLUE) {
+                goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p2).x;
+                goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p1).x;
+                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p1).y + 250;
+            } else {
+                goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p1).x;
+                goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p2).x;
+                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p1).y + 250;
+            }
 
             pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
         }
