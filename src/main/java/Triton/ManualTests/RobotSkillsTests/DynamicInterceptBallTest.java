@@ -19,8 +19,19 @@ public class DynamicInterceptBallTest extends RobotSkillsTest {
     @Override
     public boolean test() {
         System.out.println("intercepting ball");
+        ally.stop();
         while (true) {
-            ally.dynamicIntercept(ball, 90);
+            if(ally.isHoldingBall()) {
+                ally.stop();
+            } else {
+                ally.dynamicIntercept(ball, 90);
+            }
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -4,14 +4,12 @@ import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
-import Triton.CoreModules.AI.AI_Skills.ShootGoal;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
-import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
@@ -19,7 +17,6 @@ import Triton.PeriphModules.Detection.RobotData;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
@@ -28,7 +25,6 @@ import static Triton.Config.ObjectConfig.*;
 import static Triton.Config.PathfinderConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.CoreModules.Robot.MotionState.*;
-import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
@@ -459,13 +455,19 @@ public class Ally extends Robot implements AllySkills {
         if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
         } else {
-            Vec2D faceVec = new Vec2D(faceDir);
+            Vec2D faceVec = new Vec2D(faceDir).normalized();
             Vec2D offset = faceVec.scale(DRIBBLER_OFFSET);
             Vec2D targetPos = ball.getPos().sub(offset);
-            ArrayList<Vec2D> circCenters = getCircleCenters(ball.getPos(), targetPos, faceVec, offset.mag(), INTERCEPT_CIRCLE_RAD);
-            Vec2D interceptPoint = getInterceptPoint(getPos(), targetPos, faceVec, INTERCEPT_CIRCLE_RAD, circCenters);
+            ArrayList<Vec2D> circCenters = getCircleCenters(ball.getPos(), targetPos,
+                        faceVec, offset.mag(), INTERCEPT_CIRCLE_RADIUS);
 
-            strafeTo(interceptPoint, ball.getPos().sub(getPos()).toPlayerAngle());
+            // System.out.println(circCenters);
+
+            Vec2D interceptPoint = getInterceptPoint(getPos(), targetPos, faceVec, INTERCEPT_CIRCLE_RADIUS, circCenters);
+
+            //System.out.println(interceptPoint);
+
+            curveTo(interceptPoint, ball.getPos().sub(getPos()).toPlayerAngle());
         }
     }
 
@@ -546,39 +548,50 @@ public class Ally extends Robot implements AllySkills {
 
     private Vec2D getInterceptPoint(Vec2D allyPos, Vec2D targetPos, Vec2D faceVec, double circRad, ArrayList<Vec2D> circCenters) {
         Vec2D targetToCenter = circCenters.get(0).sub(targetPos);
-        double alpha = Vec2D.angleDiff(faceVec, targetToCenter);
+        // double alpha = Vec2D.angleDiff(faceVec, targetToCenter);
+        double alpha = 20;
 
-        Vec2D vel;
-        if (isCloserToFaceVec(faceVec, targetPos, allyPos, alpha)) {
-            vel = targetPos.sub(allyPos).normalized();
+        Vec2D allyToTarget = targetPos.sub(allyPos);
+        double angleDiff = PerspectiveConverter.calcAngDiff(allyToTarget.scale(-1.0).toPlayerAngle(),
+                    faceVec.scale(-1.0).toPlayerAngle());
+
+        //System.out.println(angleDiff);
+
+        Vec2D vel = new Vec2D(0, 0);
+        if (Math.abs(angleDiff) < alpha) {
+            // vel = targetPos.sub(allyPos).normalized();
+            vel = allyToTarget;
+            // System.out.println("Baga");
         } else {
-            // Determine which circle is closer to the robot
-            double dist0 = Vec2D.dist(allyPos, circCenters.get(0));
-            double dist1 = Vec2D.dist(allyPos, circCenters.get(1));
-            double centerDist = Math.min(dist0, dist1);
-            Vec2D center = dist0 <= dist1 ? circCenters.get(0) : circCenters.get(1);
 
+            // Determine which circle is closer to the robot
+            double dist0 = allyPos.sub(circCenters.get(0)).mag();
+            double dist1 = allyPos.sub(circCenters.get(1)).mag();
+            double botToCenterDist = Math.min(dist0, dist1);
+            Vec2D center = dist0 <= dist1 ? circCenters.get(0) : circCenters.get(1);
+            double angDir = -1.0;
+            if(dist0 < dist1) angDir = 1.0;
+            // System.out.println(center);
+
+            Vec2D allyToCenter = center.sub(allyPos).normalized();
             // Robot outside of both circles
             if (isOutsideCircles(circCenters, circRad, allyPos)) {
                 // Find the tangent direction and the point of tangency
-                double tangentLength = Math.pow(centerDist * centerDist - circRad * circRad, 0.5);
-                Vec2D allyToCenter = center.sub(allyPos).normalized();
-                double tangentAngle = Math.atan(circRad / tangentLength);
-                Vec2D tangentVec = allyToCenter.rotate(tangentAngle);
-                vel = tangentVec;
+                double tangentLength = Math.pow(botToCenterDist * botToCenterDist - circRad * circRad, 0.5);
+
+                if(Math.abs(tangentLength) < 0.01) tangentLength = 0.01;
+                double tangentAngle = Math.atan2(circRad, tangentLength);
+
+                Vec2D tangentVec = allyToCenter.rotate(Math.toDegrees(angDir * tangentAngle) + angDir * 30);
+                vel = tangentVec.scale(tangentLength);
             } else { // Inside of either circle
-                Vec2D awayCenterVec = allyPos.sub(center);
-                double invMag = INTERCEPT_COEF_MAX_AWAY_CENTER / awayCenterVec.mag();
-                double awayCenterScl = Math.min(invMag, INTERCEPT_COEF_MAX_AWAY_CENTER);
-                Vec2D awayCenterPart = awayCenterVec.normalized().scale(awayCenterScl);
-
-                Vec2D closestTangentVec = new Vec2D(awayCenterVec.y, -awayCenterVec.x);
-                Vec2D closestTangentPart = closestTangentVec.normalized().scale(INTERCEPT_COEF_MAX_TANGENT_CIRC);
-
-                vel = awayCenterPart.add(closestTangentPart).normalized();
+                vel = center.sub(allyPos).rotate(angDir * Math.toDegrees(65)).scale(1.5);
+                //System.out.println("Inside:" + vel);
             }
         }
-        return allyPos.add(vel.scale(1000));
+        //return allyPos.add(vel.scale(1000));
+
+        return allyPos.add(vel);
     }
 
     private boolean isCloserToFaceVec(Vec2D faceVec, Vec2D targetPos, Vec2D allyPos, double alpha) {
