@@ -7,7 +7,7 @@ public class PathfinderConfig {
     // Theta* / JPS
     public static final int NODE_RADIUS = 30;
     public static final int NODE_DIAMETER = NODE_RADIUS * 2;
-    public static final double ADD_DIST = 10;
+    public static final double ADD_DIST = 5;
     public static final double SAFE_DIST = PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
             + PathfinderConfig.ADD_DIST;
     public static final double BOUNDARY_EXTENSION = 800;

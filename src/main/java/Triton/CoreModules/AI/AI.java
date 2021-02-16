@@ -92,26 +92,12 @@ public class AI implements Module {
                 FreeKickGameState freeKickGameState = (FreeKickGameState) currGameState;
                 freeKick(freeKickGameState);
             }
-            case KICKOFF -> {
-                tmpPlaceHolder(">>>KICKOFF<<<");
-                KickoffGameState KickoffGameState = (KickoffGameState) currGameState;
-                kickOff(KickoffGameState);
-            }
-            case BALL_PLACEMENT -> {
-                tmpPlaceHolder(">>>BALL_PLACEMENT<<<");
-                BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
-                Team ballPlacementTeam = ballPlacementGameState.getTeam();
-                if (ballPlacementTeam == MY_TEAM) {
-                    Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
-                    ballPlacement(teamTargetPos);
-                }
-            }
             default -> {
             }
         }
     }
 
-    private void runSetState(GameState currGameState) {
+    private void runSetState(GameState currGameState) throws InterruptedException {
         switch (currGameState.getName()) {
             case RUNNING -> {
                 tmpPlaceHolder(">>>RUNNING<<<");
@@ -134,6 +120,20 @@ public class AI implements Module {
                 tmpPlaceHolder(">>>STOP<<<");
                 fielders.stopAll();
                 keeper.stop();
+            }
+            case KICKOFF -> {
+                tmpPlaceHolder(">>>KICKOFF<<<");
+                KickoffGameState KickoffGameState = (KickoffGameState) currGameState;
+                kickOff(KickoffGameState);
+            }
+            case BALL_PLACEMENT -> {
+                tmpPlaceHolder(">>>BALL_PLACEMENT<<<");
+                BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
+                Team ballPlacementTeam = ballPlacementGameState.getTeam();
+                if (ballPlacementTeam == MY_TEAM) {
+                    Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
+                    ballPlacement(teamTargetPos);
+                }
             }
             default -> {
                 tmpPlaceHolder(">>>UNKNOWN<<<");
@@ -161,16 +161,16 @@ public class AI implements Module {
             fielders.stopAll();
 
             long t0 = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t0 < 2000) {
+            while (System.currentTimeMillis() - t0 < 10000) {
                 getball.exec();
             }
             fielders.stopAll();
         } else {
-            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 6000);
+            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 1000);
             fielders.stopAll();
 
             long t0 = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t0 < 6000) {
+            while (System.currentTimeMillis() - t0 < 10000) {
                 tactic.exec();
             }
             fielders.stopAll();
