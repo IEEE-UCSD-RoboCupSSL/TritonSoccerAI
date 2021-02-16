@@ -59,14 +59,11 @@ public class PySocketGameCtrlModule extends GameCtrlModule {
                 }
                 case "freekick" -> {
                     System.out.println(">>>FREE_KICK<<<");
-                    if (gsSplit[1].equals("blue"))
-                        gs = new FreeKickGameState(Team.BLUE);
-                    else
-                        gs = new FreeKickGameState(Team.YELLOW);
+                    gs = gsSplit[1].equals("blue") ? new FreeKickGameState(Team.BLUE) : new FreeKickGameState(Team.YELLOW);
                 }
                 case "kickoff" -> {
                     System.out.println(">>>KICKOFF<<<");
-                    gs = (gsSplit[1].equals("blue")) ? new KickoffGameState(Team.BLUE) : new KickoffGameState(Team.YELLOW);
+                    gs = gsSplit[1].equals("blue") ? new KickoffGameState(Team.BLUE) : new KickoffGameState(Team.YELLOW);
                 }
                 case "penalty" -> {
                     System.out.println(">>>PENALTY<<<");
@@ -78,7 +75,7 @@ public class PySocketGameCtrlModule extends GameCtrlModule {
                 }
                 case "ballplacement" -> {
                     System.out.println(">>>BALL_PLACEMENT<<<");
-                    Team team = (gsSplit[1].equals("blue")) ? Team.BLUE : Team.YELLOW;
+                    Team team = gsSplit[1].equals("blue") ? Team.BLUE : Team.YELLOW;
                     Vec2D targetPos = new Vec2D(Double.parseDouble(gsSplit[2]), Double.parseDouble(gsSplit[3]));
                     gs = new BallPlacementGameState(team, targetPos);
                 }
