@@ -49,6 +49,8 @@ public class GapFinder extends ProbFinder {
 
     protected final Publisher<double[][]> pmfPub;
     protected final Subscriber<double[][]> pmfSub;
+    protected final Publisher<int[][]> rPub;
+    protected final Subscriber<int[][]> rSub;
     protected final Publisher<Vec2D[][]> localMaxPosPub;
     protected final Subscriber<Vec2D[][]> localMaxPosSub;
     protected final Publisher<double[][]> localMaxScorePub;
@@ -78,6 +80,9 @@ public class GapFinder extends ProbFinder {
         pmfPub = new FieldPublisher<>(topicName, "PDF", null);
         pmfSub = new FieldSubscriber<>(topicName, "PDF");
 
+        rPub = new FieldPublisher<>(topicName, "Receiver", null);
+        rSub = new FieldSubscriber<>(topicName, "Receiver");
+
         localMaxScorePub = new FieldPublisher<>(topicName, "Max", null);
         localMaxScoreSub = new FieldSubscriber<>(topicName, "Max");
         localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
@@ -103,6 +108,7 @@ public class GapFinder extends ProbFinder {
             foePosListSub.subscribe(TIMEOUT);
             ballPosSub.subscribe(TIMEOUT);
             pmfSub.subscribe(TIMEOUT);
+            rSub.subscribe(TIMEOUT);
             localMaxPosSub.subscribe(TIMEOUT);
             localMaxScoreSub.subscribe(TIMEOUT);
         } catch (TimeoutException e) {
