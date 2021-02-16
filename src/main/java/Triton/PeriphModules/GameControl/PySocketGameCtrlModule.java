@@ -66,7 +66,7 @@ public class PySocketGameCtrlModule extends GameCtrlModule {
                 }
                 case "kickoff" -> {
                     System.out.println(">>>KICKOFF<<<");
-                    gs = (gsSplit[1].equals("blue")) ? new FreeKickGameState(Team.BLUE) : new FreeKickGameState(Team.YELLOW);
+                    gs = (gsSplit[1].equals("blue")) ? new KickoffGameState(Team.BLUE) : new KickoffGameState(Team.YELLOW);
                 }
                 case "penalty" -> {
                     System.out.println(">>>PENALTY<<<");

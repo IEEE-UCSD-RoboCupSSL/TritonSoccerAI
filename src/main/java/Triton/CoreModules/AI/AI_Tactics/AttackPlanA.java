@@ -30,40 +30,41 @@ public class AttackPlanA extends Tactics {
         // should be invoked within a loop
         // invoking contract: ball is under our control
 
+//
+//
+//        holder = basicEstimator.getBallHolder();
+//        if (!(holder instanceof Ally)) {
+//            return false;
+//        }
+//
+//        // .......
+//
+//
+//        /*** pass & receive ***/
+//        if (CoordinatedPass.getPassState() == PassState.PENDING) {
+//            /* determine which fielders to be the passer & receiver */
+//            passer = (Ally) holder;
+//            receiver = passEstimator.getOptimalReceiver();
+//        }
+//        PassState passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimator);
+//        System.out.println(passState);
+//        switch (passState) {
+//            case PASSED -> {
+//                if (passer != null) {
+//
+//                }
+//            }
+//            case RECEIVE_SUCCESS -> {
+//
+//            }
+//            case FAILED -> {
+//                return false;
+//            }
+//        }
+//
+//        /*** delegate remaining bots to hug opponent robots ***/
+//
 
-        holder = basicEstimator.getBallHolder();
-        if (!(holder instanceof Ally)) {
-            return false;
-        }
-
-        // .......
-
-
-        /*** pass & receive ***/
-        if (CoordinatedPass.getPassState() == PassState.PENDING) {
-            /* determine which fielders to be the passer & receiver */
-            passer = (Ally) holder;
-            receiver = passEstimator.getOptimalReceiver();
-        }
-        PassState passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passEstimator);
-        System.out.println(passState);
-        switch (passState) {
-            case PASSED -> {
-                if (passer != null) {
-
-                }
-            }
-            case RECEIVE_SUCCESS -> {
-
-            }
-            case FAILED -> {
-                return false;
-            }
-        }
-
-        /*** delegate remaining bots to hug opponent robots ***/
-
-
-        return true;
+        return false;
     }
 }
