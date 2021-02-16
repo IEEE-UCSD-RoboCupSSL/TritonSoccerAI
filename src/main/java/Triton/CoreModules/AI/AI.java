@@ -26,13 +26,11 @@ public class AI implements Module {
     private final RobotList<Foe> foes;
     private final Ball ball;
 
-
     private final Strategies strategyToPlay;
     private final GameCtrlModule gameCtrl;
 
     private final GapFinder gapFinder;
     private final PassFinder passFinder;
-
 
     public AI(RobotList<Ally> fielders, Ally keeper,
               RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {

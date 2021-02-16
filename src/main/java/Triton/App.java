@@ -1,5 +1,6 @@
 package Triton;
 
+import Triton.Config.GeometryConfig;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
@@ -7,13 +8,15 @@ import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.FieldGeometry.FieldGeometryModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -23,6 +26,7 @@ import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
+import static Triton.PeriphModules.Display.PaintOption.*;
 
 
 /**
@@ -84,14 +88,12 @@ public class App {
 
         }
 
-
+        GeometryConfig.initGeo();
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         Module visionModule = new GrSimVisionModule();
-        Module geoModule = new FieldGeometryModule();
         Module detectModule = new DetectionModule();
         threadPool.submit(visionModule);
-        threadPool.submit(geoModule);
         threadPool.submit(detectModule);
         try {
             Thread.sleep(1000);
@@ -129,14 +131,14 @@ public class App {
         }
 
 
-//        Display display = new Display();
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
-//        paintOptions.add(INFO);
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
-//        display.setPaintOptions(paintOptions);
+        display.setPaintOptions(paintOptions);
 
         sleepForever();
     }

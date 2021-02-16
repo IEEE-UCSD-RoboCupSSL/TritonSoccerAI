@@ -10,6 +10,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
+import static Triton.Config.GeometryConfig.*;
 import static Triton.Config.ObjectConfig.EXCESSIVE_DRIBBLING_DIST;
 import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
 
@@ -18,28 +19,18 @@ public class ShootGoal extends Skills {
     private final Ally shooter;
     private final RobotList<Foe> foes;
     private final double precisionTolerance = 15; // mm
-    private final double worldSizeX;
-    private final double worldWizeY;
-    private final Vec2D goalLeft;
-    private final Vec2D goalRight;
     Ball ball;
 
     // Gridify
 
-    public ShootGoal(Ally shooter, RobotList<Foe> foes, Ball ball, double worldSizeX, double worldSizeY, Vec2D goalLeft, Vec2D goalRight) {
+    public ShootGoal(Ally shooter, RobotList<Foe> foes, Ball ball) {
         this.shooter = shooter;
         this.foes = foes;
         this.ball = ball;
-
-        this.worldSizeX = worldSizeX;
-        this.worldWizeY = worldSizeY;
-
-        this.goalLeft = goalLeft;
-        this.goalRight = goalRight;
     }
 
     public ArrayList<Vec2D> findOptimalShootPos(Vec2D ballCapPos) {
-        Rect2D field = new Rect2D(new Vec2D(-worldSizeX / 2, -worldWizeY / 2), worldSizeX, worldWizeY);
+        Rect2D field = new Rect2D(FIELD_BOTTOM_LEFT, FIELD_WIDTH, FIELD_LENGTH);
         double shooterStepSize = 150;
         ArrayList<Vec2D> shootPosList = new ArrayList<>();
         for (double x = ballCapPos.x - EXCESSIVE_DRIBBLING_DIST; x < ballCapPos.x + EXCESSIVE_DRIBBLING_DIST; x += shooterStepSize) {
@@ -57,12 +48,12 @@ public class ShootGoal extends Skills {
         }
 
         Vec2D shootPos = null;
-        Vec2D target = goalLeft;
+        Vec2D target = null;
         double maxScore = Double.MIN_VALUE;
         double goalStepSize = 150;
         for (Vec2D potentialShootPos : shootPosList) {
-            for (double x = goalLeft.x; x < goalRight.x; x += goalStepSize) {
-                Vec2D potentialTarget = new Vec2D(x, goalLeft.y);
+            for (double x = GOAL_LEFT; x < GOAL_RIGHT; x += goalStepSize) {
+                Vec2D potentialTarget = new Vec2D(x, FIELD_LENGTH / 2);
                 Line2D lineToTarget = new Line2D(potentialShootPos, potentialTarget);
 
                 double lineScore = Double.MAX_VALUE;

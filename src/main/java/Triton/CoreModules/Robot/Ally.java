@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
+import static Triton.Config.GeometryConfig.*;
 import static Triton.Config.ObjectConfig.*;
 import static Triton.Config.PathfinderConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
@@ -35,8 +36,6 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 public class Ally extends Robot implements AllySkills {
     private final RobotConnection conn;
     /*** external pub sub ***/
-    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-    private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
@@ -54,10 +53,6 @@ public class Ally extends Robot implements AllySkills {
     protected ThreadPoolExecutor threadPool;
     private PathFinder pathFinder;
 
-    double goalXLeft;
-    double goalXRight;
-    double goalY;
-
     private boolean prevHoldBallStatus = false;
 
     public Ally(Team team, int ID) {
@@ -65,9 +60,6 @@ public class Ally extends Robot implements AllySkills {
         this.threadPool = App.threadPool;
 
         conn = new RobotConnection(ID);
-
-        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
-        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
@@ -490,7 +482,7 @@ public class Ally extends Robot implements AllySkills {
     public void keep(Ball ball, Vec2D aimTraj) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
-        double y = goalY + 150;
+        double y = -FIELD_LENGTH / 2 - GOAL_DEPTH + 150;
 
         if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
@@ -504,8 +496,8 @@ public class Ally extends Robot implements AllySkills {
                 x = (y - b) / m;
             }
 
-            x = Math.max(x, goalXLeft);
-            x = Math.min(x, goalXRight);
+            x = Math.max(x, GOAL_LEFT);
+            x = Math.min(x, GOAL_RIGHT);
             Vec2D targetPos = new Vec2D(x, y);
             fastCurveTo(targetPos);
         }
@@ -671,7 +663,7 @@ public class Ally extends Robot implements AllySkills {
         try {
             subscribe();
             super.run();
-            initPathfinder();
+            pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH);
 
             threadPool.submit(conn.getTCPConnection());
             threadPool.submit(conn.getTCPConnection().getSendTCP());
@@ -720,8 +712,6 @@ public class Ally extends Robot implements AllySkills {
     protected void subscribe() {
         super.subscribe();
         try {
-            fieldSizeSub.subscribe(1000);
-            fieldLinesSub.subscribe(1000);
             for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
                 yellowRobotSubs.get(i).subscribe(1000);
                 blueRobotSubs.get(i).subscribe(1000);
@@ -736,34 +726,6 @@ public class Ally extends Robot implements AllySkills {
             holdBallPosSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Initialize pathfinder with geometry information
-     */
-    private void initPathfinder() {
-        while (pathFinder == null) {
-            HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-            HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
-
-            if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0)
-                continue;
-
-            double worldSizeX = fieldSize.get("fieldWidth");
-            double worldSizeY = fieldSize.get("fieldLength");
-
-            if (MY_TEAM == BLUE) {
-                goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p2).x;
-                goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p1).x;
-                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("LeftGoalDepthLine").p1).y + 250;
-            } else {
-                goalXLeft = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p1).x;
-                goalXRight = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p2).x;
-                goalY = PerspectiveConverter.audienceToPlayer(fieldLines.get("RightGoalDepthLine").p1).y + 250;
-            }
-
-            pathFinder = new JPSPathFinder(worldSizeX, worldSizeY);
         }
     }
 

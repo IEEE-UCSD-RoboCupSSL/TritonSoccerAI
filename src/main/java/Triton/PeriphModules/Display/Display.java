@@ -1,6 +1,7 @@
 package Triton.PeriphModules.Display;
 
 import Triton.Config.DisplayConfig;
+import Triton.Config.GeometryConfig;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
@@ -24,23 +25,19 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static Triton.Config.GeometryConfig.*;
 import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**
  * Display to convey information in separate window
  */
 public class Display extends JPanel {
-
-    private final Subscriber<HashMap<String, Integer>> fieldSizeSub;
-    private final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-    private final Subscriber<Circle2D> fieldCenterSub;
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final JFrame frame;
     protected Gridify convert;
     ProbFinder probFinder;
-    private HashMap<String, Line2D> fieldLines;
     private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
@@ -49,10 +46,6 @@ public class Display extends JPanel {
     /* Construct a display with robot, ball, and field */
     public Display() {
         super();
-
-        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
-        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
-        fieldCenterSub = new FieldSubscriber<>("geometry", "fieldCenter");
 
         yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
@@ -83,29 +76,10 @@ public class Display extends JPanel {
     public void start() {
         subscribe();
 
-        while (true) { // no delay needed
-            HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-
-            if (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0
-                    || fieldSize.get("fullLength") == 0) {
-                continue;
-            }
-
-            int fieldWidth = fieldSize.get("fieldWidth");
-            int fieldLength = fieldSize.get("fieldLength");
-            int fullLength = fieldSize.get("fullLength");
-
-            convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
-                    new Vec2D(-fieldWidth / 2.0, -fullLength / 2.0), false, true);
-
-            windowWidth = convert.numCols(fieldWidth);
-            windowHeight = convert.numRows(fullLength);
-            break;
-        }
-
-        do {
-            fieldLines = fieldLinesSub.getMsg();
-        } while (fieldLines == null);
+        convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
+                new Vec2D(-FIELD_WIDTH / 2.0, -FULL_FIELD_LENGTH / 2.0), false, true);
+        windowWidth = convert.numCols(FIELD_WIDTH);
+        windowHeight = convert.numRows(FULL_FIELD_LENGTH);
 
         Dimension dimension = new Dimension(windowWidth, windowHeight);
         setPreferredSize(dimension);
@@ -123,9 +97,6 @@ public class Display extends JPanel {
      */
     private void subscribe() {
         try {
-            fieldSizeSub.subscribe(1000);
-            fieldLinesSub.subscribe(1000);
-            fieldCenterSub.subscribe(1000);
             for (Subscriber<RobotData> robotSub : yellowRobotSubs)
                 robotSub.subscribe(1000);
             for (Subscriber<RobotData> robotSub : blueRobotSubs)
@@ -169,8 +140,8 @@ public class Display extends JPanel {
      * @param g2d Graphics2D object to paint to
      */
     private void paintGeo(Graphics2D g2d) {
-        fieldLines.forEach((name, line) -> {
-            if (name.equals("CenterLine"))
+        FIELD_LINES.forEach((name, line) -> {
+            if (name.equals("CENTER_LINE"))
                 return;
             int[] p1 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p1));
             int[] p2 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p2));
@@ -179,9 +150,8 @@ public class Display extends JPanel {
             g2d.drawLine(p1[0], p1[1], p2[0], p2[1]);
         });
 
-        Circle2D center = fieldCenterSub.getMsg();
-        int[] centerPos = convert.fromPos(new Vec2D(center.center.x, center.center.y));
-        int centerRadius = (int) (center.radius * DisplayConfig.SCALE);
+        int[] centerPos = convert.fromPos(new Vec2D(FIELD_CIRCLE_CENTER.x, FIELD_CIRCLE_CENTER.y));
+        int centerRadius = (int) (FIELD_CIRCLE_RADIUS * DisplayConfig.SCALE);
 
         g2d.drawArc(centerPos[0] - centerRadius, centerPos[1] - centerRadius, centerRadius * 2,
                 centerRadius * 2, 0, 360);
@@ -232,23 +202,22 @@ public class Display extends JPanel {
     public void setProbFinder(ProbFinder probFinder) {
         this.probFinder = probFinder;
     }
+
     private void paintProbFinder(Graphics2D g2d) {
         if (probFinder == null)
             return;
 
-        HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-        double fieldWidth = fieldSize.get("fieldWidth");
-        double fieldLength = fieldSize.get("fieldLength");
         double[][] pmf = probFinder.getPMF();
         if(pmf == null) return;
+
         for (int x = 0; x < windowWidth; x++) {
             for (int y = 0; y < windowHeight; y++) {
                 int[] displayPos = {x, y};
                 Vec2D worldPos = convert.fromInd(displayPos);
-                double clampedX = Math.max(worldPos.x, -fieldWidth / 2);
-                clampedX = Math.min(clampedX, fieldWidth / 2);
-                double clampedY = Math.max(worldPos.y, -fieldLength / 2);
-                clampedY = Math.min(clampedY, fieldLength / 2);
+                double clampedX = Math.max(worldPos.x, -FIELD_WIDTH / 2);
+                clampedX = Math.min(clampedX, FIELD_WIDTH / 2);
+                double clampedY = Math.max(worldPos.y, -FIELD_LENGTH / 2);
+                clampedY = Math.min(clampedY, FIELD_LENGTH / 2);
                 Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
 
                 double prob = probFinder.getProb(pmf, clampedWorldPos);
@@ -266,10 +235,10 @@ public class Display extends JPanel {
         // System.out.println(topMaxPos);
 
         for(Vec2D maxPos : topMaxPos) {
-            double clampedX = Math.max(maxPos.x, -fieldWidth / 2);
-            clampedX = Math.min(clampedX, fieldWidth / 2);
-            double clampedY = Math.max(maxPos.y, -fieldLength / 2);
-            clampedY = Math.min(clampedY, fieldLength / 2);
+            double clampedX = Math.max(maxPos.x, -FIELD_WIDTH / 2);
+            clampedX = Math.min(clampedX, FIELD_WIDTH / 2);
+            double clampedY = Math.max(maxPos.y, -FIELD_LENGTH / 2);
+            clampedY = Math.min(clampedY, FIELD_LENGTH / 2);
             Vec2D clampedPos = new Vec2D(clampedX, clampedY);
             int[] displayPos = convert.fromPos(clampedPos);
             g2d.setColor(new Color(0, 0.5F, 0.9F));
