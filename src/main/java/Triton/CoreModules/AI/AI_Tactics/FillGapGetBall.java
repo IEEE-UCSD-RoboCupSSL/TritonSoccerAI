@@ -3,13 +3,11 @@ package Triton.CoreModules.AI.AI_Tactics;
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
-import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Matrix.Vec2D;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
@@ -24,7 +22,6 @@ public class FillGapGetBall extends Tactics {
 
     public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, GapFinder gapFinder) {
         super(fielders, keeper, foes, ball);
-        gapFinder.run();
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         this.gapFinder = gapFinder;
         //state = 0;

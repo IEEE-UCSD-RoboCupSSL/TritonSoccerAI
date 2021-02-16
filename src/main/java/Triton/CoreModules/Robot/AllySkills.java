@@ -72,8 +72,6 @@ public interface AllySkills {
 
     void dribRotate(Ball ball, double angle, double offsetDist);
 
-    void passBall(Vec2D receiveLoc, double ETA); // ETA: estimated arrival time, unit: milliseconds
-
     //To-do void chipBall();
 
     void staticIntercept(Ball ball, Vec2D anchorPos);

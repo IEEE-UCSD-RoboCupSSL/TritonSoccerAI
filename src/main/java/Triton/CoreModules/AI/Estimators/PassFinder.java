@@ -32,7 +32,7 @@ public class PassFinder extends GapFinder {
     private static final double C3_DEV = 0.1;
 
     private static final double C4_MAX_DIST = 3000.0;
-    private static final double C4_MIN_DIST = 2000.0;
+    private static final double C4_MIN_DIST = 1500.0;
     private static final double C4_DEV = 500.0;
 
     private static final double C5_MAX_DIST = 500.0;
@@ -54,8 +54,17 @@ public class PassFinder extends GapFinder {
     private static final double G3_ONE_SHOT_ANGLE = 20;
     private static final double G3_WEIGHT = 1.0;
 
+    private static final double C_WEIGHT = 0.5;
+    private static final double G_WEIGHT = 1.5;
+
     private volatile boolean fixCandidate = false;
     private volatile Integer candidate = null;
+    private volatile Integer passer = null;
+
+    protected final Publisher<double[][]> gPub;
+    protected final Subscriber<double[][]> gSub;
+    protected final Publisher<int[][]> rPub;
+    protected final Subscriber<int[][]> rSub;
 
     protected final Publisher<ArrayList<Vec2D>> fielderVelListPub;
     protected final Subscriber<ArrayList<Vec2D>> fielderVelListSub;
@@ -76,7 +85,7 @@ public class PassFinder extends GapFinder {
     private Vec2D ballPos;
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
-        this(fielders, foes, ball, 50, 10);
+        this(fielders, foes, ball, 400, 20);
     }
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
@@ -97,11 +106,19 @@ public class PassFinder extends GapFinder {
         foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles" + this.toString(), null);
         foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles" + this.toString());
 
+        rPub = new FieldPublisher<>(topicName, "Receiver", null);
+        rSub = new FieldSubscriber<>(topicName, "Receiver");
+
+        gPub = new FieldPublisher<>(topicName, "G-prob", null);
+        gSub = new FieldSubscriber<>(topicName, "G-prob");
+
         try {
             fielderVelListSub.subscribe(TIMEOUT);
             foeVelListSub.subscribe(TIMEOUT);
             fielderAngListSub.subscribe(TIMEOUT);
             foeAngListSub.subscribe(TIMEOUT);
+            rSub.subscribe(TIMEOUT);
+            gSub.subscribe(TIMEOUT);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
@@ -116,6 +133,11 @@ public class PassFinder extends GapFinder {
     public int[][] getR() {
         supplyInfo();
         return rSub.getMsg();
+    }
+
+    public double[][] getGProb() {
+        supplyInfo();
+        return gSub.getMsg();
     }
 
     private void supplyInfo() {
@@ -151,6 +173,7 @@ public class PassFinder extends GapFinder {
     @Override
     protected void calcProb() {
         double[][] pmf = new double[width][height];
+        double[][] gProbs = new double[width][height];
         int[][] R = new int[width][height];
         Vec2D[][] localMaxPos = new Vec2D[evalWidth][evalHeight];
         double[][] localMax = new double[evalWidth][evalHeight];
@@ -181,7 +204,7 @@ public class PassFinder extends GapFinder {
 
         /* Find passer (default as closest fielder) **/
         double minDist = Double.MAX_VALUE;
-        int passer = 0;
+        passer = 0;
         for(int i = 0; i < fielders.size(); i++) {
             double temp;
             if ((temp = fielderPosList.get(i).sub(ballPos).mag()) < minDist) {
@@ -198,8 +221,12 @@ public class PassFinder extends GapFinder {
                 double ballTime = BallMovement.calcETAFast(PASS_VEL, ballDist, passMaxPair);
 
                 /* c3: The pass is long enough for R to react and receive the pass robustly **/
-                if (ballTime < C3_T_MIN) continue;
-                double c3 = Math.min(0, ballTime - C3_T_MAX) / C3_DEV;
+                double c3;
+                if (ballTime < C3_T_MIN) {
+                    c3 = - Double.MAX_VALUE;
+                } else {
+                    c3 = Math.min(0, ballTime - C3_T_MAX) / C3_DEV;
+                }
 
                 /* c4: The pass is short enough to be performed accurately **/
                 if (ballDist > C4_MAX_DIST) continue;
@@ -275,6 +302,7 @@ public class PassFinder extends GapFinder {
                 double g2 = (openAngle - G2_MEAN) / G2_DEV;
 
                 double maxProb = 0.0;
+                double maxGProb = 0.0;
                 int receiver = 0;
 
                 for (int candidate = 0; candidate < fielders.size(); candidate++) {
@@ -307,24 +335,31 @@ public class PassFinder extends GapFinder {
                             g3 = G3_WEIGHT;
                     }
 
-                    /*
                     double c = c1 + c2 + c3 + c4 + c5;
                     double g = g1 + g2 + g3;
-                    double prob = (1 / (1 + Math.exp(-c))) * (1 / (1 + Math.exp(-g)));
-                     */
-                    double score = c1 + c2 + c3 + c4 + c5 + g1 + g2 + g3;
+                    // double prob = (1 / (1 + Math.exp(-c))) * (1 / (1 + Math.exp(-g)));
+
+                    double score = C_WEIGHT * c + G_WEIGHT * g;
                     double prob = (1 / (1 + Math.exp(-score)));
+                    double gProb = (1 / (1 + Math.exp(-g)));
 
                     if (prob > maxProb) {
                         maxProb = prob;
                         receiver = candidate;
                     }
 
+                    if (gProb > maxGProb) {
+                        maxGProb = gProb;
+                    }
+
                     if (fixCandidate) break;
                 }
 
                 pmf[gridX][gridY] = maxProb;
+                gProbs[gridX][gridY] = maxGProb;
+
                 R[gridX][gridY] = receiver;
+                if (fixCandidate) receiver = candidate;
                 int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
                 if(maxProb > localMax[evalIdx[0]][evalIdx[1]]) {
                     localMax[evalIdx[0]][evalIdx[1]] = maxProb;
@@ -334,9 +369,8 @@ public class PassFinder extends GapFinder {
             }
         }
 
-        //System.out.println(System.currentTimeMillis() - t0);
-
         rPub.publish(R);
+        gPub.publish(gProbs);
         pmfPub.publish(pmf);
         localMaxPosPub.publish(localMaxPos);
         localMaxScorePub.publish(localMax);
@@ -390,5 +424,29 @@ public class PassFinder extends GapFinder {
 
     private static double angDiff(double a1, double a2) {
         return Math.abs(PerspectiveConverter.calcAngDiff(a1, a2));
+    }
+
+    /**
+     * @return a tuple of information needed by pass
+     */
+    public PassInfo evalPass() {
+        supplyInfo();
+        try {
+            double[][] pmf = pmfSub.getMsg();
+            if (pmf == null) return null;
+            int[][] receiver = rSub.getMsg();
+
+            Vec2D topPos = getTopNMaxPos(1).get(0);
+            int[] idx = getIdxFromPos(topPos);
+            double maxProb = pmf[idx[0]][idx[1]];
+            int bestReceiver = receiver[idx[0]][idx[1]];
+
+            PassInfo info = new PassInfo(fielders, foes, ball);
+            info.setInfo(passer, bestReceiver, fielderPosList.get(passer), topPos, maxProb);
+            return info;
+        } catch (Exception e) {
+            fixCandidate = false;
+            return null;
+        }
     }
 }

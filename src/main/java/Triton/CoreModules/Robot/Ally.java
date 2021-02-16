@@ -431,15 +431,6 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void passBall(Vec2D receivePos, double ETA) {
-        Vec2D allyToReceivePos = receivePos.sub(getPos());
-        double distToTarget = allyToReceivePos.mag();
-        double targetBallVel = (distToTarget / ETA) / 1000.0;
-        System.out.println(targetBallVel);
-        kick(new Vec2D(targetBallVel, 0));
-    }
-
-    @Override
     public void staticIntercept(Ball ball, Vec2D anchorPos) {
         // To-do (future) : edge case: ball going opposite dir
 

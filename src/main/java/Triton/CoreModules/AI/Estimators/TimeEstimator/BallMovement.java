@@ -69,6 +69,22 @@ public class BallMovement {
         return calcETAFast(s, d, temp);
     }
 
+
+    /**
+     * @param d Distance
+     * @param t ETA
+     * @return estimated kickVel
+     */
+    public static double calcKickVel(double d, double t) {
+        Function<Double, Double> f = (s) -> calcDistFast(s, t) - d;
+        return Util.bisection(f, 0.0, 10.0);
+    }
+
+    public static double calcKickVel(double d) {
+        Function<Double, Double> f = (s) -> calcMaxDist(s)[0] - d;
+        return Util.bisection(f, 0.0, 10.0);
+    }
+
     /**
      * fast ETA with precomputed max dist and time
      */

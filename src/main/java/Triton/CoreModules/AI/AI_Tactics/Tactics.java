@@ -1,8 +1,6 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
 
-import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.PassEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;

@@ -17,7 +17,6 @@ public class BasicPlayTest {
 
         gapFinder = new GapFinder(fielders, foes, ball);
         passFinder = new PassFinder(fielders, foes, ball);
-
         basicPlay = new BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder);
     }
 

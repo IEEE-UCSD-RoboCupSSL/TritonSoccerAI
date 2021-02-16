@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.AI_Tactics;
 
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.PassEstimator;
+import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -18,12 +18,12 @@ public class DefendPlanA extends Tactics {
     private double foeBlockOffset;
     private final double GUARD_GOAL_GAP = 300; // mm
     protected final BasicEstimator basicEstimator;
-    protected final PassEstimator passEstimator;
+    protected final PassInfo passInfo;
 
     public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, double foeBlockOffset) {
         super(fielders, keeper, foes, ball);
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passEstimator = new PassEstimator(fielders, keeper, foes, ball);
+        passInfo = new PassInfo(fielders, foes, ball);
         this.foeBlockOffset = foeBlockOffset;
     }
 

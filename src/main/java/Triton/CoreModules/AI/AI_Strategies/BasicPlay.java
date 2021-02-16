@@ -35,6 +35,8 @@ public class BasicPlay extends Strategies {
         this.ball = ball;
         this.gapFinder = gapFinder;
         this.passFinder = passFinder;
+        gapFinder.run();
+        passFinder.run();
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
@@ -55,10 +57,10 @@ public class BasicPlay extends Strategies {
             if(basicEstimator.getBallHolder() instanceof Foe) {
                 // play defense
                 //System.out.println("Time To Defend");
-                defend.exec();
+                //defend.exec();
             } else {
                 // Try to get ball & command remainder free bots to seek advantageous positions
-                getBall.exec();
+                //getBall.exec();
             }
         }
 
