@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class FillGapGetBall extends Tactics {
 
-    final private double interAllyClearance = 300; // mm
+    final private double interAllyClearance = 600; // mm
     protected final BasicEstimator basicEstimator;
     // private int state;
     private Ally nearestFielder = null;
