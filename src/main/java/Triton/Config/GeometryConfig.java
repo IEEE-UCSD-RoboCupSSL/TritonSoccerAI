@@ -13,6 +13,7 @@ public class GeometryConfig {
     public static final Vec2D FIELD_BOTTOM_LEFT = new Vec2D(-FIELD_LENGTH / 2, -FIELD_WIDTH / 2);
     public static final double GOAL_LEFT = -500;
     public static final double GOAL_RIGHT = 500;
+    public static final double GOAL_LENGTH = 1000;
     public static final double GOAL_DEPTH = 200;
     public static final double FULL_FIELD_LENGTH = FIELD_LENGTH + 2 * GOAL_DEPTH;
 

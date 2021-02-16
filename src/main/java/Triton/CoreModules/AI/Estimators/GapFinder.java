@@ -44,6 +44,8 @@ public class GapFinder extends ProbFinder {
 
     protected final Publisher<double[][]> pmfPub;
     protected final Subscriber<double[][]> pmfSub;
+    protected final Publisher<int[][]> rPub;
+    protected final Subscriber<int[][]> rSub;
     protected final Publisher<Vec2D[][]> localMaxPosPub;
     protected final Subscriber<Vec2D[][]> localMaxPosSub;
     protected final Publisher<double[][]> localMaxScorePub;
@@ -73,10 +75,13 @@ public class GapFinder extends ProbFinder {
         pmfPub = new FieldPublisher<>(topicName, "PDF" + this.toString(), null);
         pmfSub = new FieldSubscriber<>(topicName, "PDF" + this.toString());
 
-        localMaxScorePub = new FieldPublisher<>(topicName, "Max" + this.toString(), null);
-        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max" + this.toString());
-        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos" + this.toString(), null);
-        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos" + this.toString());
+        rPub = new FieldPublisher<>(topicName, "Receiver", null);
+        rSub = new FieldSubscriber<>(topicName, "Receiver");
+
+        localMaxScorePub = new FieldPublisher<>(topicName, "Max", null);
+        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max");
+        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
+        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
 
         fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions" + this.toString(), null);
         fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions" + this.toString());
@@ -92,6 +97,7 @@ public class GapFinder extends ProbFinder {
             foePosListSub.subscribe(TIMEOUT);
             ballPosSub.subscribe(TIMEOUT);
             pmfSub.subscribe(TIMEOUT);
+            rSub.subscribe(TIMEOUT);
             localMaxPosSub.subscribe(TIMEOUT);
             localMaxScoreSub.subscribe(TIMEOUT);
         } catch (TimeoutException e) {
