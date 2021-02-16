@@ -69,8 +69,8 @@ public class GroupToTest extends RobotSkillsTest {
                     posList.add(ball.getPos().add(new Vec2D(0, -300)));
                     posList.add(ball.getPos().add(new Vec2D(0, -600)));
                     posList.add(ball.getPos().add(new Vec2D(0, -900)));
-                    posList.add(ball.getPos().add(new Vec2D(501, -1200)));
-                    posList.add(ball.getPos().add(new Vec2D(-500, -1200)));
+                    posList.add(ball.getPos().add(new Vec2D(500, -1200)));
+                    posList.add(ball.getPos().add(new Vec2D(1000, -1200)));
                 } while (!swarm.groupTo(posList, dirList, ball.getPos()));
             }
 

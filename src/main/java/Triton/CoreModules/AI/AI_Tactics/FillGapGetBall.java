@@ -15,19 +15,19 @@ import java.util.ArrayList;
 
 public class FillGapGetBall extends Tactics {
 
-    final private GapFinder gapFinder;
-    final private double interAllyClearance = 300; // mm
+    final private double interAllyClearance = 600; // mm
     protected final BasicEstimator basicEstimator;
-    private int state;
+    // private int state;
     private Ally nearestFielder = null;
     private RobotList<Ally> restFielders = null;
+    private GapFinder gapFinder;
 
-    public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, GapFinder gapFinder) {
         super(fielders, keeper, foes, ball);
-        gapFinder = new GapFinder(fielders, foes, ball);
         gapFinder.run();
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        state = 0;
+        this.gapFinder = gapFinder;
+        //state = 0;
     }
 
     public GapFinder getGapFinder() {
@@ -40,12 +40,8 @@ public class FillGapGetBall extends Tactics {
         // invoking contract: no robot is holding the ball
 
         /* find nearest ally to the ball */
-        for (Ally fielder : fielders) {
-            if (nearestFielder == null ||
-                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
-                nearestFielder = fielder;
-            }
-        }
+        nearestFielder = basicEstimator.getNearestFielderToBall();
+
         restFielders = (RobotList<Ally>) fielders.clone();
         if(nearestFielder != null) {
             restFielders.remove(nearestFielder);

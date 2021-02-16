@@ -43,6 +43,30 @@ public class Formation {
                     new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0)),
                     new Vec2D(4450.00, -3500),
                     0.0
+            ),
+            "kickoff-offense", new FormationType(
+                    new ArrayList<>(Arrays.asList(
+                            new Vec2D(0.00, -150),
+                            new Vec2D(600.00, -500),
+                            new Vec2D(1200.00, -100),
+                            new Vec2D(-600.00, -500),
+                            new Vec2D(-1200.00, -100)
+                    )),
+                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new Vec2D(4450.00, -3500),
+                    0.0
+            ),
+            "kickoff-defense", new FormationType(
+                    new ArrayList<>(Arrays.asList(
+                            new Vec2D(0.00, -600),
+                            new Vec2D(600.00, -600),
+                            new Vec2D(1200.00, -900),
+                            new Vec2D(-600.00, -600),
+                            new Vec2D(-1200.00, -900)
+                    )),
+                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new Vec2D(4450.00, -3500),
+                    0.0
             )
     );
     private static Formation formation = null;
@@ -116,13 +140,6 @@ public class Formation {
         return keeper.isPosArrived(keeperPoint) && keeper.isDirAimed(keeperAngle);
     }
 
-    public boolean freeKickFormation(/*...*/) {
-        return false;
-    }
-
-    public boolean penaltyFormation(/*...*/) {
-        return false;
-    }
 
     public static final class FormationType {
         public final ArrayList<Vec2D> points;

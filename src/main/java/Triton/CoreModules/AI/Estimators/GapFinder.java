@@ -18,14 +18,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
+import static Triton.Config.GeometryConfig.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class GapFinder extends ProbFinder {
-
-    protected final Subscriber<HashMap<String, Integer>> fieldSizeSub;
-    protected final Subscriber<HashMap<String, Line2D>> fieldLinesSub;
-
     protected final RobotList<Ally> fielders;
     protected final RobotList<Foe> foes;
     protected final Ball ball;
@@ -39,9 +36,7 @@ public class GapFinder extends ProbFinder {
     int evalWindowSize;
     int resolutionStepSize;
 
-    protected double worldWidth, worldLength;
     protected Rect2D allyPenaltyRegion, foePenaltyRegion;
-    protected double goalLength;
 
     protected double responseRange = 1000.0;
     protected double interceptRange = 500.0;
@@ -77,8 +72,8 @@ public class GapFinder extends ProbFinder {
         String topicName = this.getClass().getSimpleName();
 
         /* internal pub-sub */
-        pmfPub = new FieldPublisher<>(topicName, "PDF", null);
-        pmfSub = new FieldSubscriber<>(topicName, "PDF");
+        pmfPub = new FieldPublisher<>(topicName, "PDF" + this.toString(), null);
+        pmfSub = new FieldSubscriber<>(topicName, "PDF" + this.toString());
 
         rPub = new FieldPublisher<>(topicName, "Receiver", null);
         rSub = new FieldSubscriber<>(topicName, "Receiver");
@@ -88,22 +83,16 @@ public class GapFinder extends ProbFinder {
         localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
         localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
 
-        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions", null);
-        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions");
+        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions" + this.toString(), null);
+        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions" + this.toString());
 
-        foePosListPub = new FieldPublisher<>(topicName, "FoePositions", null);
-        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions");
+        foePosListPub = new FieldPublisher<>(topicName, "FoePositions" + this.toString(), null);
+        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions" + this.toString());
 
-        ballPosPub = new FieldPublisher<>(topicName, "BallPosition", null);
-        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition");
-
-        /* external pub-sub */
-        fieldSizeSub = new FieldSubscriber<>("geometry", "fieldSize");
-        fieldLinesSub = new FieldSubscriber<>("geometry", "fieldLines");
+        ballPosPub = new FieldPublisher<>(topicName, "BallPosition" + this.toString(), null);
+        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition" + this.toString());
 
         try {
-            fieldSizeSub.subscribe(TIMEOUT);
-            fieldLinesSub.subscribe(TIMEOUT);
             fielderPosListSub.subscribe(TIMEOUT);
             foePosListSub.subscribe(TIMEOUT);
             ballPosSub.subscribe(TIMEOUT);
@@ -115,15 +104,11 @@ public class GapFinder extends ProbFinder {
             e.printStackTrace();
         }
 
-        HashMap<String, Integer> fieldSize = fieldSizeSub.getMsg();
-        while (fieldSize == null || fieldSize.get("fieldLength") == 0 || fieldSize.get("fieldWidth") == 0) ;
-        worldWidth = fieldSize.get("fieldWidth");
-        worldLength = fieldSize.get("fieldLength");
         grid = new Gridify(new Vec2D(resolutionStepSize, resolutionStepSize),
-                new Vec2D(-worldWidth / 2, -worldLength / 2), false, false);
-        gridOrigin = grid.fromPos(new Vec2D(-worldWidth / 2, -worldLength / 2));
-        width = grid.numCols(worldWidth) + 1;
-        height = grid.numRows(worldLength) + 1;
+                new Vec2D(-FIELD_WIDTH / 2, -FIELD_LENGTH / 2), false, false);
+        gridOrigin = grid.fromPos(new Vec2D(-FIELD_WIDTH / 2, -FIELD_LENGTH / 2));
+        width = grid.numCols(FIELD_WIDTH) + 1;
+        height = grid.numRows(FIELD_LENGTH) + 1;
 //        System.out.println(Arrays.toString(gridOrigin));
 //        System.out.println(width + " " + height);
 
@@ -135,16 +120,10 @@ public class GapFinder extends ProbFinder {
 //        System.out.println(Arrays.toString(evalOrigin));
 //        System.out.println(evalWidth + " " + evalHeight);
 
-        HashMap<String, Line2D> fieldLines = fieldLinesSub.getMsg();
-        Line2D leftPenalty = fieldLines.get("LeftPenaltyStretch");
-        Line2D rightPenalty = fieldLines.get("RightPenaltyStretch");
-        Line2D leftGoal = fieldLines.get("LeftGoalDepthLine");
-        goalLength = Math.abs(leftGoal.p1.y - leftGoal.p2.y);
-
-        Vec2D lpA = audienceToPlayer(leftPenalty.p1);
-        Vec2D lpB = audienceToPlayer(leftPenalty.p2);
-        Vec2D rpA = audienceToPlayer(rightPenalty.p1);
-        Vec2D rpB = audienceToPlayer(rightPenalty.p2);
+        Vec2D lpA = audienceToPlayer(LEFT_PENALTY_STRETCH.p1);
+        Vec2D lpB = audienceToPlayer(LEFT_PENALTY_STRETCH.p2);
+        Vec2D rpA = audienceToPlayer(RIGHT_PENALTY_STRETCH.p1);
+        Vec2D rpB = audienceToPlayer(RIGHT_PENALTY_STRETCH.p2);
         if (lpA.x > lpB.x) {
             Vec2D tmp = lpA;
             lpA = lpB;
@@ -158,16 +137,16 @@ public class GapFinder extends ProbFinder {
         double penaltyWidth = lpA.sub(lpB).mag();
         double penaltyHeight;
         if (lpA.y < 0) {
-            penaltyHeight = (new Vec2D(lpA.x, -worldLength / 2)).sub(lpA).mag();
+            penaltyHeight = (new Vec2D(lpA.x, -FIELD_LENGTH / 2)).sub(lpA).mag();
         } else {
-            penaltyHeight = (new Vec2D(lpA.x, worldLength / 2)).sub(lpA).mag();
+            penaltyHeight = (new Vec2D(lpA.x, FIELD_LENGTH / 2)).sub(lpA).mag();
         }
         if (lpA.y < rpA.y) {
-            Vec2D lpC = new Vec2D(lpA.x, -worldLength / 2);
+            Vec2D lpC = new Vec2D(lpA.x, -FIELD_LENGTH / 2);
             allyPenaltyRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
             foePenaltyRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
         } else {
-            Vec2D rpC = new Vec2D(rpA.x, -worldLength / 2);
+            Vec2D rpC = new Vec2D(rpA.x, -FIELD_LENGTH / 2);
             allyPenaltyRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
             foePenaltyRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
         }
@@ -352,7 +331,7 @@ public class GapFinder extends ProbFinder {
                     }
                 }
 
-                double distToFrontEnd = worldLength / 2 - pos.y;
+                double distToFrontEnd = FIELD_LENGTH / 2 - pos.y;
                 if (pos.y > ballPos.y) {
                     /* make it keep a balanced position between ball and frontEndLine */
                     double distToBall = pos.sub(ballPos).mag();
@@ -360,7 +339,7 @@ public class GapFinder extends ProbFinder {
                     prob *= Math.min(distToFrontEnd, distToBall) / midDist;
                 } else {
                     /* make it go as front as possible */
-                    prob *= (worldLength - distToFrontEnd) / worldLength;
+                    prob *= (FIELD_LENGTH - distToFrontEnd) / FIELD_LENGTH;
                     prob *= 0.5; // lower this prob so that position satisfying pos.y > ballPos.y will have greater prob
                 }
 

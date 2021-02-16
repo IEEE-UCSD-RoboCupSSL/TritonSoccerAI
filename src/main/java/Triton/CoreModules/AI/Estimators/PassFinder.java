@@ -16,6 +16,9 @@ import Triton.Misc.ModulePubSubSystem.Subscriber;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
+import static Triton.Config.GeometryConfig.FIELD_LENGTH;
+import static Triton.Config.GeometryConfig.FIELD_WIDTH;
+
 public class PassFinder extends GapFinder {
 
     private static final double C1_WEIGHT = 2.0;
@@ -81,17 +84,17 @@ public class PassFinder extends GapFinder {
 
         String topicName = this.getClass().getSimpleName();
 
-        fielderVelListPub = new FieldPublisher<>(topicName, "FielderVelocities", null);
-        fielderVelListSub = new FieldSubscriber<>(topicName, "FielderVelocities");
+        fielderVelListPub = new FieldPublisher<>(topicName, "FielderVelocities" + this.toString(), null);
+        fielderVelListSub = new FieldSubscriber<>(topicName, "FielderVelocities" + this.toString());
 
-        foeVelListPub = new FieldPublisher<>(topicName, "FoeVelocities", null);
-        foeVelListSub = new FieldSubscriber<>(topicName, "FoeVelocities");
+        foeVelListPub = new FieldPublisher<>(topicName, "FoeVelocities" + this.toString(), null);
+        foeVelListSub = new FieldSubscriber<>(topicName, "FoeVelocities" + this.toString());
 
-        fielderAngListPub = new FieldPublisher<>(topicName, "FielderAngles", null);
-        fielderAngListSub = new FieldSubscriber<>(topicName, "FielderAngles");
+        fielderAngListPub = new FieldPublisher<>(topicName, "FielderAngles" + this.toString(), null);
+        fielderAngListSub = new FieldSubscriber<>(topicName, "FielderAngles" + this.toString());
 
-        foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles", null);
-        foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles");
+        foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles" + this.toString(), null);
+        foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles" + this.toString());
 
         try {
             fielderVelListSub.subscribe(TIMEOUT);
@@ -204,8 +207,8 @@ public class PassFinder extends GapFinder {
                 /* c5: Location x is reliable for pass reception **/
                 if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos)) continue;
                 double penaltyDist = Math.min(allyPenaltyRegion.distTo(pos), foePenaltyRegion.distTo(pos));
-                double xDist = Math.min(Math.abs(pos.x - worldWidth / 2), Math.abs(pos.x + worldWidth / 2));
-                double yDist = Math.min(Math.abs(pos.y - worldLength / 2), Math.abs(pos.y + worldLength / 2));
+                double xDist = Math.min(Math.abs(pos.x - FIELD_WIDTH / 2), Math.abs(pos.x + FIELD_WIDTH / 2));
+                double yDist = Math.min(Math.abs(pos.y - FIELD_LENGTH / 2), Math.abs(pos.y + FIELD_LENGTH / 2));
                 double c5 = Math.min(0, penaltyDist - C5_MAX_DIST) / C5_DEV +
                         Math.min(0, xDist - C5_MAX_DIST) / C5_DEV +
                         Math.min(0, yDist - C5_MAX_DIST) / C5_DEV;
@@ -222,6 +225,7 @@ public class PassFinder extends GapFinder {
                     for (int j = 0; j < foes.size(); j++) {
                         Vec2D foePos = foePosList.get(j);
                         double[] angleRange = angleRange(foePos, ballPos);
+                        double ETA;
                         if (foePos.sub(ballPos).mag() - FRONT_PADDING < pos.sub(ballPos).mag() &&
                             angleBetween(path.toPlayerAngle(), angleRange)) {
                             foeTime_ = 0;

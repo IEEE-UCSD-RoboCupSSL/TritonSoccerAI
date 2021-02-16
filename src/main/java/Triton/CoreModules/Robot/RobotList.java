@@ -41,4 +41,7 @@ public class RobotList<T> extends ArrayList<T> {
         }
     }
 
+    public static int getFoeKeeperID() {
+        return 5;
+    }
 }

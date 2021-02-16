@@ -1,17 +1,18 @@
 package Triton.PeriphModules.GameControl;
 
-import Triton.CoreModules.AI.GameStates;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.PeriphModules.GameControl.GameStates.GameState;
+import Triton.PeriphModules.GameControl.GameStates.UnknownGameState;
 
 public abstract class GameCtrlModule implements Module {
 
-    protected FieldPublisher<GameStates> gsPub;
-    protected FieldSubscriber<GameStates> gsSub;
+    protected FieldPublisher<GameState> gsPub;
+    protected FieldSubscriber<GameState> gsSub;
 
     protected GameCtrlModule(String gcName) {
-        gsPub = new FieldPublisher<>("game state", gcName, GameStates.UNKNOWN);
+        gsPub = new FieldPublisher<>("game state", gcName, new UnknownGameState());
         gsSub = new FieldSubscriber<>("game state", gcName);
     }
 
@@ -26,7 +27,7 @@ public abstract class GameCtrlModule implements Module {
         }
     }
 
-    public GameStates getGameState() {
+    public GameState getGameState() {
         if (gsSub.isSubscribed()) {
             return gsSub.getMsg();
         }

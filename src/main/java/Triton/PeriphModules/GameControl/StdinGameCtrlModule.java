@@ -1,6 +1,6 @@
 package Triton.PeriphModules.GameControl;
 
-import Triton.CoreModules.AI.GameStates;
+import Triton.PeriphModules.GameControl.GameStates.*;
 
 import java.util.Scanner;
 
@@ -22,44 +22,44 @@ public class StdinGameCtrlModule extends GameCtrlModule {
             System.out.println("    [halt, stop, running, freekick, kickoff, penalty, timeout, ballplacement]");
 
             String gsStr = scanner.nextLine();
-            GameStates gs;
+            GameState gs;
 
             switch (gsStr) {
                 case "halt" -> {
                     System.out.println(">>>HALT<<<");
-                    gs = GameStates.HALT;
+                    gs = new HaltGameState();
                 }
                 case "stop" -> {
                     System.out.println(">>>STOP<<<");
-                    gs = GameStates.STOP;
+                    gs = new StopGameState();
                 }
                 case "running" -> {
                     System.out.println(">>>RUNNING<<<");
-                    gs = GameStates.RUNNING;
+                    gs = new RunningGameState();
                 }
                 case "freekick" -> {
                     System.out.println(">>>FREE_KICK<<<");
-                    gs = GameStates.FREE_KICK;
+                    gs = new FreeKickGameState();
                 }
                 case "kickoff" -> {
                     System.out.println(">>>KICKOFF<<<");
-                    gs = GameStates.KICKOFF;
+                    gs = new KickoffGameState();
                 }
                 case "penalty" -> {
                     System.out.println(">>>PENALTY<<<");
-                    gs = GameStates.PENALTY;
+                    gs = new PenaltyGameState();
                 }
                 case "timeout" -> {
                     System.out.println(">>>TIMEOUT<<<");
-                    gs = GameStates.TIMEOUT;
+                    gs = new TimeoutGameState();
                 }
                 case "ballplacement" -> {
                     System.out.println(">>>BALL_PLACEMENT<<<");
-                    gs = GameStates.BALL_PLACEMENT;
+                    gs = new BallPlacementGameState();
                 }
                 default -> {
                     System.out.println(">>>UNKNOWN<<<");
-                    gs = GameStates.UNKNOWN;
+                    gs = new UnknownGameState();
                 }
             }
 

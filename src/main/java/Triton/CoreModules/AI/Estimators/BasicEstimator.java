@@ -100,4 +100,44 @@ public class BasicEstimator {
     }
 
 
+    public Ally getNearestFielderToBall() {
+        Ally nearestFielder = null;
+        for (Ally fielder : fielders) {
+            if (nearestFielder == null ||
+                    fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
+                nearestFielder = fielder;
+            }
+        }
+        return nearestFielder;
+    }
+
+    public Foe getNearestFoeToBall() {
+        Foe nearestFoe = null;
+        for (Foe foe : foes) {
+            if (nearestFoe == null ||
+                    foe.getPos().sub(ball.getPos()).mag() < nearestFoe.getPos().sub(ball.getPos()).mag()) {
+                nearestFoe = foe;
+            }
+        }
+        return nearestFoe;
+    }
+
+
+    public Robot getNearestBotToBall() {
+        Robot nearestBot = null;
+        for (Ally fielder : fielders) {
+            if (nearestBot == null ||
+                    fielder.getPos().sub(ball.getPos()).mag() < nearestBot.getPos().sub(ball.getPos()).mag()) {
+                nearestBot = fielder;
+            }
+        }
+        for (Foe foe : foes) {
+            if (nearestBot == null ||
+                    foe.getPos().sub(ball.getPos()).mag() < nearestBot.getPos().sub(ball.getPos()).mag()) {
+                nearestBot = foe;
+            }
+        }
+        return nearestBot;
+    }
+
 }

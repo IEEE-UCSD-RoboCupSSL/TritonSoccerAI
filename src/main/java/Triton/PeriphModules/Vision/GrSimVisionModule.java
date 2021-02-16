@@ -20,7 +20,6 @@ public class GrSimVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> detectPub;
-    private final Publisher<SSL_GeometryData> geoPub;
     private MulticastSocket socket;
     private DatagramPacket packet;
 
@@ -39,7 +38,6 @@ public class GrSimVisionModule extends VisionModule {
      */
     public GrSimVisionModule(String ip, int port) {
         detectPub = new MQPublisher<>("vision", "detection");
-        geoPub = new MQPublisher<>("vision", "geometry");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
@@ -82,10 +80,6 @@ public class GrSimVisionModule extends VisionModule {
 
             if (SSLPacket.hasDetection()) {
                 detectPub.publish(SSLPacket.getDetection());
-            }
-
-            if (SSLPacket.hasGeometry()) {
-                geoPub.publish(SSLPacket.getGeometry());
             }
         } catch (Exception e) {
             e.printStackTrace();
