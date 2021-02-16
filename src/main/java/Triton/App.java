@@ -119,8 +119,8 @@ public class App {
         if (!isTestMode) {
             int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
-            //GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
             threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
@@ -131,14 +131,14 @@ public class App {
         }
 
 
-        Display display = new Display();
-        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-        paintOptions.add(GEOMETRY);
-        paintOptions.add(OBJECTS);
-        paintOptions.add(INFO);
+//        Display display = new Display();
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
+//        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
-        display.setPaintOptions(paintOptions);
+//        display.setPaintOptions(paintOptions);
 
         sleepForever();
     }

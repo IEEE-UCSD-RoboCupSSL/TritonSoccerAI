@@ -97,6 +97,9 @@ public class DefendPlanA extends Tactics {
         } else {
             ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
             for (Foe foe : foes) {
+                if (foe.getID() == RobotList.getFoeKeeperID())
+                    continue;
+
                 Vec2D foePos = foe.getPos();
                 Vec2D goalPos = new Vec2D(0, -4500);
                 Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();

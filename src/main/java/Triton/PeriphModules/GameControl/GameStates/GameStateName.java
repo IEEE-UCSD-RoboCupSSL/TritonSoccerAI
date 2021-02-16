@@ -1,6 +1,6 @@
-package Triton.CoreModules.AI;
+package Triton.PeriphModules.GameControl.GameStates;
 
-public enum GameStates {
+public enum GameStateName {
     UNKNOWN,
     HALT,
     STOP,
