@@ -16,6 +16,9 @@ import Triton.Misc.ModulePubSubSystem.Subscriber;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
+import static Triton.Config.GeometryConfig.FIELD_LENGTH;
+import static Triton.Config.GeometryConfig.FIELD_WIDTH;
+
 public class PassFinder extends GapFinder {
 
     private static final double C1_WEIGHT = 1.0;
@@ -183,8 +186,8 @@ public class PassFinder extends GapFinder {
                 /* c5: Location x is reliable for pass reception **/
                 if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos)) continue;
                 double penaltyDist = Math.min(allyPenaltyRegion.distTo(pos), foePenaltyRegion.distTo(pos));
-                double xDist = Math.min(Math.abs(pos.x - worldWidth / 2), Math.abs(pos.x + worldWidth / 2));
-                double yDist = Math.min(Math.abs(pos.y - worldLength / 2), Math.abs(pos.y + worldLength / 2));
+                double xDist = Math.min(Math.abs(pos.x - FIELD_WIDTH / 2), Math.abs(pos.x + FIELD_WIDTH / 2));
+                double yDist = Math.min(Math.abs(pos.y - FIELD_LENGTH / 2), Math.abs(pos.y + FIELD_LENGTH / 2));
                 double c5 = Math.min(0, penaltyDist - C5_MAX_DIST) / C5_MEAN +
                         Math.min(0, xDist - C5_MAX_DIST) / C5_MEAN +
                         Math.min(0, yDist - C5_MAX_DIST) / C5_MEAN;

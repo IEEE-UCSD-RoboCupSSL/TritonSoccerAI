@@ -2,7 +2,6 @@ package Triton.CoreModules.AI;
 
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
-import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
@@ -11,11 +10,16 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
+import Triton.PeriphModules.GameControl.GameStates.BallPlacementGameState;
+import Triton.PeriphModules.GameControl.GameStates.GameState;
 
 import static Triton.Config.ObjectConfig.DRIBBLER_OFFSET;
+import static Triton.Config.ObjectConfig.MY_TEAM;
 
 
 public class AI implements Module {
@@ -26,13 +30,11 @@ public class AI implements Module {
     private final RobotList<Foe> foes;
     private final Ball ball;
 
-
     private final Strategies strategyToPlay;
     private final GameCtrlModule gameCtrl;
 
     private final GapFinder gapFinder;
     private final PassFinder passFinder;
-
 
     public AI(RobotList<Ally> fielders, Ally keeper,
               RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {
@@ -57,10 +59,10 @@ public class AI implements Module {
     public void run() {
         try {
             while (true) { // delay added
-                GameStates currGameState = gameCtrl.getGameState();
+                GameState currGameState = gameCtrl.getGameState();
 
                 // Decision Tree
-                switch (currGameState) {
+                switch (currGameState.getName()) {
                     case RUNNING -> {
                         tmpPlaceHolder(">>>RUNNING<<<");
                         strategyToPlay.play();
@@ -93,7 +95,12 @@ public class AI implements Module {
                     }
                     case BALL_PLACEMENT -> {
                         tmpPlaceHolder(">>>BALL_PLACEMENT<<<");
-                        ballPlacement();
+                        BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
+                        Team ballPlacementTeam = ballPlacementGameState.getTeam();
+                        if (ballPlacementTeam == MY_TEAM) {
+                            Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
+                            ballPlacement(teamTargetPos);
+                        }
                     }
                     default -> {
                         tmpPlaceHolder(">>>UNKNOWN<<<");
@@ -134,13 +141,11 @@ public class AI implements Module {
         fielders.stopAll();
     }
 
-    private void ballPlacement() throws InterruptedException {
+    private void ballPlacement(Vec2D targetPos) throws InterruptedException {
 
         BasicEstimator basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
 
         Ally ally = basicEstimator.getNearestFielderToBall();
-
-        Vec2D targetPos = new Vec2D(0, 0); // To-do
 
         while(!ball.isPosArrived(targetPos)) {
             if (ally.isHoldingBall()) {

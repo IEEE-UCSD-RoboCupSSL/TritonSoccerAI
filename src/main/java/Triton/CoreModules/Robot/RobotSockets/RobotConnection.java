@@ -14,7 +14,6 @@ public class RobotConnection {
     private RobotTCPConnection tcpConnect;
     private RobotCommandUDPStream commandStream;
     private RobotVisionUDPStream visionStream;
-    private RobotDataUDPStream dataStream;
 
     /**
      * Construct a RobotConnection for specified robot
@@ -75,15 +74,6 @@ public class RobotConnection {
     }
 
     /**
-     * Constructs the data UDP stream
-     *
-     * @param port port to receive from
-     */
-    public void buildDataStream(int port) {
-        dataStream = new RobotDataUDPStream(port, ID);
-    }
-
-    /**
      * @return the tcp connection
      */
     public RobotTCPConnection getTCPConnection() {
@@ -102,12 +92,5 @@ public class RobotConnection {
      */
     public RobotVisionUDPStream getVisionStream() {
         return visionStream;
-    }
-
-    /**
-     * @return the data UDP stream
-     */
-    public RobotDataUDPStream getDataStream() {
-        return dataStream;
     }
 }
