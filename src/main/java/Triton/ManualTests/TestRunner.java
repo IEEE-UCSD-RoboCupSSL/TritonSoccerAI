@@ -5,6 +5,7 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.AI_SkillsTests.CPassTest;
+import Triton.ManualTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
 import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
@@ -73,6 +74,7 @@ public class TestRunner implements Module {
                         case "shoot" -> rtn = new ShootGoalTest(scanner, fielders.get(0), foes, ball).test();
                         case "keep" -> rtn = new KeeperTest(fielders, keeper, foes, ball).test();
                         case "defendA" -> rtn = new DefendPlanATest(fielders, keeper, foes, ball).test();
+                        case "dodge" -> rtn = new DodgingTest(fielders, keeper, foes, ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;

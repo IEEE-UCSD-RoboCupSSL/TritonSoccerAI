@@ -111,8 +111,8 @@ public class BasicEstimator {
         return nearestFielder;
     }
 
-    public Robot getNearestFoeToBall() {
-        Robot nearestFoe = null;
+    public Foe getNearestFoeToBall() {
+        Foe nearestFoe = null;
         for (Foe foe : foes) {
             if (nearestFoe == null ||
                     foe.getPos().sub(ball.getPos()).mag() < nearestFoe.getPos().sub(ball.getPos()).mag()) {
