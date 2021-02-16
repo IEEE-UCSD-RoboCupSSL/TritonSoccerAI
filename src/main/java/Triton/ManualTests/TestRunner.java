@@ -43,7 +43,7 @@ public class TestRunner implements Module {
     public void run() {
         try {
             Thread.sleep(1000);
-            new FormationTest("tester", fielders).test();
+            //new FormationTest("tester", fielders).test();
 
             String prevTestName = "";
             boolean quit = false;

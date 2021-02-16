@@ -18,6 +18,7 @@ import java.util.concurrent.TimeoutException;
 
 import static Triton.Config.GeometryConfig.FIELD_LENGTH;
 import static Triton.Config.GeometryConfig.FIELD_WIDTH;
+import static Triton.Config.GeometryConfig.GOAL_LENGTH;
 
 public class PassFinder extends GapFinder {
 
@@ -225,7 +226,6 @@ public class PassFinder extends GapFinder {
                     for (int j = 0; j < foes.size(); j++) {
                         Vec2D foePos = foePosList.get(j);
                         double[] angleRange = angleRange(foePos, ballPos);
-                        double ETA;
                         if (foePos.sub(ballPos).mag() - FRONT_PADDING < pos.sub(ballPos).mag() &&
                             angleBetween(path.toPlayerAngle(), angleRange)) {
                             foeTime_ = 0;
@@ -239,8 +239,8 @@ public class PassFinder extends GapFinder {
                 if(c2 < 0) c2 *= C2_WEIGHT;
 
                 /* g1: Shots from x can reach the opposing goal faster than their goalkeeper can block them. **/
-                Vec2D leftGoal = new Vec2D(-goalLength / 2, worldLength / 2);
-                Vec2D goalSeg = new Vec2D(goalLength, 0).scale(1.0 / G1_GOAL_INTERVAL);
+                Vec2D leftGoal = new Vec2D(-GOAL_LENGTH / 2, FIELD_LENGTH / 2);
+                Vec2D goalSeg = new Vec2D(GOAL_LENGTH, 0).scale(1.0 / G1_GOAL_INTERVAL);
                 double g1 = Double.MAX_VALUE;
 
                 for (int i = 1; i < G1_GOAL_INTERVAL; i++) {
@@ -270,7 +270,7 @@ public class PassFinder extends GapFinder {
                 if(g1 < 0) g1 *= G1_WEIGHT;
 
                 /* g2: There is a wide enough open angle θ from x to the opposing goal **/
-                Vec2D rightGoal = leftGoal.add(goalLength, 0);
+                Vec2D rightGoal = leftGoal.add(GOAL_LENGTH, 0);
                 double openAngle = angDiff(rightGoal.sub(pos).toPlayerAngle(), leftGoal.sub(pos).toPlayerAngle());
                 double g2 = (openAngle - G2_MEAN) / G2_DEV;
 
