@@ -59,12 +59,6 @@ public class MiscTest extends RobotSkillsTest {
             ally.getBall(ball);
         }
 
-        System.out.println("moving 1 meter");
-        while (!ally.isMaxDispExceeded()) {
-            double disp = ally.dispSinceHoldBall();
-            System.out.println(disp);
-            ally.sprintTo(new Vec2D(2000, 2000));
-        }
 
         ally.stop();
 

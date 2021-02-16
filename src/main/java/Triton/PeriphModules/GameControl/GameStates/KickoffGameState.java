@@ -13,4 +13,8 @@ public class KickoffGameState extends GameState {
         super(GameStateName.KICKOFF);
         this.team = team;
     }
+
+    public Team getTeam() {
+        return team;
+    }
 }

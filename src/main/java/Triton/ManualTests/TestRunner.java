@@ -8,6 +8,7 @@ import Triton.ManualTests.AI_SkillsTests.CPassTest;
 import Triton.ManualTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
+import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
 import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
@@ -75,6 +76,8 @@ public class TestRunner implements Module {
                         case "keep" -> rtn = new KeeperTest(fielders, keeper, foes, ball).test();
                         case "defendA" -> rtn = new DefendPlanATest(fielders, keeper, foes, ball).test();
                         case "dodge" -> rtn = new DodgingTest(fielders, keeper, foes, ball).test();
+                        case "holdballpos" -> rtn = new HoldBallPosTest(fielders.get(3), ball).test();
+                        case "basicplay" -> rtn = new BasicPlayTest(fielders, keeper, foes, ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class DefendPlanA extends Tactics {
 
-    private final double foeBlockOffset;
+    private double foeBlockOffset;
     private final double GUARD_GOAL_GAP = 300; // mm
     protected final BasicEstimator basicEstimator;
     protected final PassEstimator passEstimator;
@@ -24,6 +24,10 @@ public class DefendPlanA extends Tactics {
         super(fielders, keeper, foes, ball);
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passEstimator = new PassEstimator(fielders, keeper, foes, ball);
+        this.foeBlockOffset = foeBlockOffset;
+    }
+
+    public void setFoeBlockOffset(double foeBlockOffset) {
         this.foeBlockOffset = foeBlockOffset;
     }
 
@@ -66,7 +70,7 @@ public class DefendPlanA extends Tactics {
                 Vec2D foePos = foe.getPos();
                 Vec2D goalPos = new Vec2D(0, -4500);
                 Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
-                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(250)));
+                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
             }
 
             new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
@@ -103,7 +107,7 @@ public class DefendPlanA extends Tactics {
                 Vec2D foePos = foe.getPos();
                 Vec2D goalPos = new Vec2D(0, -4500);
                 Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
-                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(250)));
+                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
             }
 
             new Swarm(fielders).groupTo(attackingFoePos, ball.getPos());

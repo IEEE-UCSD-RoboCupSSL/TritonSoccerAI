@@ -482,7 +482,7 @@ public class Ally extends Robot implements AllySkills {
     public void keep(Ball ball, Vec2D aimTraj) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
-        double y = -FIELD_LENGTH / 2 - GOAL_DEPTH + 150;
+        double y = -FIELD_LENGTH / 2 + 150;
 
         if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
             getBall(ball);
@@ -518,19 +518,10 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public double dispSinceHoldBall() {
-        Vec2D holdBallPos = holdBallPosSub.getMsg();
-
-        if (holdBallPos != null)
-            return getPos().sub(holdBallPos).mag();
-        else
-            return 0;
+    public Vec2D HoldBallPos() {
+        return  holdBallPosSub.getMsg();
     }
 
-    @Override
-    public boolean isMaxDispExceeded() {
-        return dispSinceHoldBall() > EXCESSIVE_DRIBBLING_DIST;
-    }
 
     @Override
     public boolean isPosArrived(Vec2D pos) {

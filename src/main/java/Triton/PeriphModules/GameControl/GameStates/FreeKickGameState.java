@@ -13,4 +13,8 @@ public class FreeKickGameState extends GameState {
         super(GameStateName.FREE_KICK);
         this.team = team;
     }
+
+    public Team getTeam() {
+        return team;
+    }
 }

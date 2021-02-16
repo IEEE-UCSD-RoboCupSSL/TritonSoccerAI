@@ -44,6 +44,7 @@ public class Formation {
                     new Vec2D(4450.00, -3500),
                     0.0
             ),
+
             "kickoff-offense", new FormationType(
                     new ArrayList<>(Arrays.asList(
                             new Vec2D(0.00, -150),
@@ -56,6 +57,7 @@ public class Formation {
                     new Vec2D(4450.00, -3500),
                     0.0
             ),
+
             "kickoff-defense", new FormationType(
                     new ArrayList<>(Arrays.asList(
                             new Vec2D(0.00, -600),
