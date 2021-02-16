@@ -682,8 +682,9 @@ public class Ally extends Robot implements AllySkills {
                 }
                 commandsPub.publish(command);
 
-                if (isHoldingBall() != prevHoldBallStatus) {
-                    if (isHoldingBall()) {
+                boolean isHolding = isHoldingBall();
+                if (isHolding != prevHoldBallStatus) {
+                    if (isHolding) {
                         holdBallPosPub.publish(getPos());
                     } else {
                         holdBallPosPub.publish(null);

@@ -55,7 +55,11 @@ public class AttackPlanA extends Tactics {
 
 
         } else {
-            dodging.dodge((Ally) holder, ((Ally) holder).HoldBallPos());
+            Vec2D holdBallPos = ((Ally) holder).HoldBallPos();
+            // System.out.println(holdBallPos);
+            if(holdBallPos != null) {
+                dodging.dodge((Ally) holder, holdBallPos);
+            }
             restOfAllyForwardFillGap();
 
         }
