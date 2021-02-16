@@ -87,9 +87,8 @@ public interface AllySkills {
     /* getters */
     boolean isHoldingBall();
 
-    double dispSinceHoldBall();
+    Vec2D HoldBallPos();
 
-    boolean isMaxDispExceeded();
 
     boolean isPosArrived(Vec2D loc);
 
