@@ -40,7 +40,7 @@ public class BasicPlay extends Strategies {
         goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
 
         // construct tactics
-        attack = new AttackPlanA(fielders, keeper, foes, ball);
+        attack = new AttackPlanA(fielders, keeper, foes, ball, gapFinder, passFinder);
         getBall = new FillGapGetBall(fielders, keeper, foes, ball, gapFinder);
         defend = new DefendPlanA(fielders, keeper, foes, ball, 300);
     }
@@ -50,15 +50,15 @@ public class BasicPlay extends Strategies {
         if (basicEstimator.isBallUnderOurCtrl()) {
             // play offensive
             // System.out.println("Ready To Attack");
-            if(!attack.exec()) fielders.stopAll();
+            attack.exec();
         } else {
             if(basicEstimator.getBallHolder() instanceof Foe) {
                 // play defense
                 //System.out.println("Time To Defend");
-                if(!defend.exec()) fielders.stopAll();
+                defend.exec();
             } else {
                 // Try to get ball & command remainder free bots to seek advantageous positions
-                if(!getBall.exec()) fielders.stopAll();
+                getBall.exec();
             }
         }
 
