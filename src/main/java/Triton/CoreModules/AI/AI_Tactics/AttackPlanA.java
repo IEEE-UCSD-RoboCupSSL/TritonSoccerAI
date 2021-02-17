@@ -1,9 +1,6 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
-import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
-import Triton.CoreModules.AI.AI_Skills.Dodging;
-import Triton.CoreModules.AI.AI_Skills.PassState;
-import Triton.CoreModules.AI.AI_Skills.Swarm;
+import Triton.CoreModules.AI.AI_Skills.*;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
@@ -13,9 +10,15 @@ import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.RobotSkillsTests.FormationTest;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
+import org.ejml.All;
 
 import java.util.ArrayList;
+
+import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
+import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class AttackPlanA extends Tactics {
 
@@ -65,7 +68,8 @@ public class AttackPlanA extends Tactics {
             return false;
         }
 
-        if(isReadyToShoot()) {
+        if(isReadyToShoot() && holder instanceof Ally) {
+            shootingProcedure((Ally) holder);
         }
 
         passInfo = passFinder.evalPass();
@@ -153,4 +157,87 @@ public class AttackPlanA extends Tactics {
 
         return 0;
     }
+
+
+    private void shootingProcedure(Ally shooter) {
+        System.out.println("GOOD LUCK");
+        long t0 = System.currentTimeMillis();
+        while(System.currentTimeMillis() - t0 < 3000) {
+            if  (!shooter.isHoldingBall()) {
+                break;
+            }
+            else {
+                adhocShooting(shooter);
+            }
+            RobotList<Ally> restFielders = (RobotList<Ally>) fielders.clone();
+            restFielders.remove(shooter);
+            //restOfAllyFillGap(restFielders, ball.getPos());
+            ArrayList<Vec2D> sidePos = new ArrayList<>();
+            sidePos.add(new Vec2D(2800, 500));
+            sidePos.add(new Vec2D(2800, 0));
+            sidePos.add(new Vec2D(-2800, 500));
+            sidePos.add(new Vec2D(-2800, 0));
+            new Swarm(restFielders).groupTo(sidePos);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private void adhocShooting(Ally shooter) {
+        Vec2D leftGoalPole = new Vec2D(-500, 4500);
+        Vec2D rightGoalPole = new Vec2D(500, 4500);
+        Vec2D shooterPos = shooter.getPos();
+        double leftAngle = leftGoalPole.sub(shooterPos).toPlayerAngle();
+        double rightAngle = rightGoalPole.sub(shooterPos).toPlayerAngle();
+        double currAim = shooter.getDir();
+        double leftOffset = normAng(currAim - leftAngle);
+        double rightOffset = normAng(currAim - rightAngle);
+        if(leftOffset < 0 && rightOffset > 0) {
+            // aiming inside goal direction
+
+            // check if good to shoot
+            Line2D currAimLine = new Line2D(shooterPos.add(new Vec2D(currAim)).scale(100), shooterPos);
+            Robot nearAimLineBot = basicEstimator.getNearestBotToLine(currAimLine);
+            if(nearAimLineBot == null) return;
+            if(nearAimLineBot.getPos().distToLine(currAimLine) < 150) {
+                shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
+                return;
+            }
+
+            // scanning
+            Vec2D scanPos = new Vec2D(-500, 4500);
+            Vec2D optPos = null;
+            double maxScore = 0;
+            for(int i = 1; i < 10; i++) {
+                Line2D shootingLine = new Line2D(scanPos, shooterPos);
+                Robot nearestBot = basicEstimator.getNearestBotToLine(shootingLine);
+                if(nearestBot == null) return;
+                double score = nearestBot.getPos().distToLine(shootingLine);
+                if(score > maxScore) {
+                    maxScore = score;
+                    optPos = scanPos;
+                }
+                scanPos = scanPos.add(new Vec2D(i * 100, 0));
+            }
+
+            double optAngle = optPos.sub(shooterPos).toPlayerAngle();
+            shooter.rotateTo(optAngle);
+
+        } else { // outside goal direction
+            if(Math.abs(leftOffset) < Math.abs(rightOffset)) {
+                shooter.rotateTo(normAng(leftAngle - 10));
+
+            }else {
+                shooter.rotateTo(normAng(rightAngle + 10));
+            }
+        }
+
+
+
+    }
+
 }

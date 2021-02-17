@@ -10,6 +10,7 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 
@@ -134,6 +135,24 @@ public class BasicEstimator {
         for (Foe foe : foes) {
             if (nearestBot == null ||
                     foe.getPos().sub(ball.getPos()).mag() < nearestBot.getPos().sub(ball.getPos()).mag()) {
+                nearestBot = foe;
+            }
+        }
+        return nearestBot;
+    }
+
+
+    public Robot getNearestBotToLine(Line2D line) {
+        Robot nearestBot = null;
+        for (Ally fielder : fielders) {
+            if (nearestBot == null ||
+                    fielder.getPos().distToLine(line) < nearestBot.getPos().distToLine(line)) {
+                nearestBot = fielder;
+            }
+        }
+        for (Foe foe : foes) {
+            if (nearestBot == null ||
+                    foe.getPos().distToLine(line) < nearestBot.getPos().distToLine(line)) {
                 nearestBot = foe;
             }
         }

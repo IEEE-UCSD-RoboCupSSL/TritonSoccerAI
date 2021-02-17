@@ -5,6 +5,8 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
+import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
+
 public class GoalKeeping {
 
     private final Ally keeper;
@@ -22,7 +24,18 @@ public class GoalKeeping {
     }
 
     public void passiveGuarding() {
-        keeper.keep(ball, basicEstimator.getAimTrajectory());
+        if(keeper.isHoldingBall()) {
+//            Ally nearestBot = basicEstimator.getNearestFielderToBall();
+//            if(nearestBot == null) return;
+
+            if(keeper.isDirAimed(0)) {
+                keeper.kick(new Vec2D(MAX_KICK_VEL, MAX_KICK_VEL));
+            } else {
+                keeper.rotateTo(0);
+            }
+        } else {
+            keeper.keep(ball, basicEstimator.getAimTrajectory());
+        }
     }
 
     public void activeGuarding() {
