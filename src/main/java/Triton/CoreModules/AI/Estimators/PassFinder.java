@@ -22,10 +22,7 @@ import static Triton.Config.GeometryConfig.GOAL_LENGTH;
 
 public class PassFinder extends GapFinder {
 
-    private static final double C1_WEIGHT = 2.0;
-
     private static final int C2_INTERVAL = 5;
-    private static final double C2_WEIGHT = 1.0;
 
     private static final double C3_T_MIN = 0.1;
     private static final double C3_T_MAX = 0.3;
@@ -45,14 +42,20 @@ public class PassFinder extends GapFinder {
 
     private static final int G1_GOAL_INTERVAL = 3;
     private static final int G1_INTERCEPT_INTERVAL = 3;
-    private static final double G1_WEIGHT = 2.5;
 
     private static final double G2_MEAN = 20.0;
     private static final double G2_DEV = 40.0;
-    private static final double G2_WEIGHT = 2.5;
 
     private static final int G3_GOAL_INTERVAL = 5;
     private static final double G3_ONE_SHOT_ANGLE = 20;
+
+    private static final double C1_WEIGHT = 2.0;
+    private static final double C2_WEIGHT = 2.0;
+    private static final double C3_WEIGHT = 1.0;
+    private static final double C4_WEIGHT = 1.0;
+    private static final double C5_WEIGHT = 1.0;
+    private static final double G1_WEIGHT = 2.5;
+    private static final double G2_WEIGHT = 2.5;
     private static final double G3_WEIGHT = 2.5;
 
     private volatile boolean fixCandidate = false;
@@ -261,7 +264,6 @@ public class PassFinder extends GapFinder {
                     }
                     c2 = Math.min(foeTime_ - ballTime_, c2);
                 }
-                c2 *= C2_WEIGHT;
 
                 /* g1: Shots from x can reach the opposing goal faster than their goalkeeper can block them. **/
                 Vec2D leftGoal = new Vec2D(-GOAL_LENGTH / 2, FIELD_LENGTH / 2);
@@ -292,12 +294,11 @@ public class PassFinder extends GapFinder {
                     }
                     g1 = Math.min(g1_, g1);
                 }
-                if(g1 < 0) g1 *= G1_WEIGHT;
 
                 /* g2: There is a wide enough open angle θ from x to the opposing goal **/
                 Vec2D rightGoal = leftGoal.add(GOAL_LENGTH, 0);
                 double openAngle = angDiff(rightGoal.sub(pos).toPlayerAngle(), leftGoal.sub(pos).toPlayerAngle());
-                double g2 = (openAngle - G2_MEAN) / G2_DEV * G2_WEIGHT;
+                double g2 = (openAngle - G2_MEAN) / G2_DEV;
 
                 double maxProb = 0.0;
                 double maxGProb = 0.0;
@@ -320,7 +321,6 @@ public class PassFinder extends GapFinder {
                         foeTime = Math.min(ETA, foeTime);
                     }
                     c1 = foeTime - receiverTime;
-                    c1 *= C1_WEIGHT;
 
                     /* g3: R will have enough time to take a shot before opponents steal the ball **/
                     double g3 = 0.0;
@@ -330,12 +330,11 @@ public class PassFinder extends GapFinder {
                         if (goal.sub(rPos).mag() > goal.sub(pos).mag() &&
                             angDiff(goal.sub(pos).toPlayerAngle(),
                                     pos.sub(rPos).toPlayerAngle()) < G3_ONE_SHOT_ANGLE)
-                            g3 = G3_WEIGHT;
+                            g3 = 1.0;
                     }
 
-                    double c = c1 + c2 + c3 + c4 + c5;
-                    double g = g1 + g2 + g3;
-                    // double prob = (1 / (1 + Math.exp(-c))) * (1 / (1 + Math.exp(-g)));
+                    double c = c1 * C1_WEIGHT + c2 * C2_WEIGHT + c3 * C3_WEIGHT + c4 * C4_WEIGHT + c5 * C5_WEIGHT;
+                    double g = g1 * G1_WEIGHT + g2 * G2_WEIGHT + g3 * G3_WEIGHT;
 
                     double score = c + g;
                     double prob = (1 / (1 + Math.exp(-score)));
