@@ -15,10 +15,13 @@ public class PassInfo {
     private final RobotList<Foe> foes;
     private final Ball ball;
 
-    private static final double PASS_THRESHOLD = 0.6;
+    private static final double DIST_MEAN = 500.0;
+    private static final double DIST_RANGE = 500.0;
+    private static final double WEIGHT_MIN = 1.0;
+    private static final double WEIGHT_MAX = 2.2;
+
     private static final double MAX_KICK_VEL = 4.0;
     private static final double MIN_KICK_VEL = 1.0;
-    private static final double MIN_INTERVAL = 0.2;
 
     private Ally passer;
     private Ally receiver;
@@ -57,6 +60,10 @@ public class PassInfo {
         return receivingPos;
     }
 
+    private static double timeWeight(double dist) {
+        return (1 / (1 + Math.exp(-(dist - DIST_MEAN) / DIST_RANGE))) * (WEIGHT_MAX - WEIGHT_MIN) + WEIGHT_MIN;
+    }
+
     public Pair<Double, Boolean> getPassDecision() {
         double receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
                 receivingPos, receiver.getPos());
@@ -64,7 +71,7 @@ public class PassInfo {
         double s = BallMovement.calcKickVel(ballDist, receiverETA);
         s = Math.max(MIN_KICK_VEL, Math.min(s, MAX_KICK_VEL));
         double ballETA = BallMovement.calcETA(s, ballDist);
-        return new Pair<>(s, receiverETA < ballETA);
+        return new Pair<>(s, receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
     }
 
 }

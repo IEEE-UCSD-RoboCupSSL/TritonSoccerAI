@@ -25,7 +25,7 @@ public class PassFinder extends GapFinder {
     private static final double C1_WEIGHT = 2.0;
 
     private static final int C2_INTERVAL = 5;
-    private static final double C2_WEIGHT = 2.0;
+    private static final double C2_WEIGHT = 1.0;
 
     private static final double C3_T_MIN = 0.1;
     private static final double C3_T_MAX = 0.3;
@@ -45,17 +45,15 @@ public class PassFinder extends GapFinder {
 
     private static final int G1_GOAL_INTERVAL = 3;
     private static final int G1_INTERCEPT_INTERVAL = 3;
-    private static final double G1_WEIGHT = 2.0;
+    private static final double G1_WEIGHT = 2.5;
 
     private static final double G2_MEAN = 20.0;
     private static final double G2_DEV = 40.0;
+    private static final double G2_WEIGHT = 2.5;
 
     private static final int G3_GOAL_INTERVAL = 5;
     private static final double G3_ONE_SHOT_ANGLE = 20;
-    private static final double G3_WEIGHT = 1.0;
-
-    private static final double C_WEIGHT = 0.5;
-    private static final double G_WEIGHT = 1.5;
+    private static final double G3_WEIGHT = 2.5;
 
     private volatile boolean fixCandidate = false;
     private volatile Integer candidate = null;
@@ -263,7 +261,7 @@ public class PassFinder extends GapFinder {
                     }
                     c2 = Math.min(foeTime_ - ballTime_, c2);
                 }
-                if(c2 < 0) c2 *= C2_WEIGHT;
+                c2 *= C2_WEIGHT;
 
                 /* g1: Shots from x can reach the opposing goal faster than their goalkeeper can block them. **/
                 Vec2D leftGoal = new Vec2D(-GOAL_LENGTH / 2, FIELD_LENGTH / 2);
@@ -299,7 +297,7 @@ public class PassFinder extends GapFinder {
                 /* g2: There is a wide enough open angle θ from x to the opposing goal **/
                 Vec2D rightGoal = leftGoal.add(GOAL_LENGTH, 0);
                 double openAngle = angDiff(rightGoal.sub(pos).toPlayerAngle(), leftGoal.sub(pos).toPlayerAngle());
-                double g2 = (openAngle - G2_MEAN) / G2_DEV;
+                double g2 = (openAngle - G2_MEAN) / G2_DEV * G2_WEIGHT;
 
                 double maxProb = 0.0;
                 double maxGProb = 0.0;
@@ -322,7 +320,7 @@ public class PassFinder extends GapFinder {
                         foeTime = Math.min(ETA, foeTime);
                     }
                     c1 = foeTime - receiverTime;
-                    if (c1 < 0) c1 *= C1_WEIGHT;
+                    c1 *= C1_WEIGHT;
 
                     /* g3: R will have enough time to take a shot before opponents steal the ball **/
                     double g3 = 0.0;
@@ -339,7 +337,7 @@ public class PassFinder extends GapFinder {
                     double g = g1 + g2 + g3;
                     // double prob = (1 / (1 + Math.exp(-c))) * (1 / (1 + Math.exp(-g)));
 
-                    double score = C_WEIGHT * c + G_WEIGHT * g;
+                    double score = c + g;
                     double prob = (1 / (1 + Math.exp(-score)));
                     double gProb = (1 / (1 + Math.exp(-g)));
 
@@ -358,8 +356,8 @@ public class PassFinder extends GapFinder {
                 pmf[gridX][gridY] = maxProb;
                 gProbs[gridX][gridY] = maxGProb;
 
-                R[gridX][gridY] = receiver;
                 if (fixCandidate) receiver = candidate;
+                R[gridX][gridY] = receiver;
                 int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
                 if(maxProb > localMax[evalIdx[0]][evalIdx[1]]) {
                     localMax[evalIdx[0]][evalIdx[1]] = maxProb;

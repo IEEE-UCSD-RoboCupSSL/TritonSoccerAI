@@ -40,9 +40,13 @@ public class CPassTest extends RobotSkillsTest {
         try {
             while(true) {
                 /* preparation */
-                __passer = fielders.get(0);
-                while (!__passer.isHoldingBall()) {
-                    __passer.getBall(ball);
+                if (basicEstimator.getBallHolder() == null) {
+                    __passer = fielders.get(0);
+                    while (!__passer.isHoldingBall()) {
+                        __passer.getBall(ball);
+                    }
+                } else {
+                    __passer = (Ally) basicEstimator.getBallHolder();
                 }
 
                 /* Begin test */
@@ -61,7 +65,8 @@ public class CPassTest extends RobotSkillsTest {
                         if (CoordinatedPass.getPassState() == PassState.PENDING) {
                             passer = (Ally) basicEstimator.getBallHolder();
                             receiver = info.getOptimalReceiver();
-                            passFinder.fixCandidate(receiver.getID()); // lock receiver
+                            System.out.println(receiver);
+                            // passFinder.fixCandidate(receiver.getID()); // lock receiver
                         }
 
                         passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);
