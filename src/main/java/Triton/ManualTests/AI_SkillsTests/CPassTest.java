@@ -38,59 +38,65 @@ public class CPassTest extends RobotSkillsTest {
 
         boolean testRtn = true;
         try {
-            /* preparation */
-            __passer = fielders.get(0);
-            while (!__passer.isHoldingBall()) {
-                __passer.getBall(ball);
-            }
+            while(true) {
+                /* preparation */
+                __passer = fielders.get(0);
+                while (!__passer.isHoldingBall()) {
+                    __passer.getBall(ball);
+                }
 
-            /* Begin test */
-            PassState passState;
-            Ally passer = null;
-            Ally receiver = null;
-            boolean toQuit = false;
+                /* Begin test */
+                PassState passState;
+                Ally passer = null;
+                Ally receiver = null;
+                boolean toQuit = false;
 
-            while (!toQuit) {
-                if (basicEstimator.isBallUnderOurCtrl()) {
-                    info = passFinder.evalPass();
-                    if (info == null) {
-                        continue;
-                    }
+                while (!toQuit) {
+                    if (basicEstimator.isBallUnderOurCtrl()) {
+                        info = passFinder.evalPass();
+                        if (info == null) {
+                            continue;
+                        }
 
-                    if (CoordinatedPass.getPassState() == PassState.PENDING) {
-                        passer = (Ally) basicEstimator.getBallHolder();
-                        receiver = info.getOptimalReceiver();
-                        passFinder.fixCandidate(receiver.getID()); // lock receiver
-                    }
+                        if (CoordinatedPass.getPassState() == PassState.PENDING) {
+                            passer = (Ally) basicEstimator.getBallHolder();
+                            receiver = info.getOptimalReceiver();
+                            passFinder.fixCandidate(receiver.getID()); // lock receiver
+                        }
 
-                    passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);
-                    System.out.println(passState);
-                    switch (passState) {
-                        case PASSED -> {
-                            if (passer == null) {
+                        passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);
+                        System.out.println(passState);
+                        switch (passState) {
+                            case PASSED -> {
+//                            if (passer == null) {
+//                                toQuit = true;
+//                            } else {
+//                                receiver.getBall(ball);
+//                            }
+                                passer.stop();
+                            }
+                            case RECEIVE_SUCCESS -> {
+//                            passer = receiver;
+//                            passer.curveTo(info.getOptimalReceivingPos());
+//                            receiver = info.getOptimalReceiver();
+                                receiver.stop();
+                                testRtn = true;
                                 toQuit = true;
-                            } else {
-                                receiver.getBall(ball);
+                            }
+                            case FAILED -> {
+                                toQuit = true;
+                                testRtn = false;
                             }
                         }
-                        case RECEIVE_SUCCESS -> {
-                            passer = receiver;
-                            passer.curveTo(info.getOptimalReceivingPos());
-                            receiver = info.getOptimalReceiver();
-                        }
-                        case FAILED -> {
-                            toQuit = true;
-                            testRtn = false;
-                        }
+
+                    } else {
+                        System.out.println("Ball Out of Our Control");
+                        toQuit = true;
                     }
-
-                } else {
-                    System.out.println("Ball Out of Our Control");
                 }
+
+                fielders.stopAll();
             }
-
-            fielders.stopAll();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

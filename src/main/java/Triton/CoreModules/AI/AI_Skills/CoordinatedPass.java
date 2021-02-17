@@ -9,6 +9,8 @@ import Triton.CoreModules.Robot.Foe;
 import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
+import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
+
 public class CoordinatedPass extends Skills {
 
     private static Vec2D fixReceivePos = null;
@@ -113,7 +115,7 @@ public class CoordinatedPass extends Skills {
                     if (basicEstimator.getBallHolder() instanceof Foe) {
                         currState = PassState.FAILED;
                     } else {
-                        receiver.receive(ball, receivePos);
+                        receiver.dynamicIntercept(ball, normAng(180 + ball.getVel().toPlayerAngle()));
                     }
                 }
                 fixReceivePos = null; // unfix
