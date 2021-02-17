@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class AttackPlanA extends Tactics {
 
     private static final double SHOOT_THRESHOLD = 0.6;
+    private static final double PASS_THRESHOLD = 0.45;
 
     protected Ally passer, receiver;
     protected Robot holder;
@@ -64,15 +65,15 @@ public class AttackPlanA extends Tactics {
             return false;
         }
 
-        /*if(isReadyToShoot()) {
-        }*/
+        if(isReadyToShoot()) {
+        }
 
         passInfo = passFinder.evalPass();
         if(passInfo == null) {
             return false;
         }
 
-        if (passInfo.getMaxProb() > 0.5) {
+        if (passInfo.getMaxProb() > PASS_THRESHOLD) {
             int passRtnState;
             do {
                 // add time limit

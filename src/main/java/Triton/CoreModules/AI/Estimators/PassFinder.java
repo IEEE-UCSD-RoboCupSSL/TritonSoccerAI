@@ -29,7 +29,7 @@ public class PassFinder extends GapFinder {
     private static final double C3_DEV = 0.1;
 
     private static final double C4_MAX_DIST = 3000.0;
-    private static final double C4_MIN_DIST = 1500.0;
+    private static final double C4_MIN_DIST = 2500.0;
     private static final double C4_DEV = 500.0;
 
     private static final double C5_MAX_DIST = 500.0;
@@ -37,7 +37,7 @@ public class PassFinder extends GapFinder {
 
     private static final double PASS_VEL = 2.5;
     private static final double SHOOT_VEL = 4.0;
-    private static final double ROBOT_PADDING = 180.0;
+    private static final double ROBOT_PADDING = 200.0;
     private static final double FRONT_PADDING = 100.0;
 
     private static final int G1_GOAL_INTERVAL = 3;
@@ -49,14 +49,14 @@ public class PassFinder extends GapFinder {
     private static final int G3_GOAL_INTERVAL = 5;
     private static final double G3_ONE_SHOT_ANGLE = 20;
 
-    private static final double C1_WEIGHT = 2.0;
-    private static final double C2_WEIGHT = 2.0;
-    private static final double C3_WEIGHT = 1.0;
-    private static final double C4_WEIGHT = 1.0;
-    private static final double C5_WEIGHT = 1.0;
-    private static final double G1_WEIGHT = 2.5;
-    private static final double G2_WEIGHT = 2.5;
-    private static final double G3_WEIGHT = 2.5;
+    private static final double C1_WEIGHT = 1.0;
+    private static final double C2_WEIGHT = 1.0;
+    private static final double C3_WEIGHT = 1.5;
+    private static final double C4_WEIGHT = 0.5;
+    private static final double C5_WEIGHT = 2.0;
+    private static final double G1_WEIGHT = 2.0;
+    private static final double G2_WEIGHT = 1.5;
+    private static final double G3_WEIGHT = 2.0;
 
     private volatile boolean fixCandidate = false;
     private volatile Integer candidate = null;
@@ -327,10 +327,13 @@ public class PassFinder extends GapFinder {
                     Vec2D rPos = fielderPosList.get(candidate);
                     for (int i = 0; i <= G3_GOAL_INTERVAL; i++) {
                         Vec2D goal = leftGoal.add(goalSeg.scale(i));
-                        if (goal.sub(rPos).mag() > goal.sub(pos).mag() &&
-                            angDiff(goal.sub(pos).toPlayerAngle(),
-                                    pos.sub(rPos).toPlayerAngle()) < G3_ONE_SHOT_ANGLE)
-                            g3 = 1.0;
+                        if (goal.sub(rPos).mag() > goal.sub(pos).mag()) {
+                            g3 += 1.0;
+                        }
+                        if (angDiff(goal.sub(pos).toPlayerAngle(),
+                                pos.sub(rPos).toPlayerAngle()) < G3_ONE_SHOT_ANGLE) {
+                            g3 += 1.0;
+                        }
                     }
 
                     double c = c1 * C1_WEIGHT + c2 * C2_WEIGHT + c3 * C3_WEIGHT + c4 * C4_WEIGHT + c5 * C5_WEIGHT;
