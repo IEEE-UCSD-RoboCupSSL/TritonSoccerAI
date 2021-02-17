@@ -56,16 +56,18 @@ public class CPassTest extends RobotSkillsTest {
                 boolean toQuit = false;
 
                 while (!toQuit) {
+                    Thread.sleep(1);
                     if (basicEstimator.isBallUnderOurCtrl()) {
                         info = passFinder.evalPass();
                         if (info == null) {
+                            fielders.stopAll();
                             continue;
                         }
 
                         if (CoordinatedPass.getPassState() == PassState.PENDING) {
                             passer = (Ally) basicEstimator.getBallHolder();
                             receiver = info.getOptimalReceiver();
-                            System.out.println(receiver);
+                            // System.out.println(receiver);
                             // passFinder.fixCandidate(receiver.getID()); // lock receiver
                         }
 
@@ -89,13 +91,14 @@ public class CPassTest extends RobotSkillsTest {
                                 toQuit = true;
                             }
                             case FAILED -> {
+                                fielders.stopAll();
                                 toQuit = true;
                                 testRtn = false;
                             }
                         }
 
                     } else {
-                        System.out.println("Ball Out of Our Control");
+                        System.out.println("###############Ball Out of Our Control");
                         toQuit = true;
                     }
                 }

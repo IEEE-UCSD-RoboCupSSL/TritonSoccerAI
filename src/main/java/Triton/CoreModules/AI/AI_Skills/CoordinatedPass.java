@@ -13,10 +13,12 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class CoordinatedPass extends Skills {
 
-    private static Vec2D fixReceivePos = null;
+    private static Vec2D receivePos = null;
     private static final double GET_BALL_INTERVAL = 100;
 
     private static PassState currState = PassState.PENDING;
+
+    private static long t0, t1;
 
     public static PassState getPassState() {
         return currState;
@@ -35,16 +37,22 @@ public class CoordinatedPass extends Skills {
         switch (currState) {
             case PENDING -> {
                 if (!(passer == null) && passer.isHoldingBall()) {
+                    t0 = System.currentTimeMillis();
                     currState = PassState.PASSER_HOLDS_BALL;
                 } else {
-                    currState = PassState.PENDING;
+                    currState = PassState.FAILED;
                 }
             }
             case PASSER_HOLDS_BALL -> {
                 if (!passer.isHoldingBall()) {
                     currState = PassState.FAILED;
                 }
-                currState = PassState.PASSER_IN_POSITION;
+
+                if(System.currentTimeMillis() - t0 > 100) { // give dribbler time to drib
+                    currState = PassState.PASSER_IN_POSITION;
+                } else {
+                    passer.stop();
+                }
                 /*Vec2D passLoc = passInfo.getOptimalPassingPos(passer);
                 Vec2D receivePos = passInfo.getOptimalReceivingPos();
                 if (passer.isPosArrived(passLoc)) {
@@ -63,10 +71,10 @@ public class CoordinatedPass extends Skills {
                 Vec2D passPos = passInfo.getOptimalPassingPos(passer);
                 // fix receive pos
                 Vec2D receivePos;
-                if (fixReceivePos != null) {
-                    receivePos = fixReceivePos;
+                if (CoordinatedPass.receivePos != null) {
+                    receivePos = CoordinatedPass.receivePos;
                 } else {
-                    receivePos = fixReceivePos = passInfo.getOptimalReceivingPos();
+                    receivePos = CoordinatedPass.receivePos = passInfo.getOptimalReceivingPos();
                 }
                 double passAngle = receivePos.sub(passPos).toPlayerAngle();
                 double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
@@ -75,9 +83,11 @@ public class CoordinatedPass extends Skills {
                     currState = PassState.RECEIVER_IN_POSITION;
                 } else {
                     receiver.strafeTo(receivePos, receiveAngle);
-                    Pair<Double, Boolean> decision = passInfo.getPassDecision();
+                    Pair<Double, Boolean> decision = passInfo.getKickDecision();
                     if (decision.getValue1() && passer.isDirAimed(passAngle)) {
                         passer.kick(new Vec2D(decision.getValue0(), 0));
+
+                        t1 = System.currentTimeMillis();
                         currState = PassState.PASSED; // set next state directly to the PASSED state
                     }
                 }
@@ -91,21 +101,30 @@ public class CoordinatedPass extends Skills {
                 double passAngle = receivePos.sub(passPos).toPlayerAngle();
                 double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
                 if (true) { //if (passer.isDirAimed(passAngle)) {
-                    Pair<Double, Boolean> decision = passInfo.getPassDecision();
+                    Pair<Double, Boolean> decision = passInfo.getKickDecision();
                     passer.kick(new Vec2D(decision.getValue0(), 0));
+
+                    t1 = System.currentTimeMillis();
                     currState = PassState.PASSED;
                 } else {
-                    receiver.strafeTo(receivePos, receiveAngle);
+                    receiver.curveTo(receivePos, receiveAngle);
                     passer.rotateTo(passAngle);
                 }
             }
             case PASSED -> {
+                long timeGap = System.currentTimeMillis() - t1;
+                System.out.println("timegap:" + timeGap);
+                if(timeGap > 1000) {
+                    currState = PassState.FAILED;
+                }
+
+
                 // fix receive pos
-                Vec2D receivePos;
-                if (fixReceivePos != null) {
-                    receivePos = fixReceivePos;
+                Vec2D __receivePos;
+                if (receivePos != null) {
+                    __receivePos = receivePos;
                 } else {
-                    receivePos = fixReceivePos = passInfo.getOptimalReceivingPos();
+                    __receivePos = receivePos = passInfo.getOptimalReceivingPos();
                 }
 
                 // in this state, passer may be null
@@ -115,10 +134,19 @@ public class CoordinatedPass extends Skills {
                     if (basicEstimator.getBallHolder() instanceof Foe) {
                         currState = PassState.FAILED;
                     } else {
-                        receiver.dynamicIntercept(ball, normAng(180 + ball.getVel().toPlayerAngle()));
+                        Vec2D ballVel = ball.getVel();
+                        double faceDir;
+                        faceDir = normAng(180 + ballVel.toPlayerAngle());
+
+                        if(ball.getPos().sub(__receivePos).mag() < 1000) {
+                            receiver.dynamicIntercept(ball, faceDir);
+                        } else {
+                            receiver.curveTo(receivePos);
+                        }
+
                     }
                 }
-                fixReceivePos = null; // unfix
+                receivePos = null; // unfix
             }
             case RECEIVE_SUCCESS, FAILED -> {
                 currState = PassState.PENDING;

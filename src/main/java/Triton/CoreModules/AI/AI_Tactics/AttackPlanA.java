@@ -24,11 +24,10 @@ public class AttackPlanA extends Tactics {
     protected Ally passer, receiver;
     protected Robot holder;
     protected final BasicEstimator basicEstimator;
-    protected final PassInfo passInfo;
+    private PassInfo passInfo;
     private GapFinder gapFinder;
     private PassFinder passFinder;
     private Dodging dodging;
-    private RobotList<Ally> restFielders = null;
     final private double interAllyClearance = 600; // mm
 
     public AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
@@ -68,35 +67,45 @@ public class AttackPlanA extends Tactics {
         /*if(isReadyToShoot()) {
         }*/
 
-        /*if (readyToPass) {
-            Vec2D passPos = result.getValue0();
-            Integer receiver = result.getValue2();
-            launchPassReceive();
+        passInfo = passFinder.evalPass();
+        if(passInfo == null) {
+            return false;
+        }
 
-            System.out.println("receiver: " + result.getValue2());
+        if (passInfo.getMaxProb() > 0.5) {
+            int passRtnState;
+            do {
+                // add time limit
+                passRtnState = launchPassReceive(passInfo);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }while(passRtnState == 0);
+            launchPassReceive(passInfo); // run it one more iteration to reset state
+            if(passRtnState == -1) {
+                return false;
+            }
 
         } else {
             Vec2D holdBallPos = ((Ally) holder).HoldBallPos();
             if(holdBallPos != null) {
                 dodging.dodge((Ally) holder, holdBallPos);
             }
-
-            restOfAllyFillGap(ball.getPos());
-        }*/
+            RobotList<Ally> restFielders = (RobotList<Ally>) fielders.clone();
+            restFielders.remove((Ally)holder);
+            restOfAllyFillGap(restFielders, ball.getPos());
+        }
 
 
         return true;
     }
 
-    private void restOfAllyFillGap(Vec2D priorityAnchor) {
-
-        restFielders = (RobotList<Ally>) fielders.clone();
-        restFielders.remove((Ally)holder);
+    private void restOfAllyFillGap(RobotList<Ally> restFielders, Vec2D priorityAnchor) {
         if(restFielders == null) {
             return;
         }
-
-
         ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
         if(gapPos != null) {
             ArrayList<Double> gapPosDir = new ArrayList<>();
@@ -109,7 +118,7 @@ public class AttackPlanA extends Tactics {
     }
 
 
-    private boolean launchPassReceive() {
+    private int launchPassReceive(PassInfo passInfo) {
 
         /*** pass & receive ***/
         if (CoordinatedPass.getPassState() == PassState.PENDING) {
@@ -118,25 +127,29 @@ public class AttackPlanA extends Tactics {
             receiver = passInfo.getOptimalReceiver();
         }
         PassState passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passInfo);
-        // System.out.println(passState);
+        System.out.println(passState);
         switch (passState) {
             case PASSED -> {
                 if (passer != null) {
-
+                    passer.stop(); // to-do
                 }
             }
             case RECEIVE_SUCCESS -> {
-                return true;
+                return 1;
             }
             case FAILED -> {
-                return false;
+                return -1;
             }
         }
 
         /*** delegate remaining bots to hug opponent robots ***/
-        restOfAllyFillGap(new Vec2D(0, 4500));
+
+        RobotList<Ally> restFielders = (RobotList<Ally>) fielders.clone();
+        restFielders.remove((Ally)holder);
+        restFielders.remove(receiver);
+        restOfAllyFillGap(restFielders, new Vec2D(0, 4500));
 
 
-        return true;
+        return 0;
     }
 }

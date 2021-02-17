@@ -24,7 +24,7 @@ public class DynamicInterceptBallTest extends RobotSkillsTest {
             if(ally.isHoldingBall()) {
                 ally.stop();
             } else {
-                ally.dynamicIntercept(ball, 90);
+                ally.dynamicIntercept(ball, 90.0);
             }
 
             try {

@@ -407,6 +407,7 @@ public class Ally extends Robot implements AllySkills {
             statePub.publish(AUTO_CAPTURE);
         } else {
             fastCurveTo(ballLoc, currPosToBall.toPlayerAngle());
+            //dynamicIntercept(ball, 0);
         }
     }
 
@@ -466,7 +467,6 @@ public class Ally extends Robot implements AllySkills {
             Vec2D interceptPoint = getInterceptPoint(getPos(), targetPos, faceVec, INTERCEPT_CIRCLE_RADIUS, circCenters);
 
             //System.out.println(interceptPoint);
-
             curveTo(interceptPoint, ball.getPos().sub(getPos()).toPlayerAngle());
         }
     }

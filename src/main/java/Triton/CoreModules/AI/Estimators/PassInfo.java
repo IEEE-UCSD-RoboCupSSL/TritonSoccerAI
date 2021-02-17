@@ -64,7 +64,7 @@ public class PassInfo {
         return (1 / (1 + Math.exp(-(dist - DIST_MEAN) / DIST_RANGE))) * (WEIGHT_MAX - WEIGHT_MIN) + WEIGHT_MIN;
     }
 
-    public Pair<Double, Boolean> getPassDecision() {
+    public Pair<Double, Boolean> getKickDecision() {
         double receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
                 receivingPos, receiver.getPos());
         double ballDist = passingPos.sub(receivingPos).mag();
@@ -73,5 +73,7 @@ public class PassInfo {
         double ballETA = BallMovement.calcETA(s, ballDist);
         return new Pair<>(s, receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
     }
+
+
 
 }
