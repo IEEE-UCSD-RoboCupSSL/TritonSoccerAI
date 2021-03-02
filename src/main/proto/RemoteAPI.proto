@@ -7,7 +7,6 @@ message Vec2D {
     double y = 2;
 }
 
-
 message Vec3D {
     double x = 1;
     double y = 2;
@@ -20,8 +19,6 @@ message Vec3D {
 //     int32 goal_width = 3;
 //     int32 goal_depth = 4;
 // }
-
-
 
 message Commands {
     bool enable_ball_auto_capture = 1; // if true, motion cmds are disabled, robot will 
@@ -47,23 +44,6 @@ message Commands {
     // Note: dribbler will be managed by the robot automatically
 }
 
-
-
-
-message RobotInternalData { /* Body Frame */
-    Vec2D trans_vel = 1;
-
-    // this is essentially the orientation angle, if we let both the robot and the camera to reference the same axis
-    Vec2D trans_disp = 2; // Displacement relative to Robot's body reference frame
-    
-    double rotat_vel = 3;
-    double rotat_disp = 4; // Rotational displacement would be the same as the bot angle in Vision_Data below
-                           // if we initialize the robot's 0 orientation to be the same orientation of 
-                           // the camera's frame.
-                           // Though coordinate transformation will take care of the nuences, it's recommended
-                           // to set them as the same to keep things simpler
-}
-
 message VisionData { /* World(Camera) Frame */
     Vec2D bot_pos = 1; // Position on the field, relative to World camera's reference frame (world frame)
     Vec2D bot_vel = 2;
@@ -73,3 +53,7 @@ message VisionData { /* World(Camera) Frame */
     Vec2D ball_vel = 6;
 }
 
+message UDPData {
+    Commands commandData = 1;
+    VisionData visionData = 2;
+}

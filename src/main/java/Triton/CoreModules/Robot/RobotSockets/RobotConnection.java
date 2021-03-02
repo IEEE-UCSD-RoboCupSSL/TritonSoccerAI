@@ -12,8 +12,7 @@ public class RobotConnection {
     private int port;
 
     private RobotTCPConnection tcpConnect;
-    private RobotCommandUDPStream commandStream;
-    private RobotVisionUDPStream visionStream;
+    private RobotUDPStream udpStream;
 
     /**
      * Construct a RobotConnection for specified robot
@@ -62,15 +61,8 @@ public class RobotConnection {
     /**
      * Constructs the command UDP stream
      */
-    public void buildCommandUDP() {
-        commandStream = new RobotCommandUDPStream(ip, port + ConnectionConfig.COMMAND_UDP_OFFSET, ID);
-    }
-
-    /**
-     * Constructs the vision UDP stream
-     */
-    public void buildVisionStream(Team team) {
-        visionStream = new RobotVisionUDPStream(ip, port + ConnectionConfig.VISION_UDP_OFFSET, team, ID);
+    public void buildUDPStream() {
+        udpStream = new RobotUDPStream(ip, port + ConnectionConfig.UDP_OFFSET, ID);
     }
 
     /**
@@ -83,14 +75,7 @@ public class RobotConnection {
     /**
      * @return the command UDP stream
      */
-    public RobotCommandUDPStream getCommandStream() {
-        return commandStream;
-    }
-
-    /**
-     * @return the vision UDP stream
-     */
-    public RobotVisionUDPStream getVisionStream() {
-        return visionStream;
+    public RobotUDPStream getUDPStream() {
+        return udpStream;
     }
 }

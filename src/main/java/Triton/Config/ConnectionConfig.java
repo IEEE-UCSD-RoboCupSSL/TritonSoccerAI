@@ -10,9 +10,7 @@ public class ConnectionConfig {
     public static final String GRSIM_MC_ADDR = "224.5.23.2";
     public static final int GRSIM_MC_PORT = 10020;
     public static final int TCP_OFFSET = 0;
-    public static final int COMMAND_UDP_OFFSET = 1;
-    public static final int DATA_UDP_OFFSET = 2;
-    public static final int VISION_UDP_OFFSET = 3;
+    public static final int UDP_OFFSET = 1;
     // Multicast
     public static final String MC_ADDR = "224.5.0.1";
     public static final int MC_PORT = 10020;

@@ -16,10 +16,12 @@ public class DetectionModule implements Module {
     // Data objects
     private final ArrayList<RobotData> yellowRobotsData;
     private final ArrayList<RobotData> blueRobotsData;
-    private final BallData ball;
+    private final BallData ballData;
+
+    // Subscribers
+    private final Subscriber<SSL_DetectionFrame> visionSub;
 
     // Publishers
-    private final Subscriber<SSL_DetectionFrame> detectSub;
     private final ArrayList<Publisher<RobotData>> yellowRobotPubs;
     private final ArrayList<Publisher<RobotData>> blueRobotPubs;
     private final Publisher<BallData> ballPub;
@@ -28,7 +30,7 @@ public class DetectionModule implements Module {
      * Constructs a DetectionModule
      */
     public DetectionModule() {
-        detectSub = new MQSubscriber<>("vision", "detection", 10);
+        visionSub = new MQSubscriber<>("vision", "detection", 10);
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
@@ -44,8 +46,8 @@ public class DetectionModule implements Module {
             yellowRobotPubs.add(new FieldPublisher<>("detection", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
         }
 
-        ball = new BallData();
-        ballPub = new FieldPublisher<>("detection", "ball", ball);
+        ballData = new BallData();
+        ballPub = new FieldPublisher<>("detection", "ball", ballData);
     }
 
     /**
@@ -56,7 +58,7 @@ public class DetectionModule implements Module {
             subscribe();
 
             while (true) { // delay added
-                update(detectSub.getMsg());
+                update(visionSub.getMsg());
 
                 Thread.sleep(1);
             }
@@ -70,7 +72,7 @@ public class DetectionModule implements Module {
      */
     private void subscribe() {
         try {
-            detectSub.subscribe(1000);
+            visionSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,7 +99,7 @@ public class DetectionModule implements Module {
         }
 
         if (frame.getBallsCount() > 0)
-            ball.update(frame.getBalls(0), time);
-        ballPub.publish(ball);
+            ballData.update(frame.getBalls(0), time);
+        ballPub.publish(ballData);
     }
 }

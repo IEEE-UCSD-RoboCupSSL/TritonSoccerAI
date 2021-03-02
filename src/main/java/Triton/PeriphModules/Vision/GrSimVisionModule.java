@@ -1,7 +1,6 @@
 package Triton.PeriphModules.Vision;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Proto.MessagesRobocupSslGeometry.SSL_GeometryData;
 import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.ConnectionConfig;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
@@ -19,7 +18,7 @@ import java.net.NetworkInterface;
 public class GrSimVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
-    private final Publisher<SSL_DetectionFrame> detectPub;
+    private final Publisher<SSL_DetectionFrame> visionPub;
     private MulticastSocket socket;
     private DatagramPacket packet;
 
@@ -37,7 +36,7 @@ public class GrSimVisionModule extends VisionModule {
      * @param port port to recieve from
      */
     public GrSimVisionModule(String ip, int port) {
-        detectPub = new MQPublisher<>("vision", "detection");
+        visionPub = new MQPublisher<>("vision", "detection");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
@@ -79,7 +78,7 @@ public class GrSimVisionModule extends VisionModule {
                     SSL_WrapperPacket.parseFrom(input);
 
             if (SSLPacket.hasDetection()) {
-                detectPub.publish(SSLPacket.getDetection());
+                visionPub.publish(SSLPacket.getDetection());
             }
         } catch (Exception e) {
             e.printStackTrace();

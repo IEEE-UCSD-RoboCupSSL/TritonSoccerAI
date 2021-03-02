@@ -126,6 +126,9 @@ public class RobotTCPConnection implements Module {
         return receiveTCP;
     }
 
+    /**
+     * Runnable to send TCP packets
+     */
     private class SendTCPRunnable implements Runnable {
         private final PrintWriter out;
 
@@ -159,6 +162,9 @@ public class RobotTCPConnection implements Module {
         }
     }
 
+    /**
+     * Runnable to receive TCP packets
+     */
     private class ReceiveTCPRunnable implements Runnable {
         private final BufferedReader in;
         private final int ID;

@@ -31,6 +31,7 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 /* TL;DR, Instead, read RobotSkills Interface for a cleaner view !!!!!!! */
 public class Ally extends Robot implements AllySkills {
     private final RobotConnection conn;
+
     /*** external pub sub ***/
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
@@ -81,9 +82,7 @@ public class Ally extends Robot implements AllySkills {
         commandsPub = new MQPublisher<>("commands", "" + ID);
 
         conn.buildTcpConnection();
-        conn.buildCommandUDP();
-        // conn.buildDataStream(port + ConnectionConfig.DATA_UDP_OFFSET);
-        conn.buildVisionStream(team);
+        conn.buildUDPStream();
     }
 
     public boolean connect() {
@@ -663,8 +662,7 @@ public class Ally extends Robot implements AllySkills {
             threadPool.submit(conn.getTCPConnection());
             threadPool.submit(conn.getTCPConnection().getSendTCP());
             threadPool.submit(conn.getTCPConnection().getReceiveTCP());
-            threadPool.submit(conn.getCommandStream());
-            threadPool.submit(conn.getVisionStream());
+            threadPool.submit(conn.getUDPStream());
 
             conn.getTCPConnection().sendInit();
 
