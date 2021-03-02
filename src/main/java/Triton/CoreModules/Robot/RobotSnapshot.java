@@ -20,9 +20,15 @@ public class RobotSnapshot {
 
     public RobotSnapshot(RobotList<? extends Robot> robots) {
         this.robots = robots;
-        vel = new ArrayList<>(robots.size());
-        pos = new ArrayList<>(robots.size());
-        dir = new ArrayList<>(robots.size());
+        int size = robots.size();
+        vel = new ArrayList<>(size);
+        pos = new ArrayList<>(size);
+        dir = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            vel.add(null);
+            pos.add(null);
+            dir.add(null);
+        }
         update();
     }
 
