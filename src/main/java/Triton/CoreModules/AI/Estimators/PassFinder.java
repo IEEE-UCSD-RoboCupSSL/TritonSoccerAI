@@ -6,6 +6,7 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
@@ -15,6 +16,8 @@ import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static Triton.Config.GeometryConfig.FIELD_LENGTH;
 import static Triton.Config.GeometryConfig.FIELD_WIDTH;
@@ -67,22 +70,9 @@ public class PassFinder extends GapFinder {
     protected final Publisher<int[][]> rPub;
     protected final Subscriber<int[][]> rSub;
 
-    protected final Publisher<ArrayList<Vec2D>> fielderVelListPub;
-    protected final Subscriber<ArrayList<Vec2D>> fielderVelListSub;
-    protected final Publisher<ArrayList<Vec2D>> foeVelListPub;
-    protected final Subscriber<ArrayList<Vec2D>> foeVelListSub;
+    private final RobotSnapshot fielderSnap;
+    private final RobotSnapshot foeSnap;
 
-    protected final Publisher<ArrayList<Double>> fielderAngListPub;
-    protected final Subscriber<ArrayList<Double>> fielderAngListSub;
-    protected final Publisher<ArrayList<Double>> foeAngListPub;
-    protected final Subscriber<ArrayList<Double>> foeAngListSub;
-
-    private ArrayList<Vec2D> fielderPosList;
-    private ArrayList<Vec2D> fielderVelList;
-    private ArrayList<Double> fielderAngList;
-    private ArrayList<Vec2D> foePosList;
-    private ArrayList<Vec2D> foeVelList;
-    private ArrayList<Double> foeAngList;
     private Vec2D ballPos;
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
@@ -95,17 +85,8 @@ public class PassFinder extends GapFinder {
 
         String topicName = this.getClass().getSimpleName();
 
-        fielderVelListPub = new FieldPublisher<>(topicName, "FielderVelocities" + this.toString(), null);
-        fielderVelListSub = new FieldSubscriber<>(topicName, "FielderVelocities" + this.toString());
-
-        foeVelListPub = new FieldPublisher<>(topicName, "FoeVelocities" + this.toString(), null);
-        foeVelListSub = new FieldSubscriber<>(topicName, "FoeVelocities" + this.toString());
-
-        fielderAngListPub = new FieldPublisher<>(topicName, "FielderAngles" + this.toString(), null);
-        fielderAngListSub = new FieldSubscriber<>(topicName, "FielderAngles" + this.toString());
-
-        foeAngListPub = new FieldPublisher<>(topicName, "FoeAngles" + this.toString(), null);
-        foeAngListSub = new FieldSubscriber<>(topicName, "FoeAngles" + this.toString());
+        fielderSnap = new RobotSnapshot(fielders);
+        foeSnap = new RobotSnapshot(foes);
 
         rPub = new FieldPublisher<>(topicName, "Receiver", null);
         rSub = new FieldSubscriber<>(topicName, "Receiver");
@@ -114,10 +95,6 @@ public class PassFinder extends GapFinder {
         gSub = new FieldSubscriber<>(topicName, "G-prob");
 
         try {
-            fielderVelListSub.subscribe(TIMEOUT);
-            foeVelListSub.subscribe(TIMEOUT);
-            fielderAngListSub.subscribe(TIMEOUT);
-            foeAngListSub.subscribe(TIMEOUT);
             rSub.subscribe(TIMEOUT);
             gSub.subscribe(TIMEOUT);
         } catch (TimeoutException e) {
@@ -142,31 +119,10 @@ public class PassFinder extends GapFinder {
     }
 
     private void supplyInfo() {
-        ArrayList<Vec2D> fielderPosList = new ArrayList<>();
-        ArrayList<Vec2D> fielderVelList = new ArrayList<>();
-        ArrayList<Double> fielderAngList = new ArrayList<>();
-        for (Ally fielder : fielders) {
-            fielderPosList.add(fielder.getPos());
-            fielderVelList.add(fielder.getVel());
-            fielderAngList.add(fielder.getDir());
-        }
-        ArrayList<Vec2D> foePosList = new ArrayList<>();
-        ArrayList<Vec2D> foeVelList = new ArrayList<>();
-        ArrayList<Double> foeAngList = new ArrayList<>();
-        for (Foe foe : foes) {
-            foePosList.add(foe.getPos());
-            foeVelList.add(foe.getVel());
-            foeAngList.add(foe.getDir());
-        }
         Vec2D ballPos = ball.getPos();
-
-        fielderPosListPub.publish(fielderPosList);
-        fielderVelListPub.publish(fielderVelList);
-        fielderAngListPub.publish(fielderAngList);
-        foePosListPub.publish(foePosList);
-        foeVelListPub.publish(foeVelList);
-        foeAngListPub.publish(foeAngList);
         ballPosPub.publish(ballPos);
+        fielderSnap.update();
+        foeSnap.update();
     }
 
 
@@ -186,16 +142,9 @@ public class PassFinder extends GapFinder {
             }
         }
 
-        fielderPosList = fielderPosListSub.getMsg();
-        fielderVelList = fielderVelListSub.getMsg();
-        fielderAngList = fielderAngListSub.getMsg();
-        foePosList = foePosListSub.getMsg();
-        foeVelList = foeVelListSub.getMsg();
-        foeAngList = foeAngListSub.getMsg();
         ballPos = ballPosSub.getMsg();
 
-        if (fielderPosList == null || foePosList == null || fielderVelList == null || foeVelList == null ||
-                fielderAngList == null || foeAngList == null || ballPos == null) {
+        if (!fielderSnap.ready() || !foeSnap.ready() || ballPos == null) {
             return;
         }
 
@@ -208,7 +157,7 @@ public class PassFinder extends GapFinder {
         passer = 0;
         for(int i = 0; i < fielders.size(); i++) {
             double temp;
-            if ((temp = fielderPosList.get(i).sub(ballPos).mag()) < minDist) {
+            if ((temp = fielderSnap.getPos(i).sub(ballPos).mag()) < minDist) {
                 minDist = temp;
                 passer = i;
             }
@@ -252,7 +201,7 @@ public class PassFinder extends GapFinder {
                     double ballTime_ = BallMovement.calcETAFast(PASS_VEL, path.mag(), passMaxPair);
                     double foeTime_ = Double.MAX_VALUE;
                     for (int j = 0; j < foes.size(); j++) {
-                        Vec2D foePos = foePosList.get(j);
+                        Vec2D foePos = foeSnap.getPos(i);
                         double[] angleRange = angleRange(foePos, ballPos);
                         if (foePos.sub(ballPos).mag() - FRONT_PADDING < pos.sub(ballPos).mag() &&
                             angleBetween(path.toPlayerAngle(), angleRange)) {
@@ -280,7 +229,7 @@ public class PassFinder extends GapFinder {
                         double ballTime_ = BallMovement.calcETAFast(SHOOT_VEL, path.mag(), shootMaxPair);
                         double foeTime_ = Double.MAX_VALUE;
                         for (int k = 0; k < foes.size(); k++) {
-                            Vec2D foePos = foePosList.get(k);
+                            Vec2D foePos = foeSnap.getPos(k);
                             double[] angleRange = angleRange(foePos, pos);
                             if (foePos.sub(pos).mag() - FRONT_PADDING < goal.sub(pos).mag() &&
                                     angleBetween(path.toPlayerAngle(), angleRange)) {
@@ -324,7 +273,7 @@ public class PassFinder extends GapFinder {
 
                     /* g3: R will have enough time to take a shot before opponents steal the ball **/
                     double g3 = 0.0;
-                    Vec2D rPos = fielderPosList.get(candidate);
+                    Vec2D rPos = fielderSnap.getPos(candidate);
                     for (int i = 0; i <= G3_GOAL_INTERVAL; i++) {
                         Vec2D goal = leftGoal.add(goalSeg.scale(i));
                         if (goal.sub(rPos).mag() > goal.sub(pos).mag()) {
@@ -379,16 +328,8 @@ public class PassFinder extends GapFinder {
     private double calcETA(boolean ally, int ID, Vec2D dest) {
         Vec2D vel, pos;
         double ang;
-        if (ally) {
-            vel = fielderVelList.get(ID);
-            pos = fielderPosList.get(ID);
-            ang = fielderAngList.get(ID);
-        } else {
-            vel = foeVelList.get(ID);
-            pos = foePosList.get(ID);
-            ang = foeAngList.get(ID);
-        }
-        return RobotMovement.calcETA(ang, vel, dest, pos);
+        RobotSnapshot snap = ally ? fielderSnap : foeSnap;
+        return RobotMovement.calcETA(snap.getDir(ID), snap.getVel(ID), dest, snap.getPos(ID));
     }
 
     public void fixCandidate(int candidate) {
@@ -442,7 +383,7 @@ public class PassFinder extends GapFinder {
             int bestReceiver = receiver[idx[0]][idx[1]];
 
             PassInfo info = new PassInfo(fielders, foes, ball);
-            info.setInfo(passer, bestReceiver, fielderPosList.get(passer), topPos, maxProb);
+            info.setInfo(passer, bestReceiver, fielderSnap.getPos(passer), topPos, maxProb);
             return info;
         } catch (Exception e) {
             fixCandidate = false;
