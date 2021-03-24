@@ -7,6 +7,7 @@ message Vec2D {
     double y = 2;
 }
 
+
 message Vec3D {
     double x = 1;
     double y = 2;
@@ -19,6 +20,8 @@ message Vec3D {
 //     int32 goal_width = 3;
 //     int32 goal_depth = 4;
 // }
+
+
 
 message CommandData {
     bool enable_ball_auto_capture = 1; // if true, motion cmds are disabled, robot will 

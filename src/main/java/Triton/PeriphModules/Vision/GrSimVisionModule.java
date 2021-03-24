@@ -2,7 +2,7 @@ package Triton.PeriphModules.Vision;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
-import Triton.Config.ConnectionConfig;
+import Triton.Config.Config;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
 
@@ -26,7 +26,8 @@ public class GrSimVisionModule extends VisionModule {
      * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
      */
     public GrSimVisionModule() {
-        this(ConnectionConfig.GRSIM_MC_ADDR, ConnectionConfig.GRSIM_MC_PORT);
+        this(Config.load().getConnectionProperties().getGrsimMcAddr(),
+             Config.load().getConnectionProperties().getGrsimMcPort());
     }
 
     /**

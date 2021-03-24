@@ -1,7 +1,6 @@
 package Triton;
 
-import Triton.Config.GeometryConfig;
-import Triton.Config.ObjectConfig;
+import Triton.Config.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
@@ -17,13 +16,14 @@ import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.ObjectConfig.MY_TEAM;
+import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.PeriphModules.Display.PaintOption.*;
@@ -43,6 +43,8 @@ public class App {
 
     public static void main(String[] args) {
         boolean isTestMode = false;
+
+        ConnectionProperties conn = Config.load().getConnectionProperties();
 
         /* processing command line arguments */
         if (args != null && args.length >= 1) { // choose team
@@ -66,26 +68,15 @@ public class App {
                 }
             }
 
-            if (args.length >= 3) { // robot ip addr
-                ROBOT_0_IP = new Pair<>(args[2], DEFAULT_PORT_BASE);
-                ROBOT_1_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + DEFAULT_PORT_OFFSET);
-                ROBOT_2_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 2 * DEFAULT_PORT_OFFSET);
-                ROBOT_3_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 3 * DEFAULT_PORT_OFFSET);
-                ROBOT_4_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 4 * DEFAULT_PORT_OFFSET);
-                ROBOT_5_IP = new Pair<>(args[2], DEFAULT_PORT_BASE + 5 * DEFAULT_PORT_OFFSET);
-
+            if (args.length >= 3) { // robot ip addr (port base)
+                LinkedList<RobotIp> robotIPs = new LinkedList<>();
+                for (int i = 0; i < ROBOT_COUNT; i++) { // use default port base and offset
+                    int port = (args.length > 3) ? Integer.parseInt(args[3]) : conn.getDefaultPortBase();
+                    port += i * conn.getDefaultPortOffset();
+                    robotIPs.add(new RobotIp(args[2], port));
+                }
+                conn.setRobotIp(robotIPs);
             }
-
-            if (args.length > 3) { // robot ip port base value
-                ROBOT_0_IP = new Pair<>(args[2], Integer.parseInt(args[3]));
-                ROBOT_1_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + DEFAULT_PORT_OFFSET);
-                ROBOT_2_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 2 * DEFAULT_PORT_OFFSET);
-                ROBOT_3_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 3 * DEFAULT_PORT_OFFSET);
-                ROBOT_4_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 4 * DEFAULT_PORT_OFFSET);
-                ROBOT_5_IP = new Pair<>(args[2], Integer.parseInt(args[3]) + 5 * DEFAULT_PORT_OFFSET);
-
-            }
-
         }
 
         GeometryConfig.initGeo();

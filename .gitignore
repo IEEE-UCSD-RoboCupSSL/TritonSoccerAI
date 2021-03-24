@@ -5,3 +5,4 @@ target
 TritonSoccerAI.iml
 *.tmp
 *.csv
+*generated-sources
