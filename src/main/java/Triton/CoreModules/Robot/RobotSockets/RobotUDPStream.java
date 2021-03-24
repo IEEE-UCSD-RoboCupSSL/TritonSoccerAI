@@ -84,10 +84,7 @@ public class RobotUDPStream implements Module {
 
         // Vision
         RobotData allyData = allySub.getMsg();
-        System.out.println("allyData");
-
         BallData ballData = ballSub.getMsg();
-        System.out.println("ballData");
 
         RemoteAPI.VisionData.Builder visionData = RemoteAPI.VisionData.newBuilder();
         visionData.setBotPos(allyData.getPos().toProto());
