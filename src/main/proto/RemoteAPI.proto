@@ -20,7 +20,7 @@ message Vec3D {
 //     int32 goal_depth = 4;
 // }
 
-message Commands {
+message CommandData {
     bool enable_ball_auto_capture = 1; // if true, motion cmds are disabled, robot will 
                                        // automatically perform delicate moves to capture ball 
                                        // that's near the robot 
@@ -54,6 +54,6 @@ message VisionData { /* World(Camera) Frame */
 }
 
 message UDPData {
-    Commands commandData = 1;
+    CommandData commandData = 1;
     VisionData visionData = 2;
 }

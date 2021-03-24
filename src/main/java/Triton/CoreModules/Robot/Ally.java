@@ -37,7 +37,7 @@ public class Ally extends Robot implements AllySkills {
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final Subscriber<Boolean> dribStatSub;
-    private final Publisher<RemoteAPI.Commands> commandsPub;
+    private final Publisher<RemoteAPI.CommandData> commandsPub;
 
     /*** internal pub sub ***/
     private final Publisher<MotionState> statePub;
@@ -79,7 +79,7 @@ public class Ally extends Robot implements AllySkills {
         holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + ID);
 
         dribStatSub = new FieldSubscriber<>("Ally drib", "" + ID);
-        commandsPub = new MQPublisher<>("commands", "" + ID);
+        commandsPub = new FieldPublisher<>("commands", "" + ID, null);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
@@ -667,7 +667,7 @@ public class Ally extends Robot implements AllySkills {
             conn.getTCPConnection().sendInit();
 
             while (true) { // delay added
-                RemoteAPI.Commands command;
+                RemoteAPI.CommandData command;
                 MotionState state = stateSub.getMsg();
 
                 switch (state) {
@@ -723,14 +723,14 @@ public class Ally extends Robot implements AllySkills {
         }
     }
 
-    private RemoteAPI.Commands createTDRDCmd() {
+    private RemoteAPI.CommandData createTDRDCmd() {
         return createPrimitiveCmdBuilder(TDRD);
     }
 
     /*** TL;DR ***/
 
-    private RemoteAPI.Commands createPrimitiveCmdBuilder(MotionMode mode) {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
+    private RemoteAPI.CommandData createPrimitiveCmdBuilder(MotionMode mode) {
+        RemoteAPI.CommandData.Builder command = RemoteAPI.CommandData.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(false);
         command.setMode(mode.ordinal());
@@ -752,28 +752,28 @@ public class Ally extends Robot implements AllySkills {
         return command.build();
     }
 
-    private RemoteAPI.Commands createTDRVCmd() {
+    private RemoteAPI.CommandData createTDRVCmd() {
         return createPrimitiveCmdBuilder(TDRV);
     }
 
-    private RemoteAPI.Commands createTVRDCmd() {
+    private RemoteAPI.CommandData createTVRDCmd() {
         return createPrimitiveCmdBuilder(TVRD);
     }
 
-    private RemoteAPI.Commands createTVRVCmd() {
+    private RemoteAPI.CommandData createTVRVCmd() {
         return createPrimitiveCmdBuilder(TVRV);
     }
 
-    private RemoteAPI.Commands createNSTDRDCmd() {
+    private RemoteAPI.CommandData createNSTDRDCmd() {
         return createPrimitiveCmdBuilder(NSTDRD);
     }
 
-    private RemoteAPI.Commands createNSTDRVCmd() {
+    private RemoteAPI.CommandData createNSTDRVCmd() {
         return createPrimitiveCmdBuilder(NSTDRV);
     }
 
-    private RemoteAPI.Commands createAutoCapCmd() {
-        RemoteAPI.Commands.Builder command = RemoteAPI.Commands.newBuilder();
+    private RemoteAPI.CommandData createAutoCapCmd() {
+        RemoteAPI.CommandData.Builder command = RemoteAPI.CommandData.newBuilder();
         command.setIsWorldFrame(true);
         command.setEnableBallAutoCapture(true);
         command.setMode(TVRV.ordinal());

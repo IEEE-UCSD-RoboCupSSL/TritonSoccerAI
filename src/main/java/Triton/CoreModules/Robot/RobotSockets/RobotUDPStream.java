@@ -22,7 +22,7 @@ public class RobotUDPStream implements Module {
     protected int port;
     protected int ID;
 
-    private final Subscriber<RemoteAPI.Commands> commandsSub;
+    private final Subscriber<RemoteAPI.CommandData> commandsSub;
     private final Subscriber<RobotData> allySub;
     private final Subscriber<BallData> ballSub;
 
@@ -37,7 +37,8 @@ public class RobotUDPStream implements Module {
         this.port = port;
         this.ID = ID;
 
-        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
+//        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
+        commandsSub = new FieldSubscriber<>("commands", "" + ID);
         allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         ballSub = new FieldSubscriber<>("detection", "ball");
 
@@ -75,14 +76,14 @@ public class RobotUDPStream implements Module {
     }
 
     private void sendData() {
-        // Commands
         RemoteAPI.UDPData.Builder data = RemoteAPI.UDPData.newBuilder();
-        RemoteAPI.Commands commands = commandsSub.getMsg();
+
+        // Commands
+        RemoteAPI.CommandData commandData = commandsSub.getMsg();
 
         // Vision
         RobotData allyData = allySub.getMsg();
         BallData ballData = ballSub.getMsg();
-
         RemoteAPI.VisionData.Builder visionData = RemoteAPI.VisionData.newBuilder();
         visionData.setBotPos(allyData.getPos().toProto());
         visionData.setBotVel(allyData.getVel().toProto());
@@ -92,7 +93,7 @@ public class RobotUDPStream implements Module {
         visionData.setBallVel(ballData.getVel().toProto());
 
         // Combine them
-        data.setCommandData(commands);
+        data.setCommandData(commandData);
         data.setVisionData(visionData);
 
         byte[] bytes;
