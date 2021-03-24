@@ -37,8 +37,7 @@ public class RobotUDPStream implements Module {
         this.port = port;
         this.ID = ID;
 
-//        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
-        commandsSub = new FieldSubscriber<>("commands", "" + ID);
+        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
         allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
         ballSub = new FieldSubscriber<>("detection", "ball");
 
@@ -70,6 +69,8 @@ public class RobotUDPStream implements Module {
     private void subscribe() {
         try {
             commandsSub.subscribe(1000);
+            allySub.subscribe(1000);
+            ballSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +84,11 @@ public class RobotUDPStream implements Module {
 
         // Vision
         RobotData allyData = allySub.getMsg();
+        System.out.println("allyData");
+
         BallData ballData = ballSub.getMsg();
+        System.out.println("ballData");
+
         RemoteAPI.VisionData.Builder visionData = RemoteAPI.VisionData.newBuilder();
         visionData.setBotPos(allyData.getPos().toProto());
         visionData.setBotVel(allyData.getVel().toProto());
