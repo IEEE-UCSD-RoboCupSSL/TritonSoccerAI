@@ -8,6 +8,9 @@ public class FieldSubscriber<T> extends Subscriber<T> {
 
     @Override
     public T getMsg() {
+        if (!subscriptionFlag)
+            System.out.println("NOT SUBSCRIBED");
+
         T msg = channel.getMsg();
         try {
             Thread.sleep(1);

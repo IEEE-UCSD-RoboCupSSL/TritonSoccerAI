@@ -34,6 +34,9 @@ public class MQSubscriber<T> extends Subscriber<T> {
 
     @Override
     public T getMsg() {
+        if (!subscriptionFlag)
+            System.out.println("NOT SUBSCRIBED");
+
         try {
             return queue.take();
         } catch (InterruptedException e) {
