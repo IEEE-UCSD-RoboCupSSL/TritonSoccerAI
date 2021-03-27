@@ -12,6 +12,7 @@ import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
+import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import org.javatuples.Pair;
@@ -119,12 +120,13 @@ public class App {
         if (!isTestMode) {
             int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
-            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
 //            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
             threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+//            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
 
         } else {
             threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
