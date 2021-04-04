@@ -1,7 +1,7 @@
 {
     "connection-properties": {
         "grsim-mc-addr": "224.5.23.2",
-        "grsim-mc-port": 1919,
+        "grsim-mc-port": 10020,
         "tcp-offset": 0,
         "udp-offset": 1,
         "mc-addr": "224.5.0.1",
