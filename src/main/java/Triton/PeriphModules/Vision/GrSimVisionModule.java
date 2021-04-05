@@ -44,8 +44,7 @@ public class GrSimVisionModule extends VisionModule {
         try {
             socket = new MulticastSocket(port);
             InetSocketAddress group = new InetSocketAddress(ip, port);
-            NetworkInterface netIf = NetworkInterface.getByName("bge0");
-            socket.joinGroup(group, netIf);
+            socket.joinGroup(group, null);
             packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
             e.printStackTrace();
