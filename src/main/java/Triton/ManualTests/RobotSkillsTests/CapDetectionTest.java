@@ -22,8 +22,20 @@ public class CapDetectionTest extends RobotSkillsTest{
     @Override
     public boolean test() {
         LocalTime then;
+        int spinRate;
+        int moveRate;
 
         while(true){
+            try {
+                System.out.println(">> Enter spin rate: ");
+                spinRate = Integer.parseInt(scanner.nextLine());
+                System.out.println(">> Enter move rate: ");
+                moveRate = Integer.parseInt(scanner.nextLine());
+            }catch (NumberFormatException e){
+                System.out.println("Please make sure the input is valid!");
+                continue;
+            }
+
             System.out.println("getting ball..");
             while (!ally.isHoldingBall()) {
                 ally.getBall(ball);
@@ -34,8 +46,8 @@ public class CapDetectionTest extends RobotSkillsTest{
             then = LocalTime.now().plusSeconds(10);
 
             while(LocalTime.now().isBefore(then)) {
-                ally.spinAt(30);
-                ally.moveAt(new Vec2D(25, 0));
+                ally.spinAt(spinRate);
+                ally.moveAt(new Vec2D(moveRate, 0));
                 System.out.println(ally.isHoldingBall());
             }
 
