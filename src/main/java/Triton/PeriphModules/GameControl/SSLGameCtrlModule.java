@@ -22,7 +22,7 @@ public class SSLGameCtrlModule extends GameCtrlModule {
         try {
             socket = new MulticastSocket();
             InetSocketAddress group = new InetSocketAddress(MC_ADDR, MC_PORT);
-            NetworkInterface netIf = NetworkInterface.getByName("bge0");
+            NetworkInterface netIf = NetworkInterface.getByName();
             socket.joinGroup(group, netIf);
             packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
@@ -34,7 +34,12 @@ public class SSLGameCtrlModule extends GameCtrlModule {
     public void run() {
         while (true) {
             try {
+                System.out.println("Receiving Game Control Packet");
+
                 socket.receive(packet);
+
+                System.out.println(packet);
+
                 ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
                         packet.getOffset(), packet.getLength());
 
