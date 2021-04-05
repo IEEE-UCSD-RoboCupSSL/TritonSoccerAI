@@ -2,14 +2,11 @@ package Triton.PeriphModules.GameControl;
 
 import Proto.SslGcApi;
 import Triton.Config.Config;
+import Triton.Util;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
-import java.nio.channels.NetworkChannel;
-import java.util.Collections;
-import java.util.Enumeration;
 
 public class SSLGameCtrlModule extends GameCtrlModule {
     private final static int MAX_BUFFER_SIZE = 67108864;
@@ -22,31 +19,11 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
-        try {
-            final Enumeration<NetworkInterface> netIfs = NetworkInterface.getNetworkInterfaces();
-
-            NetworkInterface netIf = null;
-            while (netIfs.hasMoreElements()) {
-                netIf = netIfs.nextElement();
-                if (netIf.getDisplayName().startsWith("en")) { // use ethernet
-                    break;
-                }
-            } // otherwise, use the last network interface
-
-            DatagramChannel dc = DatagramChannel.open(StandardProtocolFamily.INET)
-                    .setOption(StandardSocketOptions.SO_REUSEADDR, true)
-                    .bind(new InetSocketAddress(Config.conn().getGcMcPort()))
-                    .setOption(StandardSocketOptions.IP_MULTICAST_IF, netIf);
-
-            InetAddress group = InetAddress.getByName(Config.conn().getGcMcAddr());
-            dc.join(group, netIf);
-
-            socket = dc.socket();
-            packet = new DatagramPacket(buffer, buffer.length);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        NetworkInterface netIf = Util.getNetIf(Config.conn().getGcNetIf());
+        socket = Util.mcSocket(Config.conn().getGcMcAddr(),
+                Config.conn().getGcMcPort(),
+                netIf);
+        packet = new DatagramPacket(buffer, buffer.length);
     }
 
     @Override
@@ -60,8 +37,12 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                 SslGcApi.Output gcOutput = SslGcApi.Output.parseFrom(input);
                 System.out.println(gcOutput);
 
-            } catch (Exception e) {
+            } catch (SocketTimeoutException e) {
+                System.err.println("SSL Game Controller Multicast Timeout");
+                return;
+            } catch (IOException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }
