@@ -5,12 +5,14 @@ import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.Config;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
+import Triton.Util;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
+import java.net.DatagramSocket;
 import java.net.NetworkInterface;
+import java.net.SocketTimeoutException;
 
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
@@ -19,7 +21,7 @@ public class GrSimVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> visionPub;
-    private MulticastSocket socket;
+    private DatagramSocket socket;
     private DatagramPacket packet;
 
     /**
@@ -42,10 +44,10 @@ public class GrSimVisionModule extends VisionModule {
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         try {
-            socket = new MulticastSocket(port);
-            InetSocketAddress group = new InetSocketAddress(ip, port);
-            NetworkInterface netIf = NetworkInterface.getByName("bge0");
-            socket.joinGroup(group, netIf);
+            NetworkInterface netIf = Util.getNetIf(Config.conn().getGrsimNetIf());
+            socket = Util.mcSocket(Config.conn().getGrsimMcAddr(),
+                    Config.conn().getGrsimMcPort(),
+                    netIf);
             packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,51 +59,36 @@ public class GrSimVisionModule extends VisionModule {
      */
     @Override
     public void run() {
-        try {
-            while (true) { // delay added
+        while (true) { // delay added
+            try {
                 update();
-                Thread.sleep(1);
+            } catch (SocketTimeoutException e) {
+                System.err.println("GrSim Vision Multicast Timeout");
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * Receive a single packet
      */
-    protected void update() {
-        try {
-            socket.receive(packet);
-            ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
-                    packet.getOffset(), packet.getLength());
-            SSL_WrapperPacket SSLPacket =
-                    SSL_WrapperPacket.parseFrom(input);
+    protected void update() throws IOException {
+        socket.receive(packet);
+        ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
+                packet.getOffset(), packet.getLength());
+        SSL_WrapperPacket SSLPacket =
+                SSL_WrapperPacket.parseFrom(input);
 
-            if (SSLPacket.hasDetection()) {
-                visionPub.publish(SSLPacket.getDetection());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Receives 4 packets
-     */
-    protected void collectData() {
-        // default configuration with 2x6 robots need 4 packets
-        collectData(4);
-    }
-
-    /**
-     * Receive a specified number of packets
-     *
-     * @param numIter Number of packets to receive
-     */
-    protected void collectData(int numIter) {
-        for (int i = 0; i < numIter; i++) {
-            update();
+        if (SSLPacket.hasDetection()) {
+            visionPub.publish(SSLPacket.getDetection());
         }
     }
 }
