@@ -77,6 +77,7 @@ public class TestRunner implements Module {
                         case "dodge" -> rtn = new DodgingTest(fielders, keeper, foes, ball).test();
                         case "holdballpos" -> rtn = new HoldBallPosTest(fielders.get(3), ball).test();
                         case "basicplay" -> rtn = new BasicPlayTest(fielders, keeper, foes, ball).test();
+                        case "capDetect" -> rtn = new CapDetectionTest(scanner, fielders.get(3), ball).test();
                         case "math" -> {
                             miscMathTests();
                             rtn = true;
