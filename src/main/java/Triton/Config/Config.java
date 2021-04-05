@@ -24,4 +24,8 @@ public class Config {
         }
         return global_properties;
     }
+
+    public static ConnectionProperties conn() {
+        return load().getConnectionProperties();
+    }
 }
