@@ -45,7 +45,7 @@ public class App {
     public static void main(String[] args) {
         boolean isTestMode = false;
 
-        ConnectionProperties conn = Config.load().getConnectionProperties();
+        ConnectionProperties conn = Config.conn();
 
         /* processing command line arguments */
         if (args != null && args.length >= 1) { // choose team

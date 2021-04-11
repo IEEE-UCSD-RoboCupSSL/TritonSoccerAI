@@ -28,8 +28,7 @@ public class GrSimVisionModule extends VisionModule {
      * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
      */
     public GrSimVisionModule() {
-        this(Config.load().getConnectionProperties().getGrsimMcAddr(),
-             Config.load().getConnectionProperties().getGrsimMcPort());
+        this(Config.conn().getGrsimMcAddr(), Config.conn().getGrsimMcPort());
     }
 
     /**
