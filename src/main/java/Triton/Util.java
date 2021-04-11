@@ -12,14 +12,14 @@ public final class Util {
     /**
      * Acquire the network interface by the name prefix
      */
-    public static NetworkInterface getNetIf(String s) {
+    public static NetworkInterface getNetIf(String prefix) {
         if (s.equals("null")) return null;
         try {
             Enumeration<NetworkInterface> netIfs = NetworkInterface.getNetworkInterfaces();
             NetworkInterface netIf = null;
             while (netIfs.hasMoreElements()) {
                 netIf = netIfs.nextElement();
-                if (netIf.getDisplayName().startsWith("en")) { // use ethernet
+                if (netIf.getDisplayName().startsWith(prefix)) { // use ethernet
                     break;
                 }
             } // otherwise, use the last network interface

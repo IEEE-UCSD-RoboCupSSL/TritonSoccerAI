@@ -1,6 +1,7 @@
 package Triton.PeriphModules.GameControl;
 
 import Proto.SslGcApi;
+import Proto.SslGcRefereeMessage;
 import Triton.Config.Config;
 import Triton.Util;
 
@@ -34,7 +35,7 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                 ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
                         packet.getOffset(), packet.getLength());
 
-                SslGcApi.Output gcOutput = SslGcApi.Output.parseFrom(input);
+                SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
                 System.out.println(gcOutput);
 
             } catch (SocketTimeoutException e) {
