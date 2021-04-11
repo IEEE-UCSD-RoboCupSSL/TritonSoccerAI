@@ -117,7 +117,7 @@ public class App {
             threadPool.submit(gameCtrlModule);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
-//            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
 
         } else {
             threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));

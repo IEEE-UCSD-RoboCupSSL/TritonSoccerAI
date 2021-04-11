@@ -1,8 +1,6 @@
 package Triton.PeriphModules.GameControl;
 
-import Proto.SslGcApi;
 import Proto.SslGcRefereeMessage;
-import Proto.SslGcState;
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -33,6 +31,8 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
     @Override
     public void run() {
+        super.subscribe();
+
         while (true) {
             try {
                 socket.receive(packet);
