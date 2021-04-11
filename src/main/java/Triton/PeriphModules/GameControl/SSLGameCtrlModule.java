@@ -37,6 +37,7 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
                 SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
                 System.out.println(gcOutput);
+                parseGcOutput(gcOutput);
 
             } catch (SocketTimeoutException e) {
                 System.err.println("SSL Game Controller Multicast Timeout");
@@ -46,5 +47,9 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                 return;
             }
         }
+    }
+
+    private void parseGcOutput(SslGcRefereeMessage.Referee gcOutput) {
+
     }
 }

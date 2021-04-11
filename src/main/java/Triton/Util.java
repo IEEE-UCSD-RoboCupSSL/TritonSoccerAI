@@ -13,7 +13,7 @@ public final class Util {
      * Acquire the network interface by the name prefix
      */
     public static NetworkInterface getNetIf(String prefix) {
-        if (s.equals("null")) return null;
+        if (prefix.equals("null")) return null;
         try {
             Enumeration<NetworkInterface> netIfs = NetworkInterface.getNetworkInterfaces();
             NetworkInterface netIf = null;
