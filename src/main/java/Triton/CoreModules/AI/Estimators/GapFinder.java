@@ -1,20 +1,15 @@
 package Triton.CoreModules.AI.Estimators;
 
-import Triton.App;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Publisher;
-import Triton.Misc.ModulePubSubSystem.Subscriber;
+import Triton.Misc.RWLockee;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.concurrent.TimeoutException;
 
 import static Triton.Config.GeometryConfig.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
@@ -38,23 +33,20 @@ public class GapFinder extends ProbFinder {
 
     protected double responseRange = 1000.0;
     protected double interceptRange = 500.0;
-    protected long TIMEOUT = 1000;
 
     protected ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
-    protected ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();;
+    protected ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();
 
-    protected final Publisher<double[][]> pmfPub;
-    protected final Subscriber<double[][]> pmfSub;
-    protected final Publisher<Vec2D[][]> localMaxPosPub;
-    protected final Subscriber<Vec2D[][]> localMaxPosSub;
-    protected final Publisher<double[][]> localMaxScorePub;
-    protected final Subscriber<double[][]> localMaxScoreSub;
-    protected final Publisher<Vec2D> ballPosPub;
-    protected final Subscriber<Vec2D> ballPosSub;
+    protected RWLockee<Vec2D> ballPosWrapper;
+    protected RWLockee<double[][]> pmfWrapper = new RWLockee<>(null);
+    protected RWLockee<Vec2D[][]> localMaxPosWrapper = new RWLockee<>(null);
+    protected RWLockee<double[][]> localMaxScoreWrapper = new RWLockee<>(null);
+
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 100, 10);
     }
+
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
                      int resolutionStepSize, int evalWindowSize) {
@@ -64,8 +56,6 @@ public class GapFinder extends ProbFinder {
         this.evalWindowSize = evalWindowSize;
         this.resolutionStepSize = resolutionStepSize;
 
-        String topicName = this.getClass().getSimpleName();
-
         /* mutex robot snapshots */
         for (Ally fielder : fielders) {
             fielderSnaps.add(new RobotSnapshot(fielder));
@@ -73,49 +63,26 @@ public class GapFinder extends ProbFinder {
         for (Foe foe : foes) {
             foeSnaps.add(new RobotSnapshot(foe));
         }
+        ballPosWrapper = new RWLockee<>(ball.getPos());
 
-
-        /* internal pub-sub */
-        pmfPub = new FieldPublisher<>(topicName, "PDF" + this.toString(), null);
-        pmfSub = new FieldSubscriber<>(topicName, "PDF" + this.toString());
-
-        localMaxScorePub = new FieldPublisher<>(topicName, "Max", null);
-        localMaxScoreSub = new FieldSubscriber<>(topicName, "Max");
-        localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
-        localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
-
-        ballPosPub = new FieldPublisher<>(topicName, "BallPosition" + this.toString(), null);
-        ballPosSub = new FieldSubscriber<>(topicName, "BallPosition" + this.toString());
-
-        try {
-            ballPosSub.subscribe(TIMEOUT);
-            pmfSub.subscribe(TIMEOUT);
-            localMaxPosSub.subscribe(TIMEOUT);
-            localMaxScoreSub.subscribe(TIMEOUT);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-
+        /* discretize the field */
         grid = new Gridify(new Vec2D(resolutionStepSize, resolutionStepSize),
                 new Vec2D(-FIELD_WIDTH / 2, -FIELD_LENGTH / 2), false, false);
         gridOrigin = grid.fromPos(new Vec2D(-FIELD_WIDTH / 2, -FIELD_LENGTH / 2));
         width = grid.numCols(FIELD_WIDTH) + 1;
         height = grid.numRows(FIELD_LENGTH) + 1;
-//        System.out.println(Arrays.toString(gridOrigin));
-//        System.out.println(width + " " + height);
 
         evalGrid = new Gridify(new Vec2D(evalWindowSize, evalWindowSize),
                 new Vec2D(0, 0), false, false);
         evalOrigin = evalGrid.fromPos(new Vec2D(0, 0));
         evalWidth = evalGrid.numCols(width) + 1;
         evalHeight = evalGrid.numRows(height) + 1;
-//        System.out.println(Arrays.toString(evalOrigin));
-//        System.out.println(evalWidth + " " + evalHeight);
 
         Vec2D lpA = audienceToPlayer(LEFT_PENALTY_STRETCH.p1);
         Vec2D lpB = audienceToPlayer(LEFT_PENALTY_STRETCH.p2);
         Vec2D rpA = audienceToPlayer(RIGHT_PENALTY_STRETCH.p1);
         Vec2D rpB = audienceToPlayer(RIGHT_PENALTY_STRETCH.p2);
+
         if (lpA.x > lpB.x) {
             Vec2D tmp = lpA;
             lpA = lpB;
@@ -142,17 +109,6 @@ public class GapFinder extends ProbFinder {
             allyPenaltyRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
             foePenaltyRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
         }
-//        System.out.println(allyPenalityRegion.anchor + " " + allyPenalityRegion.width + " " + allyPenalityRegion.height);
-//        System.out.println(foePenalityRegion.anchor + " " + foePenalityRegion.width + " " + foePenalityRegion.height);
-    }
-
-
-
-    public void setResponseRange(double responseRange) {
-        this.responseRange = responseRange;
-    }
-    public void setInterceptRange(double interceptRange) {
-        this.interceptRange = interceptRange;
     }
 
 
@@ -188,12 +144,15 @@ public class GapFinder extends ProbFinder {
         return maxPos;
     }
 
+
     public ArrayList<Vec2D> getTopNMaxPos(int n) {
-        Vec2D[][] localMaxPosArr = getLocalMaxPosArr();
-        double[][] localMaxScoreArr = localMaxScoreSub.getMsg();
+        Vec2D[][] localMaxPosArr = localMaxPosWrapper.get();
+        double[][] localMaxScoreArr = localMaxScoreWrapper.get();
+
         if(localMaxPosArr == null || localMaxScoreArr == null) {
             return null;
         }
+
         ArrayList<Vec2D> topNPos = new ArrayList<>();
         for(int k = 0; k < n; k++) {
             double globalMax = 0.0;
@@ -218,8 +177,13 @@ public class GapFinder extends ProbFinder {
 
     /* certain element of this 2dArray might be null, make sure to check it */
     public Vec2D[][] getLocalMaxPosArr() {
-        getPMF();
-        return localMaxPosSub.getMsg();
+        update();
+        return localMaxPosWrapper.get();
+    }
+
+    public double[][] getPMF() {
+        update();
+        return pmfWrapper.get();
     }
 
 
@@ -229,7 +193,7 @@ public class GapFinder extends ProbFinder {
         return pmf[idx[0]][idx[1]];
     }
 
-    public double[][] getPMF() {
+    public void update() {
         /* Update robot states snapshot */
         ListIterator<RobotSnapshot> fielderSnapIt = fielderSnaps.listIterator();
         while (fielderSnapIt.hasNext()) {
@@ -243,10 +207,8 @@ public class GapFinder extends ProbFinder {
             foeSnapIt.next().update(foe);
         }
 
-        Vec2D ballPos = ball.getPos();
-        ballPosPub.publish(ballPos);
-
-        return pmfSub.getMsg();
+        /* Update ball pos */
+        ballPosWrapper.set(ball.getPos());
     }
 
 
@@ -254,19 +216,15 @@ public class GapFinder extends ProbFinder {
      * Calculate the pmf of optimal gap region for passing and attacking,
      * the pmf are indexed by gridIdx instead of coordinates
      */
+    @Override
     protected void calcProb() {
         // long t0 = System.currentTimeMillis();
+        Vec2D ballPos = ballPosWrapper.get();
 
         double[][] pmf = new double[width][height];
         Vec2D[][] localMaxPos = new Vec2D[evalWidth][evalHeight];
         double[][] localMax = new double[evalWidth][evalHeight]; // all-zero by default
         double[][] localMaxScore = new double[evalWidth][evalHeight]; // all-zero by default
-
-        Vec2D ballPos = ballPosSub.getMsg();
-
-        if (ballPos == null) {
-            return;
-        }
 
         for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
             for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
@@ -339,30 +297,14 @@ public class GapFinder extends ProbFinder {
                 localMaxScore[evalIdx[0]][evalIdx[1]] += prob;
             }
         }
-        pmfPub.publish(pmf);
-        localMaxPosPub.publish(localMaxPos);
-        localMaxScorePub.publish(localMax);
 
-        // System.out.println(System.currentTimeMillis() - t0);
+        pmfWrapper.set(pmf);
+        localMaxPosWrapper.set(localMaxPos);
+        localMaxScoreWrapper.set(localMax);
     }
 
     public int[] getIdxFromPos(Vec2D pos) {
         return grid.fromPos(pos);
     }
 
-    public void run() {
-        App.threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    calcProb();
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
 }

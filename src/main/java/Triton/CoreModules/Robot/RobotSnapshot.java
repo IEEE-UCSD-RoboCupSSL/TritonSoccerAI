@@ -1,8 +1,5 @@
 package Triton.CoreModules.Robot;
 
-
-import Triton.CoreModules.Robot.Robot;
-import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.concurrent.locks.ReadWriteLock;

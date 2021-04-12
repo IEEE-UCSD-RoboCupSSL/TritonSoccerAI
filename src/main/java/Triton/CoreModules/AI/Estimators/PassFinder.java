@@ -9,12 +9,7 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Publisher;
-import Triton.Misc.ModulePubSubSystem.Subscriber;
-
-import java.util.concurrent.TimeoutException;
+import Triton.Misc.RWLockee;
 
 import static Triton.Config.GeometryConfig.FIELD_LENGTH;
 import static Triton.Config.GeometryConfig.FIELD_WIDTH;
@@ -62,45 +57,30 @@ public class PassFinder extends GapFinder {
     private volatile Integer candidate = null;
     private volatile Integer passer = null;
 
-    protected final Publisher<double[][]> gPub;
-    protected final Subscriber<double[][]> gSub;
-    protected final Publisher<int[][]> rPub;
-    protected final Subscriber<int[][]> rSub;
+    protected RWLockee<double[][]> gWrapper = new RWLockee<>(null);
+    protected RWLockee<int[][]> rWrapper = new RWLockee<>(null);
 
-    private Vec2D ballPos;
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 400, 20);
     }
 
+
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
                      int resolutionStepSize, int evalWindowSize) {
         super(fielders, foes, ball, resolutionStepSize, evalWindowSize);
-
-        String topicName = this.getClass().getSimpleName();
-
-        rPub = new FieldPublisher<>(topicName, "Receiver", null);
-        rSub = new FieldSubscriber<>(topicName, "Receiver");
-
-        gPub = new FieldPublisher<>(topicName, "G-prob", null);
-        gSub = new FieldSubscriber<>(topicName, "G-prob");
-
-        try {
-            rSub.subscribe(TIMEOUT);
-            gSub.subscribe(TIMEOUT);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
     }
+
 
     public int[][] getR() {
-        getPMF();
-        return rSub.getMsg();
+        update();
+        return rWrapper.get();
     }
 
+
     public double[][] getGProb() {
-        getPMF();
-        return gSub.getMsg();
+        update();
+        return gWrapper.get();
     }
 
 
@@ -113,15 +93,12 @@ public class PassFinder extends GapFinder {
         double[][] localMax = new double[evalWidth][evalHeight];
         double[][] localMaxScore = new double[evalWidth][evalHeight];
 
+        Vec2D ballPos = ballPosWrapper.get();
+
         for(int i = 0; i < evalWidth; i++) {
             for(int j = 0; j < evalHeight; j++) {
                 localMax[i][j] = 0.0;
             }
-        }
-
-        ballPos = ballPosSub.getMsg();
-        if (ballPos == null) {
-            return;
         }
 
         long t0 = System.currentTimeMillis();
@@ -294,11 +271,11 @@ public class PassFinder extends GapFinder {
             }
         }
 
-        rPub.publish(R);
-        gPub.publish(gProbs);
-        pmfPub.publish(pmf);
-        localMaxPosPub.publish(localMaxPos);
-        localMaxScorePub.publish(localMax);
+        rWrapper.set(R);
+        gWrapper.set(gProbs);
+        pmfWrapper.set(pmf);
+        localMaxPosWrapper.set(localMaxPos);
+        localMaxScoreWrapper.set(localMax);
     }
 
     private double calcETA(RobotSnapshot snap, Vec2D dest) {
@@ -344,11 +321,12 @@ public class PassFinder extends GapFinder {
      * @return a tuple of information needed by pass
      */
     public PassInfo evalPass() {
-        getPMF();
+        update();
         try {
-            double[][] pmf = pmfSub.getMsg();
+            double[][] pmf = pmfWrapper.get();
             if (pmf == null) return null;
-            int[][] receiver = rSub.getMsg();
+            int[][] receiver = rWrapper.get();
+            if (receiver == null) return null;
 
             Vec2D topPos = getTopNMaxPos(1).get(0);
             int[] idx = getIdxFromPos(topPos);
