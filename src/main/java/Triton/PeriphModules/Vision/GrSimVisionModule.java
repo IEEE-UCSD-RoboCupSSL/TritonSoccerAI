@@ -35,7 +35,7 @@ public class GrSimVisionModule extends VisionModule {
      * Constructs a VisionModule listening on specified ip and port
      *
      * @param ip   ip to receive from
-     * @param port port to recieve from
+     * @param port port to receive from
      */
     public GrSimVisionModule(String ip, int port) {
         visionPub = new MQPublisher<>("vision", "detection");

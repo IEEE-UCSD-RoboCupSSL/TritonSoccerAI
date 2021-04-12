@@ -2,9 +2,7 @@ package Triton.CoreModules.AI.Estimators;
 
 import Triton.App;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
-import Triton.CoreModules.Robot.RobotList;
+import Triton.CoreModules.Robot.*;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
@@ -15,7 +13,7 @@ import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.concurrent.TimeoutException;
 
 import static Triton.Config.GeometryConfig.*;
@@ -42,16 +40,15 @@ public class GapFinder extends ProbFinder {
     protected double interceptRange = 500.0;
     protected long TIMEOUT = 1000;
 
+    protected ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
+    protected ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();;
+
     protected final Publisher<double[][]> pmfPub;
     protected final Subscriber<double[][]> pmfSub;
     protected final Publisher<Vec2D[][]> localMaxPosPub;
     protected final Subscriber<Vec2D[][]> localMaxPosSub;
     protected final Publisher<double[][]> localMaxScorePub;
     protected final Subscriber<double[][]> localMaxScoreSub;
-    protected final Publisher<ArrayList<Vec2D>> fielderPosListPub;
-    protected final Subscriber<ArrayList<Vec2D>> fielderPosListSub;
-    protected final Publisher<ArrayList<Vec2D>> foePosListPub;
-    protected final Subscriber<ArrayList<Vec2D>> foePosListSub;
     protected final Publisher<Vec2D> ballPosPub;
     protected final Subscriber<Vec2D> ballPosSub;
 
@@ -69,6 +66,15 @@ public class GapFinder extends ProbFinder {
 
         String topicName = this.getClass().getSimpleName();
 
+        /* mutex robot snapshots */
+        for (Ally fielder : fielders) {
+            fielderSnaps.add(new RobotSnapshot(fielder));
+        }
+        for (Foe foe : foes) {
+            foeSnaps.add(new RobotSnapshot(foe));
+        }
+
+
         /* internal pub-sub */
         pmfPub = new FieldPublisher<>(topicName, "PDF" + this.toString(), null);
         pmfSub = new FieldSubscriber<>(topicName, "PDF" + this.toString());
@@ -78,18 +84,10 @@ public class GapFinder extends ProbFinder {
         localMaxPosPub = new FieldPublisher<>(topicName, "MaxPos", null);
         localMaxPosSub = new FieldSubscriber<>(topicName, "MaxPos");
 
-        fielderPosListPub = new FieldPublisher<>(topicName, "FielderPositions" + this.toString(), null);
-        fielderPosListSub = new FieldSubscriber<>(topicName, "FielderPositions" + this.toString());
-
-        foePosListPub = new FieldPublisher<>(topicName, "FoePositions" + this.toString(), null);
-        foePosListSub = new FieldSubscriber<>(topicName, "FoePositions" + this.toString());
-
         ballPosPub = new FieldPublisher<>(topicName, "BallPosition" + this.toString(), null);
         ballPosSub = new FieldSubscriber<>(topicName, "BallPosition" + this.toString());
 
         try {
-            fielderPosListSub.subscribe(TIMEOUT);
-            foePosListSub.subscribe(TIMEOUT);
             ballPosSub.subscribe(TIMEOUT);
             pmfSub.subscribe(TIMEOUT);
             localMaxPosSub.subscribe(TIMEOUT);
@@ -232,47 +230,41 @@ public class GapFinder extends ProbFinder {
     }
 
     public double[][] getPMF() {
-        ArrayList<Vec2D> fielderPosList = new ArrayList<>();
-        for (Ally fielder : fielders) {
-            fielderPosList.add(fielder.getPos());
+        /* Update robot states snapshot */
+        ListIterator<RobotSnapshot> fielderSnapIt = fielderSnaps.listIterator();
+        while (fielderSnapIt.hasNext()) {
+            Robot fielder = fielders.get(fielderSnapIt.nextIndex());
+            fielderSnapIt.next().update(fielder);
         }
-        ArrayList<Vec2D> foePosList = new ArrayList<>();
-        for (Foe foe : foes) {
-            foePosList.add(foe.getPos());
-        }
-        Vec2D ballPos = ball.getPos();
 
-        fielderPosListPub.publish(fielderPosList);
-        foePosListPub.publish(foePosList);
+        ListIterator<RobotSnapshot> foeSnapIt = foeSnaps.listIterator();
+        while (foeSnapIt.hasNext()) {
+            Robot foe = foes.get(foeSnapIt.nextIndex());
+            foeSnapIt.next().update(foe);
+        }
+
+        Vec2D ballPos = ball.getPos();
         ballPosPub.publish(ballPos);
 
         return pmfSub.getMsg();
     }
 
 
-
-    /* calculate the pmf of optimal gap region for passing and attacking,
+    /**
+     * Calculate the pmf of optimal gap region for passing and attacking,
      * the pmf are indexed by gridIdx instead of coordinates
-     *   */
+     */
     protected void calcProb() {
-
-        long t0 = System.currentTimeMillis();
+        // long t0 = System.currentTimeMillis();
 
         double[][] pmf = new double[width][height];
         Vec2D[][] localMaxPos = new Vec2D[evalWidth][evalHeight];
-        double[][] localMax = new double[evalWidth][evalHeight];
-        double[][] localMaxScore = new double[evalWidth][evalHeight];
-        for(int i = 0; i < evalWidth; i++) {
-            for(int j = 0; j < evalHeight; j++) {
-                localMax[i][j] = 0.0;
-            }
-        }
+        double[][] localMax = new double[evalWidth][evalHeight]; // all-zero by default
+        double[][] localMaxScore = new double[evalWidth][evalHeight]; // all-zero by default
 
-        ArrayList<Vec2D> fielderPosList = fielderPosListSub.getMsg();
-        ArrayList<Vec2D> foePosList = foePosListSub.getMsg();
         Vec2D ballPos = ballPosSub.getMsg();
 
-        if (fielderPosList == null || foePosList == null || ballPos == null) {
+        if (ballPos == null) {
             return;
         }
 
@@ -288,11 +280,10 @@ public class GapFinder extends ProbFinder {
                     continue;
                 }
 
-
                 /* away from foe bots */
                 double minDist = Double.MAX_VALUE;
-                for (Vec2D foePos : foePosList) {
-                    double dist = pos.sub(foePos).mag();
+                for (RobotSnapshot foeSnap : foeSnaps) {
+                    double dist = pos.sub(foeSnap.getPos()).mag();
                     if (dist < minDist) {
                         minDist = dist;
                     }
@@ -306,12 +297,12 @@ public class GapFinder extends ProbFinder {
                 double distFoeToIntercept = Double.MAX_VALUE;
                 Vec2D nearestFoePos = null;
                 /* find nearest foe dist to the potential passing line */
-                for (Vec2D foePos : foePosList) {
+                for (RobotSnapshot foeSnap : foeSnaps) {
                     // enforce correct direction
-                    double dist = foePos.distToLine(new Line2D(pos, ballPos));
+                    double dist = foeSnap.getPos().distToLine(new Line2D(pos, ballPos));
                     if (dist < distFoeToIntercept) {
                         distFoeToIntercept = dist;
-                        nearestFoePos = foePos;
+                        nearestFoePos = foeSnap.getPos();
                     }
                 }
 
