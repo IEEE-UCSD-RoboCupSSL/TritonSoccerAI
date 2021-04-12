@@ -2,15 +2,15 @@ package Triton.PeriphModules.GameControl.GameStates;
 
 import Triton.CoreModules.Robot.Team;
 
-public class FreeKickGameState extends GameState {
+public class PrepareIndirectFreeGameState extends GameState {
     private Team team;
 
-    public FreeKickGameState(Team team) {
-        super(GameStateName.FREE_KICK);
+    public PrepareIndirectFreeGameState(Team team) {
+        super(GameStateName.PREPARE_INDIRECT_FREE);
         this.team = team;
     }
 
-    public FreeKickGameState() {
+    public PrepareIndirectFreeGameState() {
         this(Team.BLUE);
     }
 

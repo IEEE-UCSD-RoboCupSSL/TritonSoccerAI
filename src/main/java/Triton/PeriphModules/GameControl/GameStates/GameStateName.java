@@ -1,13 +1,15 @@
 package Triton.PeriphModules.GameControl.GameStates;
 
 public enum GameStateName {
-    UNKNOWN,
     HALT,
     STOP,
-    RUNNING,
-    FREE_KICK,
-    KICKOFF,
-    PENALTY,
+    NORMAL_START,
+    FORCE_START,
+    PREPARE_KICKOFF,
+    PREPARE_PENALTY,
+    PREPARE_DIRECT_FREE,
+    PREPARE_INDIRECT_FREE,
     TIMEOUT,
-    BALL_PLACEMENT
+    BALL_PLACEMENT,
+    UNKNOWN
 }

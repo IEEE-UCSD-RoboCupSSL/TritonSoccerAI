@@ -17,6 +17,10 @@ public class BallPlacementGameState extends GameState {
         this(Team.BLUE, new Vec2D(0, 0));
     }
 
+    public BallPlacementGameState(Team team) {
+        this(team, new Vec2D(0, 0));
+    }
+
     public Team getTeam() {
         return team;
     }

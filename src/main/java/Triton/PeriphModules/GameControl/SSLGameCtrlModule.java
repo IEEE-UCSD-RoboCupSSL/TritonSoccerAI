@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 
+import static Triton.Config.ObjectConfig.MY_TEAM;
+
 public class SSLGameCtrlModule extends GameCtrlModule {
     private final static int MAX_BUFFER_SIZE = 67108864;
 
@@ -40,7 +42,7 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                         packet.getOffset(), packet.getLength());
 
                 SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
-//                System.err.println(gcOutput);
+                System.err.println(gcOutput);
                 parseGcOutput(gcOutput);
             } catch (SocketTimeoutException e) {
 //                System.err.println("SSL Game Controller Multicast Timeout");
@@ -57,73 +59,73 @@ public class SSLGameCtrlModule extends GameCtrlModule {
         GameState gameState;
         switch (command) {
             case HALT -> {
-                System.err.println(">>>HALT<<<");
+                System.err.println(">>>GC: HALT<<<");
                 gameState = new HaltGameState();
             }
             case STOP -> {
-                System.err.println(">>>STOP<<<");
+                System.err.println(">>>GC: STOP<<<");
                 gameState = new StopGameState();
             }
             case NORMAL_START -> {
-                System.err.println(">>>NORMAL_START<<<");
-                gameState = new RunningGameState();
+                System.err.println(">>>GC: NORMAL_START<<<");
+                gameState = new NormalStartGameState();
             }
             case FORCE_START -> {
-                System.err.println(">>>FORCE_START<<<");
-                gameState = new RunningGameState();
+                System.err.println(">>>GC: FORCE_START<<<");
+                gameState = new ForceStartGameState();
             }
             case PREPARE_KICKOFF_YELLOW -> {
-                System.err.println(">>>PREPARE_KICKOFF_YELLOW<<<");
-                gameState = new KickoffGameState(Team.YELLOW);
+                System.err.println(">>>GC: PREPARE_KICKOFF_YELLOW<<<");
+                gameState = new PrepareKickoffGameState(Team.YELLOW);
             }
             case PREPARE_KICKOFF_BLUE -> {
-                System.err.println(">>>PREPARE_KICKOFF_BLUE<<<");
-                gameState = new KickoffGameState(Team.BLUE);
+                System.err.println(">>>GC: PREPARE_KICKOFF_BLUE<<<");
+                gameState = new PrepareKickoffGameState(Team.BLUE);
             }
             case PREPARE_PENALTY_YELLOW -> {
-                System.err.println(">>>PREPARE_PENALTY_YELLOW<<<");
-                gameState = new PenaltyGameState(Team.YELLOW);
+                System.err.println(">>>GC: PREPARE_PENALTY_YELLOW<<<");
+                gameState = new PreparePenaltyGameState(Team.YELLOW);
             }
             case PREPARE_PENALTY_BLUE -> {
-                System.err.println(">>>PREPARE_PENALTY_BLUE<<<");
-                gameState = new PenaltyGameState(Team.BLUE);
+                System.err.println(">>>GC: PREPARE_PENALTY_BLUE<<<");
+                gameState = new PreparePenaltyGameState(Team.BLUE);
             }
             case DIRECT_FREE_YELLOW -> {
-                System.err.println(">>>DIRECT_FREE_YELLOW<<<");
-                gameState = new FreeKickGameState(Team.YELLOW);
+                System.err.println(">>>GC: DIRECT_FREE_YELLOW<<<");
+                gameState = new PrepareDirectFreeGameState(Team.YELLOW);
             }
             case DIRECT_FREE_BLUE -> {
-                System.err.println(">>>DIRECT_FREE_BLUE<<<");
-                gameState = new FreeKickGameState(Team.BLUE);
+                System.err.println(">>>GC: DIRECT_FREE_BLUE<<<");
+                gameState = new PrepareDirectFreeGameState(Team.BLUE);
             }
             case INDIRECT_FREE_YELLOW -> {
-                System.err.println(">>>INDIRECT_FREE_YELLOW<<<");
-                gameState = new FreeKickGameState(Team.YELLOW);
+                System.err.println(">>>GC: INDIRECT_FREE_YELLOW<<<");
+                gameState = new PrepareIndirectFreeGameState(Team.YELLOW);
             }
             case INDIRECT_FREE_BLUE -> {
-                System.err.println(">>>INDIRECT_FREE_BLUE<<<");
-                gameState = new FreeKickGameState(Team.BLUE);
+                System.err.println(">>>GC: INDIRECT_FREE_BLUE<<<");
+                gameState = new PrepareIndirectFreeGameState(Team.BLUE);
             }
             case TIMEOUT_YELLOW -> {
-                System.err.println(">>>TIMEOUT_YELLOW<<<");
+                System.err.println(">>>GC: TIMEOUT_YELLOW<<<");
                 gameState = new TimeoutGameState(Team.YELLOW);
             }
             case TIMEOUT_BLUE -> {
-                System.err.println(">>>TIMEOUT_BLUE<<<");
+                System.err.println(">>>GC: TIMEOUT_BLUE<<<");
                 gameState = new TimeoutGameState(Team.BLUE);
             }
             case BALL_PLACEMENT_BLUE -> {
-                System.err.println(">>>BALL_PLACEMENT_BLUE<<<");
+                System.err.println(">>>GC: BALL_PLACEMENT_BLUE<<<");
                 SslGcRefereeMessage.Referee.Point point = gcOutput.getDesignatedPosition();
                 gameState = new BallPlacementGameState(Team.BLUE, new Vec2D(point.getX(), point.getY()));
             }
             case BALL_PLACEMENT_YELLOW -> {
-                System.err.println(">>>BALL_PLACEMENT_YELLOW<<<");
+                System.err.println(">>>GC: BALL_PLACEMENT_YELLOW<<<");
                 SslGcRefereeMessage.Referee.Point point = gcOutput.getDesignatedPosition();
-                gameState = new BallPlacementGameState(Team.BLUE, new Vec2D(point.getX(), point.getY()));
+                gameState = new BallPlacementGameState(Team.YELLOW, new Vec2D(point.getX(), point.getY()));
             }
             default -> {
-                System.err.println(">>>UNKNOWN<<<");
+                System.err.println(">>>GC: UNKNOWN<<<");
                 gameState = new UnknownGameState();
             }
         }
