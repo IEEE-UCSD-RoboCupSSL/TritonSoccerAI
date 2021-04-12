@@ -1,5 +1,8 @@
 package Triton.PeriphModules.GameControl;
 
+import Proto.SslGcRefereeMessage;
+import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.PeriphModules.GameControl.GameStates.*;
 
 import java.util.Scanner;
@@ -22,48 +25,80 @@ public class StdinGameCtrlModule extends GameCtrlModule {
             System.out.println("    [halt, stop, running, freekick, kickoff, penalty, timeout, ballplacement]");
 
             String gsStr = scanner.nextLine();
-            GameState gs;
+            GameState gameState;
 
             switch (gsStr) {
-                case "halt" -> {
-                    System.out.println(">>>HALT<<<");
-                    gs = new HaltGameState();
+                case "HALT" -> {
+                    System.err.println(">>>GC: HALT<<<");
+                    gameState = new HaltGameState();
                 }
-                case "stop" -> {
-                    System.out.println(">>>STOP<<<");
-                    gs = new StopGameState();
+                case "STOP" -> {
+                    System.err.println(">>>GC: STOP<<<");
+                    gameState = new StopGameState();
                 }
-                case "running" -> {
-                    System.out.println(">>>RUNNING<<<");
-                    gs = new RunningGameState();
+                case "NORMAL_START" -> {
+                    System.err.println(">>>GC: NORMAL_START<<<");
+                    gameState = new NormalStartGameState();
                 }
-                case "freekick" -> {
-                    System.out.println(">>>FREE_KICK<<<");
-                    gs = new FreeKickGameState();
+                case "FORCE_START" -> {
+                    System.err.println(">>>GC: FORCE_START<<<");
+                    gameState = new ForceStartGameState();
                 }
-                case "kickoff" -> {
-                    System.out.println(">>>KICKOFF<<<");
-                    gs = new KickoffGameState();
+                case "PREPARE_KICKOFF_YELLOW" -> {
+                    System.err.println(">>>GC: PREPARE_KICKOFF_YELLOW<<<");
+                    gameState = new PrepareKickoffGameState(Team.YELLOW);
                 }
-                case "penalty" -> {
-                    System.out.println(">>>PENALTY<<<");
-                    gs = new PenaltyGameState();
+                case "PREPARE_KICKOFF_BLUE" -> {
+                    System.err.println(">>>GC: PREPARE_KICKOFF_BLUE<<<");
+                    gameState = new PrepareKickoffGameState(Team.BLUE);
                 }
-                case "timeout" -> {
-                    System.out.println(">>>TIMEOUT<<<");
-                    gs = new TimeoutGameState();
+                case "PREPARE_PENALTY_YELLOW" -> {
+                    System.err.println(">>>GC: PREPARE_PENALTY_YELLOW<<<");
+                    gameState = new PreparePenaltyGameState(Team.YELLOW);
                 }
-                case "ballplacement" -> {
-                    System.out.println(">>>BALL_PLACEMENT<<<");
-                    gs = new BallPlacementGameState();
+                case "PREPARE_PENALTY_BLUE" -> {
+                    System.err.println(">>>GC: PREPARE_PENALTY_BLUE<<<");
+                    gameState = new PreparePenaltyGameState(Team.BLUE);
+                }
+                case "DIRECT_FREE_YELLOW" -> {
+                    System.err.println(">>>GC: DIRECT_FREE_YELLOW<<<");
+                    gameState = new PrepareDirectFreeGameState(Team.YELLOW);
+                }
+                case "DIRECT_FREE_BLUE" -> {
+                    System.err.println(">>>GC: DIRECT_FREE_BLUE<<<");
+                    gameState = new PrepareDirectFreeGameState(Team.BLUE);
+                }
+                case "INDIRECT_FREE_YELLOW" -> {
+                    System.err.println(">>>GC: INDIRECT_FREE_YELLOW<<<");
+                    gameState = new PrepareIndirectFreeGameState(Team.YELLOW);
+                }
+                case "INDIRECT_FREE_BLUE" -> {
+                    System.err.println(">>>GC: INDIRECT_FREE_BLUE<<<");
+                    gameState = new PrepareIndirectFreeGameState(Team.BLUE);
+                }
+                case "TIMEOUT_YELLOW" -> {
+                    System.err.println(">>>GC: TIMEOUT_YELLOW<<<");
+                    gameState = new TimeoutGameState(Team.YELLOW);
+                }
+                case "TIMEOUT_BLUE" -> {
+                    System.err.println(">>>GC: TIMEOUT_BLUE<<<");
+                    gameState = new TimeoutGameState(Team.BLUE);
+                }
+                case "BALL_PLACEMENT_BLUE" -> {
+                    System.err.println(">>>GC: BALL_PLACEMENT_BLUE<<<");
+                    gameState = new BallPlacementGameState(Team.BLUE);
+                }
+                case "BALL_PLACEMENT_YELLOW" -> {
+                    System.err.println(">>>GC: BALL_PLACEMENT_YELLOW<<<");
+                    gameState = new BallPlacementGameState(Team.YELLOW);
                 }
                 default -> {
-                    System.out.println(">>>UNKNOWN<<<");
-                    gs = new UnknownGameState();
+                    System.err.println(">>>GC: UNKNOWN<<<");
+                    gameState = new UnknownGameState();
                 }
             }
 
-            gsPub.publish(gs);
+            gsPub.publish(gameState);
 
             try {
                 Thread.sleep(100);

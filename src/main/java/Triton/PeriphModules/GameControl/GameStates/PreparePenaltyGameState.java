@@ -2,15 +2,15 @@ package Triton.PeriphModules.GameControl.GameStates;
 
 import Triton.CoreModules.Robot.Team;
 
-public class KickoffGameState extends GameState {
+public class PreparePenaltyGameState extends GameState {
     private Team team;
 
-    public KickoffGameState(Team team) {
-        super(GameStateName.KICKOFF);
+    public PreparePenaltyGameState(Team team) {
+        super(GameStateName.PREPARE_PENALTY);
         this.team = team;
     }
 
-    public KickoffGameState() {
+    public PreparePenaltyGameState() {
         this(Team.BLUE);
     }
 
