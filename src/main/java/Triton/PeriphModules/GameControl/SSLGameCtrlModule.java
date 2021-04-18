@@ -11,8 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 
-import static Triton.Config.ObjectConfig.MY_TEAM;
-
 public class SSLGameCtrlModule extends GameCtrlModule {
     private final static int MAX_BUFFER_SIZE = 67108864;
 

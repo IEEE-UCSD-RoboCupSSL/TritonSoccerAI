@@ -165,8 +165,12 @@ public class AI implements Module {
                 System.err.println(">>>CURRENT: BALL_PLACEMENT<<<");
                 BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
                 Team ballPlacementTeam = ballPlacementGameState.getTeam();
+
                 if (ballPlacementTeam == MY_TEAM) {
                     Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
+
+                    System.err.println(teamTargetPos);
+
                     ballPlacement(teamTargetPos);
                 }
             }

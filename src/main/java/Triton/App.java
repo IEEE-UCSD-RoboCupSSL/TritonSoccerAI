@@ -111,8 +111,8 @@ public class App {
         if (!isTestMode) {
             int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
-            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
+//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
 //            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
             threadPool.submit(gameCtrlModule);
 
