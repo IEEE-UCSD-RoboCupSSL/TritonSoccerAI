@@ -78,7 +78,8 @@ public class CoordinatedPass extends Skills {
                 }
                 double passAngle = receivePos.sub(passPos).toPlayerAngle();
                 double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
-                passer.rotateTo(passAngle);
+//                passer.rotateTo(passAngle);
+                passer.dribRotate(ball, passAngle);
                 if (receiver.isDirAimed(receiveAngle) && receiver.isPosArrived(receivePos)) {
                     currState = PassState.RECEIVER_IN_POSITION;
                 } else {
@@ -108,7 +109,8 @@ public class CoordinatedPass extends Skills {
                     currState = PassState.PASSED;
                 } else {
                     receiver.curveTo(receivePos, receiveAngle);
-                    passer.rotateTo(passAngle);
+//                    passer.rotateTo(passAngle);
+                    passer.dribRotate(ball, passAngle);
                 }
             }
             case PASSED -> {

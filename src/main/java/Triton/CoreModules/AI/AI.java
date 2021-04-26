@@ -168,9 +168,6 @@ public class AI implements Module {
 
                 if (ballPlacementTeam == MY_TEAM) {
                     Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
-
-                    System.err.println(teamTargetPos);
-
                     ballPlacement(teamTargetPos);
                 }
             }
