@@ -1,5 +1,7 @@
 package Triton.Misc.ModulePubSubSystem;
 
+
+
 public class FieldPublisher<T> extends Publisher<T> {
 
     public FieldPublisher(String topicName, String msgName, T defaultMsg) {
