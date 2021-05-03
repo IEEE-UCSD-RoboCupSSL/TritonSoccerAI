@@ -12,11 +12,11 @@ public class FieldSubscriber<T> extends Subscriber<T> {
             System.out.println("NOT SUBSCRIBED");
 
         T msg = channel.getMsg();
-        try {
-            Thread.sleep(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(1);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return msg;
     }
 

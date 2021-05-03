@@ -2,6 +2,7 @@ package Triton.Misc.ModulePubSubSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -87,5 +88,18 @@ public class MsgChannel<T> {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    public boolean isAnyQueueFull() {
+        for (BlockingQueue<T> queue : queues) {
+            if (queue.remainingCapacity() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<BlockingQueue<T>> getQueues() {
+        return queues;
     }
 }

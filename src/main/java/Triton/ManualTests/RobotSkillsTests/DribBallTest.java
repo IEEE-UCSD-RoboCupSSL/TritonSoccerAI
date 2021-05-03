@@ -6,8 +6,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 
-import static Triton.Config.ObjectConfig.BALL_RADIUS;
-import static Triton.Config.ObjectConfig.ROBOT_RADIUS;
+import static Triton.Config.ObjectConfig.*;
 
 public class DribBallTest extends RobotSkillsTest {
     Scanner scanner;
@@ -40,17 +39,29 @@ public class DribBallTest extends RobotSkillsTest {
 
                 while (!ally.isHoldingBall()) {
                     ally.getBall(ball);
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 Vec2D angleUnitVec = new Vec2D(targetAngle);
                 Vec2D angleOffsetVec = angleUnitVec.scale(ROBOT_RADIUS + BALL_RADIUS);
                 Vec2D targetPos = ball.getPos().sub(angleOffsetVec);
+                boolean held = true;
 
-                while (!ally.isDirAimed(targetAngle) || !ally.isPosArrived(targetPos)) {
+                while ((!ally.isDirAimed(targetAngle) || !ally.isPosArrived(targetPos, 20)) && held) {
+                    held = ally.dribRotate(ball, targetAngle);
+
                     angleUnitVec = new Vec2D(targetAngle);
                     angleOffsetVec = angleUnitVec.scale(ROBOT_RADIUS + BALL_RADIUS);
                     targetPos = ball.getPos().sub(angleOffsetVec);
-                    ally.dribRotate(ball, targetAngle);
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 ally.stop();
             }

@@ -8,6 +8,8 @@ import Triton.CoreModules.Robot.Team;
 public final class ObjectConfig {
     public static final int ROBOT_COUNT = 6;
     public static final double ROBOT_RADIUS = 90.0;
+    public static final double ROBOT_MIN_RADIUS = ROBOT_RADIUS - 15;
+    public static final double ROBOT_DRIB_WIDTH = 80.0;
     public static final double BALL_RADIUS = 45.0 / 2.0;
 
     public static final double EXCESSIVE_DRIBBLING_DIST = 1000; // 1 meter

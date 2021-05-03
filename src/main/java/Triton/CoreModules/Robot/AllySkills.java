@@ -68,9 +68,9 @@ public interface AllySkills {
     /*** Soccer Skills methods ***/
     void getBall(Ball ball);
 
-    void dribRotate(Ball ball, double angle);
+    boolean dribRotate(Ball ball, double angle);
 
-    void dribRotate(Ball ball, double angle, double offsetDist);
+    boolean dribRotate(Ball ball, double angle, double offsetDist);
 
     //To-do void chipBall();
 

@@ -411,16 +411,21 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void dribRotate(Ball ball, double angle) {
-        dribRotate(ball, angle, 0);
+    public boolean dribRotate(Ball ball, double angle) {
+        return dribRotate(ball, angle, 0);
     }
 
     @Override
-    public void dribRotate(Ball ball, double angle, double offsetDist) {
+    public boolean dribRotate(Ball ball, double angle, double offsetDist) {
         Vec2D angleUnitVec = new Vec2D(angle);
-        Vec2D angleOffsetVec = angleUnitVec.scale(ROBOT_RADIUS + BALL_RADIUS + offsetDist);
+        Vec2D angleOffsetVec = angleUnitVec.scale(ROBOT_MIN_RADIUS + BALL_RADIUS + offsetDist);
         Vec2D targetPos = ball.getPos().sub(angleOffsetVec);
         curveTo(targetPos, angle);
+
+        if (ball.getPos().sub(getPos()).mag() - ROBOT_MIN_RADIUS - BALL_RADIUS > 30) {
+            return false;
+        }
+        return true;
     }
 
     @Override
