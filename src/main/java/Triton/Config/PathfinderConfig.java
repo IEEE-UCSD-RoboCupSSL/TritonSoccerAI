@@ -1,5 +1,8 @@
 package Triton.Config;
 
+import static Triton.Config.ObjectConfig.BALL_RADIUS;
+import static Triton.Config.ObjectConfig.ROBOT_MIN_RADIUS;
+
 /**
  * Config file for pathfinding
  */
@@ -20,4 +23,8 @@ public class PathfinderConfig {
     public static final double INTERCEPT_CIRCLE_RADIUS = 100;
     public static final double INTERCEPT_COEF_MAX_AWAY_CENTER = 2000;
     public static final double INTERCEPT_COEF_MAX_TANGENT_CIRC = 2000;
+
+    public static final double DRIB_ROTATE_BALL_PUSH = 2000;
+    public static final double DRIB_ROTATE_DIST = ROBOT_MIN_RADIUS + BALL_RADIUS;
+    public static final double DRIB_ROTATE_MAX_DIST = (ROBOT_MIN_RADIUS + BALL_RADIUS) * 2;
 }
