@@ -27,6 +27,11 @@ public class DribBallTest extends RobotSkillsTest {
 
         while (!ally.isHoldingBall()) {
             ally.getBall(ball);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         ally.stop();
