@@ -4,6 +4,16 @@ import Triton.Config.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
+import Triton.ManualTests.AI_SkillsTests.CPassTest;
+import Triton.ManualTests.AI_SkillsTests.DodgingTest;
+import Triton.ManualTests.AI_SkillsTests.GroupToTest;
+import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
+import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
+import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
+import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
+import Triton.ManualTests.EstimatorTests.GapFinderTest;
+import Triton.ManualTests.EstimatorTests.PassFinderTest;
+import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
@@ -36,6 +46,7 @@ import static Triton.PeriphModules.Display.PaintOption.*;
 public class App {
     public static ThreadPoolExecutor threadPool;
 
+
     static {
         /* Prepare a Thread Pool*/
         threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS, 0,
@@ -43,7 +54,8 @@ public class App {
     }
 
     public static void main(String[] args) {
-        boolean isTestMode = false;
+        boolean toRunTest = false;
+        Scanner scanner = new Scanner(System.in);
 
         ConnectionProperties conn = Config.conn();
 
@@ -61,7 +73,24 @@ public class App {
             if (args.length >= 2) { // mode
                 switch (args[1]) {
                     case "NORMAL" -> System.out.println("###########################################");
-                    case "TEST" -> isTestMode = true;
+                    case "TEST" -> {
+
+                        System.out.println(">> Enter [Y] for CoreTest Mode, or Enter [N] for PeriphTest Mode");
+                        String testMode = scanner.nextLine();
+                        switch (testMode) {
+                            /* CoreTest Mode */
+                            case "Y" -> toRunTest = true;
+
+                            /* PeriphTest Mode */
+                            case "N" -> {
+                                System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
+                                runPeriphTest(scanner);
+                                toRunTest = true;
+                            }
+                            default -> System.out.println("Invalid Input");
+                        }
+
+                    }
                     default -> {
                         System.out.println("Error: Invalid Args");
                         sleepForever();
@@ -108,7 +137,12 @@ public class App {
         foes.runAll(); // submit all to threadPool
 
 
-        if (!isTestMode) {
+        if (toRunTest) {
+            System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
+            threadPool.submit(new TestRunner(scanner, allies, goalKeeper, foes, ball));
+        } else {
+            /* Run the actual game program */
+
             int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
             GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
@@ -118,9 +152,6 @@ public class App {
 
             /* Instantiate & Run the main AI module, which is the core of this software */
             threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
-
-        } else {
-            threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         }
 
 
@@ -145,6 +176,41 @@ public class App {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static void runPeriphTest(Scanner scanner) {
+        boolean quit = false;
+        String prevTestName = "";
+        while (!quit) {
+            System.out.println(">> ENTER TEST NAME:");
+            String testName = scanner.nextLine();
+            boolean rtn = false;
+            int repeat = 0;
+            do {
+                switch (testName) {
+                    case "SayHi" -> {
+                        System.out.println("Hi!");
+                        rtn = true;
+                    }
+
+                    case "quit" -> {
+                        quit = true;
+                        rtn = true;
+                    }
+                    case "" -> {
+                        repeat++;
+                        testName = prevTestName;
+                    }
+                    default -> System.out.println("Invalid Test Name");
+                }
+            } while (repeat-- > 0);
+            repeat = 0;
+            prevTestName = testName;
+            if(!quit) System.out.println(rtn ? "Test Success" : "Test Fail");
+        }
+
+        System.out.println("PeriphTest Ended");
+        System.out.println("Automatically run CoreTest TestRunner next\n");
     }
 
 }

@@ -30,14 +30,14 @@ public class TestRunner implements Module {
 
     private String testName;
 
-    public TestRunner(RobotList<Ally> fielders,
+    public TestRunner(Scanner scanner, RobotList<Ally> fielders,
                       Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.fielders = fielders;
         this.keeper = keeper;
         this.foes = foes;
         this.ball = ball;
 
-        scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
 
     @Override
@@ -78,10 +78,6 @@ public class TestRunner implements Module {
                         case "holdballpos" -> rtn = new HoldBallPosTest(fielders.get(3), ball).test();
                         case "basicplay" -> rtn = new BasicPlayTest(fielders, keeper, foes, ball).test();
                         case "capDetect" -> rtn = new CapDetectionTest(scanner, fielders.get(3), ball).test();
-                        case "math" -> {
-                            miscMathTests();
-                            rtn = true;
-                        }
                         case "quit" -> {
                             quit = true;
                             rtn = true;
@@ -95,22 +91,25 @@ public class TestRunner implements Module {
                 } while (repeat-- > 0);
                 repeat = 0;
                 prevTestName = testName;
-                System.out.println(rtn ? "Test Success" : "Test Fail");
+                if(!quit) System.out.println(rtn ? "Test Success" : "Test Fail");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        System.out.println("CoreTest TestRunner Ended, Enter Ctrl+C to Exit");
     }
 
 
-    private void miscMathTests() {
-        System.out.println(Mat2D.rotation(90).mult(new Vec2D(1, 0)));
-        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, 1)));
-        System.out.println(Mat2D.rotation(90).mult(new Vec2D(-1, 0)));
-        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, -1)));
-
-        System.out.println(Mat2D.rotation(90).mult(new Vec2D(10, 10)));
-    }
+//    private void miscMathTests() {
+//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(1, 0)));
+//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, 1)));
+//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(-1, 0)));
+//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, -1)));
+//
+//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(10, 10)));
+//    }
 
 
 }
