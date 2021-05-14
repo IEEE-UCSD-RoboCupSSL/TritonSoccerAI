@@ -4,29 +4,14 @@ import Triton.Config.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
-import Triton.ManualTests.AI_SkillsTests.CPassTest;
-import Triton.ManualTests.AI_SkillsTests.DodgingTest;
-import Triton.ManualTests.AI_SkillsTests.GroupToTest;
-import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
-import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
-import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
-import Triton.ManualTests.EstimatorTests.GapFinderTest;
-import Triton.ManualTests.EstimatorTests.PassFinderTest;
-import Triton.ManualTests.RobotSkillsTests.*;
+import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
-import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
-import org.javatuples.Pair;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -37,13 +22,14 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
-import static Triton.PeriphModules.Display.PaintOption.*;
 
 
 /**
  * Main Program
  */
 public class App {
+
+    /* declare a global threadpool*/
     public static ThreadPoolExecutor threadPool;
 
 
@@ -84,7 +70,7 @@ public class App {
                             /* PeriphTest Mode */
                             case "N" -> {
                                 System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                                runPeriphTest(scanner);
+                                runPeriphMiscTest(scanner);
                                 toRunTest = true;
                             }
                             default -> System.out.println("Invalid Input");
@@ -178,7 +164,7 @@ public class App {
         }
     }
 
-    private static void runPeriphTest(Scanner scanner) {
+    private static void runPeriphMiscTest(Scanner scanner) {
         boolean quit = false;
         String prevTestName = "";
         while (!quit) {
@@ -188,10 +174,12 @@ public class App {
             int repeat = 0;
             do {
                 switch (testName) {
-                    case "SayHi" -> {
+                    case "sayhi" -> {
                         System.out.println("Hi!");
                         rtn = true;
                     }
+
+                    case "futask" -> rtn = new FutureTaskTest(threadPool).test();
 
                     case "quit" -> {
                         quit = true;
