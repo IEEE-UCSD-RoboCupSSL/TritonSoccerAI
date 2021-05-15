@@ -7,6 +7,8 @@ import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
+import Triton.CoreModules.Robot.ProceduralSkills.Dependency.AsyncProcedure;
+import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
@@ -17,6 +19,8 @@ import Triton.PeriphModules.Detection.RobotData;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
@@ -52,9 +56,13 @@ public class Ally extends Robot implements AllySkills {
 
     private boolean prevHoldBallStatus = false;
 
+    private AsyncProcedure asyncProcedure = null;
+
     public Ally(Team team, int ID) {
         super(team, ID);
         this.threadPool = App.threadPool;
+
+        asyncProcedure = new AsyncProcedure(this.threadPool);
 
         conn = new RobotConnection(ID);
 
@@ -100,13 +108,41 @@ public class Ally extends Robot implements AllySkills {
         // To-do for physical robots
     }
 
+
+    /*** Allow robot to run a parallel procedural task asynchronously ***/
+    synchronized public void executeProceduralTask(ProceduralTask task) {
+        asyncProcedure.execute(this, task);
+    }
+
+    synchronized public boolean isProcedureCompleted() {
+        return asyncProcedure.isCompleted();
+    }
+
+    synchronized public boolean getProcedureReturnStatus() throws ExecutionException, InterruptedException {
+        return asyncProcedure.getCompletionReturn();
+    }
+
+
+    synchronized public void cancelProceduralTask() {
+        asyncProcedure.cancel();
+    }
+
+    synchronized public boolean isProcedureCancelled() {
+        return asyncProcedure.isCancelled();
+    }
+
+
+
+
+
     /*** primitive control methods ***/
-    public void autoCap() {
+    @Override
+    synchronized public void autoCap() {
         statePub.publish(AUTO_CAPTURE);
     }
 
     @Override
-    public void stop() {
+    synchronized public void stop() {
         moveAt(new Vec2D(0, 0));
         spinAt(0);
     }
@@ -115,7 +151,7 @@ public class Ally extends Robot implements AllySkills {
      * @param loc player perspective, millimeter
      */
     @Override
-    public void moveTo(Vec2D loc) {
+    synchronized public void moveTo(Vec2D loc) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_TDRD);
             default -> statePub.publish(MOVE_TDRV);
@@ -127,7 +163,7 @@ public class Ally extends Robot implements AllySkills {
      * @param vel player perspective, vector with unit as percentage from -100 to 100
      */
     @Override
-    public void moveAt(Vec2D vel) {
+    synchronized public void moveAt(Vec2D vel) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_TVRD);
             default -> statePub.publish(MOVE_TVRV);
@@ -139,7 +175,7 @@ public class Ally extends Robot implements AllySkills {
      * @param angle player perspective, degrees, starting from y-axis, positive is counter clockwise
      */
     @Override
-    public void spinTo(double angle) {
+    synchronized public void spinTo(double angle) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TDRV, MOVE_NSTDRD, MOVE_NSTDRV -> statePub.publish(MOVE_TDRD);
             default -> statePub.publish(MOVE_TVRD);
@@ -151,7 +187,7 @@ public class Ally extends Robot implements AllySkills {
      * @param angVel unit is percentage from -100 to 100, positive is counter clockwise
      */
     @Override
-    public void spinAt(double angVel) {
+    synchronized public void spinAt(double angVel) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TDRV, MOVE_NSTDRD, MOVE_NSTDRV -> statePub.publish(MOVE_TDRV);
             default -> statePub.publish(MOVE_TVRV);
@@ -161,7 +197,7 @@ public class Ally extends Robot implements AllySkills {
 
     // runs in the caller thread
     @Override
-    public void kick(Vec2D kickVel) {
+    synchronized public void kick(Vec2D kickVel) {
         double mag = kickVel.mag();
         if (mag >= MAX_KICK_VEL) {
             kickVel = kickVel.normalized().scale(MAX_KICK_VEL);
@@ -183,7 +219,7 @@ public class Ally extends Robot implements AllySkills {
 
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to advanced control methods
     @Override
-    public void rotateTo(double angle) {
+    synchronized public void rotateTo(double angle) {
         double targetAngle = normAng(angle);
         double angDiff = calcAngDiff(targetAngle, getDir());
 
@@ -198,12 +234,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void strafeTo(Vec2D endPoint) {
+    synchronized public void strafeTo(Vec2D endPoint) {
         strafeTo(endPoint, getDir());
     }
 
     @Override
-    public void strafeTo(Vec2D endPoint, double angle) {
+    synchronized public void strafeTo(Vec2D endPoint, double angle) {
         double targetAngle = normAng(angle);
         double angDiff = calcAngDiff(targetAngle, getDir());
         double absAngleDiff = Math.abs(angDiff);
@@ -233,12 +269,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void curveTo(Vec2D endPoint) {
+    synchronized public void curveTo(Vec2D endPoint) {
         curveTo(endPoint, getDir());
     }
 
     @Override
-    public void curveTo(Vec2D endPoint, double angle) {
+    synchronized public void curveTo(Vec2D endPoint, double angle) {
         double targetAngle = normAng(angle);
         double angDiff = calcAngDiff(targetAngle, getDir());
         double absAngleDiff = Math.abs(angDiff);
@@ -260,12 +296,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void fastCurveTo(Vec2D endPoint) {
+    synchronized public void fastCurveTo(Vec2D endPoint) {
         fastCurveTo(endPoint, getDir());
     }
 
     @Override
-    public void fastCurveTo(Vec2D endPoint, double endAngle) {
+    synchronized public void fastCurveTo(Vec2D endPoint, double endAngle) {
         // included rear-prioritizing case
         ArrayList<Vec2D> path = findPath(endPoint);
         if (path != null && path.size() > 0) {
@@ -293,12 +329,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void sprintFrontTo(Vec2D endPoint) {
+    synchronized public void sprintFrontTo(Vec2D endPoint) {
         sprintFrontTo(endPoint, getDir());
     }
 
     @Override
-    public void sprintFrontTo(Vec2D endPoint, double endAngle) {
+    synchronized public void sprintFrontTo(Vec2D endPoint, double endAngle) {
         ArrayList<Vec2D> path = findPath(endPoint);
         if (path != null && path.size() > 0) {
             double fastestAngle = 0;
@@ -341,12 +377,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void sprintTo(Vec2D endPoint) {
+    synchronized public void sprintTo(Vec2D endPoint) {
         sprintTo(endPoint, getDir());
     }
 
     @Override
-    public void sprintTo(Vec2D endPoint, double endAngle) {
+    synchronized public void sprintTo(Vec2D endPoint, double endAngle) {
         // included rear-prioritizing case
         ArrayList<Vec2D> path = findPath(endPoint);
         if (path != null && path.size() > 0) {
@@ -398,7 +434,7 @@ public class Ally extends Robot implements AllySkills {
 
     /*** Soccer Skills methods ***/
     @Override
-    public void getBall(Ball ball) {
+    synchronized public void getBall(Ball ball) {
         Vec2D ballLoc = ball.getPos();
         Vec2D currPos = getPos();
         Vec2D currPosToBall = ballLoc.sub(currPos);
@@ -411,12 +447,12 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public boolean dribRotate(Ball ball, double angle) {
+    synchronized public boolean dribRotate(Ball ball, double angle) {
         return dribRotate(ball, angle, 0);
     }
 
     @Override
-    public boolean dribRotate(Ball ball, double angle, double offsetDist) {
+    synchronized public boolean dribRotate(Ball ball, double angle, double offsetDist) {
         // POSITION
         // Unit vector from final end point to the ball
         Vec2D angleUnitDir = new Vec2D(angle);
@@ -464,7 +500,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void staticIntercept(Ball ball, Vec2D anchorPos) {
+    synchronized public void staticIntercept(Ball ball, Vec2D anchorPos) {
         // To-do (future) : edge case: ball going opposite dir
 
         Vec2D currPos = getPos();
@@ -485,7 +521,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void dynamicIntercept(Ball ball, double faceDir) {
+    synchronized public void dynamicIntercept(Ball ball, double faceDir) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
 
@@ -508,7 +544,7 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void keep(Ball ball, Vec2D aimTraj) {
+    synchronized public void keep(Ball ball, Vec2D aimTraj) {
         Vec2D currPos = getPos();
         Vec2D ballPos = ball.getPos();
         double y = -FIELD_LENGTH / 2 + 150;
@@ -533,13 +569,13 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public void receive(Ball ball, Vec2D receivePos) {
+    synchronized public void receive(Ball ball, Vec2D receivePos) {
         // To-do: devise new implementation or choose the better between the two intercept impl
         staticIntercept(ball, receivePos);
     }
 
     @Override
-    public boolean isHoldingBall() {
+    synchronized public boolean isHoldingBall() {
         if (!dribStatSub.isSubscribed()) {
             return false;
         }
@@ -547,32 +583,32 @@ public class Ally extends Robot implements AllySkills {
     }
 
     @Override
-    public Vec2D HoldBallPos() {
+    synchronized public Vec2D HoldBallPos() {
         return  holdBallPosSub.getMsg();
     }
 
 
     @Override
-    public boolean isPosArrived(Vec2D pos) {
+    synchronized public boolean isPosArrived(Vec2D pos) {
         return isPosArrived(pos, POS_PRECISION);
     }
 
     @Override
-    public boolean isPosArrived(Vec2D pos, double dist) {
+    synchronized public boolean isPosArrived(Vec2D pos, double dist) {
         return pos.sub(getPos()).mag() < dist;
     }
 
     @Override
-    public boolean isDirAimed(double angle) {
+    synchronized public boolean isDirAimed(double angle) {
         return isDirAimed(angle, DIR_PRECISION);
     }
 
     @Override
-    public boolean isDirAimed(double angle, double angleDiff) {
+    synchronized public boolean isDirAimed(double angle, double angleDiff) {
         return Math.abs(calcAngDiff(angle, getDir())) < angleDiff;
     }
 
-    public ArrayList<Vec2D> getCircleCenters(Vec2D ballPos, Vec2D targetPos, Vec2D faceVec, double ballTargetDist, double circRad) {
+    private ArrayList<Vec2D> getCircleCenters(Vec2D ballPos, Vec2D targetPos, Vec2D faceVec, double ballTargetDist, double circRad) {
         Vec2D circCentersVec = new Vec2D(faceVec.y, -faceVec.x);
         Vec2D ballTargetMidpoint = ballPos.add(targetPos).scale(0.5);
         double centerMidpointDist = Math.pow(circRad * circRad - 1 / 4 * ballTargetDist * ballTargetDist, 0.5);
@@ -830,7 +866,7 @@ public class Ally extends Robot implements AllySkills {
         return command.build();
     }
 
-    public void displayPathFinder() {
+    synchronized public void displayPathFinder() {
         if (pathFinder instanceof JPSPathFinder) {
             ((JPSPathFinder) pathFinder).display();
         }

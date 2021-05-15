@@ -14,6 +14,7 @@ import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
+import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
 import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -78,6 +79,7 @@ public class TestRunner implements Module {
                         case "holdballpos" -> rtn = new HoldBallPosTest(fielders.get(3), ball).test();
                         case "basicplay" -> rtn = new BasicPlayTest(fielders, keeper, foes, ball).test();
                         case "capDetect" -> rtn = new CapDetectionTest(scanner, fielders.get(3), ball).test();
+                        case "spsdemo" -> rtn = new SimpleProceduralSkillDemo(scanner, fielders, ball).test();
                         case "quit" -> {
                             quit = true;
                             rtn = true;

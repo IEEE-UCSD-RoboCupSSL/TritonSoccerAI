@@ -15,7 +15,7 @@ public class Ball implements Module {
         dataSub = new FieldSubscriber<>("detection", "ball");
     }
 
-    public Vec2D getTrajectoryConstraint() {
+    synchronized public Vec2D getTrajectoryConstraint() {
         return getData().getVel().normalized();
     }
 
@@ -23,19 +23,19 @@ public class Ball implements Module {
         return dataSub.getMsg();
     }
 
-    public Vec2D getVel() {
+    synchronized public Vec2D getVel() {
         return getData().getVel();
     }
 
-    public Vec2D getPos() {
+    synchronized public Vec2D getPos() {
         return getData().getPos();
     }
 
-    public double getTime() {
+    synchronized public double getTime() {
         return getData().getTime();
     }
 
-    public int timeToPoint() {
+    synchronized public int timeToPoint() {
         return 0;
     }
 
@@ -56,11 +56,11 @@ public class Ball implements Module {
         }
     }
 
-    public boolean isPosArrived(Vec2D pos) {
+    synchronized public boolean isPosArrived(Vec2D pos) {
         return isPosArrived(pos, POS_PRECISION);
     }
 
-    public boolean isPosArrived(Vec2D pos, double dist) {
+    synchronized public boolean isPosArrived(Vec2D pos, double dist) {
         return pos.sub(getPos()).mag() < dist;
     }
 }

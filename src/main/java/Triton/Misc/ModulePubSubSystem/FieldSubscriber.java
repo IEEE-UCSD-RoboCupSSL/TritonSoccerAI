@@ -15,7 +15,7 @@ public class FieldSubscriber<T> extends Subscriber<T> {
         try {
             Thread.sleep(1);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return msg;
     }
