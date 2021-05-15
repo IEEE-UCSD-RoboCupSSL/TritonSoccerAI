@@ -27,6 +27,11 @@ public class AsyncProcedure {
         }
     }
 
+    public void reset() {
+        futureTask = null;
+        task = null;
+    }
+
     public boolean isCompleted() {
         if(futureTask == null) return false;
         return futureTask.isDone();

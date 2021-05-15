@@ -17,7 +17,7 @@ public abstract class Subscriber<T> {
             channel = MsgChannel.getChannel(topicName, msgName);
         } while (channel == null);
         subscriptionFlag = true;
-        return true;
+        return true; // meaningless return, just ignore it
     }
 
     public boolean subscribe(long timeout) throws TimeoutException {

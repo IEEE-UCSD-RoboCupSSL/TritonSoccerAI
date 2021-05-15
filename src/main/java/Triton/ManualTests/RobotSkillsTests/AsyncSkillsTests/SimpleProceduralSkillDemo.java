@@ -53,27 +53,33 @@ public class SimpleProceduralSkillDemo {
         while(!quit) {
 
             /* example main thread job */
-            if(botA.isProcedureCompleted()) {
+
+            if(!botA.isProcedureCompleted()) {
+                botA.executeProceduralTask(taskA);
+            } else {
                 if(botA.isProcedureCancelled()) {
                     System.out.println("TaskA Interrupted and Canceled! :(");
                 } else {
-                    System.out.println("Procedural TaskA Completed! :)");
+                   System.out.println("Procedural TaskA Completed! :)");
                 }
+                botA.resetProceduralTask();
             }
-            botA.executeProceduralTask(taskA);
 
 
-            if(botB.isProcedureCompleted()) {
+            if(!botB.isProcedureCompleted()) {
+                botB.executeProceduralTask(taskB);
+            } else {
                 if(botB.isProcedureCancelled()) {
                     System.out.println("TaskB Interrupted and Canceled! :(");
                 } else {
                     System.out.println("Procedural TaskB Completed! :)");
                 }
+                botB.resetProceduralTask();
             }
-            botB.executeProceduralTask(taskB);
+
 
             for(Ally bot : fielders) {
-                if(bot != botA || bot != botB) { // rest of bots
+                if(bot != botA && bot != botB) { // rest of bots
                     bot.spinAt(15);
                     bot.moveAt(new Vec2D(0,0));
                 }
@@ -189,7 +195,8 @@ public class SimpleProceduralSkillDemo {
                 try { Thread.sleep(1); } catch (InterruptedException e) { return false; }
             }
 
-            Thread.sleep(500);
+            thisRobot.stop();
+            Thread.sleep(50);
 
             Vec2D toCenter = new Vec2D(0, 0).sub(ball.getPos());
             while(!thisRobot.isDirAimed(toCenter.toPlayerAngle())) {
@@ -199,8 +206,9 @@ public class SimpleProceduralSkillDemo {
             }
 
             thisRobot.stop();
-            Thread.sleep(300);
-            thisRobot.kick(new Vec2D(2, 3));
+            thisRobot.kick(new Vec2D(2.5, 2.5));
+            Thread.sleep(50);
+            thisRobot.stop();
 
             return true;
         }

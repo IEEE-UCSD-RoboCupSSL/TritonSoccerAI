@@ -110,8 +110,13 @@ public class Ally extends Robot implements AllySkills {
 
 
     /*** Allow robot to run a parallel procedural task asynchronously ***/
+    // To-do: lock all exe method when in procedural mode
     synchronized public void executeProceduralTask(ProceduralTask task) {
         asyncProcedure.execute(this, task);
+    }
+
+    synchronized public void resetProceduralTask() {
+        asyncProcedure.reset();
     }
 
     synchronized public boolean isProcedureCompleted() {

@@ -15,11 +15,16 @@ public class MsgChannel<T> {
     private T msg;
     private ArrayList<BlockingQueue<T>> queues;
 
-    public MsgChannel(String topicName, String msgName) {
+
+    public static class ChannelAlreadyRegisteredException extends Exception {
+        public ChannelAlreadyRegisteredException() {super();}
+    }
+
+
+    public MsgChannel(String topicName, String msgName) throws ChannelAlreadyRegisteredException {
         channelName = topicName + msgName;
         if (channels.containsKey(channelName)) {
-            System.out.println(channelName);
-            return;
+            throw new ChannelAlreadyRegisteredException();
         }
 
         lock = new ReentrantReadWriteLock();
