@@ -1,5 +1,8 @@
 package Triton.Misc.ModulePubSubSystem;
 
+import lombok.Data;
+
+@Data
 public class FieldPubSubPair<T> {
 
     public final FieldPublisher<T> pub;
