@@ -2,17 +2,14 @@ package Triton.CoreModules.Robot.ProceduralSkills.Dependency;
 
 import Triton.CoreModules.Robot.Ally;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 public class AsyncProcedure {
-    final private ThreadPoolExecutor threadPool;
+    final private ExecutorService threadPool;
     private FutureTask<Boolean> futureTask = null;
     ProceduralTask task = null;
 
-    public AsyncProcedure(ThreadPoolExecutor threadPool) {
+    public AsyncProcedure(ExecutorService threadPool) {
         this.threadPool = threadPool;
     }
 

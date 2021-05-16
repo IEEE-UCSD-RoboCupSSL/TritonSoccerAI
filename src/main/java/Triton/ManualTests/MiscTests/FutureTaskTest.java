@@ -6,18 +6,15 @@ import Triton.Misc.PeriodicTask;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class FutureTaskTest {
 
     private double val = 0.0;
 
-    ThreadPoolExecutor threadPool;
-    public FutureTaskTest(ThreadPoolExecutor threadPool) {
+    ExecutorService threadPool;
+    public FutureTaskTest(ExecutorService threadPool) {
         this.threadPool = threadPool;
     }
 

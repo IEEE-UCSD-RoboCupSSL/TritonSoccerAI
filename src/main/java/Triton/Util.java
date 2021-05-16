@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.channels.DatagramChannel;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 
 public final class Util {
 
@@ -56,6 +57,19 @@ public final class Util {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    /**
+     *  Convert frequency in Hz to period of given Unit
+     *
+     *  Side Note: ScheduledThreadPoolExecutor.schedule is of nano second precision
+     */
+    public static long toPeriod(double freqInHz, TimeUnit unit) {
+
+        long periodInNanos = (long)(1e9 / freqInHz);
+
+        return unit.convert(periodInNanos, TimeUnit.NANOSECONDS);
     }
 
 }

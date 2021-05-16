@@ -20,6 +20,7 @@ import Triton.PeriphModules.Detection.RobotData;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -51,7 +52,7 @@ public class Ally extends Robot implements AllySkills {
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
-    protected ThreadPoolExecutor threadPool;
+    protected ExecutorService threadPool;
     private PathFinder pathFinder;
 
     private boolean prevHoldBallStatus = false;

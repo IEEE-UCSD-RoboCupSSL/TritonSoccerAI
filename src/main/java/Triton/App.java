@@ -5,6 +5,7 @@ import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.MiscTests.FutureTaskTest;
+import Triton.ManualTests.MiscTests.PubSubTests;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
@@ -14,9 +15,7 @@ import Triton.PeriphModules.Vision.GrSimVisionModule;
 
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
@@ -30,13 +29,17 @@ import static Triton.CoreModules.Robot.Team.BLUE;
 public class App {
 
     /* declare a global threadpool*/
-    public static ThreadPoolExecutor threadPool;
+    public static ScheduledExecutorService threadPool;
 
 
     static {
         /* Prepare a Thread Pool*/
+        /*
         threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS, 0,
-                TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+                TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>()) {
+        };*/
+
+        threadPool = new ScheduledThreadPoolExecutor(TOTAL_THREADS);
     }
 
     public static void main(String[] args) {
@@ -180,6 +183,8 @@ public class App {
                     }
 
                     case "futask" -> rtn = new FutureTaskTest(threadPool).test();
+
+                    case "pubsub" -> rtn = new PubSubTests(threadPool, scanner).test();
 
                     case "quit" -> {
                         quit = true;

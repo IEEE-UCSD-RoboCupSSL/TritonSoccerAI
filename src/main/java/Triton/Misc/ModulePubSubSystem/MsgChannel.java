@@ -2,7 +2,6 @@ package Triton.Misc.ModulePubSubSystem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -13,7 +12,7 @@ public class MsgChannel<T> {
     private final String channelName;
     private ReadWriteLock lock;
     private T msg;
-    private ArrayList<BlockingQueue<T>> queues;
+    private ArrayList<BlockingQueue<T>> queueList;
 
 
     public static class ChannelAlreadyRegisteredException extends Exception {
@@ -28,7 +27,7 @@ public class MsgChannel<T> {
         }
 
         lock = new ReentrantReadWriteLock();
-        queues = new ArrayList<>();
+        queueList = new ArrayList<>();
         channels.put(channelName, this);
     }
 
@@ -41,7 +40,7 @@ public class MsgChannel<T> {
     public void addMsgQueue(BlockingQueue<T> queue) {
         lock.writeLock().lock();
         try {
-            queues.add(queue);
+            queueList.add(queue);
         } finally {
             lock.writeLock().unlock();
         }
@@ -68,7 +67,7 @@ public class MsgChannel<T> {
     public void addMsg(T msg) {
         lock.writeLock().lock();
         try {
-            for (BlockingQueue<T> queue : queues) {
+            for (BlockingQueue<T> queue : queueList) {
                 try {
                     queue.put(msg);
                 } catch (InterruptedException e) {
@@ -83,7 +82,7 @@ public class MsgChannel<T> {
     public void addMsg(T msg, long timeout_ms) {
         lock.writeLock().lock();
         try {
-            for (BlockingQueue<T> queue : queues) {
+            for (BlockingQueue<T> queue : queueList) {
                 try {
                     queue.offer(msg, timeout_ms, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
@@ -96,15 +95,15 @@ public class MsgChannel<T> {
     }
 
     public boolean isAnyQueueFull() {
-        for (BlockingQueue<T> queue : queues) {
-            if (queue.remainingCapacity() == 0) {
+        for (BlockingQueue<T> queue : queueList) {
+            if (queue.remainingCapacity() <= 0) {
                 return true;
             }
         }
         return false;
     }
 
-    public ArrayList<BlockingQueue<T>> getQueues() {
-        return queues;
+    public ArrayList<BlockingQueue<T>> getQueueList() {
+        return queueList;
     }
 }
