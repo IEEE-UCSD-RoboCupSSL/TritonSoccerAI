@@ -76,7 +76,7 @@ public class App {
                             /* PeriphTest Mode */
                             case "N" -> {
                                 System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                                runPeriphMiscTest(scanner);
+                                runPeriphMiscTest();
                                 toRunTest = true;
                             }
                             default -> System.out.println("Invalid Input");

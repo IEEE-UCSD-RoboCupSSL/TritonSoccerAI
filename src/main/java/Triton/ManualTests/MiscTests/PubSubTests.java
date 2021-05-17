@@ -1,21 +1,21 @@
 package Triton.ManualTests.MiscTests;
 
+import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Util;
 
 import java.util.Scanner;
 import java.util.concurrent.*;
 
-public class PubSubTests {
+public class PubSubTests implements TritonTestable {
     ScheduledExecutorService threadPool;
-    Scanner scanner;
 
-    public PubSubTests(ScheduledExecutorService threadPool, Scanner scanner) {
+    public PubSubTests(ScheduledExecutorService threadPool) {
         this.threadPool = threadPool;
-        this.scanner = scanner;
     }
 
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
 
         boolean quit = false;
         String cmd;

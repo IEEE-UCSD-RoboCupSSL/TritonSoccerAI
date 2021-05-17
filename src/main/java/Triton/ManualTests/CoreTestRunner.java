@@ -4,24 +4,6 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.AI_SkillsTests.CPassTest;
-import Triton.ManualTests.AI_SkillsTests.DodgingTest;
-import Triton.ManualTests.AI_SkillsTests.GroupToTest;
-import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
-import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
-import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
-import Triton.ManualTests.EstimatorTests.GapFinderTest;
-import Triton.ManualTests.EstimatorTests.PassFinderTest;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
-import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
-import Triton.ManualTests.RobotSkillsTests.*;
-import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
-import Triton.Misc.Math.Matrix.Mat2D;
-import Triton.Misc.Math.Matrix.Vec2D;
-import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.util.Optional;
 import java.util.Scanner;
@@ -32,7 +14,7 @@ public class CoreTestRunner {
         Scanner scanner = new Scanner(System.in);
         try {
             Thread.sleep(1000);
-            TestFactory testFactory = new TestFactory(fielders, keeper, foes, ball);
+            CoreTestFactory testFactory = new CoreTestFactory(fielders, keeper, foes, ball);
 
             TritonTestable defaultFormation = testFactory.getTest("defaultFormation");
             Optional<TritonTestable> defaultFormation1 = Optional.of(defaultFormation);
