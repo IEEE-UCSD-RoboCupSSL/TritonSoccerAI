@@ -34,10 +34,6 @@ public class GapFinder extends ProbFinder {
     protected double responseRange = 1000.0;
     protected double interceptRange = 500.0;
 
-    protected ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
-    protected ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();
-
-    protected RWLockee<Vec2D> ballPosWrapper;
     protected RWLockee<double[][]> pmfWrapper = new RWLockee<>(null);
     protected RWLockee<Vec2D[][]> localMaxPosWrapper = new RWLockee<>(null);
     protected RWLockee<double[][]> localMaxScoreWrapper = new RWLockee<>(null);
