@@ -11,8 +11,9 @@ public class Formation {
 
    static public void printAvailableFormations(){
         int count = 0;
+        System.out.println("Available Formations:");
         for (String s : preset.keySet()) {
-            System.out.printf("%d. %s", count++, s);
+            System.out.printf("%d. %s \n", count++, s);
         }
     }
 
