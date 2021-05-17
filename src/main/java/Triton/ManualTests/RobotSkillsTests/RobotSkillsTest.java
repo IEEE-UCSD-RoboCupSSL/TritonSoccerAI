@@ -1,5 +1,8 @@
 package Triton.ManualTests.RobotSkillsTests;
 
-public abstract class RobotSkillsTest {
-    public abstract boolean test();
+import Triton.ManualTests.TritonTestable;
+import lombok.Data;
+
+@Data
+public abstract class RobotSkillsTest implements TritonTestable {
 }

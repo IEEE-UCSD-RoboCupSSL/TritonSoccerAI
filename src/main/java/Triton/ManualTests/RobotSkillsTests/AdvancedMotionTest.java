@@ -2,21 +2,19 @@ package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Robot.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Scanner;
 
 
+@AllArgsConstructor
 public class AdvancedMotionTest extends RobotSkillsTest {
-    Ally bot;
-    Scanner scanner;
-
-    public AdvancedMotionTest(Scanner scanner, Ally bot) {
-        this.scanner = scanner;
-        this.bot = bot;
-    }
+    private Ally bot;
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         try {
             boolean toQuit = false;
             while (!toQuit) {

@@ -128,7 +128,7 @@ public class App {
 
         if (toRunTest) {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            threadPool.submit(new TestRunner(scanner, allies, goalKeeper, foes, ball));
+            threadPool.submit(new TestRunner(allies, goalKeeper, foes, ball));
         } else {
             /* Run the actual game program */
 

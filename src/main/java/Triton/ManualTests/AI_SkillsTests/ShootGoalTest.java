@@ -22,15 +22,13 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.CoreModules.Robot.Team.BLUE;
 
 public class ShootGoalTest extends RobotSkillsTest {
-    Scanner scanner;
     Ally shooter;
     RobotList<Foe> foes;
     Ball ball;
 
     ShootGoal shootGoal;
 
-    public ShootGoalTest(Scanner scanner, Ally shooter, RobotList<Foe> foes, Ball ball) {
-        this.scanner = scanner;
+    public ShootGoalTest(Ally shooter, RobotList<Foe> foes, Ball ball) {
         this.shooter = shooter;
         this.foes = foes;
         this.ball = ball;
@@ -40,6 +38,7 @@ public class ShootGoalTest extends RobotSkillsTest {
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         try {
             while (true) {
                 if  (!shooter.isHoldingBall()) {

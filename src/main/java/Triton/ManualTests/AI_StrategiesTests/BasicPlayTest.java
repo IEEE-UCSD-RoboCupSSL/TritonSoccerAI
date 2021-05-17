@@ -1,15 +1,15 @@
 package Triton.ManualTests.AI_StrategiesTests;
 
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
-import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 
-public class BasicPlayTest {
+public class BasicPlayTest implements TritonTestable {
     private final GapFinder gapFinder;
     private final PassFinder passFinder;
     BasicPlay basicPlay;
