@@ -1,8 +1,13 @@
 package Triton.CoreModules.Robot;
 
 import Triton.App;
+import Triton.Config.ModuleFreqConfig;
+import Triton.PeriphModules.Vision.OldGrSimVisionModule;
+import Triton.Util;
 
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class RobotList<T> extends ArrayList<T> {
 
@@ -24,7 +29,9 @@ public class RobotList<T> extends ArrayList<T> {
     public void runAll() {
         for (T bot : this) {
             if (bot instanceof Robot) {
-                App.threadPool.submit((Robot) bot);
+                ScheduledFuture<?> robotFuture = App.threadPool.scheduleAtFixedRate((Robot) bot,
+                        0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
             } else {
                 System.out.println("Invalid Type");
             }

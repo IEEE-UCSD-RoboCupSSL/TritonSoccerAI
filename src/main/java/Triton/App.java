@@ -4,12 +4,7 @@ import Triton.Config.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
-import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
-import Triton.ManualTests.TestRunner;
-import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.ManualTests.CoreTestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
@@ -26,6 +21,7 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
+import static Triton.ManualTests.PeriphTestRunner.runPeriphMiscTest;
 import static Triton.PeriphModules.Display.PaintOption.GEOMETRY;
 import static Triton.PeriphModules.Display.PaintOption.OBJECTS;
 
@@ -120,24 +116,25 @@ public class App {
             e.printStackTrace();
         }
 
-        /* Instantiate & run Ball module*/
         Ball ball = new Ball();
-        threadPool.submit(ball);
+        ball.subscribe();
 
-        RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
+        RobotList<Ally> fielders = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
         Ally goalKeeper = RobotFactory.createGoalKeeperBot();
         RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT);
-        if (allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
+        if (fielders.connectAll() == ObjectConfig.ROBOT_COUNT - 1
                 && goalKeeper.connect()) {
-            allies.runAll();
-            threadPool.submit(goalKeeper);
+            fielders.runAll();
+
+            ScheduledFuture<?> goalKeeperFuture = App.threadPool.scheduleAtFixedRate(goalKeeper,
+                    0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
         }
         foes.runAll(); // submit all to threadPool
 
 
         if (toRunTest) {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            threadPool.submit(new TestRunner(scanner, allies, goalKeeper, foes, ball));
+            CoreTestRunner.runCoreTest(scanner, fielders, goalKeeper, foes, ball);
         } else {
             /* Run the actual game program */
 
@@ -150,7 +147,7 @@ public class App {
                     0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+            threadPool.submit(new AI(fielders, goalKeeper, foes, ball, gameCtrlModule));
         }
 
 
@@ -163,7 +160,7 @@ public class App {
 //        paintOptions.add(PREDICTION);
         display.setPaintOptions(paintOptions);
 
-        ScheduledFuture<?> future = App.threadPool.scheduleAtFixedRate(display,
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
                 0,
                 Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
                 TimeUnit.NANOSECONDS);
@@ -189,50 +186,6 @@ public class App {
             }
         }
     }
-
-    private static void runPeriphMiscTest(Scanner scanner) {
-        boolean quit = false;
-        String prevTestName = "";
-        while (!quit) {
-            System.out.println(">> ENTER TEST NAME:");
-            String testName = scanner.nextLine();
-            boolean rtn = false;
-            int repeat = 0;
-            do {
-                switch (testName) {
-                    case "sayhi" -> {
-                        System.out.println("Hi!");
-                        rtn = true;
-                    }
-
-                    case "futask" -> rtn = new FutureTaskTest(threadPool).test();
-
-                    case "pubsub" -> rtn = new PubSubTests(threadPool, scanner).test();
-
-                    case "grsimvision" -> rtn = new OldGrsimVisionModuleTest().test();
-
-                    case "SSL" -> rtn = new SSLGameCtrlModuleTest().test();
-
-                    case "quit" -> {
-                        quit = true;
-                        rtn = true;
-                    }
-                    case "" -> {
-                        repeat++;
-                        testName = prevTestName;
-                    }
-                    default -> System.out.println("Invalid Test Name");
-                }
-            } while (repeat-- > 0);
-            repeat = 0;
-            prevTestName = testName;
-            if(!quit) System.out.println(rtn ? "Test Success" : "Test Fail");
-        }
-
-        System.out.println("PeriphTest Ended");
-        System.out.println("Automatically run CoreTest TestRunner next\n");
-    }
-
 }
 
 

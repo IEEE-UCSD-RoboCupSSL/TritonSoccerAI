@@ -13,6 +13,10 @@ import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
+import Triton.ManualTests.MiscTests.FutureTaskTest;
+import Triton.ManualTests.MiscTests.PubSubTests;
+import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
+import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
 import Triton.Misc.Math.Matrix.Mat2D;
@@ -21,28 +25,8 @@ import Triton.Misc.ModulePubSubSystem.Module;
 
 import java.util.Scanner;
 
-public class TestRunner implements Module {
-
-    private final Scanner scanner;
-    private final RobotList<Ally> fielders;
-    private final Ally keeper;
-    private final RobotList<Foe> foes;
-    private final Ball ball;
-
-    private String testName;
-
-    public TestRunner(Scanner scanner, RobotList<Ally> fielders,
-                      Ally keeper, RobotList<Foe> foes, Ball ball) {
-        this.fielders = fielders;
-        this.keeper = keeper;
-        this.foes = foes;
-        this.ball = ball;
-
-        this.scanner = scanner;
-    }
-
-    @Override
-    public void run() {
+public class CoreTestRunner {
+    public static void runCoreTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         try {
             Thread.sleep(1000);
             new FormationTest("tester", fielders).test();
@@ -51,7 +35,7 @@ public class TestRunner implements Module {
             boolean quit = false;
             while (!quit) {
                 System.out.println(">> ENTER TEST NAME:");
-                testName = scanner.nextLine();
+                String testName = scanner.nextLine();
                 boolean rtn = false;
                 int repeat = 0;
                 do {
@@ -99,19 +83,6 @@ public class TestRunner implements Module {
             e.printStackTrace();
         }
 
-
         System.out.println("CoreTest TestRunner Ended, Enter Ctrl+C to Exit");
     }
-
-
-//    private void miscMathTests() {
-//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(1, 0)));
-//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, 1)));
-//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(-1, 0)));
-//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(0, -1)));
-//
-//        System.out.println(Mat2D.rotation(90).mult(new Vec2D(10, 10)));
-//    }
-
-
 }

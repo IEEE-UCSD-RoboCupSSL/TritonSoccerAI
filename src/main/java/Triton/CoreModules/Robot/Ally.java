@@ -2,6 +2,7 @@ package Triton.CoreModules.Robot;
 
 import Proto.RemoteAPI;
 import Triton.App;
+import Triton.Config.ModuleFreqConfig;
 import Triton.Config.ObjectConfig;
 import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -16,13 +17,11 @@ import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
+import Triton.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
 import static Triton.Config.GeometryConfig.*;
@@ -56,6 +55,7 @@ public class Ally extends Robot implements AllySkills {
     private PathFinder pathFinder;
 
     private boolean prevHoldBallStatus = false;
+    private boolean isFirstRun = true;
 
     private AsyncProcedure asyncProcedure = null;
 
@@ -733,52 +733,61 @@ public class Ally extends Robot implements AllySkills {
     // Everything in run() runs in the Ally Thread
     @Override
     public void run() {
-        try {
-            subscribe();
-            super.run();
-            pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH);
+        if (isFirstRun) {
+            try {
+                subscribe();
+                super.run();
+                pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH);
 
-            threadPool.submit(conn.getTCPConnection());
-            threadPool.submit(conn.getTCPConnection().getSendTCP());
-            threadPool.submit(conn.getTCPConnection().getReceiveTCP());
-            threadPool.submit(conn.getUDPStream());
+                ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getSendTCP(),
+                        0,
+                        Util.toPeriod(ModuleFreqConfig.TCP_CONNECTION_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
 
-            conn.getTCPConnection().sendInit();
+                ScheduledFuture<?> receiveTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getReceiveTCP(),
+                        0,
+                        Util.toPeriod(ModuleFreqConfig.TCP_CONNECTION_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
 
-            while (true) { // delay added
-                RemoteAPI.CommandData command;
-                MotionState state = stateSub.getMsg();
+                ScheduledFuture<?> UDPFuture = App.threadPool.scheduleAtFixedRate(conn.getUDPStream(),
+                        0,
+                        Util.toPeriod(ModuleFreqConfig.UDP_STREAM_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
 
-                switch (state) {
-                    case MOVE_TDRD -> command = createTDRDCmd();
-                    case MOVE_TDRV -> command = createTDRVCmd();
-                    case MOVE_TVRD -> command = createTVRDCmd();
-                    case MOVE_TVRV -> command = createTVRVCmd();
-                    case MOVE_NSTDRD -> command = createNSTDRDCmd();
-                    case MOVE_NSTDRV -> command = createNSTDRVCmd();
-                    case AUTO_CAPTURE -> command = createAutoCapCmd();
-                    default -> {
-                        command = createTVRVCmd();
-                    }
-                }
-                commandsPub.publish(command);
-
-                boolean isHolding = isHoldingBall();
-                if (isHolding != prevHoldBallStatus) {
-                    if (isHolding) {
-                        holdBallPosPub.publish(getPos());
-                    } else {
-                        holdBallPosPub.publish(null);
-                    }
-                }
-                prevHoldBallStatus = isHoldingBall();
-
-                // avoid starving other threads
-                Thread.sleep(1);
+                conn.getTCPConnection().sendInit();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            isFirstRun = false;
         }
+
+        RemoteAPI.CommandData command;
+        MotionState state = stateSub.getMsg();
+
+        switch (state) {
+            case MOVE_TDRD -> command = createTDRDCmd();
+            case MOVE_TDRV -> command = createTDRVCmd();
+            case MOVE_TVRD -> command = createTVRDCmd();
+            case MOVE_TVRV -> command = createTVRVCmd();
+            case MOVE_NSTDRD -> command = createNSTDRDCmd();
+            case MOVE_NSTDRV -> command = createNSTDRVCmd();
+            case AUTO_CAPTURE -> command = createAutoCapCmd();
+            default -> {
+                command = createTVRVCmd();
+            }
+        }
+        commandsPub.publish(command);
+
+        boolean isHolding = isHoldingBall();
+        if (isHolding != prevHoldBallStatus) {
+            if (isHolding) {
+                holdBallPosPub.publish(getPos());
+            } else {
+                holdBallPosPub.publish(null);
+            }
+        }
+        prevHoldBallStatus = isHoldingBall();
     }
 
     @Override

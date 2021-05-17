@@ -26,6 +26,8 @@ public class RobotUDPStream implements Module {
     private final Subscriber<RobotData> allySub;
     private final Subscriber<BallData> ballSub;
 
+    private boolean isFirstRun = true;
+
     /**
      * Constructs a UDP stream
      *
@@ -51,16 +53,12 @@ public class RobotUDPStream implements Module {
 
     @Override
     public void run() {
-        subscribe();
-        while (true) { // delay added
-            sendData();
-
-            try { // avoid starving other threads
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (isFirstRun) {
+            subscribe();
+            isFirstRun = false;
         }
+
+        sendData();
     }
 
     /**

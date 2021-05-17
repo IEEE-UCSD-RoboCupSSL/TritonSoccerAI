@@ -14,7 +14,7 @@ import java.net.Socket;
 /**
  * TCP connection to robot
  */
-public class RobotTCPConnection implements Module {
+public class RobotTCPConnection {
     private final String ip;
     private final int port;
     private final int ID;
@@ -93,17 +93,6 @@ public class RobotTCPConnection implements Module {
     private void subscribe() {
         try {
             allySub.subscribe(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            while (true) { // delay added
-                Thread.sleep(1000);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
