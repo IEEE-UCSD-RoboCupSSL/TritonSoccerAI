@@ -23,61 +23,49 @@ import Triton.Misc.Math.Matrix.Mat2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 
+import java.util.Optional;
 import java.util.Scanner;
 
+
 public class CoreTestRunner {
-    public static void runCoreTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public static void runCoreTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+        Scanner scanner = new Scanner(System.in);
         try {
             Thread.sleep(1000);
-            new FormationTest("tester", fielders).test();
+            TestFactory testFactory = new TestFactory(fielders, keeper, foes, ball);
+
+            TritonTestable defaultFormation = testFactory.getTest("defaultFormation");
+            Optional<TritonTestable> defaultFormation1 = Optional.of(defaultFormation);
+            defaultFormation1.get().test();
 
             String prevTestName = "";
-            boolean quit = false;
-            while (!quit) {
+
+            while (true) {
+                boolean result = false;
+
+                testFactory.printAvailableTestNames();
                 System.out.println(">> ENTER TEST NAME:");
                 String testName = scanner.nextLine();
-                boolean rtn = false;
-                int repeat = 0;
-                do {
-                    switch (testName) {
-                        case "pmotion" -> rtn = new PrimitiveMotionTest(scanner, fielders.get(3)).test();
-                        case "amotion" -> rtn = new AdvancedMotionTest(scanner, fielders.get(1)).test();
-                        case "getball" -> rtn = new GetBallTest(scanner, fielders.get(3), ball).test();
-                        case "kick" -> rtn = new KickTest(scanner, fielders.get(3), ball).test();
-                        case "misc" -> rtn = new MiscTest(scanner, fielders.get(3), ball).test();
-                        case "cpass" -> rtn = new CPassTest(scanner, fielders, keeper, foes, ball).test();
-                        case "group" -> rtn = new GroupToTest(scanner, fielders, ball).test();
-                        case "drib" -> rtn = new DribBallTest(scanner, fielders.get(1), ball).test();
-                        case "vel" -> rtn = new VelTest(scanner, fielders.get(0)).test();
-                        case "inter" -> rtn = new DynamicInterceptBallTest(scanner, fielders.get(1), ball).test();
-                        case "collect" -> rtn = new DataCollector(scanner, fielders, keeper, ball).test();
-                        case "reset" -> rtn = new FormationTest("tester", fielders).test();
-                        case "formation" -> rtn = new FormationTest(scanner, fielders, keeper).test();
-                        case "gap" -> rtn = new GapFinderTest(fielders, foes, ball).test();
-                        case "pass" -> rtn = new PassFinderTest(scanner, fielders, foes, ball).test();
-                        case "gapgetball" -> rtn = new GapGetBallTest(fielders, keeper, foes, ball).test();
-                        case "shoot" -> rtn = new ShootGoalTest(scanner, fielders.get(0), foes, ball).test();
-                        case "keep" -> rtn = new KeeperTest(fielders, keeper, foes, ball).test();
-                        case "defendA" -> rtn = new DefendPlanATest(fielders, keeper, foes, ball).test();
-                        case "dodge" -> rtn = new DodgingTest(fielders, keeper, foes, ball).test();
-                        case "holdballpos" -> rtn = new HoldBallPosTest(fielders.get(3), ball).test();
-                        case "basicplay" -> rtn = new BasicPlayTest(fielders, keeper, foes, ball).test();
-                        case "capDetect" -> rtn = new CapDetectionTest(scanner, fielders.get(3), ball).test();
-                        case "spsdemo" -> rtn = new SimpleProceduralSkillDemo(scanner, fielders, ball).test();
-                        case "quit" -> {
-                            quit = true;
-                            rtn = true;
-                        }
-                        case "" -> {
-                            repeat++;
-                            testName = prevTestName;
-                        }
-                        default -> System.out.println("Invalid Test Name");
-                    }
-                } while (repeat-- > 0);
-                repeat = 0;
+
+
+                if (testName.equals("")) {
+                    testName = prevTestName;
+                } else if (testName.equals("quit")) {
+                    break;
+                }
+
+                TritonTestable test = testFactory.getTest(testName);
+                Optional<TritonTestable> test1 = Optional.ofNullable(test);
+
+                if (test1.isEmpty()) {
+                    System.out.println("Invalid Test Name");
+                    continue;
+                } else {
+                    result = test1.get().test();
+                }
+
                 prevTestName = testName;
-                if(!quit) System.out.println(rtn ? "Test Success" : "Test Fail");
+                System.out.println(result ? "Test Success" : "Test Fail");
             }
         } catch (Exception e) {
             e.printStackTrace();

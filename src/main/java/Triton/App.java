@@ -134,7 +134,9 @@ public class App {
 
         if (toRunTest) {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            CoreTestRunner.runCoreTest(scanner, fielders, goalKeeper, foes, ball);
+
+            CoreTestRunner.runCoreTest(fielders, goalKeeper, foes, ball);
+
         } else {
             /* Run the actual game program */
 
