@@ -4,6 +4,8 @@ import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.MQPubSubPair;
 import Triton.Util;
+import lombok.Synchronized;
+import lombok.extern.log4j.Log4j;
 
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -192,6 +194,12 @@ public class PubSubTests implements TritonTestable {
 
     /*** Sync/EmptyFullBlocking/MessageQueue PubSub ***/
 
+    private static  void safePrintln(String s){
+        synchronized (System.out){
+            System.out.println(s);
+        }
+    }
+
     private boolean syncOnePubToOneSub(int queueSize) {
         final MQPubSubPair<String> xxxPubSub =
                 new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
@@ -206,7 +214,7 @@ public class PubSubTests implements TritonTestable {
 
         // ThreadB - subscribed to xxxPubSub
         ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.sub.getMsg());
+            safePrintln(xxxPubSub.sub.getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         try {
@@ -217,15 +225,19 @@ public class PubSubTests implements TritonTestable {
 
         threadAFuture.cancel(false);
         threadBFuture.cancel(false);
+        System.out.println("Sync 1-1 Now returning");
+
         return true;
     }
 
 
     private boolean syncOnePubToManySub(int queueSize) {
+        System.out.println("Sync 1-m Now running");
         final MQPubSubPair<String> xxxPubSub =
                 new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
+
 
         // Thread A - publishing to xxxPubSub
         ScheduledFuture<?> threadAFuture = threadPool.scheduleAtFixedRate(()->{
@@ -234,12 +246,12 @@ public class PubSubTests implements TritonTestable {
 
         // ThreadB - subscribed to xxxPubSub
         ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.getSub().getMsg());
+            safePrintln(xxxPubSub.getSub().getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         // ThreadC - subscribed to xxxPubSub
         ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.getSub().getMsg());
+            safePrintln(xxxPubSub.getSub().getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         try {
@@ -251,6 +263,8 @@ public class PubSubTests implements TritonTestable {
         threadAFuture.cancel(false);
         threadBFuture.cancel(false);
         threadCFuture.cancel(false);
+        System.out.println("Sync 1-m Now returning");
+
         return true;
 
     }
@@ -274,7 +288,7 @@ public class PubSubTests implements TritonTestable {
 
         // ThreadC - subscribed to xxxPubSub
         ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.getSub().getMsg());
+            safePrintln(xxxPubSub.getSub().getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         try {
@@ -286,6 +300,8 @@ public class PubSubTests implements TritonTestable {
         threadAFuture.cancel(false);
         threadBFuture.cancel(false);
         threadCFuture.cancel(false);
+        System.out.println("Sync m-1 Now returning");
+
         return true;
     }
 
@@ -308,12 +324,12 @@ public class PubSubTests implements TritonTestable {
 
         // ThreadC - subscribed to xxxPubSub
         ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.getSub().getMsg());
+            safePrintln(xxxPubSub.getSub().getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         // ThreadD - subscribed to xxxPubSub
         ScheduledFuture<?> threadDFuture = threadPool.scheduleAtFixedRate(()->{
-            System.out.println(xxxPubSub.getSub().getMsg());
+            safePrintln(xxxPubSub.getSub().getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         try {
@@ -326,6 +342,8 @@ public class PubSubTests implements TritonTestable {
         threadBFuture.cancel(false);
         threadCFuture.cancel(false);
         threadDFuture.cancel(false);
+        System.out.println("Sync m-m Now returning");
+
         return true;
     }
 
