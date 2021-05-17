@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.AI_Skills;
 
 import Triton.Config.ObjectConfig;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;

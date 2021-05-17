@@ -1,20 +1,18 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Scanner;
 
+@AllArgsConstructor
 public class HoldBallPosTest extends RobotSkillsTest {
     Ally ally;
     Ball ball;
 
-    public HoldBallPosTest(Ally ally, Ball ball) {
-
-        this.ally = ally;
-        this.ball = ball;
-    }
 
     @Override
     public boolean test() {

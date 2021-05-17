@@ -2,8 +2,8 @@ package Triton.CoreModules.AI.Estimators;
 
 import Triton.CoreModules.AI.Estimators.Scores.*;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.RWLockee;
@@ -35,7 +35,7 @@ public class PassFinder extends GapFinder {
 
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
-                     int resolutionStepSize, int evalWindowSize) {
+                      int resolutionStepSize, int evalWindowSize) {
         super(fielders, foes, ball, resolutionStepSize, evalWindowSize);
     }
 

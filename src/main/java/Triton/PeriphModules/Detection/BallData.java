@@ -6,12 +6,20 @@ import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 
 /**
  * Class to store information about the ball
  */
 public class BallData {
+    private static class TimePairComparator<T> implements Comparator<Pair<T, Double>> {
+        @Override
+        public int compare(Pair<T, Double> o1, Pair<T, Double> o2) {
+            return Double.compare(o1.getValue1(), o2.getValue1());
+        }
+    }
+
     private final LinkedList<Pair<Vec2D, Double>> posList;
     private Vec2D pos, vel;
     private double time;
@@ -23,6 +31,18 @@ public class BallData {
         pos = new Vec2D(0, 0);
         vel = new Vec2D(0, 0);
         time = 0.0;
+    }
+
+    public double getTime() {
+        return time;
+    }
+
+    public Vec2D getPos() {
+        return pos;
+    }
+
+    public Vec2D getVel() {
+        return vel;
     }
 
     /**
@@ -60,17 +80,5 @@ public class BallData {
         double oldestPosTime = oldestPosTimePair.getValue1();
 
         vel = newestPos.sub(oldestPos).scale(1 / (newestPosTime - oldestPosTime));
-    }
-
-    public double getTime() {
-        return time;
-    }
-
-    public Vec2D getPos() {
-        return pos;
-    }
-
-    public Vec2D getVel() {
-        return vel;
     }
 }

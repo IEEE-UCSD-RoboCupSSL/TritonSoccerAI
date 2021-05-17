@@ -1,4 +1,4 @@
-package Triton.CoreModules.Robot;
+package Triton.CoreModules.Robot.Ally;
 
 import Triton.CoreModules.Ball.Ball;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -46,7 +46,6 @@ public interface AllySkills {
 
     void strafeTo(Vec2D endPoint, double angle);
 
-    // Simutaneously rotate and translate to a position in a smooth curve
     void curveTo(Vec2D endPoint);
 
     void curveTo(Vec2D endPoint, double angle);
@@ -64,8 +63,7 @@ public interface AllySkills {
 
     void sprintTo(Vec2D endPoint, double angle);
 
-
-    /*** Soccer Skills methods ***/
+    /** Soccer Skills methods **/
     void getBall(Ball ball);
 
     boolean dribRotate(Ball ball, double angle);

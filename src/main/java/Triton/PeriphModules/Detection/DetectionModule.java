@@ -26,11 +26,13 @@ public class DetectionModule implements Module {
     private final ArrayList<Publisher<RobotData>> blueRobotPubs;
     private final Publisher<BallData> ballPub;
 
+    private boolean isFirstRun = true;
+
     /**
      * Constructs a DetectionModule
      */
     public DetectionModule() {
-        visionSub = new MQSubscriber<>("vision", "detection", 10);
+        visionSub = new MQSubscriber<>("vision", "detection");
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
@@ -54,17 +56,17 @@ public class DetectionModule implements Module {
      * Repeatedly updates detection data
      */
     public void run() {
-        try {
-            subscribe();
-
-            while (true) { // delay added
-                update(visionSub.getMsg());
-
-                Thread.sleep(1);
+        if (isFirstRun) {
+            try {
+                subscribe();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            isFirstRun = false;
         }
+
+        update(visionSub.getMsg());
     }
 
     /**

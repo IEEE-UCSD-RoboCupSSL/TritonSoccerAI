@@ -31,7 +31,7 @@ import static Triton.PeriphModules.Display.PaintOption.*;
 /**
  * Display to convey information in separate window
  */
-public class Display extends JPanel {
+public class Display extends JPanel implements Runnable {
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
@@ -87,9 +87,6 @@ public class Display extends JPanel {
         setMaximumSize(dimension);
         frame.pack();
         frame.setVisible(true);
-
-        Timer repaintTimer = new Timer();
-        repaintTimer.scheduleAtFixedRate(new RepaintTask(this), 0, DisplayConfig.UPDATE_DELAY);
     }
 
     /**
@@ -105,6 +102,11 @@ public class Display extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void run() {
+        paintImmediately(0, 0, windowWidth, windowHeight);
     }
 
     /**
@@ -279,21 +281,5 @@ public class Display extends JPanel {
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {
         this.paintOptions = paintOptions;
-    }
-
-    /**
-     * Task to call paint at set intervals
-     */
-    private static class RepaintTask extends TimerTask {
-        private final Display display;
-
-        public RepaintTask(Display display) {
-            this.display = display;
-        }
-
-        @Override
-        public void run() {
-            display.paintImmediately(0, 0, display.windowWidth, display.windowHeight);
-        }
     }
 }

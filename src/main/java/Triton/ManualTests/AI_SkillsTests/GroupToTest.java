@@ -2,7 +2,7 @@ package Triton.ManualTests.AI_SkillsTests;
 
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -11,12 +11,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GroupToTest extends RobotSkillsTest {
-    Scanner scanner;
     RobotList<Ally> allies;
     Ball ball;
 
-    public GroupToTest(Scanner scanner, RobotList<Ally> allies, Ball ball) {
-        this.scanner = scanner;
+    public GroupToTest(RobotList<Ally> allies, Ball ball) {
         //noinspection unchecked
         this.allies = (RobotList<Ally>) allies.clone();
         this.ball = ball;

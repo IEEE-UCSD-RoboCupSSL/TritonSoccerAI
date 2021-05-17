@@ -4,19 +4,19 @@ import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
 import static Triton.PeriphModules.Display.PaintOption.*;
 
-public class GapGetBallTest {
+public class GapGetBallTest implements TritonTestable {
 
     private final BasicEstimator basicEstimator;
     private final FillGapGetBall fillGapGetBall;

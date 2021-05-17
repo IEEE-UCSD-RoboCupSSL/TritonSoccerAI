@@ -8,8 +8,8 @@ import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 
 public class BasicPlay extends Strategies {

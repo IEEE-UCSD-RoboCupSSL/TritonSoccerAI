@@ -1,21 +1,20 @@
 package Triton.ManualTests.RobotSkillsTests;
 
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 
 public class VelTest extends RobotSkillsTest {
-    Scanner scanner;
     Ally ally;
 
-    public VelTest(Scanner scanner, Ally ally) {
-        this.scanner = scanner;
+    public VelTest( Ally ally) {
         this.ally = ally;
     }
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         try {
             System.out.println(">> MOVE TO WHERE?:");
             double posX = scanner.nextDouble();
@@ -35,4 +34,5 @@ public class VelTest extends RobotSkillsTest {
 
         return true;
     }
+
 }

@@ -4,15 +4,17 @@ import Triton.Config.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.TestRunner;
-import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
+import Triton.ManualTests.CoreTestRunner;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.PeriphModules.Vision.OldGrSimVisionModule;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -21,6 +23,9 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
+import static Triton.ManualTests.PeriphTestRunner.runPeriphMiscTest;
+import static Triton.PeriphModules.Display.PaintOption.GEOMETRY;
+import static Triton.PeriphModules.Display.PaintOption.OBJECTS;
 
 
 /**
@@ -73,7 +78,7 @@ public class App {
                             /* PeriphTest Mode */
                             case "N" -> {
                                 System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                                runPeriphMiscTest(scanner);
+                                runPeriphMiscTest();
                                 toRunTest = true;
                             }
                             default -> System.out.println("Invalid Input");
@@ -101,34 +106,37 @@ public class App {
         GeometryConfig.initGeo();
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        Module visionModule = new GrSimVisionModule();
-        Module detectModule = new DetectionModule();
-        threadPool.submit(visionModule);
-        threadPool.submit(detectModule);
+        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new OldGrSimVisionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.OLD_GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        /* Instantiate & run Ball module*/
         Ball ball = new Ball();
-        threadPool.submit(ball);
+        ball.subscribe();
 
-        RobotList<Ally> allies = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
+        RobotList<Ally> fielders = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
         Ally goalKeeper = RobotFactory.createGoalKeeperBot();
         RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT);
-        if (allies.connectAll() == ObjectConfig.ROBOT_COUNT - 1
+        if (fielders.connectAll() == ObjectConfig.ROBOT_COUNT - 1
                 && goalKeeper.connect()) {
-            allies.runAll();
-            threadPool.submit(goalKeeper);
+            fielders.runAll();
+
+            ScheduledFuture<?> goalKeeperFuture = App.threadPool.scheduleAtFixedRate(goalKeeper,
+                    0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
         }
         foes.runAll(); // submit all to threadPool
 
 
         if (toRunTest) {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            threadPool.submit(new TestRunner(scanner, allies, goalKeeper, foes, ball));
+            CoreTestRunner.runCoreTest(fielders, goalKeeper, foes, ball);
         } else {
             /* Run the actual game program */
 
@@ -137,21 +145,35 @@ public class App {
             GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
 //            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
 //            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-            threadPool.submit(gameCtrlModule);
+            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
+                    0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
+            threadPool.submit(new AI(fielders, goalKeeper, foes, ball, gameCtrlModule));
         }
 
 
-//        Display display = new Display();
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
-//        display.setPaintOptions(paintOptions);
+        display.setPaintOptions(paintOptions);
+
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        future.cancel(false);
 
         sleepForever();
     }
@@ -166,46 +188,6 @@ public class App {
             }
         }
     }
-
-    private static void runPeriphMiscTest(Scanner scanner) {
-        boolean quit = false;
-        String prevTestName = "";
-        while (!quit) {
-            System.out.println(">> ENTER TEST NAME:");
-            String testName = scanner.nextLine();
-            boolean rtn = false;
-            int repeat = 0;
-            do {
-                switch (testName) {
-                    case "sayhi" -> {
-                        System.out.println("Hi!");
-                        rtn = true;
-                    }
-
-                    case "futask" -> rtn = new FutureTaskTest(threadPool).test();
-
-                    case "pubsub" -> rtn = new PubSubTests(threadPool, scanner).test();
-
-                    case "quit" -> {
-                        quit = true;
-                        rtn = true;
-                    }
-                    case "" -> {
-                        repeat++;
-                        testName = prevTestName;
-                    }
-                    default -> System.out.println("Invalid Test Name");
-                }
-            } while (repeat-- > 0);
-            repeat = 0;
-            prevTestName = testName;
-            if(!quit) System.out.println(rtn ? "Test Success" : "Test Fail");
-        }
-
-        System.out.println("PeriphTest Ended");
-        System.out.println("Automatically run CoreTest TestRunner next\n");
-    }
-
 }
 
 

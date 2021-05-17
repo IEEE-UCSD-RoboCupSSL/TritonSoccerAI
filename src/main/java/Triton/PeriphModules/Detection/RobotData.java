@@ -7,12 +7,20 @@ import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import org.javatuples.Pair;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 
 /**
  * Stores data about robot object
  */
 public class RobotData {
+
+    private static class TimePairComparator<T> implements Comparator<Pair<T, Double>> {
+        @Override
+        public int compare(Pair<T, Double> o1, Pair<T, Double> o2) {
+            return Double.compare(o1.getValue1(), o2.getValue1());
+        }
+    }
 
     private final Team team;
     private final int ID;
@@ -37,6 +45,34 @@ public class RobotData {
         angle = 0.0;
         angleVel = 0.0;
         time = 0.0;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public double getTime() {
+        return time;
+    }
+
+    public Vec2D getPos() {
+        return pos;
+    }
+
+    public Vec2D getVel() {
+        return vel;
+    }
+
+    public double getDir() {
+        return angle;
+    }
+
+    public double getAngleVel() {
+        return angleVel;
     }
 
     public void update(SSL_DetectionRobot detection, double time) {
@@ -96,33 +132,5 @@ public class RobotData {
         double oldestAngleTime = oldestAngleTimePair.getValue1();
 
         angleVel = (newestAngle - oldestAngle) / (newestAngleTime - oldestAngleTime);
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public double getTime() {
-        return time;
-    }
-
-    public Vec2D getPos() {
-        return pos;
-    }
-
-    public Vec2D getVel() {
-        return vel;
-    }
-
-    public double getDir() {
-        return angle;
-    }
-
-    public double getAngleVel() {
-        return angleVel;
     }
 }

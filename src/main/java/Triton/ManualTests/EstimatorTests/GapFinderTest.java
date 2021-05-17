@@ -2,9 +2,10 @@ package Triton.ManualTests.EstimatorTests;
 
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 
 import static Triton.PeriphModules.Display.PaintOption.*;
 
-public class GapFinderTest {
+public class GapFinderTest implements TritonTestable {
 
     GapFinder gapFinder;
 

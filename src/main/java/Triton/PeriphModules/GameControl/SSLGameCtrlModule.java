@@ -17,6 +17,8 @@ public class SSLGameCtrlModule extends GameCtrlModule {
     private DatagramSocket socket;
     private DatagramPacket packet;
 
+    private boolean isFirstRun = true;
+
     public SSLGameCtrlModule() {
         super("ssl game controller");
 
@@ -31,24 +33,24 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
     @Override
     public void run() {
-        super.subscribe();
+        if (isFirstRun) {
+            super.subscribe();
+            isFirstRun = false;
+        }
 
-        while (true) {
-            try {
-                socket.receive(packet);
-                ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
-                        packet.getOffset(), packet.getLength());
+         try {
+            socket.receive(packet);
+            ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
+                    packet.getOffset(), packet.getLength());
 
-                SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
+            SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
 //                System.err.println(gcOutput);
-                parseGcOutput(gcOutput);
-            } catch (SocketTimeoutException e) {
+            parseGcOutput(gcOutput);
+        } catch (SocketTimeoutException e) {
 //                System.err.println("SSL Game Controller Multicast Timeout");
-                continue;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
         }
     }
 

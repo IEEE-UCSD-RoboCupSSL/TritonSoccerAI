@@ -1,28 +1,24 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Scanner;
 
-import static Triton.Config.ObjectConfig.*;
-import static Triton.Config.PathfinderConfig.DRIB_ROTATE_BALL_PUSH;
 import static Triton.Config.PathfinderConfig.DRIB_ROTATE_DIST;
 
+@AllArgsConstructor
 public class DribBallTest extends RobotSkillsTest {
-    Scanner scanner;
     Ally ally;
     Ball ball;
 
-    public DribBallTest(Scanner scanner, Ally ally, Ball ball) {
-        this.scanner = scanner;
-        this.ally = ally;
-        this.ball = ball;
-    }
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         System.out.println("getting ball");
 
         while (!ally.isHoldingBall()) {

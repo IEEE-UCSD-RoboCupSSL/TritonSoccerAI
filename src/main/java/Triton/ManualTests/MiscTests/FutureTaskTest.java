@@ -1,5 +1,6 @@
 package Triton.ManualTests.MiscTests;
 
+import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.PeriodicTask;
@@ -9,7 +10,7 @@ import java.util.TimerTask;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class FutureTaskTest {
+public class FutureTaskTest implements TritonTestable {
 
     private double val = 0.0;
 

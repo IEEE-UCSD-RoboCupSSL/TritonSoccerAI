@@ -6,14 +6,12 @@ import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.RobotSkillsTests.FormationTest;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
-import org.ejml.All;
 
 import java.util.ArrayList;
 

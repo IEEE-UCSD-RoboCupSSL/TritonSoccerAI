@@ -7,7 +7,7 @@ import Triton.PeriphModules.Detection.BallData;
 
 import static Triton.Config.ObjectConfig.POS_PRECISION;
 
-public class Ball implements Module {
+public class Ball {
 
     private final FieldSubscriber<BallData> dataSub;
 
@@ -39,16 +39,7 @@ public class Ball implements Module {
         return 0;
     }
 
-    @Override
-    public void run() {
-        try {
-            subscribe();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void subscribe() {
+    public void subscribe() {
         try {
             dataSub.subscribe(1000);
         } catch (Exception e) {

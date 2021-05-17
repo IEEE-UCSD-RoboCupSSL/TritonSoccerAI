@@ -1,17 +1,16 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 
 import java.util.Scanner;
 
+
 public class GetBallTest extends RobotSkillsTest {
-    Scanner scanner;
     Ally ally;
     Ball ball;
 
-    public GetBallTest(Scanner scanner, Ally ally, Ball ball) {
-        this.scanner = scanner;
+    public GetBallTest(Ally ally, Ball ball) {
         this.ally = ally;
         this.ball = ball;
     }

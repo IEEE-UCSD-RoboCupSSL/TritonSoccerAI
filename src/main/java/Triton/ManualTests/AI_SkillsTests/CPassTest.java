@@ -6,8 +6,8 @@ import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
 
@@ -23,8 +23,7 @@ public class CPassTest extends RobotSkillsTest {
     PassFinder passFinder;
     PassInfo info;
 
-    public CPassTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
-        this.scanner = scanner;
+    public CPassTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.ball = ball;
         this.fielders = fielders;
 
