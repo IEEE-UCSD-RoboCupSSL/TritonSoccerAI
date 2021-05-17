@@ -59,10 +59,9 @@ public class CoreTestFactory {
     }
 
     public void printAvailableTestNames() {
-        int counter = 0;
         System.out.println("Available Tests:");
         for (String test : coreTestMap.keySet()) {
-            System.out.printf("%d. %s \n", counter++, test);
+            System.out.printf("- %s \n", test);
         }
         System.out.println("");
     }
@@ -70,11 +69,4 @@ public class CoreTestFactory {
     public TritonTestable getTest(String testName) {
         return coreTestMap.get(testName);
     }
-
-    public TritonTestable getTest(int testIndex){
-        String testName = (String) coreTestMap.keySet().toArray()[testIndex];
-        return coreTestMap.get(testName);
-    }
-
-
 }

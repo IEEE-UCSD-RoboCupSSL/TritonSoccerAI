@@ -26,10 +26,9 @@ public class PeriphMiscTestFactory {
     }
 
     public void printAvailableTestNames() {
-        int counter = 0;
         System.out.println("Available Tests:");
         for (String test : periphTestMap.keySet()) {
-            System.out.printf("%d. %s \n", counter++, test);
+            System.out.printf("- %s \n", test);
         }
         System.out.println("");
     }
@@ -37,11 +36,4 @@ public class PeriphMiscTestFactory {
     public TritonTestable getTest(String testName) {
         return periphTestMap.get(testName);
     }
-
-    public TritonTestable getTest(int testIndex){
-        String testName = (String) periphTestMap.keySet().toArray()[testIndex];
-        return periphTestMap.get(testName);
-    }
-
-
 }
