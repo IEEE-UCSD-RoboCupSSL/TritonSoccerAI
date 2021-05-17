@@ -1,10 +1,8 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
-
-import java.util.Scanner;
 
 public class HoldBallPosTest extends RobotSkillsTest {
     Ally ally;

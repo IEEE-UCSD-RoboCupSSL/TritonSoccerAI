@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.ProceduralSkills.Dependency;
 
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 
 import java.util.concurrent.Callable;

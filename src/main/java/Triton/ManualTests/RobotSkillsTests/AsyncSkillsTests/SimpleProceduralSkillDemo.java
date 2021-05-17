@@ -2,7 +2,7 @@ package Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests;
 
 import Triton.App;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Matrix.Vec2D;

@@ -1,13 +1,11 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.Scanner;
 
-import static Triton.Config.ObjectConfig.*;
-import static Triton.Config.PathfinderConfig.DRIB_ROTATE_BALL_PUSH;
 import static Triton.Config.PathfinderConfig.DRIB_ROTATE_DIST;
 
 public class DribBallTest extends RobotSkillsTest {

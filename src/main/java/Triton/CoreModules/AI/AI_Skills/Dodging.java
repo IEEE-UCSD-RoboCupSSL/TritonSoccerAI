@@ -4,17 +4,14 @@ package Triton.CoreModules.AI.AI_Skills;
 import Triton.Config.ObjectConfig;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
-import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class Dodging extends Skills {

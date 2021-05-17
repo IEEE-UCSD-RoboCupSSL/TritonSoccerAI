@@ -2,7 +2,7 @@ package Triton.ManualTests.AI_SkillsTests;
 
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
 import Triton.Misc.Math.Matrix.Vec2D;

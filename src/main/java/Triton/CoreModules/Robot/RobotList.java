@@ -2,7 +2,7 @@ package Triton.CoreModules.Robot;
 
 import Triton.App;
 import Triton.Config.ModuleFreqConfig;
-import Triton.PeriphModules.Vision.OldGrSimVisionModule;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Util;
 
 import java.util.ArrayList;

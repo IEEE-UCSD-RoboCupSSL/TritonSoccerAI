@@ -1,7 +1,7 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.AI.Formation;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 
 import java.util.Scanner;

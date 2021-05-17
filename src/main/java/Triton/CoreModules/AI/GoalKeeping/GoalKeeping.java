@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.GoalKeeping;
 
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import static Triton.Config.ObjectConfig.MAX_KICK_VEL;

@@ -1,17 +1,21 @@
-package Triton.CoreModules.Robot;
+package Triton.CoreModules.Robot.Ally;
 
 import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.ModuleFreqConfig;
 import Triton.Config.ObjectConfig;
-import Triton.Config.PathfinderConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
+import Triton.CoreModules.Robot.Ally.KeeperSkills.Keep;
+import Triton.CoreModules.Robot.MotionMode;
+import Triton.CoreModules.Robot.MotionState;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.AsyncProcedure;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
+import Triton.CoreModules.Robot.Ally.AdvancedSkills.*;
+import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotSockets.RobotConnection;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
@@ -21,12 +25,14 @@ import Triton.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
-import static Triton.Config.GeometryConfig.*;
+import static Triton.Config.GeometryConfig.FIELD_LENGTH;
+import static Triton.Config.GeometryConfig.FIELD_WIDTH;
 import static Triton.Config.ObjectConfig.*;
-import static Triton.Config.PathfinderConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.CoreModules.Robot.MotionState.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
@@ -34,17 +40,15 @@ import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 /* TL;DR, Instead, read RobotSkills Interface for a cleaner view !!!!!!! */
 public class Ally extends Robot implements AllySkills {
+    /*** internal pub sub ***/
+    private final Publisher<MotionState> statePub;
     private final RobotConnection conn;
-
     /*** external pub sub ***/
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
     private final Subscriber<Boolean> dribStatSub;
     private final Publisher<RemoteAPI.CommandData> commandsPub;
-
-    /*** internal pub sub ***/
-    private final Publisher<MotionState> statePub;
     private final Subscriber<MotionState> stateSub;
     private final Publisher<Vec2D> pointPub, kickVelPub, holdBallPosPub;
     private final Subscriber<Vec2D> pointSub, kickVelSub, holdBallPosSub;
@@ -128,7 +132,6 @@ public class Ally extends Robot implements AllySkills {
         return asyncProcedure.getCompletionReturn();
     }
 
-
     synchronized public void cancelProceduralTask() {
         asyncProcedure.cancel();
     }
@@ -136,10 +139,6 @@ public class Ally extends Robot implements AllySkills {
     synchronized public boolean isProcedureCancelled() {
         return asyncProcedure.isCancelled();
     }
-
-
-
-
 
     /*** primitive control methods ***/
     @Override
@@ -226,352 +225,88 @@ public class Ally extends Robot implements AllySkills {
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to advanced control methods
     @Override
     synchronized public void rotateTo(double angle) {
-        double targetAngle = normAng(angle);
-        double angDiff = calcAngDiff(targetAngle, getDir());
-
-        double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            moveAt(new Vec2D(0, 0));
-            spinTo(targetAngle);
-        } else {
-            moveAt(new Vec2D(0, 0));
-            spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
-        }
+        RotateTo.exec(this, angle);
     }
 
     @Override
     synchronized public void strafeTo(Vec2D endPoint) {
-        strafeTo(endPoint, getDir());
+        StrafeTo.exec(this, endPoint, getDir());
     }
 
     @Override
     synchronized public void strafeTo(Vec2D endPoint, double angle) {
-        double targetAngle = normAng(angle);
-        double angDiff = calcAngDiff(targetAngle, getDir());
-        double absAngleDiff = Math.abs(angDiff);
-
-        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-            spinTo(targetAngle);
-        } else {
-            spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 100);
-        }
-
-        if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-            ArrayList<Vec2D> path = findPath(endPoint);
-            if (path != null && path.size() > 0) {
-                Vec2D nextNode;
-                if (path.size() == 1) nextNode = path.get(0);
-                else if (path.size() == 2) nextNode = path.get(1);
-                else nextNode = path.get(1);
-
-                if (path.size() <= 2) moveTo(nextNode);
-                else moveToNoSlowDown(nextNode);
-            } else {
-                moveAt(new Vec2D(0, 0));
-            }
-        } else {
-            moveAt(new Vec2D(0, 0));
-        }
+        StrafeTo.exec(this, endPoint, angle);
     }
 
     @Override
-    synchronized public void curveTo(Vec2D endPoint) {
-        curveTo(endPoint, getDir());
+    public void curveTo(Vec2D endPoint) {
+        CurveTo.exec(this, endPoint, getDir());
     }
 
     @Override
     synchronized public void curveTo(Vec2D endPoint, double angle) {
-        double targetAngle = normAng(angle);
-        double angDiff = calcAngDiff(targetAngle, getDir());
-        double absAngleDiff = Math.abs(angDiff);
-
-        spinTo(targetAngle);
-
-        ArrayList<Vec2D> path = findPath(endPoint);
-        if (path != null && path.size() > 0) {
-            Vec2D nextNode;
-            if (path.size() == 1) nextNode = path.get(0);
-            else if (path.size() == 2) nextNode = path.get(1);
-            else nextNode = path.get(1);
-
-            if (path.size() <= 2) moveTo(nextNode);
-            else moveToNoSlowDown(nextNode);
-        } else {
-            moveAt(new Vec2D(0, 0));
-        }
+        CurveTo.exec(this, endPoint, angle);
     }
 
     @Override
     synchronized public void fastCurveTo(Vec2D endPoint) {
-        fastCurveTo(endPoint, getDir());
+        FastCurveTo.exec(this, endPoint, getDir());
     }
 
     @Override
     synchronized public void fastCurveTo(Vec2D endPoint, double endAngle) {
-        // included rear-prioritizing case
-        ArrayList<Vec2D> path = findPath(endPoint);
-        if (path != null && path.size() > 0) {
-            double fastestAngle = endPoint.sub(getPos()).toPlayerAngle();
-            Vec2D nextNode;
-            if (path.size() == 1) nextNode = path.get(0);
-            else if (path.size() == 2) nextNode = path.get(1);
-            else nextNode = path.get(1);
-
-            double angDiff = calcAngDiff(fastestAngle, getDir());
-            double absAngleDiff = Math.abs(angDiff);
-
-            if (endPoint.sub(getPos()).mag() < SPRINT_TO_ROTATE_DIST_THRESH) {
-                spinTo(endAngle);
-            } else {
-                if (absAngleDiff <= 90) spinTo(fastestAngle);
-                else spinTo(normAng(fastestAngle + 180));
-            }
-            if (path.size() <= 2) moveTo(nextNode);
-            else moveToNoSlowDown(nextNode);
-        } else {
-            moveAt(new Vec2D(0, 0));
-            spinAt(0);
-        }
+        FastCurveTo.exec(this, endPoint, endAngle);
     }
 
     @Override
     synchronized public void sprintFrontTo(Vec2D endPoint) {
-        sprintFrontTo(endPoint, getDir());
+        SprintFrontTo.exec(this, endPoint, getDir());
     }
 
     @Override
     synchronized public void sprintFrontTo(Vec2D endPoint, double endAngle) {
-        ArrayList<Vec2D> path = findPath(endPoint);
-        if (path != null && path.size() > 0) {
-            double fastestAngle = 0;
-            boolean fastestAngleFound = false;
-            for (Vec2D node : path) {
-                double dist = node.sub(getPos()).mag();
-                if (dist >= SPRINT_TO_ROTATE_DIST_THRESH) {
-                    fastestAngle = node.sub(getPos()).toPlayerAngle();
-                    fastestAngleFound = true;
-                    break;
-                }
-            }
-
-            Vec2D nextNode;
-            if (path.size() == 1) nextNode = path.get(0);
-            else if (path.size() == 2) nextNode = path.get(1);
-            else nextNode = path.get(1);
-
-            if (!fastestAngleFound) fastestAngle = endAngle;
-
-            double angDiff = calcAngDiff(fastestAngle, getDir());
-            double absAngleDiff = Math.abs(angDiff);
-
-            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
-                spinTo(fastestAngle);
-            } else {
-                spinAt((isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 60);
-            }
-
-            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                if (path.size() <= 2) moveTo(nextNode);
-                else moveToNoSlowDown(nextNode);
-            } else {
-                moveAt(new Vec2D(0, 0));
-            }
-        } else {
-            moveAt(new Vec2D(0, 0));
-            spinAt(0);
-        }
+        SprintFrontTo.exec(this, endPoint, endAngle);
     }
 
     @Override
     synchronized public void sprintTo(Vec2D endPoint) {
-        sprintTo(endPoint, getDir());
+        SprintTo.exec(this, endPoint);
     }
 
     @Override
     synchronized public void sprintTo(Vec2D endPoint, double endAngle) {
-        // included rear-prioritizing case
-        ArrayList<Vec2D> path = findPath(endPoint);
-        if (path != null && path.size() > 0) {
-            double fastestAngle = 0;
-            boolean fastestAngleFound = false;
-            for (Vec2D node : path) {
-                double dist = node.sub(getPos()).mag();
-                if (dist >= SPRINT_TO_ROTATE_DIST_THRESH) {
-                    fastestAngle = node.sub(getPos()).toPlayerAngle();
-                    fastestAngleFound = true;
-                    break;
-                }
-            }
-
-            Vec2D nextNode;
-            if (path.size() == 1) nextNode = path.get(0);
-            else if (path.size() == 2) nextNode = path.get(1);
-            else nextNode = path.get(1);
-
-            if (!fastestAngleFound) fastestAngle = endAngle;
-
-            double angDiff = calcAngDiff(fastestAngle, getDir());
-            double absAngleDiff = Math.abs(angDiff);
-
-            if (absAngleDiff <= 90) {
-                spinTo(fastestAngle);
-                if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
-                    if (path.size() <= 2) moveTo(nextNode);
-                    else moveToNoSlowDown(nextNode);
-                } else {
-                    moveAt(new Vec2D(0, 0));
-                }
-            } else {
-                if (!fastestAngleFound) spinTo(normAng(fastestAngle));
-                else spinTo(normAng(fastestAngle + 180));
-
-                if (absAngleDiff >= 180 - PathfinderConfig.MOVE_ANGLE_THRESH) {
-                    if (path.size() <= 2) moveTo(nextNode);
-                    else moveToNoSlowDown(nextNode);
-                } else {
-                    moveAt(new Vec2D(0, 0));
-                }
-            }
-        } else {
-            moveAt(new Vec2D(0, 0));
-            spinAt(0);
-        }
+        SprintTo.exec(this, endPoint, endAngle);
     }
 
     /*** Soccer Skills methods ***/
     @Override
     synchronized public void getBall(Ball ball) {
-        Vec2D ballLoc = ball.getPos();
-        Vec2D currPos = getPos();
-        Vec2D currPosToBall = ballLoc.sub(currPos);
-        if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            statePub.publish(AUTO_CAPTURE);
-        } else {
-            fastCurveTo(ballLoc, currPosToBall.toPlayerAngle());
-            //dynamicIntercept(ball, 0);
-        }
+        GetBall.exec(this, ball);
     }
 
     @Override
     synchronized public boolean dribRotate(Ball ball, double angle) {
-        return dribRotate(ball, angle, 0);
+        return DribRotate.exec(this, ball, angle);
     }
 
     @Override
     synchronized public boolean dribRotate(Ball ball, double angle, double offsetDist) {
-        // POSITION
-        // Unit vector from final end point to the ball
-        Vec2D angleUnitDir = new Vec2D(angle);
-        // Scale angleUnitDir to have a certain distance from the ball
-        Vec2D angleOffsetVec = angleUnitDir.scale(DRIB_ROTATE_DIST + offsetDist);
-        // Subtract the offset from the current ball location to determine the final location of the robot
-        Vec2D endPos = ball.getPos().sub(angleOffsetVec);
-
-        // Vector from ball to robot
-        Vec2D ballToBot = getPos().sub(ball.getPos());
-        // Unit vector from ball to robot
-        Vec2D ballPushDir = ballToBot.normalized();
-        // Distance from ball to robot
-        double ballToBotDist = ballToBot.mag();
-        // Difference between the current rotation and the final rotation
-        double angleDiff = (angleUnitDir.dot(ballPushDir) - 1.0) / 2.0;
-        // Calculate the push from the ball to move the robot away from the ball
-        // This push will get weaker as the robot rotates around the ball
-        // The push will be 0 when the robot's position is in alignment with the end position
-        Vec2D ballPushVec = ballPushDir.scale(DRIB_ROTATE_BALL_PUSH / ballToBotDist).scale(angleDiff);
-
-        // Add the end position and the push to get the target position of the robot
-        Vec2D targetPos = endPos.add(ballPushVec);
-
-        // ANGLE
-        // Angle from the bot to the ball
-//        double botToBallAngle = ball.getPos().sub(getPos()).normalized().toPlayerAngle();
-        // Smoothly translate between botToBallAngle vs end angle using the distance from the bot to the final
-        // destination
-
-        // Distance from current location of robot to the end destination
-//        double distToEnd = endPos.sub(getPos()).mag();
-        // Divide by the max distance the robot can be from the destination
-//        double distToEndScale = distToEnd / (DRIB_ROTATE_MAX_DIST + 2 * offsetDist) * 2;
-
-//        double targetAngle = (distToEndScale * botToBallAngle + (2 - distToEndScale) * angle) / 2;
-
-
-        curveTo(targetPos, angle);
-
-        if (ball.getPos().sub(getPos()).mag() - DRIB_ROTATE_DIST > 30) {
-            return false;
-        }
-        return true;
+        return DribRotate.exec(this, ball, angle, offsetDist);
     }
 
     @Override
     synchronized public void staticIntercept(Ball ball, Vec2D anchorPos) {
-        // To-do (future) : edge case: ball going opposite dir
-
-        Vec2D currPos = getPos();
-        Vec2D ballPos = ball.getPos();
-        Vec2D ballVelDir = ball.getVel().normalized();
-        Vec2D ballToAnchor = anchorPos.sub(ballPos);
-        Vec2D receivePoint = ballPos.add(ballVelDir.scale(ballToAnchor.dot(ballVelDir)));
-
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            getBall(ball);
-        } else {
-            if (ball.getVel().mag() < 750) { // To-do: magic number && comment vel unit
-                getBall(ball);
-            } else {
-                strafeTo(receivePoint, normAng(ballVelDir.toPlayerAngle() + 180));
-            }
-        }
+        StaticIntercept.exec(this, ball, anchorPos);
     }
 
     @Override
     synchronized public void dynamicIntercept(Ball ball, double faceDir) {
-        Vec2D currPos = getPos();
-        Vec2D ballPos = ball.getPos();
-
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            getBall(ball);
-        } else {
-            Vec2D faceVec = new Vec2D(faceDir).normalized();
-            Vec2D offset = faceVec.scale(DRIBBLER_OFFSET);
-            Vec2D targetPos = ball.getPos().sub(offset);
-            ArrayList<Vec2D> circCenters = getCircleCenters(ball.getPos(), targetPos,
-                        faceVec, offset.mag(), INTERCEPT_CIRCLE_RADIUS);
-
-            // System.out.println(circCenters);
-
-            Vec2D interceptPoint = getInterceptPoint(getPos(), targetPos, faceVec, INTERCEPT_CIRCLE_RADIUS, circCenters);
-
-            //System.out.println(interceptPoint);
-            curveTo(interceptPoint, ball.getPos().sub(getPos()).toPlayerAngle());
-        }
+        DynamicIntercept.exec(this, ball, faceDir);
     }
 
     @Override
     synchronized public void keep(Ball ball, Vec2D aimTraj) {
-        Vec2D currPos = getPos();
-        Vec2D ballPos = ball.getPos();
-        double y = -FIELD_LENGTH / 2 + 150;
-
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
-            getBall(ball);
-        } else {
-            double x;
-            if (Math.abs(aimTraj.y) <= 0.0001 || Math.abs(aimTraj.x) <= 0.0001) {
-                x = ballPos.x;
-            } else {
-                double m = aimTraj.y / aimTraj.x;
-                double b = ballPos.y - (ballPos.x * m);
-                x = (y - b) / m;
-            }
-
-            x = Math.max(x, GOAL_LEFT);
-            x = Math.min(x, GOAL_RIGHT);
-            Vec2D targetPos = new Vec2D(x, y);
-            fastCurveTo(targetPos);
-        }
+        Keep.exec(this, ball, aimTraj);
     }
 
     @Override
@@ -590,7 +325,7 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     synchronized public Vec2D HoldBallPos() {
-        return  holdBallPosSub.getMsg();
+        return holdBallPosSub.getMsg();
     }
 
 
@@ -614,77 +349,10 @@ public class Ally extends Robot implements AllySkills {
         return Math.abs(calcAngDiff(angle, getDir())) < angleDiff;
     }
 
-    private ArrayList<Vec2D> getCircleCenters(Vec2D ballPos, Vec2D targetPos, Vec2D faceVec, double ballTargetDist, double circRad) {
-        Vec2D circCentersVec = new Vec2D(faceVec.y, -faceVec.x);
-        Vec2D ballTargetMidpoint = ballPos.add(targetPos).scale(0.5);
-        double centerMidpointDist = Math.pow(circRad * circRad - 1 / 4 * ballTargetDist * ballTargetDist, 0.5);
-        ArrayList<Vec2D> circCenters = new ArrayList<>();
-        circCenters.add(ballTargetMidpoint.add(circCentersVec.scale(centerMidpointDist)));
-        circCenters.add(ballTargetMidpoint.sub(circCentersVec.scale(centerMidpointDist)));
-        return circCenters;
-    }
-
-    private Vec2D getInterceptPoint(Vec2D allyPos, Vec2D targetPos, Vec2D faceVec, double circRad, ArrayList<Vec2D> circCenters) {
-        Vec2D targetToCenter = circCenters.get(0).sub(targetPos);
-        // double alpha = Vec2D.angleDiff(faceVec, targetToCenter);
-        double alpha = 20;
-
-        Vec2D allyToTarget = targetPos.sub(allyPos);
-        double angleDiff = PerspectiveConverter.calcAngDiff(allyToTarget.scale(-1.0).toPlayerAngle(),
-                    faceVec.scale(-1.0).toPlayerAngle());
-
-        //System.out.println(angleDiff);
-
-        Vec2D vel = new Vec2D(0, 0);
-        if (Math.abs(angleDiff) < alpha) {
-            // vel = targetPos.sub(allyPos).normalized();
-            vel = allyToTarget;
-            // System.out.println("Baga");
-        } else {
-
-            // Determine which circle is closer to the robot
-            double dist0 = allyPos.sub(circCenters.get(0)).mag();
-            double dist1 = allyPos.sub(circCenters.get(1)).mag();
-            double botToCenterDist = Math.min(dist0, dist1);
-            Vec2D center = dist0 <= dist1 ? circCenters.get(0) : circCenters.get(1);
-            double angDir = -1.0;
-            if(dist0 < dist1) angDir = 1.0;
-            // System.out.println(center);
-
-            Vec2D allyToCenter = center.sub(allyPos).normalized();
-            // Robot outside of both circles
-            if (isOutsideCircles(circCenters, circRad, allyPos)) {
-                // Find the tangent direction and the point of tangency
-                double tangentLength = Math.pow(botToCenterDist * botToCenterDist - circRad * circRad, 0.5);
-
-                if(Math.abs(tangentLength) < 0.01) tangentLength = 0.01;
-                double tangentAngle = Math.atan2(circRad, tangentLength);
-
-                Vec2D tangentVec = allyToCenter.rotate(Math.toDegrees(angDir * tangentAngle) + angDir * 30);
-                vel = tangentVec.scale(tangentLength);
-            } else { // Inside of either circle
-                vel = center.sub(allyPos).rotate(angDir * Math.toDegrees(65)).scale(1.5);
-                //System.out.println("Inside:" + vel);
-            }
-        }
-        //return allyPos.add(vel.scale(1000));
-
-        return allyPos.add(vel);
-    }
-
-    private boolean isCloserToFaceVec(Vec2D faceVec, Vec2D targetPos, Vec2D allyPos, double alpha) {
-        Vec2D allyToTarget = targetPos.sub(allyPos);
-        return Math.abs(Vec2D.angleDiff(faceVec, allyToTarget)) <= alpha;
-    }
-
-    private boolean isOutsideCircles(ArrayList<Vec2D> circCenters, double circRad, Vec2D allyPos) {
-        return Vec2D.dist(allyPos, circCenters.get(0)) > circRad && Vec2D.dist(allyPos, circCenters.get(1)) > circRad;
-    }
-
     /**
      * Update the set path of the robot
      */
-    private ArrayList<Vec2D> findPath(Vec2D endPoint) {
+    public ArrayList<Vec2D> findPath(Vec2D endPoint) {
         pathFinder.setObstacles(getObstacles());
         return pathFinder.findPath(getPos(), endPoint);
     }
@@ -722,7 +390,7 @@ public class Ally extends Robot implements AllySkills {
         return obstacles;
     }
 
-    private void moveToNoSlowDown(Vec2D loc) {
+    public void moveToNoSlowDown(Vec2D loc) {
         switch (stateSub.getMsg()) {
             case MOVE_TDRD, MOVE_TVRD, MOVE_NSTDRD -> statePub.publish(MOVE_NSTDRD);
             default -> statePub.publish(MOVE_NSTDRV);
@@ -886,6 +554,4 @@ public class Ally extends Robot implements AllySkills {
             ((JPSPathFinder) pathFinder).display();
         }
     }
-
-
 }
