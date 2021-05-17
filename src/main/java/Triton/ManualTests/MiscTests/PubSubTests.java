@@ -53,13 +53,13 @@ public class PubSubTests {
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
-        // Thread A
+        // Thread A - publishing to xxxPubSub
         ScheduledFuture<?> threadAFuture = threadPool.scheduleAtFixedRate(()->{
             xxxPubSub.pub.publish(System.currentTimeMillis());
         }, 0, Util.toPeriod(threadAFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
 
-        // ThreadB
+        // ThreadB - subscribed to xxxPubSub
         ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
             System.out.println(xxxPubSub.sub.getMsg());
         }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
@@ -77,16 +77,110 @@ public class PubSubTests {
 
 
     private boolean asyncOnePubToManySub() {
+        final FieldPubSubPair<String> xxxPubSub =
+                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+        long threadAFreqInHz = 1000;
+        long threadBFreqInHz = 100;
+
+        // Thread A - publishing to xxxPubSub
+        ScheduledFuture<?> threadAFuture = threadPool.scheduleAtFixedRate(()->{
+            xxxPubSub.pub.publish("From thread A : " + System.currentTimeMillis());
+        }, 0, Util.toPeriod(threadAFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadB - subscribed to xxxPubSub
+        ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
+            System.out.println(xxxPubSub.getSub().getMsg());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadC - subscribed to xxxPubSub
+        ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
+            System.out.println(xxxPubSub.getSub().getMsg());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        threadAFuture.cancel(false);
+        threadBFuture.cancel(false);
+        threadCFuture.cancel(false);
         return true;
+
     }
 
 
     private boolean asyncManyPubToOneSub() {
+        final FieldPubSubPair<String> xxxPubSub =
+                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+        long threadAFreqInHz = 1000;
+        long threadBFreqInHz = 100;
+
+        // Thread A - publishing to xxxPubSub
+        ScheduledFuture<?> threadAFuture = threadPool.scheduleAtFixedRate(()->{
+            xxxPubSub.pub.publish("From thread A : " + System.currentTimeMillis());
+        }, 0, Util.toPeriod(threadAFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadB - publishing to xxxPubSub
+        ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
+            xxxPubSub.pub.publish("From thread B : " + System.currentTimeMillis());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadC - subscribed to xxxPubSub
+        ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
+            System.out.println(xxxPubSub.getSub().getMsg());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        threadAFuture.cancel(false);
+        threadBFuture.cancel(false);
+        threadCFuture.cancel(false);
         return true;
     }
 
 
     private boolean asyncManyPubToManySub() {
+        final FieldPubSubPair<String> xxxPubSub =
+                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+        long threadAFreqInHz = 1000;
+        long threadBFreqInHz = 100;
+
+        // Thread A - publishing to xxxPubSub
+        ScheduledFuture<?> threadAFuture = threadPool.scheduleAtFixedRate(()->{
+            xxxPubSub.pub.publish("From thread A : " + System.currentTimeMillis());
+        }, 0, Util.toPeriod(threadAFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadB - publishing to xxxPubSub
+        ScheduledFuture<?> threadBFuture = threadPool.scheduleAtFixedRate(()->{
+            xxxPubSub.pub.publish("From thread B : " + System.currentTimeMillis());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadC - subscribed to xxxPubSub
+        ScheduledFuture<?> threadCFuture = threadPool.scheduleAtFixedRate(()->{
+            System.out.println(xxxPubSub.getSub().getMsg());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        // ThreadD - subscribed to xxxPubSub
+        ScheduledFuture<?> threadDFuture = threadPool.scheduleAtFixedRate(()->{
+            System.out.println(xxxPubSub.getSub().getMsg());
+        }, 0, Util.toPeriod(threadBFreqInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        threadAFuture.cancel(false);
+        threadBFuture.cancel(false);
+        threadCFuture.cancel(false);
+        threadDFuture.cancel(false);
         return true;
     }
 
