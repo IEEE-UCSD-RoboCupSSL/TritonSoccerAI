@@ -2,8 +2,8 @@ package Triton.ManualTests.AI_TacticsTests;
 
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
 

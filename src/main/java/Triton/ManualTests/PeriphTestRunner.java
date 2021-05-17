@@ -2,8 +2,8 @@ package Triton.ManualTests;
 
 import Triton.App;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.MiscTests.PubSubTests;

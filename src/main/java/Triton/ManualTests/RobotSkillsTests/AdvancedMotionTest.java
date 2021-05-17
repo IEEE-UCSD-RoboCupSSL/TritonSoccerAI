@@ -2,10 +2,11 @@ package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
 
 import java.util.Scanner;
 
-
+@AllArgsConstructor
 public class AdvancedMotionTest extends RobotSkillsTest {
     private Ally bot;
 
