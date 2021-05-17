@@ -6,8 +6,17 @@ import Triton.Misc.Math.Matrix.Vec2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Formation {
+
+   static public void printAvailableFormations(){
+
+        System.out.println("Available Formations:");
+        for (String s : preset.keySet()) {
+            System.out.printf("- %s \n", s);
+        }
+    }
 
     public static final Map<String, FormationType> preset = Map.of(
             "default", new FormationType(

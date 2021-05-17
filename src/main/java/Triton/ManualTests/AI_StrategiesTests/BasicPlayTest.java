@@ -7,8 +7,9 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 
-public class BasicPlayTest {
+public class BasicPlayTest implements TritonTestable {
     private final GapFinder gapFinder;
     private final PassFinder passFinder;
     BasicPlay basicPlay;

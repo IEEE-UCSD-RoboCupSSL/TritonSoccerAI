@@ -3,22 +3,20 @@ package Triton.ManualTests.RobotSkillsTests;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Scanner;
 
+@AllArgsConstructor
 public class KickTest extends RobotSkillsTest {
-    Scanner scanner;
     Ally ally;
     Ball ball;
 
-    public KickTest(Scanner scanner, Ally ally, Ball ball) {
-        this.scanner = scanner;
-        this.ally = ally;
-        this.ball = ball;
-    }
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         try {
 //            String line;
 //            do {

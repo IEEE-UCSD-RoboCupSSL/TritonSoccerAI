@@ -3,24 +3,23 @@ package Triton.ManualTests.RobotSkillsTests;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.Scanner;
 
-public class CapDetectionTest extends RobotSkillsTest{
-    private final Scanner scanner;
-    private final Ally ally;
-    private final Ball ball;
 
-    public CapDetectionTest(Scanner scanner, Ally ally, Ball ball) {
-        this.scanner = scanner;
-        this.ally = ally;
-        this.ball = ball;
-    }
+@AllArgsConstructor
+public class CapDetectionTest extends RobotSkillsTest{
+    private Ally ally;
+    private Ball ball;
 
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         LocalTime then;
         int spinRate;
         int moveRate;

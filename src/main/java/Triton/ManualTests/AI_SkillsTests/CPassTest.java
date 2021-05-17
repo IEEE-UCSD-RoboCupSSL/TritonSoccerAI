@@ -23,8 +23,7 @@ public class CPassTest extends RobotSkillsTest {
     PassFinder passFinder;
     PassInfo info;
 
-    public CPassTest(Scanner scanner, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
-        this.scanner = scanner;
+    public CPassTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.ball = ball;
         this.fielders = fielders;
 

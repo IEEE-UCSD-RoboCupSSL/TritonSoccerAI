@@ -7,16 +7,11 @@ import java.util.Scanner;
 
 
 public class AdvancedMotionTest extends RobotSkillsTest {
-    Ally bot;
-    Scanner scanner;
-
-    public AdvancedMotionTest(Scanner scanner, Ally bot) {
-        this.scanner = scanner;
-        this.bot = bot;
-    }
+    private Ally bot;
 
     @Override
     public boolean test() {
+        Scanner scanner = new Scanner(System.in);
         try {
             boolean toQuit = false;
             while (!toQuit) {

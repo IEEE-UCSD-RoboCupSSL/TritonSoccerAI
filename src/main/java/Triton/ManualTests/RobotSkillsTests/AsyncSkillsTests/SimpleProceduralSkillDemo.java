@@ -5,28 +5,27 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 
 import java.util.Scanner;
 import java.util.concurrent.Future;
 
-public class SimpleProceduralSkillDemo {
+public class SimpleProceduralSkillDemo implements TritonTestable {
 
-    private final Scanner scanner;
     private final RobotList<Ally> fielders;
     private Ball ball;
 
 
-    public SimpleProceduralSkillDemo(Scanner scanner, RobotList<Ally> fielders, Ball ball) {
-        this.scanner = scanner;
+    public SimpleProceduralSkillDemo(RobotList<Ally> fielders, Ball ball) {
         this.fielders = fielders;
         this.ball = ball;
     }
 
 
     public boolean test() {
-
+        Scanner scanner = new Scanner(System.in);
         ExampleProceduralTaskA taskA = new ExampleProceduralTaskA(); // example side thread job
         ExampleProceduralTaskB taskB = new ExampleProceduralTaskB(ball); // another example side thread job
 

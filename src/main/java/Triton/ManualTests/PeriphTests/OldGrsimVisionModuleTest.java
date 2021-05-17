@@ -3,6 +3,7 @@ package Triton.ManualTests.PeriphTests;
 import Proto.*;
 import Triton.App;
 import Triton.Config.ModuleFreqConfig;
+import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 
 import static Proto.MessagesRobocupSslDetection.*;
 
-public class OldGrsimVisionModuleTest {
+public class OldGrsimVisionModuleTest implements TritonTestable {
     public boolean test() {
         OldGrSimVisionModule grSimVisionModule = new OldGrSimVisionModule();
         App.threadPool.scheduleAtFixedRate(grSimVisionModule,

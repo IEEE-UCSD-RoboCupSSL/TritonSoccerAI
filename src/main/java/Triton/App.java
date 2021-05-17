@@ -78,7 +78,7 @@ public class App {
                             /* PeriphTest Mode */
                             case "N" -> {
                                 System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                                runPeriphMiscTest(scanner);
+                                runPeriphMiscTest();
                                 toRunTest = true;
                             }
                             default -> System.out.println("Invalid Input");
@@ -136,7 +136,7 @@ public class App {
 
         if (toRunTest) {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            CoreTestRunner.runCoreTest(scanner, fielders, goalKeeper, foes, ball);
+            CoreTestRunner.runCoreTest(fielders, goalKeeper, foes, ball);
         } else {
             /* Run the actual game program */
 

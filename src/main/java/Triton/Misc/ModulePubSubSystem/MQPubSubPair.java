@@ -1,5 +1,10 @@
 package Triton.Misc.ModulePubSubSystem;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class MQPubSubPair<T> {
 
     public final MQPublisher<T> pub;

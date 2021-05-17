@@ -8,6 +8,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 import static Triton.PeriphModules.Display.PaintOption.*;
 
-public class GapGetBallTest {
+public class GapGetBallTest implements TritonTestable {
 
     private final BasicEstimator basicEstimator;
     private final FillGapGetBall fillGapGetBall;
