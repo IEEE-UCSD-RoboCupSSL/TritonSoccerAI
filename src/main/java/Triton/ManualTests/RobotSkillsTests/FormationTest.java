@@ -41,10 +41,9 @@ public class FormationTest extends RobotSkillsTest {
     @Override
     public boolean test() {
         Scanner scanner = new Scanner(System.in);
-        if (scanner != null) {
-            System.out.println(">> ENTER FORMATION TO MOVE TO:");
-            formationName = scanner.nextLine();
-        }
+        Formation.printAvailableFormations();
+        System.out.println(">> ENTER FORMATION TO MOVE TO:");
+        formationName = scanner.nextLine();
 
         while (!Formation.getInstance().moveToFormation(formationName, fielders, keeper)) {
             try {

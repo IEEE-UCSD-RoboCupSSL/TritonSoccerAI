@@ -35,48 +35,46 @@ public class TestFactory {
         testMap.put("pmotion", new PrimitiveMotionTest(fielders.get(3)));
         testMap.put("amotion", new AdvancedMotionTest(fielders.get(1)));
         testMap.put("getball", new GetBallTest(fielders.get(3), ball));
-        testMap.put( "kick", new KickTest(fielders.get(3), ball));
-        testMap.put( "misc", new MiscTest(fielders.get(3), ball));
-        testMap.put( "cpass", new CPassTest(fielders, keeper, foes, ball));
-        testMap.put( "group", new GroupToTest(fielders, ball));
-        testMap.put( "drib", new DribBallTest(fielders.get(1), ball));
-        testMap.put( "vel", new VelTest(fielders.get(0)));
-        testMap.put( "inter", new DynamicInterceptBallTest(fielders.get(1), ball));
-        testMap.put( "collect", new DataCollector(fielders, keeper, ball));
-        testMap.put( "reset", new FormationTest("tester", fielders));
-        testMap.put( "formation", new FormationTest(fielders, keeper));
-        testMap.put( "gap", new GapFinderTest(fielders, foes, ball));
-        testMap.put( "pass", new PassFinderTest(fielders, foes, ball));
-        testMap.put( "gapgetball", new GapGetBallTest(fielders, keeper, foes, ball));
-        testMap.put( "shoot", new ShootGoalTest(fielders.get(0), foes, ball));
-        testMap.put( "keep", new KeeperTest(fielders, keeper, foes, ball));
-        testMap.put( "defendA", new DefendPlanATest(fielders, keeper, foes, ball));
-        testMap.put( "dodge", new DodgingTest(fielders, keeper, foes, ball));
-        testMap.put( "holdballpos", new HoldBallPosTest(fielders.get(3), ball));
-        testMap.put( "basicplay", new BasicPlayTest(fielders, keeper, foes, ball));
-        testMap.put( "capDetect", new CapDetectionTest(fielders.get(3), ball));
+        testMap.put("kick", new KickTest(fielders.get(3), ball));
+        testMap.put("misc", new MiscTest(fielders.get(3), ball));
+        testMap.put("cpass", new CPassTest(fielders, keeper, foes, ball));
+        testMap.put("group", new GroupToTest(fielders, ball));
+        testMap.put("drib", new DribBallTest(fielders.get(1), ball));
+        testMap.put("vel", new VelTest(fielders.get(0)));
+        testMap.put("inter", new DynamicInterceptBallTest(fielders.get(1), ball));
+        testMap.put("collect", new DataCollector(fielders, keeper, ball));
+        testMap.put("reset", new FormationTest("tester", fielders));
+        testMap.put("formation", new FormationTest(fielders, keeper));
+        testMap.put("gap", new GapFinderTest(fielders, foes, ball));
+        testMap.put("pass", new PassFinderTest(fielders, foes, ball));
+        testMap.put("gapgetball", new GapGetBallTest(fielders, keeper, foes, ball));
+        testMap.put("shoot", new ShootGoalTest(fielders.get(0), foes, ball));
+        testMap.put("keep", new KeeperTest(fielders, keeper, foes, ball));
+        testMap.put("defendA", new DefendPlanATest(fielders, keeper, foes, ball));
+        testMap.put("dodge", new DodgingTest(fielders, keeper, foes, ball));
+        testMap.put("holdballpos", new HoldBallPosTest(fielders.get(3), ball));
+        testMap.put("basicplay", new BasicPlayTest(fielders, keeper, foes, ball));
+        testMap.put("capDetect", new CapDetectionTest(fielders.get(3), ball));
         testMap.put("spsdemo", new SimpleProceduralSkillDemo(fielders, ball));
         testMap.put("defaultFormation", new FormationTest("tester", fielders));
     }
 
-    public String[] getAvailableTestNames(){
+    public String[] getAvailableTestNames() {
         return testMap.keySet().toArray(new String[0]);
     }
 
-    public void printAvailableTestNames(){
+    public void printAvailableTestNames() {
         int counter = 0;
         System.out.println("Available Tests:");
-        for(String test: testMap.keySet()){
-            System.out.printf("%d. %s \n", counter, test);
+        for (String test : testMap.keySet()) {
+            System.out.printf("%d. %s \n", counter++, test);
         }
         System.out.println("");
     }
 
-    public TritonTestable getTest(String testName){
+    public TritonTestable getTest(String testName) {
         return testMap.get(testName);
     }
-
-
 
 
 }

@@ -9,6 +9,13 @@ import java.util.Map;
 
 public class Formation {
 
+   static public void printAvailableFormations(){
+        int count = 0;
+        for (String s : preset.keySet()) {
+            System.out.printf("%d. %s", count++, s);
+        }
+    }
+
     public static final Map<String, FormationType> preset = Map.of(
             "default", new FormationType(
                     new ArrayList<>(Arrays.asList(
