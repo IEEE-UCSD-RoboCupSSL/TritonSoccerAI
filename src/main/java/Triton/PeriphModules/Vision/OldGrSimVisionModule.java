@@ -17,7 +17,7 @@ import java.net.SocketTimeoutException;
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
  */
-public class GrSimVisionModule extends VisionModule {
+public class OldGrSimVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> visionPub;
@@ -27,7 +27,7 @@ public class GrSimVisionModule extends VisionModule {
     /**
      * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
      */
-    public GrSimVisionModule() {
+    public OldGrSimVisionModule() {
         this(Config.conn().getGrsimMcAddr(), Config.conn().getGrsimMcPort());
     }
 
@@ -37,7 +37,7 @@ public class GrSimVisionModule extends VisionModule {
      * @param ip   ip to receive from
      * @param port port to receive from
      */
-    public GrSimVisionModule(String ip, int port) {
+    public OldGrSimVisionModule(String ip, int port) {
         visionPub = new MQPublisher<>("vision", "detection");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
@@ -58,21 +58,14 @@ public class GrSimVisionModule extends VisionModule {
      */
     @Override
     public void run() {
-        while (true) { // delay added
-            try {
-                update();
-            } catch (SocketTimeoutException e) {
-                System.err.println("GrSim Vision Multicast Timeout");
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            update();
+        } catch (SocketTimeoutException e) {
+            System.err.println("GrSim Vision Multicast Timeout");
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
         }
     }
 

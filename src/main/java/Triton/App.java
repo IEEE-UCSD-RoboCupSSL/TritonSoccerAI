@@ -6,13 +6,18 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.MiscTests.PubSubTests;
+import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
+import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
 import Triton.ManualTests.TestRunner;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.PeriphModules.Vision.OldGrSimVisionModule;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -21,6 +26,8 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
+import static Triton.PeriphModules.Display.PaintOption.GEOMETRY;
+import static Triton.PeriphModules.Display.PaintOption.OBJECTS;
 
 
 /**
@@ -101,10 +108,12 @@ public class App {
         GeometryConfig.initGeo();
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        Module visionModule = new GrSimVisionModule();
-        Module detectModule = new DetectionModule();
-        threadPool.submit(visionModule);
-        threadPool.submit(detectModule);
+        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new OldGrSimVisionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.OLD_GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -137,21 +146,35 @@ public class App {
             GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
 //            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
 //            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-            threadPool.submit(gameCtrlModule);
+            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
+                    0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
             /* Instantiate & Run the main AI module, which is the core of this software */
             threadPool.submit(new AI(allies, goalKeeper, foes, ball, gameCtrlModule));
         }
 
 
-//        Display display = new Display();
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
+        Display display = new Display();
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
-//        display.setPaintOptions(paintOptions);
+        display.setPaintOptions(paintOptions);
+
+        ScheduledFuture<?> future = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        future.cancel(false);
 
         sleepForever();
     }
@@ -185,6 +208,10 @@ public class App {
                     case "futask" -> rtn = new FutureTaskTest(threadPool).test();
 
                     case "pubsub" -> rtn = new PubSubTests(threadPool, scanner).test();
+
+                    case "grsimvision" -> rtn = new OldGrsimVisionModuleTest().test();
+
+                    case "SSL" -> rtn = new SSLGameCtrlModuleTest().test();
 
                     case "quit" -> {
                         quit = true;
