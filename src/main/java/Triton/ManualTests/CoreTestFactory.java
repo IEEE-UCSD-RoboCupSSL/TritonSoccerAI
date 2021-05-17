@@ -1,6 +1,5 @@
 package Triton.ManualTests;
 
-import Triton.App;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally;
 import Triton.CoreModules.Robot.Foe;
@@ -14,17 +13,16 @@ import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
-import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
+
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
 
+
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class CoreTestFactory {
-    private final HashMap<String, TritonTestable> coreTestMap = new HashMap<>();
+    private final TreeMap<String, TritonTestable> coreTestMap = new TreeMap<>();
 
     public CoreTestFactory(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
 
@@ -70,6 +68,11 @@ public class CoreTestFactory {
     }
 
     public TritonTestable getTest(String testName) {
+        return coreTestMap.get(testName);
+    }
+
+    public TritonTestable getTest(int testIndex){
+        String testName = (String) coreTestMap.keySet().toArray()[testIndex];
         return coreTestMap.get(testName);
     }
 

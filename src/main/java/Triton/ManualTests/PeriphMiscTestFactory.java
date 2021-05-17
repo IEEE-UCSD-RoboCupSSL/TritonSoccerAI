@@ -1,31 +1,17 @@
 package Triton.ManualTests;
 
 import Triton.App;
-import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally;
-import Triton.CoreModules.Robot.Foe;
-import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.AI_SkillsTests.CPassTest;
-import Triton.ManualTests.AI_SkillsTests.DodgingTest;
-import Triton.ManualTests.AI_SkillsTests.GroupToTest;
-import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
-import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
-import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
-import Triton.ManualTests.EstimatorTests.GapFinderTest;
-import Triton.ManualTests.EstimatorTests.PassFinderTest;
+
 import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.MiscTests.PubSubTests;
 import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
 import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
-import Triton.ManualTests.RobotSkillsTests.*;
-import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class PeriphMiscTestFactory {
 
-    private final HashMap<String, TritonTestable> periphTestMap = new HashMap<>();
+    private final TreeMap<String, TritonTestable> periphTestMap = new TreeMap<>();
 
     public PeriphMiscTestFactory() {
 
@@ -49,6 +35,11 @@ public class PeriphMiscTestFactory {
     }
 
     public TritonTestable getTest(String testName) {
+        return periphTestMap.get(testName);
+    }
+
+    public TritonTestable getTest(int testIndex){
+        String testName = (String) periphTestMap.keySet().toArray()[testIndex];
         return periphTestMap.get(testName);
     }
 
