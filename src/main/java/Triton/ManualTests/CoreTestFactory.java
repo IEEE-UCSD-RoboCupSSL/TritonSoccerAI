@@ -16,16 +16,30 @@ import Triton.ManualTests.EstimatorTests.PassFinderTest;
 
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
-
-
-import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * --> Writing New Tests <--
+ * Manual Tests are now automatically registered when you put the test name and an instantiation
+ * of the test into `TestMaps`.
+ *
+ * Below are inputs needed by the tests. If a new test requires some more inputs simply overload
+ * the constructor.
+ *
+ */
 public class CoreTestFactory {
     private final TreeMap<String, TritonTestable> coreTestMap = new TreeMap<>();
 
-    public CoreTestFactory(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
 
+    /**
+     * Constructor created to accommodate existing tests at the time of refactoring.
+     *
+     * @param fielders Argument needed by existing tests.
+     * @param keeper Argument needed by existing tests.
+     * @param foes Argument needed by existing tests.
+     * @param ball Argument needed by existing tests.
+     */
+    public CoreTestFactory(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         coreTestMap.put("pmotion", new PrimitiveMotionTest(fielders.get(3)));
         coreTestMap.put("amotion", new AdvancedMotionTest(fielders.get(1)));
         coreTestMap.put("getball", new GetBallTest(fielders.get(3), ball));
@@ -63,7 +77,7 @@ public class CoreTestFactory {
         for (String test : coreTestMap.keySet()) {
             System.out.printf("- %s \n", test);
         }
-        System.out.println("");
+        System.out.println();
     }
 
     public TritonTestable getTest(String testName) {

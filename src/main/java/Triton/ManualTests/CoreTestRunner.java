@@ -9,6 +9,13 @@ import java.util.Optional;
 import java.util.Scanner;
 
 
+/**
+ * Test runner for core tests. When manual test mode is enabled. It outputs a list of currently registered tests
+ * and prompts the user for input. It simply executes corresponding test given a test name.
+ *
+ * --> Writing New Tests <--
+ * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
+ */
 public class CoreTestRunner {
     public static void runCoreTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         Scanner scanner = new Scanner(System.in);
