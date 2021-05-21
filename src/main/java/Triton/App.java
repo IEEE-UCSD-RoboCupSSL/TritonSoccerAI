@@ -12,7 +12,7 @@ import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.Vision.OldGrSimVisionModule;
+import Triton.PeriphModules.Vision.GrSimVisionModule;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,6 +49,7 @@ public class App {
 
     public static void main(String[] args) {
         boolean toRunTest = false;
+        boolean toTestTritonBot = false;
         Scanner scanner = new Scanner(System.in);
 
         ConnectionProperties conn = Config.conn();
@@ -83,7 +84,9 @@ public class App {
                             }
                             default -> System.out.println("Invalid Input");
                         }
-
+                    }
+                    case "TEST_TRITONBOT" -> {
+                        toTestTritonBot = true;
                     }
                     default -> {
                         System.out.println("Error: Invalid Args");
@@ -91,7 +94,6 @@ public class App {
                     }
                 }
             }
-
             if (args.length >= 3) { // robot ip addr (port base)
                 LinkedList<RobotIp> robotIPs = new LinkedList<>();
                 for (int i = 0; i < ROBOT_COUNT; i++) { // use default port base and offset
@@ -105,9 +107,13 @@ public class App {
 
         GeometryConfig.initGeo();
 
+        if(toTestTritonBot) {
+            testTritonBotMode(scanner);
+        }
+
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new OldGrSimVisionModule(),
-                0, Util.toPeriod(ModuleFreqConfig.OLD_GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
                 0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
@@ -188,6 +194,38 @@ public class App {
             }
         }
     }
+
+    private static void testTritonBotMode(Scanner scanner) {
+        System.out.println("Press Enter to begin");
+        scanner.nextLine();
+        System.out.println("Started!");
+
+
+        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
+        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
+                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Ball ball = new Ball();
+        ball.subscribe();
+
+
+
+        Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
+        ally.connect();
+
+
+        sleepForever();
+    }
+
 }
 
 

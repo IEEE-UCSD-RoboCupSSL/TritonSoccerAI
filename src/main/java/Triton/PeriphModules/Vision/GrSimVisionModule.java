@@ -17,7 +17,7 @@ import java.net.SocketTimeoutException;
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
  */
-public class OldGrSimVisionModule extends VisionModule {
+public class GrSimVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> visionPub;
@@ -27,7 +27,7 @@ public class OldGrSimVisionModule extends VisionModule {
     /**
      * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
      */
-    public OldGrSimVisionModule() {
+    public GrSimVisionModule() {
         this(Config.conn().getGrsimMcAddr(), Config.conn().getGrsimMcPort());
     }
 
@@ -37,7 +37,7 @@ public class OldGrSimVisionModule extends VisionModule {
      * @param ip   ip to receive from
      * @param port port to receive from
      */
-    public OldGrSimVisionModule(String ip, int port) {
+    public GrSimVisionModule(String ip, int port) {
         visionPub = new MQPublisher<>("vision", "detection");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
