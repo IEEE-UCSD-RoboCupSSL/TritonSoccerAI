@@ -9,12 +9,20 @@ import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
 
 import java.util.TreeMap;
 
+/**
+ * --> Writing New Tests <--
+ * Manual Tests are now automatically registered when you put the test name and an instantiation
+ * of the test into `TestMaps`.
+ *
+ * PeriphMisc tests require no input therefore there is only a no-argument constructor for now.
+ * If a new test requires some more inputs simply overloadthe constructor.
+ *
+ */
 public class PeriphMiscTestFactory {
 
     private final TreeMap<String, TritonTestable> periphTestMap = new TreeMap<>();
 
     public PeriphMiscTestFactory() {
-
         periphTestMap.put("futask", new FutureTaskTest(App.threadPool));
         periphTestMap.put("pubsub", new PubSubTests(App.threadPool));
         periphTestMap.put("grsimvision", new OldGrsimVisionModuleTest());
@@ -30,7 +38,7 @@ public class PeriphMiscTestFactory {
         for (String test : periphTestMap.keySet()) {
             System.out.printf("- %s \n", test);
         }
-        System.out.println("");
+        System.out.println();
     }
 
     public TritonTestable getTest(String testName) {

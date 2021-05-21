@@ -1,19 +1,16 @@
 package Triton.ManualTests;
 
-import Triton.App;
-import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.CoreModules.Robot.Foe.Foe;
-import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
-import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
-
 import java.util.Optional;
 import java.util.Scanner;
 
-public class PeriphTestRunner {
+/**
+ * Test runner for periph-misc tests. When manual test mode is enabled. It outputs a list of currently registered tests
+ * and prompts the user for input. It simply executes corresponding test given a test name.
+ *
+ * --> Writing New Tests <--
+ * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
+ */
+public class PeriphMiscTestRunner {
     public static void runPeriphMiscTest() {
         Scanner scanner = new Scanner(System.in);
         try {

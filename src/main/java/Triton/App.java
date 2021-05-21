@@ -23,7 +23,7 @@ import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
-import static Triton.ManualTests.PeriphTestRunner.runPeriphMiscTest;
+import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
 import static Triton.PeriphModules.Display.PaintOption.GEOMETRY;
 import static Triton.PeriphModules.Display.PaintOption.OBJECTS;
 
