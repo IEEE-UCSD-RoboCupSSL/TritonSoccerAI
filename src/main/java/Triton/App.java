@@ -8,6 +8,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
+import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
@@ -15,9 +16,7 @@ import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static Triton.Config.ObjectConfig.MY_TEAM;
@@ -211,7 +210,7 @@ public class App {
         Ball ball = new Ball();
         ball.subscribe();
 
-        Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
+        final Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
         ally.connect();
 
         App.threadPool.scheduleAtFixedRate(ally,
@@ -224,19 +223,51 @@ public class App {
             e.printStackTrace();
         }
 
-        (new PrimitiveMotionTest(ally)).test();
-        /*
-        while(true) {
-            if(ally.getPos() != null && ball.getPos() != null) {
-                System.out.println(ally.getPos() + " | " + ball.getPos());
+        TreeMap<String, TritonTestable> testMap = new TreeMap<>();
+        testMap.put("PrimitiveMotion", (new PrimitiveMotionTest(ally)));
+        testMap.put("PrintHoldBall", new TritonTestable() {
+            @Override
+            public boolean test() {
+                System.out.println("This test will quit in 5 seconds");
+                long t0 = System.currentTimeMillis();
+                while(System.currentTimeMillis() - t0 < 5000) {
+                    System.out.println(ally.isHoldingBall());
+                }
+                return true;
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
+        });
 
+
+        System.out.println("Available Tests:");
+        for (String test : testMap.keySet()) {
+            System.out.printf("- %s \n", test);
+        }
+        System.out.println();
+
+        String prevTestName = "";
+        while (true) {
+            boolean result = false;
+            System.out.println(">> ENTER TEST NAME:");
+            String testName = scanner.nextLine();
+            if (testName.equals("")) {
+                testName = prevTestName;
+            } else if (testName.equals("quit")) {
+                break;
+            }
+
+            TritonTestable test = testMap.get(testName);
+            Optional<TritonTestable> test1 = Optional.ofNullable(test);
+
+            if (test1.isEmpty()) {
+                System.out.println("Invalid Test Name");
+                continue;
+            } else {
+                result = test1.get().test();
+            }
+
+            prevTestName = testName;
+            System.out.println(result ? "Test Success" : "Test Fail");
+        }
         //sleepForever();
     }
 
