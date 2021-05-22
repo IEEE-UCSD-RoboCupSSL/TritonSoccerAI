@@ -7,6 +7,7 @@ import Triton.CoreModules.Robot.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
+import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
@@ -196,9 +197,7 @@ public class App {
     }
 
     private static void testTritonBotMode(Scanner scanner) {
-        System.out.println("Press Enter to begin");
-        scanner.nextLine();
-        System.out.println("Started!");
+        System.out.println("Test Started!");
 
 
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
@@ -208,22 +207,37 @@ public class App {
         ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
                 0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         Ball ball = new Ball();
         ball.subscribe();
 
-
-
         Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
         ally.connect();
 
+        App.threadPool.scheduleAtFixedRate(ally,
+                0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
-        sleepForever();
+
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        (new PrimitiveMotionTest(ally)).test();
+        /*
+        while(true) {
+            if(ally.getPos() != null && ball.getPos() != null) {
+                System.out.println(ally.getPos() + " | " + ball.getPos());
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+        //sleepForever();
     }
 
 }
