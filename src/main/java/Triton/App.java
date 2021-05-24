@@ -112,7 +112,7 @@ public class App {
                 conn.setRobotIp(robotIPs);
             }
             if (args.length >= 4) {
-                switch (args[4]) {
+                switch (args[3]) {
                     case "GRSIM" -> {
                         SystemConfig.SIM = Simulator.GRSIM;
                     }
