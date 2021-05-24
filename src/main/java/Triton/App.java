@@ -15,10 +15,16 @@ import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.VirtualBot.ErForce.ErForceProcessingModule;
+import Triton.VirtualBot.ErForce.ErForceSendModule;
+import Triton.VirtualBot.GrSim.GrSimProcessingModule;
+import Triton.VirtualBot.GrSim.GrSimSendModule;
+import Triton.VirtualBot.TritonBotReceiveModule;
 
 import java.util.*;
 import java.util.concurrent.*;
 
+import static Triton.Config.ConnectionConfig.*;
 import static Triton.Config.ObjectConfig.MY_TEAM;
 import static Triton.Config.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.ThreadConfig.TOTAL_THREADS;
@@ -53,6 +59,8 @@ public class App {
         Scanner scanner = new Scanner(System.in);
 
         ConnectionProperties conn = Config.conn();
+
+        IniFileProcessor.readIni();
 
         /* processing command line arguments */
         if (args != null && args.length >= 1) { // choose team
@@ -102,6 +110,16 @@ public class App {
                     robotIPs.add(new RobotIp(args[2], port));
                 }
                 conn.setRobotIp(robotIPs);
+            }
+            if (args.length >= 4) {
+                switch (args[4]) {
+                    case "GRSIM" -> {
+                        SystemConfig.SIM = Simulator.GRSIM;
+                    }
+                    case "ERFORCE" -> {
+                        SystemConfig.SIM = Simulator.ERFORCE;
+                    }
+                }
             }
         }
 
@@ -158,20 +176,52 @@ public class App {
             threadPool.submit(new AI(fielders, goalKeeper, foes, ball, gameCtrlModule));
         }
 
+        for (int i = 0; i < ROBOT_COUNT; i++) {
+            ScheduledFuture<?> tritonBotReceiveModuleFuture = App.threadPool.scheduleAtFixedRate(
+                    new TritonBotReceiveModule(TRITON_IP, TRITON_PORT, i),
+                    0, Util.toPeriod(ModuleFreqConfig.TRITON_BOT_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
+                    TimeUnit.NANOSECONDS);
+        }
 
-        Display display = new Display();
-        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-        paintOptions.add(GEOMETRY);
-        paintOptions.add(OBJECTS);
+        // Schedule VirtualBot modules
+        switch (SystemConfig.SIM) {
+            case GRSIM -> {
+                ScheduledFuture<?> grSimProcessingFuture = App.threadPool.scheduleAtFixedRate(
+                        new GrSimProcessingModule(),
+                        0, Util.toPeriod(ModuleFreqConfig.GRSIM_PROCESSING_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
+
+                ScheduledFuture<?> grSimSendFuture = App.threadPool.scheduleAtFixedRate(
+                        new GrSimSendModule(GRSIM_SEND_IP, GRSIM_SEND_PORT),
+                        0, Util.toPeriod(ModuleFreqConfig.GRSIM_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
+            }
+            case ERFORCE -> {
+                ScheduledFuture<?> grSimProcessingFuture = App.threadPool.scheduleAtFixedRate(
+                        new ErForceProcessingModule(),
+                        0, Util.toPeriod(ModuleFreqConfig.ERFORCE_PROCESSING_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
+
+                ScheduledFuture<?> grSimSendFuture = App.threadPool.scheduleAtFixedRate(
+                        new ErForceSendModule(GRSIM_SEND_IP, GRSIM_SEND_PORT),
+                        0, Util.toPeriod(ModuleFreqConfig.ERFORCE_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        TimeUnit.NANOSECONDS);
+            }
+        }
+
+//        Display display = new Display();
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
 //        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
-        display.setPaintOptions(paintOptions);
+//        display.setPaintOptions(paintOptions);
 
-        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-                0,
-                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
-                TimeUnit.NANOSECONDS);
+//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+//                0,
+//                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+//                TimeUnit.NANOSECONDS);
 
         try {
             Thread.sleep(3000);
