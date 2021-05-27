@@ -1,6 +1,7 @@
 syntax = "proto2";
 
-option java_package = "Proto";
+
+
 
 // A 2D float vector.
 message Vector2f {

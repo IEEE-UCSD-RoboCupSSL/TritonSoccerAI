@@ -1,6 +1,7 @@
 syntax = "proto2";
 
-option java_package = "Proto";
+
+
 
 message Robots_Status{
   repeated Robot_Status robots_status = 1;

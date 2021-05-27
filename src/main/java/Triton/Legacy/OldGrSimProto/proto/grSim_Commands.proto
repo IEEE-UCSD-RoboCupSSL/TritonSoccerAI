@@ -1,6 +1,5 @@
 syntax = "proto2";
 
-option java_package = "Proto";
 
 message grSim_Robot_Command {
 required uint32 id = 1;

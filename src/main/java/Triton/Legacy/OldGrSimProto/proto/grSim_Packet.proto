@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-option java_package = "Proto";
+
 
 import "grSim_Commands.proto";
 import "grSim_Replacement.proto";

@@ -1,7 +1,7 @@
 package Triton.PeriphModules.Vision;
 
-import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
+import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
+import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Config.OldConfigs.jsonConfig;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;

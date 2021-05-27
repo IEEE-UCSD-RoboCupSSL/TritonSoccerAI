@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+option java_package = "Proto";
 
 /* embedded application layer ==cmd==> firmware layer */
 message FirmwareCommand {

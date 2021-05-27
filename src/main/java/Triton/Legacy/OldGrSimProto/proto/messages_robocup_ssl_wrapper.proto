@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-option java_package = "Proto";
+
 
 import "messages_robocup_ssl_detection.proto";
 import "messages_robocup_ssl_geometry.proto";

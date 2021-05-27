@@ -1,6 +1,6 @@
 package Triton.PeriphModules.Detection;
 
-import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;

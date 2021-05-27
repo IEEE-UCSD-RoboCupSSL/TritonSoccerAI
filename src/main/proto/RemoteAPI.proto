@@ -48,12 +48,13 @@ message CommandData {
 }
 
 message VisionData { /* World(Camera) Frame */
-    Vec2D bot_pos = 1; // Position on the field, relative to World camera's reference frame (world frame)
-    Vec2D bot_vel = 2;
-    double bot_ang = 3;
-    double bot_ang_vel = 4;
-    Vec2D ball_pos = 5;
-    Vec2D ball_vel = 6;
+    Vec2D bot_pos = 1; /* Position on the field, relative to World camera's reference frame (world frame) 
+                          unit: mm*/
+    Vec2D bot_vel = 2; // unit: mm/s
+    double bot_ang = 3; // unit: degree (-180 ~ 180), positive==counter-clockwise
+    double bot_ang_vel = 4; // unit: degree/s 
+    Vec2D ball_pos = 5; // unit: mm
+    Vec2D ball_vel = 6; // unit: mm/s
 }
 
 message UDPData {

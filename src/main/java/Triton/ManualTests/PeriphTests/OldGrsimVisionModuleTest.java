@@ -1,6 +1,6 @@
 package Triton.ManualTests.PeriphTests;
 
-import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.App;
 import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.ManualTests.TritonTestable;
@@ -10,8 +10,7 @@ import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import Triton.Util;
-import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
+import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

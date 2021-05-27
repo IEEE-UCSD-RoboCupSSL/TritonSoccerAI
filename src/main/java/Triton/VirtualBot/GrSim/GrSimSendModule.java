@@ -1,7 +1,7 @@
 package Triton.VirtualBot.GrSim;
 
-import Proto.GrSimCommands;
-import Proto.GrSimPacket;
+import Triton.Legacy.OldGrSimProto.protosrcs.GrSimCommands;
+import Triton.Legacy.OldGrSimProto.protosrcs.GrSimPacket;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
