@@ -1,7 +1,7 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
-import static Triton.Config.ObjectConfig.BALL_RADIUS;
-import static Triton.Config.ObjectConfig.ROBOT_MIN_RADIUS;
+import static Triton.Config.OldConfigs.ObjectConfig.BALL_RADIUS;
+import static Triton.Config.OldConfigs.ObjectConfig.ROBOT_MIN_RADIUS;
 
 /**
  * Config file for pathfinding

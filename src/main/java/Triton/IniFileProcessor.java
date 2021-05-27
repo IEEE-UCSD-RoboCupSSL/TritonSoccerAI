@@ -1,7 +1,7 @@
 package Triton;
 
-import Triton.Config.ObjectConfig;
-import Triton.Config.SystemConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.Config.OldConfigs.SystemConfig;
 import org.ini4j.*;
 
 import java.io.File;

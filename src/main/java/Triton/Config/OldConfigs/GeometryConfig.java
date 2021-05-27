@@ -1,4 +1,4 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;

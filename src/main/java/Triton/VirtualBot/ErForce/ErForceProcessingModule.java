@@ -1,12 +1,8 @@
 package Triton.VirtualBot.ErForce;
 
-import Proto.GrSimCommands;
+/*
 import Proto.VFirmwareAPI;
-import Triton.Config.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.ModulePubSubSystem.*;
-
-import java.util.ArrayList;
 
 public class ErForceProcessingModule implements Module {
 
@@ -63,3 +59,4 @@ public class ErForceProcessingModule implements Module {
 //        grSimCmdPubs.get(ID).publish(grSimRobotCommands.build());
     }
 }
+*/

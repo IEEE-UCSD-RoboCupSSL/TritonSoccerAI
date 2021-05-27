@@ -2,7 +2,7 @@ package Triton.PeriphModules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;

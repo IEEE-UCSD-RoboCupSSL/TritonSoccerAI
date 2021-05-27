@@ -1,7 +1,9 @@
 package Triton.VirtualBot;
 
+
+/*
 import Proto.VFirmwareAPI;
-import Triton.Config.Config;
+import Triton.Config.OldConfigs.jsonConfig;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.Publisher;
@@ -27,9 +29,9 @@ public class TritonBotReceiveModule implements Module {
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
         try {
-            NetworkInterface netIf = Util.getNetIf(Config.conn().getGrsimNetIf());
-            socket = Util.mcSocket(Config.conn().getGrsimMcAddr(),
-                    Config.conn().getGrsimMcPort(),
+            NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGrsimNetIf());
+            socket = Util.mcSocket(jsonConfig.conn().getGrsimMcAddr(),
+                    jsonConfig.conn().getGrsimMcPort(),
                     netIf);
             packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
@@ -53,3 +55,4 @@ public class TritonBotReceiveModule implements Module {
         }
     }
 }
+*/

@@ -1,7 +1,8 @@
 package Triton.ManualTests.PeriphTests;
 
+import Proto.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.App;
-import Triton.Config.ModuleFreqConfig;
+import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -9,11 +10,12 @@ import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 import Triton.Util;
+import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
+import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static Proto.MessagesRobocupSslDetection.*;
 
 public class OldGrsimVisionModuleTest implements TritonTestable {
     public boolean test() {

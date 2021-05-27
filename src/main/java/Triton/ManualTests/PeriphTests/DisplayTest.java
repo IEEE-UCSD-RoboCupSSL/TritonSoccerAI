@@ -1,7 +1,7 @@
 package Triton.ManualTests.PeriphTests;
 
 import Triton.App;
-import Triton.Config.ModuleFreqConfig;
+import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.PeriphModules.Display.Display;
 import Triton.Util;
 

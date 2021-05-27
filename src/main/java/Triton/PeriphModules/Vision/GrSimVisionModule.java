@@ -2,7 +2,7 @@ package Triton.PeriphModules.Vision;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Proto.MessagesRobocupSslWrapper.SSL_WrapperPacket;
-import Triton.Config.Config;
+import Triton.Config.OldConfigs.jsonConfig;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Util;
@@ -25,10 +25,10 @@ public class GrSimVisionModule extends VisionModule {
     private DatagramPacket packet;
 
     /**
-     * Constructs a VisionModule listening on default ip and port inside ConnectionConfig
+     * Constructs a VisionModule listening on default ip and port inside ConnectionjsonConfig
      */
     public GrSimVisionModule() {
-        this(Config.conn().getGrsimMcAddr(), Config.conn().getGrsimMcPort());
+        this(jsonConfig.conn().getGrsimMcAddr(), jsonConfig.conn().getGrsimMcPort());
     }
 
     /**
@@ -43,9 +43,9 @@ public class GrSimVisionModule extends VisionModule {
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         try {
-            NetworkInterface netIf = Util.getNetIf(Config.conn().getGrsimNetIf());
-            socket = Util.mcSocket(Config.conn().getGrsimMcAddr(),
-                    Config.conn().getGrsimMcPort(),
+            NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGrsimNetIf());
+            socket = Util.mcSocket(jsonConfig.conn().getGrsimMcAddr(),
+                    jsonConfig.conn().getGrsimMcPort(),
                     netIf);
             packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {

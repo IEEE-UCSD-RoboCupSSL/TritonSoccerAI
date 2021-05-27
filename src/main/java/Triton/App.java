@@ -1,6 +1,7 @@
 package Triton;
 
 import Triton.Config.*;
+import Triton.Config.OldConfigs.*;
 import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
@@ -10,28 +11,19 @@ import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
-import Triton.VirtualBot.ErForce.ErForceProcessingModule;
-import Triton.VirtualBot.ErForce.ErForceSendModule;
-import Triton.VirtualBot.GrSim.GrSimProcessingModule;
-import Triton.VirtualBot.GrSim.GrSimSendModule;
-import Triton.VirtualBot.TritonBotReceiveModule;
 
 import java.util.*;
 import java.util.concurrent.*;
 
-import static Triton.Config.ConnectionConfig.*;
-import static Triton.Config.ObjectConfig.MY_TEAM;
-import static Triton.Config.ObjectConfig.ROBOT_COUNT;
-import static Triton.Config.ThreadConfig.TOTAL_THREADS;
+import static Triton.Config.OldConfigs.DEPRECATED_ConnectionConfig.*;
+import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
+import static Triton.Config.OldConfigs.ObjectConfig.ROBOT_COUNT;
+import static Triton.Config.OldConfigs.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
-import static Triton.PeriphModules.Display.PaintOption.GEOMETRY;
-import static Triton.PeriphModules.Display.PaintOption.OBJECTS;
 
 
 /**
@@ -58,7 +50,7 @@ public class App {
         boolean toTestTritonBot = false;
         Scanner scanner = new Scanner(System.in);
 
-        ConnectionProperties conn = Config.conn();
+        ConnectionProperties conn = jsonConfig.conn();
 
         IniFileProcessor.readIni();
 
@@ -176,13 +168,16 @@ public class App {
             threadPool.submit(new AI(fielders, goalKeeper, foes, ball, gameCtrlModule));
         }
 
+        /*
         for (int i = 0; i < ROBOT_COUNT; i++) {
             ScheduledFuture<?> tritonBotReceiveModuleFuture = App.threadPool.scheduleAtFixedRate(
                     new TritonBotReceiveModule(TRITON_IP, TRITON_PORT, i),
                     0, Util.toPeriod(ModuleFreqConfig.TRITON_BOT_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
                     TimeUnit.NANOSECONDS);
-        }
+        }*/
 
+
+        /*
         // Schedule VirtualBot modules
         switch (SystemConfig.SIM) {
             case GRSIM -> {
@@ -208,6 +203,8 @@ public class App {
                         TimeUnit.NANOSECONDS);
             }
         }
+
+         */
 
 //        Display display = new Display();
 //        ArrayList<PaintOption> paintOptions = new ArrayList<>();

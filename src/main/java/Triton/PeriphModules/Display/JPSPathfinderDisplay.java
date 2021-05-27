@@ -1,7 +1,7 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Config.DisplayConfig;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.DisplayConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.Node;
 import Triton.Misc.Math.Matrix.Vec2D;

@@ -1,7 +1,6 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
-import Triton.Config.ObjectConfig;
-import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.RobotData;
 

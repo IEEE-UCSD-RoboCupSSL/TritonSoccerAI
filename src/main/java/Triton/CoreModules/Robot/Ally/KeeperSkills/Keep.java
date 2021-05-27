@@ -1,11 +1,11 @@
 package Triton.CoreModules.Robot.Ally.KeeperSkills;
 
-import Triton.Config.PathfinderConfig;
+import Triton.Config.OldConfigs.PathfinderConfig;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.GeometryConfig.*;
+import static Triton.Config.OldConfigs.GeometryConfig.*;
 
 public class Keep {
 

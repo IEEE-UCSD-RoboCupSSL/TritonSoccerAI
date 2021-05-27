@@ -2,10 +2,9 @@ package Triton.CoreModules.Ball;
 
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.BallData;
 
-import static Triton.Config.ObjectConfig.POS_PRECISION;
+import static Triton.Config.OldConfigs.ObjectConfig.POS_PRECISION;
 
 public class Ball {
 

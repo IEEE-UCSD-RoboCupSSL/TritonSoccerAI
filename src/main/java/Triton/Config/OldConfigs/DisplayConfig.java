@@ -1,4 +1,4 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
 /**
  * Config file for display

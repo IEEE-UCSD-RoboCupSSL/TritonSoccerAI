@@ -4,8 +4,8 @@ import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.GeometryConfig.FIELD_LENGTH;
-import static Triton.Config.GeometryConfig.GOAL_LENGTH;
+import static Triton.Config.OldConfigs.GeometryConfig.FIELD_LENGTH;
+import static Triton.Config.OldConfigs.GeometryConfig.GOAL_LENGTH;
 
 /**
  * g3: R will have enough time to take a shot before opponents steal the ball

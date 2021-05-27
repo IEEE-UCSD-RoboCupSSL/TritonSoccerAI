@@ -1,4 +1,4 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
 public class ThreadConfig {
     public static final int TOTAL_THREADS = 150;

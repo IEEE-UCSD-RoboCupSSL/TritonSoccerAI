@@ -13,7 +13,7 @@ import Triton.Misc.RWLockee;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import static Triton.Config.GeometryConfig.*;
+import static Triton.Config.OldConfigs.GeometryConfig.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 

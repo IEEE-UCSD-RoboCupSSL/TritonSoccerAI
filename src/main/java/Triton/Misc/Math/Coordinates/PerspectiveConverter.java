@@ -1,6 +1,6 @@
 package Triton.Misc.Math.Coordinates;
 
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
 

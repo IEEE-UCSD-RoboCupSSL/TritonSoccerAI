@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;

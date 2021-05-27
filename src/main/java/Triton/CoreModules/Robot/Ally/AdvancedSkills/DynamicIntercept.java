@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.PathfinderConfig;
+import Triton.Config.OldConfigs.PathfinderConfig;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
@@ -8,8 +8,8 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.ObjectConfig.DRIBBLER_OFFSET;
-import static Triton.Config.PathfinderConfig.INTERCEPT_CIRCLE_RADIUS;
+import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
+import static Triton.Config.OldConfigs.PathfinderConfig.INTERCEPT_CIRCLE_RADIUS;
 
 public class DynamicIntercept {
 

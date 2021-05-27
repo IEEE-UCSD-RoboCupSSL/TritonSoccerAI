@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.AI_Skills;
 
 
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;

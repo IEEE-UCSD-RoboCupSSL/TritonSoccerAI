@@ -1,7 +1,6 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
-import Triton.Config.Config;
-import Triton.Config.ConnectionProperties;
+import Triton.Config.OldConfigs.jsonConfig;
 
 /**
  * Contains all connections of a single robot
@@ -23,8 +22,8 @@ public class RobotConnection {
         this.ID = ID;
 
         try {
-            ip = Config.conn().getRobotIp().get(ID).getIp();
-            port = Config.conn().getRobotIp().get(ID).getPort();
+            ip = jsonConfig.conn().getRobotIp().get(ID).getIp();
+            port = jsonConfig.conn().getRobotIp().get(ID).getPort();
         } catch (Exception e) {
             System.out.println("Invalid Robot ID");
         }
@@ -34,14 +33,14 @@ public class RobotConnection {
      * Constructs a tcp connection
      */
     public void buildTcpConnection() {
-        tcpConnect = new RobotTCPConnection(ip,port + Config.conn().getTcpOffset(), ID);
+        tcpConnect = new RobotTCPConnection(ip,port + jsonConfig.conn().getTcpOffset(), ID);
     }
 
     /**
      * Constructs the command UDP stream
      */
     public void buildUDPStream() {
-        udpStream = new RobotUDPStream(ip,port + Config.conn().getUdpOffset(), ID);
+        udpStream = new RobotUDPStream(ip,port + jsonConfig.conn().getUdpOffset(), ID);
     }
 
     /**

@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.PathFinder.ThetaStar;
 
-import Triton.Config.PathfinderConfig;
+import Triton.Config.OldConfigs.PathfinderConfig;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;

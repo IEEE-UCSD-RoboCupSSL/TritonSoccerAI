@@ -4,7 +4,7 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.PathfinderConfig.*;
+import static Triton.Config.OldConfigs.PathfinderConfig.*;
 
 public class DribRotate {
     public static boolean exec(Ally ally, Ball ball, double angle) {

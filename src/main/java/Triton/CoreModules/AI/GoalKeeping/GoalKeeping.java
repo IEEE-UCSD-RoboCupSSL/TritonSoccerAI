@@ -5,7 +5,7 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
+import static Triton.Config.OldConfigs.ObjectConfig.MAX_KICK_VEL;
 
 public class GoalKeeping {
 

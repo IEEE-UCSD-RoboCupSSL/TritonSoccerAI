@@ -1,12 +1,12 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.PathfinderConfig;
+import Triton.Config.OldConfigs.PathfinderConfig;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.AIConfig.HOLDING_BALL_VEL_THRESH;
+import static Triton.Config.OldConfigs.AIConfig.HOLDING_BALL_VEL_THRESH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 

@@ -1,17 +1,15 @@
 package Triton.ManualTests.PeriphTests;
 
 import Triton.App;
-import Triton.Config.ModuleFreqConfig;
+import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
-import Triton.PeriphModules.GameControl.StdinGameCtrlModule;
 import Triton.Util;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static Triton.Config.ObjectConfig.MY_TEAM;
+import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
 import static Triton.CoreModules.Robot.Team.BLUE;
 
 public class PySocketGameCtrlModuleTest {

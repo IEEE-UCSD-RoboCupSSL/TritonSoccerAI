@@ -1,7 +1,7 @@
 package Triton.PeriphModules.GameControl;
 
 import Proto.SslGcRefereeMessage;
-import Triton.Config.Config;
+import Triton.Config.OldConfigs.jsonConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.PeriphModules.GameControl.GameStates.*;
@@ -24,9 +24,9 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
-        NetworkInterface netIf = Util.getNetIf(Config.conn().getGcNetIf());
-        socket = Util.mcSocket(Config.conn().getGcMcAddr(),
-                Config.conn().getGcMcPort(),
+        NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGcNetIf());
+        socket = Util.mcSocket(jsonConfig.conn().getGcMcAddr(),
+                jsonConfig.conn().getGcMcPort(),
                 netIf);
         packet = new DatagramPacket(buffer, buffer.length);
     }

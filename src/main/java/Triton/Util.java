@@ -1,6 +1,6 @@
 package Triton;
 
-import Triton.Config.Config;
+import Triton.Config.OldConfigs.jsonConfig;
 
 import java.io.IOException;
 import java.net.*;
@@ -50,7 +50,7 @@ public final class Util {
                 InetAddress group = InetAddress.getByName(addr);
                 dc.join(group, netIf);
                 DatagramSocket socket = dc.socket();
-                socket.setSoTimeout(Config.conn().getMcTimeout());
+                socket.setSoTimeout(jsonConfig.conn().getMcTimeout());
                 return dc.socket();
             }
         } catch (IOException e) {

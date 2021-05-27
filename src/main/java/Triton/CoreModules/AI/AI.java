@@ -18,8 +18,8 @@ import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
 
-import static Triton.Config.ObjectConfig.DRIBBLER_OFFSET;
-import static Triton.Config.ObjectConfig.MY_TEAM;
+import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
+import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
 
 
 public class AI implements Module {

@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.Estimators;
 
 
-import Triton.Config.AIConfig;
+import Triton.Config.OldConfigs.AIConfig;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.Ball.Ball;

@@ -1,8 +1,8 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Config.DisplayConfig;
-import Triton.Config.GeometryConfig;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.DisplayConfig;
+import Triton.Config.OldConfigs.GeometryConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static Triton.Config.GeometryConfig.*;
+import static Triton.Config.OldConfigs.GeometryConfig.*;
 import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**

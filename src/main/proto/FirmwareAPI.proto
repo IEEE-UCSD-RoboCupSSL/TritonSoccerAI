@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+
+/* embedded application layer ==cmd==> firmware layer */
+message FirmwareCommand {
+    /* set true only once at the beginning to initialize the sensor systems */
+    bool init = 1; 
+    
+    /* motion cmd to make the robot translationally move at direction of cartesian vector (vx, vy)
+     * with unit represented by percentage of maximum motor output
+     * unit range: (-100.0f ~ 100.0f) x (-100.0f ~ 100.0f) where 100 corresponds to 100 percent 
+     * of motor maximum speed 
+     */
+    float vx = 2;
+    float vy = 3;
+    /* similar to the above, motor cmd for rational angular velocity, (positive rotation is counterclockwise) 
+     * unit range -100.0f ~ 100.0f (percent of max possible angular velocity)
+     */
+    float w = 4;
+    // Note that norm(<vx, vy, w>) guarantees to be 1
+
+    /* Kicker cmd represented in vector (kx, kz)
+     * with unit range (-100 ~ 100) x (-100 ~ 100) (percentage too like vx,vy,w above)
+     * x corresponds to horizontal kick strength
+     * z corresponds to vertical kick strength
+     */
+    float kx = 5;
+    float kz = 6;
+
+    /* set true to turn dribbler on, false to turn off */
+    bool dribbler = 7; 
+}
+
+
+/* firmware layer ==data==> embedded application layer */
+message FirmwareData {
+
+    /* Motor Built-in Encoder Count Data */ // unit: millimeter
+    float enc_x = 1; /* WheelToBody transformed motor encoder count on x axis: 
+                            estimate robot's translational displacement since 
+                            robot got initialized. (imu_accel data might have been used to make WheelToBody transform more precise direction-wise) */
+    float enc_y = 2; // ... on y axis ...
+
+    /* IMU Kalman/AHRS Filtered Data */ 
+    float imu_theta = 3; /* IMU (filter may incorporate encoder data) 
+                                estimated heading angle/orientation, 
+                                in degrees (NOT radians), 
+                                range from (-180 ~ 180), (NOT 0 ~ 360), 
+                                positive direction is counter-clockwise */
+    float imu_omega = 4; /* IMU (filter may incorporate encoder data)
+                                estimated angular velocity,
+                                unit is degree/s, positive direction is counter-clockwise */
+    float imu_ax = 5; // imu's accelerometer: robot's translational acceleration 
+    float imu_ay = 6; //       <ax, ay>, unit: g (gravitational constant)
+
+    bool is_holdingball = 7; // on robot ToF sensor detecting whether the robot successfully holds the ball under the dribbler
+    
+}

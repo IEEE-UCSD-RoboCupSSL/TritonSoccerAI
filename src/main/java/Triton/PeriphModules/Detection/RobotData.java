@@ -1,7 +1,7 @@
 package Triton.PeriphModules.Detection;
 
 import Proto.MessagesRobocupSslDetection.SSL_DetectionRobot;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;

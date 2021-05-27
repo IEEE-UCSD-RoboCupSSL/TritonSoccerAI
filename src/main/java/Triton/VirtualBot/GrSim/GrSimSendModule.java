@@ -2,7 +2,7 @@ package Triton.VirtualBot.GrSim;
 
 import Proto.GrSimCommands;
 import Proto.GrSimPacket;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.Subscriber;

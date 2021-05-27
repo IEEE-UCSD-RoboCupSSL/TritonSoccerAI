@@ -1,15 +1,9 @@
 package Triton.VirtualBot.ErForce;
 
-import Proto.GrSimCommands;
-import Proto.GrSimPacket;
-import Triton.Config.ObjectConfig;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
 
 public class ErForceSendModule implements Module {
     protected InetAddress address;

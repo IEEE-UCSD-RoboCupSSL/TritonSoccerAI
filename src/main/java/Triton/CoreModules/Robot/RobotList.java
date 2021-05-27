@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot;
 
 import Triton.App;
-import Triton.Config.ModuleFreqConfig;
+import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Util;
 

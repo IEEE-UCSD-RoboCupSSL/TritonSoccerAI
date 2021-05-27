@@ -15,7 +15,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.ObjectConfig.MAX_KICK_VEL;
+import static Triton.Config.OldConfigs.ObjectConfig.MAX_KICK_VEL;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
 public class AttackPlanA extends Tactics {

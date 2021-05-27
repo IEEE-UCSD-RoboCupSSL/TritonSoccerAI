@@ -1,6 +1,6 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Config.DisplayConfig;
+import Triton.Config.OldConfigs.DisplayConfig;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

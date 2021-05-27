@@ -1,8 +1,10 @@
 package Triton.VirtualBot.GrSim;
 
-import Proto.GrSimCommands;
+
+/*
+import Triton.Legacy.OldGrSimProtoSrcs.GrSimCommands;
 import Proto.VFirmwareAPI;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.Misc.ModulePubSubSystem.Module;
 
@@ -64,3 +66,4 @@ public class GrSimProcessingModule implements Module {
         grSimCmdPubs.get(ID).publish(grSimRobotCommands.build());
     }
 }
+*/

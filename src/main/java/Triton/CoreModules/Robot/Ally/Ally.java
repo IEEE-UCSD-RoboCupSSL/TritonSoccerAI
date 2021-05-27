@@ -2,8 +2,8 @@ package Triton.CoreModules.Robot.Ally;
 
 import Proto.RemoteAPI;
 import Triton.App;
-import Triton.Config.ModuleFreqConfig;
-import Triton.Config.ObjectConfig;
+import Triton.Config.OldConfigs.ModuleFreqConfig;
+import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
@@ -30,9 +30,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static Triton.Config.GeometryConfig.FIELD_LENGTH;
-import static Triton.Config.GeometryConfig.FIELD_WIDTH;
-import static Triton.Config.ObjectConfig.*;
+import static Triton.Config.OldConfigs.GeometryConfig.FIELD_LENGTH;
+import static Triton.Config.OldConfigs.GeometryConfig.FIELD_WIDTH;
+import static Triton.Config.OldConfigs.ObjectConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.CoreModules.Robot.MotionState.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;

@@ -1,4 +1,4 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
 public class AIConfig {
     public static final double BALL_HOLD_DIST_THRESH = 150;

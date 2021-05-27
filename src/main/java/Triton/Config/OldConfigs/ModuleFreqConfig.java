@@ -1,4 +1,4 @@
-package Triton.Config;
+package Triton.Config.OldConfigs;
 
 public class ModuleFreqConfig {
     public static final double GRSIM_VISION_MODULE_FREQ = 500;
