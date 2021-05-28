@@ -1,6 +1,7 @@
 package Triton.ManualTests.PeriphTests;
 
 import Triton.App;
+import Triton.Config.Config;
 import Triton.Config.OldConfigs.ModuleFreqConfig;
 import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
@@ -11,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class SSLGameCtrlModuleTest implements TritonTestable {
-    public boolean test() {
+    public boolean test(Config config) {
         GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
         ScheduledFuture<?> future = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
                 0,

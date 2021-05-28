@@ -26,16 +26,19 @@ public class RobotList<T> extends ArrayList<T> {
         return numSuccessConnect;
     }
 
-    public void runAll() {
+    public ArrayList<ScheduledFuture<?>> runAll() {
+        ArrayList<ScheduledFuture<?>> robotFutures = new ArrayList<>();
         for (T bot : this) {
             if (bot instanceof Robot) {
-                ScheduledFuture<?> robotFuture = App.threadPool.scheduleAtFixedRate((Robot) bot,
+                ScheduledFuture<?> robotFuture = App.threadPool.scheduleAtFixedRate(
+                            (Robot) bot,
                         0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
+                robotFutures.add(robotFuture);
             } else {
                 System.out.println("Invalid Type");
             }
         }
+        return robotFutures;
     }
 
     public void stopAll() {

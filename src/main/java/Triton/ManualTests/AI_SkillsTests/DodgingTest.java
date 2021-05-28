@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_SkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.Dodging;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.Ball.Ball;
@@ -27,7 +28,7 @@ public class DodgingTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         try {
             Ally holder = allies.get(2);
 

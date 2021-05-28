@@ -1,5 +1,6 @@
 package Triton.ManualTests.EstimatorTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -22,7 +23,7 @@ public class GapFinderTest implements TritonTestable {
         gapFinder.run();
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         Display display = new Display();
         ArrayList<PaintOption> paintOptions = new ArrayList<>();
         paintOptions.add(GEOMETRY);

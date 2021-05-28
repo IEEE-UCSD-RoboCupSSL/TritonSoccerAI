@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.Formation;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
@@ -39,7 +40,7 @@ public class FormationTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
         Formation.printAvailableFormations();
         System.out.println(">> ENTER FORMATION TO MOVE TO:");

@@ -1,5 +1,7 @@
 package Triton.ManualTests;
 
+import Triton.Config.Config;
+
 public interface TritonTestable {
-    boolean test();
+    boolean test(Config config);
 }

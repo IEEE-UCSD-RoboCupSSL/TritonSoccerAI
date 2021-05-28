@@ -1,5 +1,6 @@
 package Triton.ManualTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -17,7 +18,7 @@ import java.util.Scanner;
  * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
  */
 public class CoreTestRunner {
-    public static void runCoreTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public static void runCoreTest(Config config, RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         Scanner scanner = new Scanner(System.in);
         try {
             Thread.sleep(1000);
@@ -25,7 +26,7 @@ public class CoreTestRunner {
 
             TritonTestable defaultFormation = testFactory.getTest("defaultFormation");
             Optional<TritonTestable> defaultFormation1 = Optional.of(defaultFormation);
-            defaultFormation1.get().test();
+            defaultFormation1.get().test(config);
 
             String prevTestName = "";
 
@@ -50,7 +51,7 @@ public class CoreTestRunner {
                     System.out.println("Invalid Test Name");
                     continue;
                 } else {
-                    result = test1.get().test();
+                    result = test1.get().test(config);
                 }
 
                 prevTestName = testName;

@@ -1,8 +1,6 @@
 package Triton.Config;
 import Triton.Config.GlobalVaribles.General;
-import org.apache.commons.math3.fraction.FractionConversionException;
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -39,7 +37,7 @@ public class CliConfig {
         commandLine.parseArgs(args);
         if (commandLine.isUsageHelpRequested()) {
             commandLine.usage(System.out);
-            return;
+            System.exit(0);
         }
 
         if(!Arrays.asList(General.supportedSimulators).contains(simulator)) {

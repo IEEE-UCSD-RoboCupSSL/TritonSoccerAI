@@ -2,9 +2,10 @@ package Triton.ManualTests;
 
 import Triton.App;
 
+import Triton.Config.Config;
 import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.MiscTests.PubSubTests;
-import Triton.ManualTests.PeriphTests.OldGrsimVisionModuleTest;
+import Triton.ManualTests.PeriphTests.SSLVisionModuleTest;
 import Triton.ManualTests.PeriphTests.SSLGameCtrlModuleTest;
 
 import java.util.TreeMap;
@@ -22,10 +23,10 @@ public class PeriphMiscTestFactory {
 
     private final TreeMap<String, TritonTestable> periphTestMap = new TreeMap<>();
 
-    public PeriphMiscTestFactory() {
+    public PeriphMiscTestFactory(Config config) {
         periphTestMap.put("futask", new FutureTaskTest(App.threadPool));
         periphTestMap.put("pubsub", new PubSubTests(App.threadPool));
-        periphTestMap.put("grsimvision", new OldGrsimVisionModuleTest());
+        periphTestMap.put("grsimvision", new SSLVisionModuleTest());
         periphTestMap.put("SSL", new SSLGameCtrlModuleTest());
     }
 

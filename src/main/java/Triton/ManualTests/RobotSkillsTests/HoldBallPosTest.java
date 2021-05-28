@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -15,7 +16,7 @@ public class HoldBallPosTest extends RobotSkillsTest {
 
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         try {
             while(true) {
                 if(ally.isHoldingBall()) {

@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ public class AdvancedMotionTest extends RobotSkillsTest {
     private Ally bot;
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
         try {
             boolean toQuit = false;

@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ public class DynamicInterceptBallTest extends RobotSkillsTest {
 
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         System.out.println("intercepting ball");
         ally.stop();
         while (true) {

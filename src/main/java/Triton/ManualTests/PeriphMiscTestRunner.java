@@ -1,5 +1,7 @@
 package Triton.ManualTests;
 
+import Triton.Config.Config;
+
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -11,10 +13,10 @@ import java.util.Scanner;
  * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
  */
 public class PeriphMiscTestRunner {
-    public static void runPeriphMiscTest() {
+    public static void runPeriphMiscTest(Config config) {
         Scanner scanner = new Scanner(System.in);
         try {
-            PeriphMiscTestFactory testFactory = new PeriphMiscTestFactory();
+            PeriphMiscTestFactory testFactory = new PeriphMiscTestFactory(config);
             String prevTestName = "";
 
             while (true) {
@@ -38,7 +40,7 @@ public class PeriphMiscTestRunner {
                     System.out.println("Invalid Test Name");
                     continue;
                 } else {
-                    result = test1.get().test();
+                    result = test1.get().test(config);
                 }
 
                 prevTestName = testName;

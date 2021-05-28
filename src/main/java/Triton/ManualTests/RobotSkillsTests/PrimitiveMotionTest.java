@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ public class PrimitiveMotionTest extends RobotSkillsTest {
     Ally bot;
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Testing Primitive Motion Commands, Modes: TDRD, TDRV, TVRD, TVRV (T=Translational, R=Rotational, D=Displacement, V=Velocity)");
         boolean toQuit = false;

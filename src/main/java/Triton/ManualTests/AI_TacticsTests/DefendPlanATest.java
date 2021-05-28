@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_TacticsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -15,7 +16,7 @@ public class DefendPlanATest implements TritonTestable {
         defendPlanA = new DefendPlanA(fielders, keeper, foes, ball, 250);
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         try {
             while (true) {
                 defendPlanA.exec();

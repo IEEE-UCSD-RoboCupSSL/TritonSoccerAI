@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_SkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.ShootGoal;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -27,7 +28,7 @@ public class ShootGoalTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
         try {
             while (true) {

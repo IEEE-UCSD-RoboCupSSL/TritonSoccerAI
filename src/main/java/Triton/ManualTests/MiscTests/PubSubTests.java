@@ -1,5 +1,6 @@
 package Triton.ManualTests.MiscTests;
 
+import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.MQPubSubPair;
@@ -17,7 +18,7 @@ public class PubSubTests implements TritonTestable {
         this.threadPool = threadPool;
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
 
         boolean quit = false;

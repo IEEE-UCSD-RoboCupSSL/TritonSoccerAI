@@ -1,5 +1,6 @@
 package Triton.ManualTests.EstimatorTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -24,7 +25,7 @@ public class PassFinderTest implements TritonTestable {
         passFinder.run();
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         Display display = new Display();
         ArrayList<PaintOption> paintOptions = new ArrayList<>();
         paintOptions.add(GEOMETRY);

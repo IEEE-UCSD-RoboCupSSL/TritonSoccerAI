@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_SkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -21,7 +22,7 @@ public class GroupToTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         try {
 
             Swarm swarm = new Swarm(allies);

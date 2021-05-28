@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_StrategiesTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
@@ -20,7 +21,7 @@ public class BasicPlayTest implements TritonTestable {
         basicPlay = new BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder);
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         try {
             while (true) {
                 basicPlay.play();

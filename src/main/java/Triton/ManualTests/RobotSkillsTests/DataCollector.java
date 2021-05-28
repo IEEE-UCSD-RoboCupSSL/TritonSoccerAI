@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
@@ -38,8 +39,8 @@ public class DataCollector extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
-        new FormationTest("out", fielders, keeper).test();
+    public boolean test(Config config) {
+        new FormationTest("out", fielders, keeper).test(config);
         Ally ally = fielders.get(0);
 
         for (double kickSpeed = 3.99; kickSpeed <= 4; kickSpeed += 0.01) {

@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_SkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
@@ -33,7 +34,7 @@ public class CPassTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
 
         boolean testRtn = true;
         try {

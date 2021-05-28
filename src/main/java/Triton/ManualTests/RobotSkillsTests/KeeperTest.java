@@ -1,5 +1,6 @@
 package Triton.ManualTests.RobotSkillsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
@@ -31,7 +32,7 @@ public class KeeperTest extends RobotSkillsTest {
     }
 
     @Override
-    public boolean test() {
+    public boolean test(Config config) {
         while (true) {
             goalKeeping.passiveGuarding();
         }

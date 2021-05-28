@@ -1,5 +1,6 @@
 package Triton.PeriphModules.Detection;
 
+import Triton.Config.Config;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.Config.OldConfigs.ObjectConfig;
@@ -31,19 +32,19 @@ public class DetectionModule implements Module {
     /**
      * Constructs a DetectionModule
      */
-    public DetectionModule() {
+    public DetectionModule(Config config) {
         visionSub = new MQSubscriber<>("vision", "detection");
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.connConfig.numRobots; i++) {
             yellowRobotsData.add(new RobotData(Team.YELLOW, i));
             blueRobotsData.add(new RobotData(Team.BLUE, i));
         }
 
         yellowRobotPubs = new ArrayList<>();
         blueRobotPubs = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.connConfig.numRobots; i++) {
             blueRobotPubs.add(new FieldPublisher<>("detection", Team.BLUE.name() + i, blueRobotsData.get(i)));
             yellowRobotPubs.add(new FieldPublisher<>("detection", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
         }

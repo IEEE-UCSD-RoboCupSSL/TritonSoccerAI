@@ -8,23 +8,20 @@ import Triton.CoreModules.Robot.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
-import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
-import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
-import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.PeriphModules.Vision.SSLVisionModule;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static Triton.Config.OldConfigs.DEPRECATED_ConnectionConfig.*;
 import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
-import static Triton.Config.OldConfigs.ObjectConfig.ROBOT_COUNT;
 import static Triton.Config.OldConfigs.ThreadConfig.TOTAL_THREADS;
 import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
+import static Triton.Util.delay;
 
 
 /**
@@ -35,7 +32,7 @@ import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
  *  * run:
  *      * mvn exec:java
  *      * or if with args: mvn exec:java -Dexec.args="arg1 arg2 ..."
- *  Example: mvn exec:java -Dexec.args="-b -v ini/Setups/DevelopmentSetups/virtual-grsim-6v6.ini ini/RobotConfig/triton-2021-grsim.ini"
+ *  Example: mvn exec:java -Dexec.args="-bvt ini/Setups/DevelopmentSetups/virtual-grsim-6v6.ini ini/RobotConfig/triton-2021-grsim.ini"
  *
  * compile to a jar: mvn clean compile assembly:single
  * then use java -jar to execute the jar
@@ -49,6 +46,7 @@ public class App {
     }
 
     public static void main(String[] args) {
+        /** process cli args & ini configs **/
         System.out.println("==============================================================");
         Config config = new Config(args);
         try {
@@ -58,17 +56,102 @@ public class App {
         }
         System.out.println(config.cliConfig);
         System.out.println(config.connConfig);
+        // ...
         System.out.println("==============================================================");
+        Scanner scanner = new Scanner(System.in);
+        boolean toRunTest = false;
+        boolean toTestTritonBot = false;
+        
+        GeometryConfig.initGeo(); // To-do: refactor this
+
+        if(config.cliConfig.isTestMode) {
+            System.out.println(">> Enter [Y] for CoreTest Mode, or Enter [N] for PeriphTest Mode");
+            String testMode = scanner.nextLine();
+            switch (testMode) {
+                /* CoreTest Mode */
+                case "Y" -> toRunTest = true;
+                /* PeriphTest Mode */
+                case "N" -> {
+                    System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
+                    runPeriphMiscTest(config);
+                    toRunTest = true;
+                }
+                default -> System.out.println("Invalid Input");
+            }
+        }
+        if(config.cliConfig.isTestTritonBotMode) {
+            testTritonBotMode(scanner);
+            sleepForever();
+        }
+        
+        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
+        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(
+                    new SSLVisionModule(config),
+                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(
+                    new DetectionModule(config),
+                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        delay(1000);
+        
+        Ball ball = new Ball();
+        ball.subscribe();
+
+        // instantiate robots
+        ArrayList<ScheduledFuture<?>> allyFieldersFutures;
+        ArrayList<ScheduledFuture<?>> foesFutures;
+        ScheduledFuture<?> goalKeeperFuture;
+        RobotList<Ally> fielders = RobotFactory.createAllyFielderBots(config);
+        Ally goalKeeper = RobotFactory.createGoalKeeperBot(config);
+        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(config);
+        // our/ally robots == fielders + 1 goalkeeper
+        if (fielders.connectAll() == config.connConfig.numRobots - 1 && goalKeeper.connect()) {
+            allyFieldersFutures = fielders.runAll();
+            goalKeeperFuture = App.threadPool.scheduleAtFixedRate(
+                        goalKeeper,
+                    0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+        }
+        // opponent/foe robots: foes = foeFielders + 1 foeGoalKeeper
+        foesFutures = foes.runAll(); // submit all to threadPool
+
+
+        if (toRunTest) {
+            System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
+            CoreTestRunner.runCoreTest(config, fielders, goalKeeper, foes, ball);
+        } else {
+            /* Run the actual game program */
+
+            int port = (config.team == BLUE) ? 6543 : 6544;
+
+            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
+//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
+                    0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+            /* Instantiate & Run the main AI module, which is the core of this software */
+            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
+        }
+
+
 
         sleepForever();
 
-        boolean toRunTest = false;
-        boolean toTestTritonBot = false;
-        Scanner scanner = new Scanner(System.in);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // old code
 
         ConnectionProperties conn = jsonConfig.conn();
 
-        IniFileProcessor.readIni();
 
         /* processing command line arguments */
         if (args != null && args.length >= 1) { // choose team
@@ -80,109 +163,15 @@ public class App {
                     sleepForever();
                 }
             }
-
-            if (args.length >= 2) { // mode
-                switch (args[1]) {
-                    case "NORMAL" -> System.out.println("###########################################");
-                    case "TEST" -> {
-
-                        System.out.println(">> Enter [Y] for CoreTest Mode, or Enter [N] for PeriphTest Mode");
-                        String testMode = scanner.nextLine();
-                        switch (testMode) {
-                            /* CoreTest Mode */
-                            case "Y" -> toRunTest = true;
-
-                            /* PeriphTest Mode */
-                            case "N" -> {
-                                System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                                runPeriphMiscTest();
-                                toRunTest = true;
-                            }
-                            default -> System.out.println("Invalid Input");
-                        }
-                    }
-                    case "TEST_TRITONBOT" -> {
-                        toTestTritonBot = true;
-                    }
-                    default -> {
-                        System.out.println("Error: Invalid Args");
-                        sleepForever();
-                    }
-                }
-            }
-            if (args.length >= 3) { // robot ip addr (port base)
-                LinkedList<RobotIp> robotIPs = new LinkedList<>();
-                for (int i = 0; i < ROBOT_COUNT; i++) { // use default port base and offset
-                    int port = (args.length > 3) ? Integer.parseInt(args[3]) : conn.getDefaultPortBase();
-                    port += i * conn.getDefaultPortOffset();
-                    robotIPs.add(new RobotIp(args[2], port));
-                }
-                conn.setRobotIp(robotIPs);
-            }
-            if (args.length >= 4) {
-                switch (args[3]) {
-                    case "GRSIM" -> {
-                        SystemConfig.SIM = Simulator.GRSIM;
-                    }
-                    case "ERFORCE" -> {
-                        SystemConfig.SIM = Simulator.ERFORCE;
-                    }
-                }
-            }
         }
 
-        GeometryConfig.initGeo();
-
-        if(toTestTritonBot) {
-            testTritonBotMode(scanner);
-        }
-
-        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
-                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
-                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Ball ball = new Ball();
-        ball.subscribe();
-
-        RobotList<Ally> fielders = RobotFactory.createAllyBots(ObjectConfig.ROBOT_COUNT - 1);
-        Ally goalKeeper = RobotFactory.createGoalKeeperBot();
-        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(ObjectConfig.ROBOT_COUNT);
-        if (fielders.connectAll() == ObjectConfig.ROBOT_COUNT - 1
-                && goalKeeper.connect()) {
-            fielders.runAll();
-
-            ScheduledFuture<?> goalKeeperFuture = App.threadPool.scheduleAtFixedRate(goalKeeper,
-                    0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-        }
-        foes.runAll(); // submit all to threadPool
 
 
-        if (toRunTest) {
-            System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            CoreTestRunner.runCoreTest(fielders, goalKeeper, foes, ball);
-        } else {
-            /* Run the actual game program */
 
-            int port = (MY_TEAM == BLUE) ? 6543 : 6544;
 
-            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
-//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
-                    0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
-            /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(fielders, goalKeeper, foes, ball, gameCtrlModule));
-        }
+
+
 
         /*
         for (int i = 0; i < ROBOT_COUNT; i++) {
@@ -261,77 +250,77 @@ public class App {
     private static void testTritonBotMode(Scanner scanner) {
         System.out.println("Test Started!");
 
-
-        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
-                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
-                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-
-        Ball ball = new Ball();
-        ball.subscribe();
-
-        final Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
-        ally.connect();
-
-        App.threadPool.scheduleAtFixedRate(ally,
-                0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        TreeMap<String, TritonTestable> testMap = new TreeMap<>();
-        testMap.put("PrimitiveMotion", (new PrimitiveMotionTest(ally)));
-        testMap.put("PrintHoldBall", new TritonTestable() {
-            @Override
-            public boolean test() {
-                System.out.println("This test will quit in 5 seconds");
-                long t0 = System.currentTimeMillis();
-                while(System.currentTimeMillis() - t0 < 5000) {
-                    System.out.println(ally.isHoldingBall());
-                }
-                return true;
-            }
-        });
-
-
-        System.out.println("Available Tests:");
-        for (String test : testMap.keySet()) {
-            System.out.printf("- %s \n", test);
-        }
-        System.out.println();
-
-        String prevTestName = "";
-        while (true) {
-            boolean result = false;
-            System.out.println(">> ENTER TEST NAME:");
-            String testName = scanner.nextLine();
-            if (testName.equals("")) {
-                testName = prevTestName;
-            } else if (testName.equals("quit")) {
-                break;
-            }
-
-            TritonTestable test = testMap.get(testName);
-            Optional<TritonTestable> test1 = Optional.ofNullable(test);
-
-            if (test1.isEmpty()) {
-                System.out.println("Invalid Test Name");
-                continue;
-            } else {
-                result = test1.get().test();
-            }
-
-            prevTestName = testName;
-            System.out.println(result ? "Test Success" : "Test Fail");
-        }
-        //sleepForever();
+//
+//        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
+//        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
+//                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+//
+//        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
+//                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+//
+//
+//        Ball ball = new Ball();
+//        ball.subscribe();
+//
+//        final Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
+//        ally.connect();
+//
+//        App.threadPool.scheduleAtFixedRate(ally,
+//                0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+//
+//
+//        try {
+//            Thread.sleep(1500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        TreeMap<String, TritonTestable> testMap = new TreeMap<>();
+//        testMap.put("PrimitiveMotion", (new PrimitiveMotionTest(ally)));
+//        testMap.put("PrintHoldBall", new TritonTestable() {
+//            @Override
+//            public boolean test() {
+//                System.out.println("This test will quit in 5 seconds");
+//                long t0 = System.currentTimeMillis();
+//                while(System.currentTimeMillis() - t0 < 5000) {
+//                    System.out.println(ally.isHoldingBall());
+//                }
+//                return true;
+//            }
+//        });
+//
+//
+//        System.out.println("Available Tests:");
+//        for (String test : testMap.keySet()) {
+//            System.out.printf("- %s \n", test);
+//        }
+//        System.out.println();
+//
+//        String prevTestName = "";
+//        while (true) {
+//            boolean result = false;
+//            System.out.println(">> ENTER TEST NAME:");
+//            String testName = scanner.nextLine();
+//            if (testName.equals("")) {
+//                testName = prevTestName;
+//            } else if (testName.equals("quit")) {
+//                break;
+//            }
+//
+//            TritonTestable test = testMap.get(testName);
+//            Optional<TritonTestable> test1 = Optional.ofNullable(test);
+//
+//            if (test1.isEmpty()) {
+//                System.out.println("Invalid Test Name");
+//                continue;
+//            } else {
+//                result = test1.get().test();
+//            }
+//
+//            prevTestName = testName;
+//            System.out.println(result ? "Test Success" : "Test Fail");
+//        }
+        sleepForever();
     }
 
 }

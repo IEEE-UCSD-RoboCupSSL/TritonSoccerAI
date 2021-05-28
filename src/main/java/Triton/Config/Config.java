@@ -1,4 +1,5 @@
 package Triton.Config;
+import Triton.CoreModules.Robot.Team;
 import org.ini4j.Wini;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -21,12 +22,19 @@ public class Config {
     public CliConfig cliConfig = null ;
     public ConnectionConfig connConfig = null;
     public RobotConfig botConfig = null;
+    public Team team = Team.BLUE;
 
     public void processAllConfigs() throws IOException {
         cliConfig.processCliArgs(args);
         connConfig.processFromParsingIni(getIniFileByType("main-setup"));
         // botConfig //...
         // ...
+
+        if(cliConfig.isBlueTeam) {
+            team = Team.BLUE;
+        } else if(cliConfig.isYellowTeam) {
+            team = Team.YELLOW;
+        }
     }
 
     private File getIniFileByType(String type) throws IOException {

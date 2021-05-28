@@ -1,5 +1,6 @@
 package Triton.ManualTests.PeriphTests;
 
+import Triton.Config.Config;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall;
 import Triton.App;
 import Triton.Config.OldConfigs.ModuleFreqConfig;
@@ -8,7 +9,7 @@ import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
-import Triton.PeriphModules.Vision.GrSimVisionModule;
+import Triton.PeriphModules.Vision.SSLVisionModule;
 import Triton.Util;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 
@@ -16,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
-public class OldGrsimVisionModuleTest implements TritonTestable {
-    public boolean test() {
-        GrSimVisionModule grSimVisionModule = new GrSimVisionModule();
-        App.threadPool.scheduleAtFixedRate(grSimVisionModule,
+public class SSLVisionModuleTest implements TritonTestable {
+    public boolean test(Config config) {
+        SSLVisionModule sslVisionModule = new SSLVisionModule(config);
+        App.threadPool.scheduleAtFixedRate(sslVisionModule,
                 0,
                 Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS),
                 TimeUnit.NANOSECONDS);

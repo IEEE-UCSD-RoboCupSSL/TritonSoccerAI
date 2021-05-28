@@ -1,6 +1,7 @@
 package Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests;
 
 import Triton.App;
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
@@ -24,7 +25,7 @@ public class SimpleProceduralSkillDemo implements TritonTestable {
     }
 
 
-    public boolean test() {
+    public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
         ExampleProceduralTaskA taskA = new ExampleProceduralTaskA(); // example side thread job
         ExampleProceduralTaskB taskB = new ExampleProceduralTaskB(ball); // another example side thread job

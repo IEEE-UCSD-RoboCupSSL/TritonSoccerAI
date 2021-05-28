@@ -1,5 +1,6 @@
 package Triton.ManualTests.AI_TacticsTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
@@ -28,7 +29,7 @@ public class GapGetBallTest implements TritonTestable {
                 new GapFinder(fielders, foes, ball));
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
         Display display = new Display();
         ArrayList<PaintOption> paintOptions = new ArrayList<>();
         paintOptions.add(GEOMETRY);

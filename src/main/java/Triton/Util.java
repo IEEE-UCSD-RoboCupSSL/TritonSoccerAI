@@ -72,4 +72,14 @@ public final class Util {
         return unit.convert(periodInNanos, TimeUnit.NANOSECONDS);
     }
 
+
+    public static void delay(long durationInMillis) {
+        try {
+            Thread.sleep(durationInMillis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

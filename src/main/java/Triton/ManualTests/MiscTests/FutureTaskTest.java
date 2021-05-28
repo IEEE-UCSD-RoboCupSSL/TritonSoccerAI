@@ -1,5 +1,6 @@
 package Triton.ManualTests.MiscTests;
 
+import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
@@ -19,7 +20,7 @@ public class FutureTaskTest implements TritonTestable {
         this.threadPool = threadPool;
     }
 
-    public boolean test() {
+    public boolean test(Config config) {
 
         threadPool.submit(() ->{
             FieldPublisher<Double> valPub = new FieldPublisher<>("FutureTaskTest", "val", val);

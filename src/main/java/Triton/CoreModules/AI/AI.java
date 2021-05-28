@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
@@ -19,7 +20,6 @@ import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
-import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
 
 
 public class AI implements Module {
@@ -38,12 +38,14 @@ public class AI implements Module {
 
     private GameState prevState;
 
-    public AI(RobotList<Ally> fielders, Ally keeper,
+    private Config config;
+
+    public AI(Config config, RobotList<Ally> fielders, Ally keeper,
               RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {
         if (fielders == null || keeper == null || foes == null || ball == null || gameCtrl == null) {
             throw new NullPointerException();
         }
-
+        this.config = config;
         this.fielders = fielders;
         this.keeper = keeper;
         this.foes = foes;
@@ -166,7 +168,7 @@ public class AI implements Module {
                 BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
                 Team ballPlacementTeam = ballPlacementGameState.getTeam();
 
-                if (ballPlacementTeam == MY_TEAM) {
+                if (ballPlacementTeam == config.team) {
                     Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
                     ballPlacement(teamTargetPos);
                 }
@@ -183,26 +185,26 @@ public class AI implements Module {
     private void newNormalStart(NormalStartGameState normalStartGameState) throws InterruptedException {
         switch (prevState.getName()) {
             case PREPARE_KICKOFF -> {
-                if (((PrepareKickoffGameState) prevState).getTeam() == MY_TEAM) {
+                if (((PrepareKickoffGameState) prevState).getTeam() == config.team) {
                     System.err.println(">>>SWITCH: START_KICKOFF<<<");
                     PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) prevState;
                 }
             }
             case PREPARE_PENALTY -> {
-                if (((PreparePenaltyGameState) prevState).getTeam() == MY_TEAM) {
+                if (((PreparePenaltyGameState) prevState).getTeam() == config.team) {
                     System.err.println(">>>SWITCH: START_PENALTY<<<");
                     PreparePenaltyGameState penaltyGameState = (PreparePenaltyGameState) prevState;
                 }
             }
             case PREPARE_DIRECT_FREE -> {
-                if (((PrepareDirectFreeGameState) prevState).getTeam() == MY_TEAM) {
+                if (((PrepareDirectFreeGameState) prevState).getTeam() == config.team) {
                     System.err.println(">>>SWITCH: START_DIRECT_FREE<<<");
                     PrepareDirectFreeGameState prepareDirectFreeGameState = (PrepareDirectFreeGameState) prevState;
                     freeKick(prepareDirectFreeGameState);
                 }
             }
             case PREPARE_INDIRECT_FREE -> {
-                if (((PrepareIndirectFreeGameState) prevState).getTeam() == MY_TEAM) {
+                if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.team) {
                     System.err.println(">>>SWITCH: START_INDIRECT_FREE<<<");
                     PrepareIndirectFreeGameState prepareIndirectFreeGameState = (PrepareIndirectFreeGameState) prevState;
                 }
@@ -212,7 +214,7 @@ public class AI implements Module {
     }
 
     private void kickOff(PrepareKickoffGameState prepareKickoffGameState) {
-        if (prepareKickoffGameState.getTeam() == MY_TEAM) {
+        if (prepareKickoffGameState.getTeam() == config.team) {
             Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper);
         } else {
             Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
@@ -220,7 +222,7 @@ public class AI implements Module {
     }
 
     private boolean freeKick(PrepareDirectFreeGameState prepareDirectFreeGameState) throws InterruptedException {
-        if (prepareDirectFreeGameState.getTeam() == MY_TEAM) {
+        if (prepareDirectFreeGameState.getTeam() == config.team) {
             Tactics getball = strategyToPlay.getGetBallTactics();
             while (!getball.exec()) {
                 Thread.sleep(1);
