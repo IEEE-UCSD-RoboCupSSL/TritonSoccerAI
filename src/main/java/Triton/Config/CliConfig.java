@@ -1,4 +1,5 @@
 package Triton.Config;
+import Triton.Config.GlobalVaribles.General;
 import org.apache.commons.math3.fraction.FractionConversionException;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -7,6 +8,7 @@ import picocli.CommandLine.Parameters;
 
 import java.io.File;
 import java.util.Arrays;
+
 
 public class CliConfig {
     // initialized with default values, these values are subject to change based on config files &/ cli args
@@ -33,7 +35,18 @@ public class CliConfig {
     public String simulator = "grsim";
 
     public void processCliArgs(String[] args) {
-        new CommandLine(this).parseArgs(args);
+        CommandLine commandLine = new CommandLine(this);
+        commandLine.parseArgs(args);
+        if (commandLine.isUsageHelpRequested()) {
+            commandLine.usage(System.out);
+            return;
+        }
+
+        if(!Arrays.asList(General.supportedSimulators).contains(simulator)) {
+            System.out.println("Error: unknown simulators, supported simulators are: " + Arrays.toString(General.supportedSimulators));
+            throw new RuntimeException();
+        }
+
         if(!isBlueTeam && !isYellowTeam) {
             System.out.println("Error: must select a team color, run with -h or --help for more details");
             throw new RuntimeException();
@@ -42,18 +55,23 @@ public class CliConfig {
             System.out.println("Error: must choose one between test mode and test-tritonbot mode");
             throw new RuntimeException();
         }
+
+
     }
 
     @Override
     public String toString() {
         return "CliConfig{" +
-                "isBlueTeam=" + isBlueTeam +
-                ", isYellowTeam=" + isYellowTeam +
-                ", isVirtualMode=" + isVirtualMode +
-                ", isTestMode=" + isTestMode +
-                ", isTestTritonBotMode=" + isTestTritonBotMode +
-                ", iniFiles=" + Arrays.toString(iniFiles) +
-                ", simulator='" + simulator + '\'' +
+                "\nisBlueTeam=" + isBlueTeam +
+                ", \nisYellowTeam=" + isYellowTeam +
+                ", \nisVirtualMode=" + isVirtualMode +
+                ", \nisTestMode=" + isTestMode +
+                ", \nisTestTritonBotMode=" + isTestTritonBotMode +
+                ", \niniFiles=" + Arrays.toString(iniFiles) +
+                ", \nsimulator='" + simulator + '\'' + "\n" +
                 '}';
     }
+
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+    private boolean usageHelpRequested;
 }

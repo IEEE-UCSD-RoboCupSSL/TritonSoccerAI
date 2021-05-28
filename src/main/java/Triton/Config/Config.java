@@ -30,6 +30,10 @@ public class Config {
     }
 
     private File getIniFileByType(String type) throws IOException {
+        if(cliConfig.iniFiles == null) {
+            System.out.println("Error: must provide at lease an ini file of type 'main-setup'");
+            return null;
+        }
         for(File file : cliConfig.iniFiles) {
             Wini iniParser = new Wini(file);
             String typeOfIni = iniParser.get("basic-info", "type", String.class);

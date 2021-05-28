@@ -35,26 +35,21 @@ import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
  *  * run:
  *      * mvn exec:java
  *      * or if with args: mvn exec:java -Dexec.args="arg1 arg2 ..."
+ *  Example: mvn exec:java -Dexec.args="-b -v ini/Setups/DevelopmentSetups/virtual-grsim-6v6.ini ini/RobotConfig/triton-2021-grsim.ini"
+ *
+ * compile to a jar: mvn clean compile assembly:single
+ * then use java -jar to execute the jar
  */
 public class App {
-
     /* declare a global threadpool*/
     public static ScheduledExecutorService threadPool;
-
-
     static {
         /* Prepare a Thread Pool*/
-        /*
-        threadPool = new ThreadPoolExecutor(TOTAL_THREADS, TOTAL_THREADS, 0,
-                TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>()) {
-        };*/
-
         threadPool = new ScheduledThreadPoolExecutor(TOTAL_THREADS);
     }
 
     public static void main(String[] args) {
-
-
+        System.out.println("==============================================================");
         Config config = new Config(args);
         try {
             config.processAllConfigs();
@@ -63,10 +58,9 @@ public class App {
         }
         System.out.println(config.cliConfig);
         System.out.println(config.connConfig);
+        System.out.println("==============================================================");
 
         sleepForever();
-
-
 
         boolean toRunTest = false;
         boolean toTestTritonBot = false;
