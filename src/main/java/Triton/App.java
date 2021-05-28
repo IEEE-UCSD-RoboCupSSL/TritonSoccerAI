@@ -15,6 +15,7 @@ import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -28,6 +29,12 @@ import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
 
 /**
  * Main Program
+ * If wanting to manually compile & run:
+ *  * install dependencies & plugins: mvn clean install
+ *  * compile: mvn package
+ *  * run:
+ *      * mvn exec:java
+ *      * or if with args: mvn exec:java -Dexec.args="arg1 arg2 ..."
  */
 public class App {
 
@@ -46,6 +53,21 @@ public class App {
     }
 
     public static void main(String[] args) {
+
+
+        Config config = new Config(args);
+        try {
+            config.processAllConfigs();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(config.cliConfig);
+        System.out.println(config.connConfig);
+
+        sleepForever();
+
+
+
         boolean toRunTest = false;
         boolean toTestTritonBot = false;
         Scanner scanner = new Scanner(System.in);

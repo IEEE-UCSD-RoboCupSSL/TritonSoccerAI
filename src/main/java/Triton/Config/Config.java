@@ -1,10 +1,20 @@
 package Triton.Config;
+import org.ini4j.Wini;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+
+import java.io.File;
+import java.io.IOException;
+
 
 public class Config {
-    public Config() {
+    public Config(String[] args) {
         cliConfig = new CliConfig();
         connConfig = new ConnectionConfig();
         botConfig = new RobotConfig();
+        this.args = args;
     }
 
 
@@ -12,5 +22,25 @@ public class Config {
     public ConnectionConfig connConfig = null;
     public RobotConfig botConfig = null;
 
+    public void processAllConfigs() throws IOException {
+        cliConfig.processCliArgs(args);
+        connConfig.processFromParsingIni(getIniFileByType("main-setup"));
+        // botConfig //...
+        // ...
+    }
+
+    private File getIniFileByType(String type) throws IOException {
+        for(File file : cliConfig.iniFiles) {
+            Wini iniParser = new Wini(file);
+            String typeOfIni = iniParser.get("basic-info", "type", String.class);
+            if(typeOfIni.equals(type)) {
+                return file;
+            }
+        }
+        return null;
+    }
+
+
+    private final String[] args;
 
 }
