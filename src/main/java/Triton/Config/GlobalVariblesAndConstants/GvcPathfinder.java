@@ -1,4 +1,6 @@
-package Triton.Config.OldConfigs;
+package Triton.Config.GlobalVariblesAndConstants;
+
+import Triton.Config.OldConfigs.ObjectConfig;
 
 import static Triton.Config.OldConfigs.ObjectConfig.BALL_RADIUS;
 import static Triton.Config.OldConfigs.ObjectConfig.ROBOT_MIN_RADIUS;
@@ -6,13 +8,13 @@ import static Triton.Config.OldConfigs.ObjectConfig.ROBOT_MIN_RADIUS;
 /**
  * Config file for pathfinding
  */
-public class PathfinderConfig {
+public class GvcPathfinder {
     // Theta* / JPS
     public static final int NODE_RADIUS = 30;
     public static final int NODE_DIAMETER = NODE_RADIUS * 2;
     public static final double ADD_DIST = 5;
-    public static final double SAFE_DIST = PathfinderConfig.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
-            + PathfinderConfig.ADD_DIST;
+    public static final double SAFE_DIST = GvcPathfinder.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
+            + GvcPathfinder.ADD_DIST;
     public static final double BOUNDARY_EXTENSION = 800;
 
     public static final double SPRINT_TO_ROTATE_DIST_THRESH = 500; // When sprinting, face closest node outside of this threshold

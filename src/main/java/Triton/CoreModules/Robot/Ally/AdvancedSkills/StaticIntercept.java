@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -17,7 +17,7 @@ public class StaticIntercept {
         Vec2D ballToAnchor = anchorPos.sub(ballPos);
         Vec2D receivePoint = ballPos.add(ballVelDir.scale(ballToAnchor.dot(ballVelDir)));
 
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
+        if (currPos.sub(ballPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
             ally.getBall(ball);
         } else {
             if (ball.getVel().mag() < 750) { // To-do: magic number && comment vel unit

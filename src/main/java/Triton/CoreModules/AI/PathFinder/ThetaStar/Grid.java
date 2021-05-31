@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.PathFinder.ThetaStar;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
@@ -23,9 +23,9 @@ public class Grid {
         this.worldSizeY = worldSizeY;
 
         convert = new Gridify(
-                new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
-                new Vec2D(PathfinderConfig.NODE_RADIUS - worldSizeX / 2,
-                        PathfinderConfig.NODE_RADIUS - worldSizeY / 2),
+                new Vec2D(GvcPathfinder.NODE_DIAMETER, GvcPathfinder.NODE_DIAMETER),
+                new Vec2D(GvcPathfinder.NODE_RADIUS - worldSizeX / 2,
+                        GvcPathfinder.NODE_RADIUS - worldSizeY / 2),
                 false, true);
 
         numCols = convert.numCols(worldSizeX);
@@ -48,10 +48,10 @@ public class Grid {
             for (int col = 0; col < numCols; col++) {
                 Node node = nodes[row][col];
                 Vec2D nodeWorldPos = node.getWorldPos();
-                node.setWalkable(!(nodeWorldPos.x < -worldSizeX / 2 + PathfinderConfig.SAFE_DIST)
-                        && !(nodeWorldPos.x > worldSizeX / 2 - PathfinderConfig.SAFE_DIST)
-                        && !(nodeWorldPos.y < -worldSizeY / 2 + PathfinderConfig.SAFE_DIST)
-                        && !(nodeWorldPos.y > worldSizeY / 2 - PathfinderConfig.SAFE_DIST));
+                node.setWalkable(!(nodeWorldPos.x < -worldSizeX / 2 + GvcPathfinder.SAFE_DIST)
+                        && !(nodeWorldPos.x > worldSizeX / 2 - GvcPathfinder.SAFE_DIST)
+                        && !(nodeWorldPos.y < -worldSizeY / 2 + GvcPathfinder.SAFE_DIST)
+                        && !(nodeWorldPos.y > worldSizeY / 2 - GvcPathfinder.SAFE_DIST));
             }
         }
 
@@ -66,7 +66,7 @@ public class Grid {
 
     public ArrayList<Node> getNodesToCheck(Circle2D obstacle) {
         Vec2D center = obstacle.center;
-        double radius = obstacle.radius + PathfinderConfig.SAFE_DIST;
+        double radius = obstacle.radius + GvcPathfinder.SAFE_DIST;
 
         Vec2D topLeft = new Vec2D(center.x - radius, center.y + radius);
         Vec2D botRight = new Vec2D(center.x + radius, center.y - radius);
@@ -81,7 +81,7 @@ public class Grid {
     }
 
     public boolean checkWalkable(Node node, Circle2D obstacle) {
-        double unwalkableDist = obstacle.radius + PathfinderConfig.SAFE_DIST;
+        double unwalkableDist = obstacle.radius + GvcPathfinder.SAFE_DIST;
         return !(Vec2D.dist(node.getWorldPos(), obstacle.center) <= unwalkableDist);
     }
 
@@ -108,9 +108,9 @@ public class Grid {
         Vec2D pointB = nodeB.getWorldPos();
         Line2D line = new Line2D(pointA, pointB);
         double totalDist = line.length();
-        int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
+        int moveCount = (int) totalDist / GvcPathfinder.NODE_RADIUS;
         Vec2D dir = line.getDir();
-        Vec2D moveAdd = dir.scale(PathfinderConfig.NODE_RADIUS);
+        Vec2D moveAdd = dir.scale(GvcPathfinder.NODE_RADIUS);
 
         Vec2D currentPos = new Vec2D(pointA);
         for (int i = 0; i < moveCount; i++) {

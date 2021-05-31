@@ -1,10 +1,10 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.OldConfigs.AIConfig.HOLDING_BALL_VEL_THRESH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcAI.HOLDING_BALL_VEL_THRESH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
@@ -14,7 +14,7 @@ public class RotateTo {
         double angDiff = calcAngDiff(targetAngle, ally.getDir());
 
         double absAngleDiff = Math.abs(angDiff);
-        if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+        if (absAngleDiff <= GvcPathfinder.RD_ANGLE_THRESH) {
             ally.moveAt(new Vec2D(0, 0));
             ally.spinTo(targetAngle);
         } else {

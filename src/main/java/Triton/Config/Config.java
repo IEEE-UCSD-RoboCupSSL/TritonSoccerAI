@@ -1,10 +1,7 @@
 package Triton.Config;
 import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import org.ini4j.Wini;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +19,8 @@ public class Config {
     public CliConfig cliConfig = null ;
     public ConnectionConfig connConfig = null;
     public RobotConfig botConfig = null;
-    public Team team = Team.BLUE;
+    public Team myTeam = Team.BLUE; // default, subject to change in body code
+    public Team foeTeam = Team.YELLOW; // default, subject to change in  body code
 
     public void processAllConfigs() throws IOException {
         cliConfig.processCliArgs(args);
@@ -31,9 +29,13 @@ public class Config {
         // ...
 
         if(cliConfig.isBlueTeam) {
-            team = Team.BLUE;
+            myTeam = Team.BLUE;
+            foeTeam = Team.YELLOW;
+            PerspectiveConverter.setTeam(myTeam);
         } else if(cliConfig.isYellowTeam) {
-            team = Team.YELLOW;
+            myTeam = Team.YELLOW;
+            foeTeam = Team.BLUE;
+            PerspectiveConverter.setTeam(myTeam);
         }
     }
 

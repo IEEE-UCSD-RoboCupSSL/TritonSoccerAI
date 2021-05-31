@@ -1,6 +1,6 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Config.OldConfigs.DisplayConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.Node;
@@ -59,7 +59,7 @@ public class JPSPathfinderDisplay extends Display {
     private void paintPath(Graphics2D g2d) {
         if (JPS == null) return;
         g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * DisplayConfig.SCALE)));
+        g2d.setStroke(new BasicStroke((int) (ObjectConfig.ROBOT_RADIUS / 2 * GvcDisplay.SCALE)));
 
         ArrayList<Vec2D> path = JPS.getPath();
         if (path != null && !path.isEmpty()) {

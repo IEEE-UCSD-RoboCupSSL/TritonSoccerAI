@@ -1,13 +1,13 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.OldConfigs.AIConfig.HOLDING_BALL_VEL_THRESH;
-import static Triton.Config.OldConfigs.PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcAI.HOLDING_BALL_VEL_THRESH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SPRINT_TO_ROTATE_DIST_THRESH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 
 public class SprintFrontTo {
@@ -39,13 +39,13 @@ public class SprintFrontTo {
             double angDiff = calcAngDiff(fastestAngle, ally.getDir());
             double absAngleDiff = Math.abs(angDiff);
 
-            if (absAngleDiff <= PathfinderConfig.RD_ANGLE_THRESH) {
+            if (absAngleDiff <= GvcPathfinder.RD_ANGLE_THRESH) {
                 ally.spinTo(fastestAngle);
             } else {
                 ally.spinAt((ally.isHoldingBall()) ? Math.signum(angDiff) * HOLDING_BALL_VEL_THRESH : Math.signum(angDiff) * 60);
             }
 
-            if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+            if (absAngleDiff <= GvcPathfinder.MOVE_ANGLE_THRESH) {
                 if (path.size() <= 2) ally.moveTo(nextNode);
                 else ally.moveToNoSlowDown(nextNode);
             } else {

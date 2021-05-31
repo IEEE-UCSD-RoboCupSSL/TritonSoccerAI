@@ -2,7 +2,8 @@ package Triton.CoreModules.Robot.Ally;
 
 import Proto.RemoteAPI;
 import Triton.App;
-import Triton.Config.OldConfigs.ModuleFreqConfig;
+import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
@@ -47,7 +48,7 @@ public class Ally extends Robot implements AllySkills {
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
-    private final Subscriber<Boolean> dribStatSub;
+    private final Subscriber<Boolean> isDribbledSub;
     private final Publisher<RemoteAPI.CommandData> commandsPub;
     private final Subscriber<MotionState> stateSub;
     private final Publisher<Vec2D> pointPub, kickVelPub, holdBallPosPub;
@@ -63,13 +64,13 @@ public class Ally extends Robot implements AllySkills {
 
     private AsyncProcedure asyncProcedure = null;
 
-    public Ally(Team team, int ID) {
-        super(team, ID);
+    public Ally(Config config, int id) {
+        super(config.myTeam, id);
         this.threadPool = App.threadPool;
 
         asyncProcedure = new AsyncProcedure(this.threadPool);
 
-        conn = new RobotConnection(ID);
+        conn = new RobotConnection(config, id);
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
@@ -79,20 +80,20 @@ public class Ally extends Robot implements AllySkills {
         }
         ballSub = new FieldSubscriber<>("detection", "ball");
 
-        statePub = new FieldPublisher<>("Ally state", "" + ID, MOVE_TVRV);
-        pointPub = new FieldPublisher<>("Ally point", "" + ID, new Vec2D(0, 0));
-        angPub = new FieldPublisher<>("Ally ang", "" + ID, 0.0);
-        kickVelPub = new FieldPublisher<>("Ally kickVel", "" + ID, new Vec2D(0, 0));
-        holdBallPosPub = new FieldPublisher<>("Ally holdBallPos", "" + ID, null);
+        statePub = new FieldPublisher<>("Ally state", "" + id, MOVE_TVRV);
+        pointPub = new FieldPublisher<>("Ally point", "" + id, new Vec2D(0, 0));
+        angPub = new FieldPublisher<>("Ally ang", "" + id, 0.0);
+        kickVelPub = new FieldPublisher<>("Ally kickVel", "" + id, new Vec2D(0, 0));
+        holdBallPosPub = new FieldPublisher<>("Ally holdBallPos", "" + id, null);
 
-        stateSub = new FieldSubscriber<>("Ally state", "" + ID);
-        pointSub = new FieldSubscriber<>("Ally point", "" + ID);
-        angSub = new FieldSubscriber<>("Ally ang", "" + ID);
-        kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + ID);
-        holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + ID);
+        stateSub = new FieldSubscriber<>("Ally state", "" + id);
+        pointSub = new FieldSubscriber<>("Ally point", "" + id);
+        angSub = new FieldSubscriber<>("Ally ang", "" + id);
+        kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + id);
+        holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + id);
 
-        dribStatSub = new FieldSubscriber<>("Ally drib", "" + ID);
-        commandsPub = new MQPublisher<>("commands", "" + ID);
+        isDribbledSub = new FieldSubscriber<>("Ally drib", "" + id);
+        commandsPub = new MQPublisher<>("commands", "" + id);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
@@ -317,10 +318,10 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     synchronized public boolean isHoldingBall() {
-        if (!dribStatSub.isSubscribed()) {
+        if (!isDribbledSub.isSubscribed()) {
             return false;
         }
-        return dribStatSub.getMsg();
+        return isDribbledSub.getMsg();
     }
 
     @Override
@@ -409,17 +410,17 @@ public class Ally extends Robot implements AllySkills {
 
                 ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getSendTCP(),
                         0,
-                        Util.toPeriod(ModuleFreqConfig.TCP_CONNECTION_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        Util.toPeriod(GvcModuleFreqs.TCP_CONNECTION_SEND_FREQ, TimeUnit.NANOSECONDS),
                         TimeUnit.NANOSECONDS);
 
                 ScheduledFuture<?> receiveTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getReceiveTCP(),
                         0,
-                        Util.toPeriod(ModuleFreqConfig.TCP_CONNECTION_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
+                        Util.toPeriod(GvcModuleFreqs.TCP_CONNECTION_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
                         TimeUnit.NANOSECONDS);
 
                 ScheduledFuture<?> UDPFuture = App.threadPool.scheduleAtFixedRate(conn.getUDPStream(),
                         0,
-                        Util.toPeriod(ModuleFreqConfig.UDP_STREAM_SEND_FREQ, TimeUnit.NANOSECONDS),
+                        Util.toPeriod(GvcModuleFreqs.UDP_STREAM_SEND_FREQ, TimeUnit.NANOSECONDS),
                         TimeUnit.NANOSECONDS);
 
                 conn.getTCPConnection().sendInit();
@@ -468,7 +469,7 @@ public class Ally extends Robot implements AllySkills {
             }
             ballSub.subscribe(1000);
 
-            dribStatSub.subscribe(1000);
+            isDribbledSub.subscribe(1000);
             stateSub.subscribe(1000);
             pointSub.subscribe(1000);
             angSub.subscribe(1000);

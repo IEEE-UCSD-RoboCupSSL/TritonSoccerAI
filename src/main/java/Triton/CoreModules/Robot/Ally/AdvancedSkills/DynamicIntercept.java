@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
@@ -9,7 +9,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 import java.util.ArrayList;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
-import static Triton.Config.OldConfigs.PathfinderConfig.INTERCEPT_CIRCLE_RADIUS;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.INTERCEPT_CIRCLE_RADIUS;
 
 public class DynamicIntercept {
 
@@ -17,7 +17,7 @@ public class DynamicIntercept {
         Vec2D currPos = ally.getPos();
         Vec2D ballPos = ball.getPos();
 
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
+        if (currPos.sub(ballPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
             ally.getBall(ball);
         } else {
             Vec2D faceVec = new Vec2D(faceDir).normalized();

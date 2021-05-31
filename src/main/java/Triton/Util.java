@@ -1,6 +1,8 @@
 package Triton;
 
 import Triton.Config.OldConfigs.jsonConfig;
+import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 
 import java.io.IOException;
 import java.net.*;
@@ -9,6 +11,7 @@ import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 public final class Util {
+
 
     /**
      * Acquire the network interface by the name prefix
@@ -82,4 +85,16 @@ public final class Util {
     }
 
 
+    public static void sleepForever() {
+        while (true) {
+            delay(1000);
+        }
+    }
+
+
+    public static void sleepForever(FieldSubscriber<Boolean> canceller) {
+        while (!canceller.getMsg()) {
+            delay(1000);
+        }
+    }
 }

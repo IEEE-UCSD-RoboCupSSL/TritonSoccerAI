@@ -5,8 +5,13 @@ import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 public class PerspectiveConverter {
+    private static Team myTeam = Team.BLUE; // default 
+    public static void setTeam(Team team) {
+        PerspectiveConverter.myTeam = team;
+    }
+    
     public static Vec2D audienceToPlayer(Vec2D audienceVector) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return new Vec2D(-audienceVector.y, audienceVector.x);
         } else {
             return new Vec2D(audienceVector.y, -audienceVector.x);
@@ -14,7 +19,7 @@ public class PerspectiveConverter {
     }
 
     public static int[] audienceToPlayer(int[] audienceVector) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return new int[]{-audienceVector[1], audienceVector[0]};
         } else {
             return new int[]{audienceVector[1], -audienceVector[0]};
@@ -22,7 +27,7 @@ public class PerspectiveConverter {
     }
 
     public static double audienceToPlayer(double audienceAngle) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return audienceAngle;
         } else {
             return normAng(audienceAngle + 180);
@@ -36,7 +41,7 @@ public class PerspectiveConverter {
     }
 
     public static Vec2D playerToAudience(Vec2D playerVector) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return new Vec2D(playerVector.y, -playerVector.x);
         } else {
             return new Vec2D(-playerVector.y, playerVector.x);
@@ -44,7 +49,7 @@ public class PerspectiveConverter {
     }
 
     public static int[] playerToAudience(int[] playerVector) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return new int[]{playerVector[1], -playerVector[0]};
         } else {
             return new int[]{-playerVector[1], playerVector[0]};
@@ -52,7 +57,7 @@ public class PerspectiveConverter {
     }
 
     public static double playerToAudience(double playerAngle) {
-        if (ObjectConfig.MY_TEAM == Team.BLUE) {
+        if (myTeam == Team.BLUE) {
             return playerAngle;
         } else {
             return normAng(playerAngle - 180);

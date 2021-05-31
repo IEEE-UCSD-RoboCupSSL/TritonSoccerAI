@@ -10,10 +10,7 @@ import Triton.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.NetworkInterface;
-import java.net.SocketTimeoutException;
+import java.net.*;
 
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
@@ -22,7 +19,7 @@ public class SSLVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> visionPub;
-    private DatagramSocket socket;
+    private MulticastSocket socket;
     private DatagramPacket packet;
 
     /**
@@ -44,11 +41,14 @@ public class SSLVisionModule extends VisionModule {
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         try {
-            NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGrsimNetIf());
-            socket = Util.mcSocket(jsonConfig.conn().getGrsimMcAddr(),
-                    jsonConfig.conn().getGrsimMcPort(),
-                    netIf);
-            packet = new DatagramPacket(buffer, buffer.length);
+//            socket = Util.mcSocket(jsonConfig.conn().getGrsimMcAddr(),
+//                    jsonConfig.conn().getGrsimMcPort());
+
+              socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
+              socket.joinGroup(new InetSocketAddress(ip, port),
+                        NetworkInterface.getByInetAddress(InetAddress.getByName(ip)));
+
+              packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
             e.printStackTrace();
         }

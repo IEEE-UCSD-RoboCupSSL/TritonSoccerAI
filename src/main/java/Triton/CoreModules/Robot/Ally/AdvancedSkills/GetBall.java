@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -10,7 +10,7 @@ public class GetBall {
         Vec2D ballLoc = ball.getPos();
         Vec2D currPos = ally.getPos();
         Vec2D currPosToBall = ballLoc.sub(currPos);
-        if (currPosToBall.mag() <= PathfinderConfig.AUTOCAP_DIST_THRESH) {
+        if (currPosToBall.mag() <= GvcPathfinder.AUTOCAP_DIST_THRESH) {
             ally.autoCap();
         } else {
             ally.fastCurveTo(ballLoc, currPosToBall.toPlayerAngle());

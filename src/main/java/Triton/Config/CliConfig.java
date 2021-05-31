@@ -1,5 +1,7 @@
 package Triton.Config;
-import Triton.Config.GlobalVaribles.General;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
+import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -40,8 +42,8 @@ public class CliConfig {
             System.exit(0);
         }
 
-        if(!Arrays.asList(General.supportedSimulators).contains(simulator)) {
-            System.out.println("Error: unknown simulators, supported simulators are: " + Arrays.toString(General.supportedSimulators));
+        if(!Arrays.asList(GvcGeneral.supportedSimulators).contains(simulator)) {
+            System.out.println("Error: unknown simulators, supported simulators are: " + Arrays.toString(GvcGeneral.supportedSimulators));
             throw new RuntimeException();
         }
 

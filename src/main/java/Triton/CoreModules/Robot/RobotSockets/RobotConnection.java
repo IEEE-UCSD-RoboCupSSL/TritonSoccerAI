@@ -1,14 +1,18 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
-import Triton.Config.OldConfigs.jsonConfig;
+import Triton.Config.Config;
+import Triton.Config.ConnectionConfig;
+import Triton.CoreModules.Robot.Team;
 
 /**
  * Contains all connections of a single robot
  */
 public class RobotConnection {
-    private final int ID;
-    private String ip;
-    private int port;
+    private final int id;
+    private String ip = null;
+    private int tcpPort;
+    private int udpPort;
+    private Team myTeam;
 
     private RobotTCPConnection tcpConnect;
     private RobotUDPStream udpStream;
@@ -16,16 +20,21 @@ public class RobotConnection {
     /**
      * Construct a RobotConnection for specified robot
      *
-     * @param ID ID of the robot
+     * @param id ID of the robot
      */
-    public RobotConnection(int ID) {
-        this.ID = ID;
+    public RobotConnection(Config config, int id) throws RuntimeException {
+        this.id = id;
+        this.myTeam = config.myTeam;
 
-        try {
-            ip = jsonConfig.conn().getRobotIp().get(ID).getIp();
-            port = jsonConfig.conn().getRobotIp().get(ID).getPort();
-        } catch (Exception e) {
-            System.out.println("Invalid Robot ID");
+        for(ConnectionConfig.BotConn conn : config.connConfig.botConns) {
+            if(conn.id == id) {
+                ip = conn.ipAddr;
+                tcpPort = conn.tritonBotTcpPort;
+                udpPort = conn.tritonBotUdpPort;
+            }
+        }
+        if(ip == null) {
+            throw new RuntimeException("can't find a IP config with matching bot id");
         }
     }
 
@@ -33,14 +42,14 @@ public class RobotConnection {
      * Constructs a tcp connection
      */
     public void buildTcpConnection() {
-        tcpConnect = new RobotTCPConnection(ip,port + jsonConfig.conn().getTcpOffset(), ID);
+        tcpConnect = new RobotTCPConnection(ip,tcpPort, id, myTeam);
     }
 
     /**
      * Constructs the command UDP stream
      */
     public void buildUDPStream() {
-        udpStream = new RobotUDPStream(ip,port + jsonConfig.conn().getUdpOffset(), ID);
+        udpStream = new RobotUDPStream(ip,udpPort, id, myTeam);
     }
 
     /**

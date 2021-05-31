@@ -168,7 +168,7 @@ public class AI implements Module {
                 BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
                 Team ballPlacementTeam = ballPlacementGameState.getTeam();
 
-                if (ballPlacementTeam == config.team) {
+                if (ballPlacementTeam == config.myTeam) {
                     Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
                     ballPlacement(teamTargetPos);
                 }
@@ -185,26 +185,26 @@ public class AI implements Module {
     private void newNormalStart(NormalStartGameState normalStartGameState) throws InterruptedException {
         switch (prevState.getName()) {
             case PREPARE_KICKOFF -> {
-                if (((PrepareKickoffGameState) prevState).getTeam() == config.team) {
+                if (((PrepareKickoffGameState) prevState).getTeam() == config.myTeam) {
                     System.err.println(">>>SWITCH: START_KICKOFF<<<");
                     PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) prevState;
                 }
             }
             case PREPARE_PENALTY -> {
-                if (((PreparePenaltyGameState) prevState).getTeam() == config.team) {
+                if (((PreparePenaltyGameState) prevState).getTeam() == config.myTeam) {
                     System.err.println(">>>SWITCH: START_PENALTY<<<");
                     PreparePenaltyGameState penaltyGameState = (PreparePenaltyGameState) prevState;
                 }
             }
             case PREPARE_DIRECT_FREE -> {
-                if (((PrepareDirectFreeGameState) prevState).getTeam() == config.team) {
+                if (((PrepareDirectFreeGameState) prevState).getTeam() == config.myTeam) {
                     System.err.println(">>>SWITCH: START_DIRECT_FREE<<<");
                     PrepareDirectFreeGameState prepareDirectFreeGameState = (PrepareDirectFreeGameState) prevState;
                     freeKick(prepareDirectFreeGameState);
                 }
             }
             case PREPARE_INDIRECT_FREE -> {
-                if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.team) {
+                if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.myTeam) {
                     System.err.println(">>>SWITCH: START_INDIRECT_FREE<<<");
                     PrepareIndirectFreeGameState prepareIndirectFreeGameState = (PrepareIndirectFreeGameState) prevState;
                 }
@@ -214,7 +214,7 @@ public class AI implements Module {
     }
 
     private void kickOff(PrepareKickoffGameState prepareKickoffGameState) {
-        if (prepareKickoffGameState.getTeam() == config.team) {
+        if (prepareKickoffGameState.getTeam() == config.myTeam) {
             Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper);
         } else {
             Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
@@ -222,7 +222,7 @@ public class AI implements Module {
     }
 
     private boolean freeKick(PrepareDirectFreeGameState prepareDirectFreeGameState) throws InterruptedException {
-        if (prepareDirectFreeGameState.getTeam() == config.team) {
+        if (prepareDirectFreeGameState.getTeam() == config.myTeam) {
             Tactics getball = strategyToPlay.getGetBallTactics();
             while (!getball.exec()) {
                 Thread.sleep(1);

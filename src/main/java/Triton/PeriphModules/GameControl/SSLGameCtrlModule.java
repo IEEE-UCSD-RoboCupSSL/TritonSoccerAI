@@ -1,6 +1,7 @@
 package Triton.PeriphModules.GameControl;
 
 import Proto.SslGcRefereeMessage;
+import Triton.Config.Config;
 import Triton.Config.OldConfigs.jsonConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -14,12 +15,13 @@ import java.net.*;
 public class SSLGameCtrlModule extends GameCtrlModule {
     private final static int MAX_BUFFER_SIZE = 67108864;
 
+    //private MulticastSocket socket;
     private DatagramSocket socket;
     private DatagramPacket packet;
 
     private boolean isFirstRun = true;
 
-    public SSLGameCtrlModule() {
+    public SSLGameCtrlModule(Config config) {
         super("ssl game controller");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
@@ -29,6 +31,18 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                 jsonConfig.conn().getGcMcPort(),
                 netIf);
         packet = new DatagramPacket(buffer, buffer.length);
+//
+//        int port = config.connConfig.gcConn.port;
+//        String ip = config.connConfig.gcConn.ipAddr;
+//        try {
+//            socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
+//            socket.joinGroup(new InetSocketAddress(ip, port),
+//                NetworkInterface.getByInetAddress(InetAddress.getByName(ip)));
+//
+//            packet = new DatagramPacket(buffer, buffer.length);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -44,6 +58,7 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                     packet.getOffset(), packet.getLength());
 
             SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
+            //System.out.println(input);
 //                System.err.println(gcOutput);
             parseGcOutput(gcOutput);
         } catch (SocketTimeoutException e) {

@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.Estimators;
 
 
-import Triton.Config.OldConfigs.AIConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.Ball.Ball;
@@ -64,7 +64,7 @@ public class BasicEstimator {
             double angleDiff = PerspectiveConverter.calcAngDiff(ballFaceAngle, botAngle);
             double absAngleDiff = Math.abs(angleDiff);
 
-            if (dist <= AIConfig.BALL_HOLD_DIST_THRESH && absAngleDiff <= AIConfig.BALL_HOLD_ANGLE_THRESH) {
+            if (dist <= GvcAI.BALL_HOLD_DIST_THRESH && absAngleDiff <= GvcAI.BALL_HOLD_ANGLE_THRESH) {
                 return bot;
             }
         }

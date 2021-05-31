@@ -2,7 +2,7 @@ package Triton.ManualTests.PeriphTests;
 
 import Triton.App;
 import Triton.Config.Config;
-import Triton.Config.OldConfigs.ModuleFreqConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Display.Display;
 import Triton.Util;
@@ -15,7 +15,7 @@ public class DisplayTest implements TritonTestable {
         Display display = new Display();
         ScheduledFuture<?> future = App.threadPool.scheduleAtFixedRate(display,
                 0,
-                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
                 TimeUnit.NANOSECONDS);
 
         try {

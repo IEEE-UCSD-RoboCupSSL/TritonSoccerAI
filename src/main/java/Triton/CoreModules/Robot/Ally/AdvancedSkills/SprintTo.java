@@ -1,12 +1,12 @@
 package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.OldConfigs.PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SPRINT_TO_ROTATE_DIST_THRESH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
@@ -42,7 +42,7 @@ public class SprintTo {
 
             if (absAngleDiff <= 90) {
                 ally.spinTo(fastestAngle);
-                if (absAngleDiff <= PathfinderConfig.MOVE_ANGLE_THRESH) {
+                if (absAngleDiff <= GvcPathfinder.MOVE_ANGLE_THRESH) {
                     if (path.size() <= 2) ally.moveTo(nextNode);
                     else ally.moveToNoSlowDown(nextNode);
                 } else {
@@ -52,7 +52,7 @@ public class SprintTo {
                 if (!fastestAngleFound) ally.spinTo(normAng(fastestAngle));
                 else ally.spinTo(normAng(fastestAngle + 180));
 
-                if (absAngleDiff >= 180 - PathfinderConfig.MOVE_ANGLE_THRESH) {
+                if (absAngleDiff >= 180 - GvcPathfinder.MOVE_ANGLE_THRESH) {
                     if (path.size() <= 2) ally.moveTo(nextNode);
                     else ally.moveToNoSlowDown(nextNode);
                 } else {

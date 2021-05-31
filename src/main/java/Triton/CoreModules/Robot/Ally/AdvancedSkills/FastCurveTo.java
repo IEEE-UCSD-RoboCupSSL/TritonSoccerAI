@@ -5,7 +5,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.OldConfigs.PathfinderConfig.SPRINT_TO_ROTATE_DIST_THRESH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SPRINT_TO_ROTATE_DIST_THRESH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.calcAngDiff;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 

@@ -1,24 +1,22 @@
 package Triton;
 
 import Triton.Config.*;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.*;
-import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
+import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.GameControl.GameCtrlModule;
-import Triton.PeriphModules.GameControl.PySocketGameCtrlModule;
 import Triton.PeriphModules.Vision.SSLVisionModule;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static Triton.Config.OldConfigs.ObjectConfig.MY_TEAM;
-import static Triton.Config.OldConfigs.ThreadConfig.TOTAL_THREADS;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
 import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
 import static Triton.Util.delay;
@@ -39,10 +37,11 @@ import static Triton.Util.delay;
  */
 public class App {
     /* declare a global threadpool*/
+    public static FieldPubSubPair<Boolean> appCanceller = new FieldPubSubPair<>("App", "Canceller", false);
     public static ScheduledExecutorService threadPool;
     static {
         /* Prepare a Thread Pool*/
-        threadPool = new ScheduledThreadPoolExecutor(TOTAL_THREADS);
+        threadPool = new ScheduledThreadPoolExecutor(TotalNumOfThreads);
     }
 
     public static void main(String[] args) {
@@ -81,17 +80,17 @@ public class App {
         }
         if(config.cliConfig.isTestTritonBotMode) {
             testTritonBotMode(scanner);
-            sleepForever();
+            Util.sleepForever();
         }
         
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(
                     new SSLVisionModule(config),
-                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+                0, Util.toPeriod(GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(
                     new DetectionModule(config),
-                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+                0, Util.toPeriod(GvcModuleFreqs.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         delay(1000);
         
@@ -99,9 +98,9 @@ public class App {
         ball.subscribe();
 
         // instantiate robots
-        ArrayList<ScheduledFuture<?>> allyFieldersFutures;
-        ArrayList<ScheduledFuture<?>> foesFutures;
-        ScheduledFuture<?> goalKeeperFuture;
+        ArrayList<ScheduledFuture<?>> allyFieldersFutures = null;
+        ArrayList<ScheduledFuture<?>> foesFutures = null;
+        ScheduledFuture<?> goalKeeperFuture = null;
         RobotList<Ally> fielders = RobotFactory.createAllyFielderBots(config);
         Ally goalKeeper = RobotFactory.createGoalKeeperBot(config);
         RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(config);
@@ -110,7 +109,9 @@ public class App {
             allyFieldersFutures = fielders.runAll();
             goalKeeperFuture = App.threadPool.scheduleAtFixedRate(
                         goalKeeper,
-                    0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+                    0, Util.toPeriod(GvcModuleFreqs.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+        } else {
+            System.out.println("Error Connecting to Robots (in App.java)");
         }
         // opponent/foe robots: foes = foeFielders + 1 foeGoalKeeper
         foesFutures = foes.runAll(); // submit all to threadPool
@@ -120,50 +121,50 @@ public class App {
             System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
             CoreTestRunner.runCoreTest(config, fielders, goalKeeper, foes, ball);
         } else {
+            System.out.println("Temporarily Down, Please Use Test Mode");
             /* Run the actual game program */
-
-            int port = (config.team == BLUE) ? 6543 : 6544;
-
-            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
-//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(gameCtrlModule,
-                    0, Util.toPeriod(ModuleFreqConfig.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-            /* Instantiate & Run the main AI module, which is the core of this software */
-            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
+//
+//            int port = (config.team == BLUE) ? 6543 : 6544;
+//
+//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+////            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
+////            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+//            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(
+//                    gameCtrlModule,
+//                0, Util.toPeriod(GvcModuleFreqs.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+//
+//            /* Instantiate & Run the main AI module, which is the core of this software */
+//            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
         }
 
 
 
-        sleepForever();
+        Util.sleepForever(appCanceller.sub);
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        // old code
-
-        ConnectionProperties conn = jsonConfig.conn();
-
-
-        /* processing command line arguments */
-        if (args != null && args.length >= 1) { // choose team
-            switch (args[0]) {
-                case "BLUE" -> MY_TEAM = BLUE;
-                case "YELLOW" -> MY_TEAM = Team.YELLOW;
-                default -> {
-                    System.out.println("Error: Invalid Team");
-                    sleepForever();
-                }
+        boolean toInterrupt = true;
+        visionFuture.cancel(toInterrupt);
+        detectFuture.cancel(toInterrupt);
+        if(allyFieldersFutures != null) {
+            for (ScheduledFuture<?> future : allyFieldersFutures) {
+                future.cancel(toInterrupt);
             }
         }
+        if(foesFutures != null) {
+            for (ScheduledFuture<?> future : foesFutures) {
+                future.cancel(toInterrupt);
+            }
+        }
+        if(goalKeeperFuture != null) {
+            goalKeeperFuture.cancel(toInterrupt);
+        }
+        
+        
+        
+        
+        
+        
+        
+        
 
 
 
@@ -225,26 +226,9 @@ public class App {
 //                Util.toPeriod(ModuleFreqConfig.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
 //                TimeUnit.NANOSECONDS);
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
 //        future.cancel(false);
 
-        sleepForever();
-    }
-
-    private static void sleepForever() {
-        while (true) {
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private static void testTritonBotMode(Scanner scanner) {
@@ -320,7 +304,7 @@ public class App {
 //            prevTestName = testName;
 //            System.out.println(result ? "Test Success" : "Test Fail");
 //        }
-        sleepForever();
+        Util.sleepForever();
     }
 
 }

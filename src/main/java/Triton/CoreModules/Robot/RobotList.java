@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot;
 
 import Triton.App;
-import Triton.Config.OldConfigs.ModuleFreqConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Util;
 
@@ -32,7 +32,7 @@ public class RobotList<T> extends ArrayList<T> {
             if (bot instanceof Robot) {
                 ScheduledFuture<?> robotFuture = App.threadPool.scheduleAtFixedRate(
                             (Robot) bot,
-                        0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+                        0, Util.toPeriod(GvcModuleFreqs.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
                 robotFutures.add(robotFuture);
             } else {
                 System.out.println("Invalid Type");

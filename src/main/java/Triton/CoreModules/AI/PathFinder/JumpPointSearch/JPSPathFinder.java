@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
@@ -27,13 +27,13 @@ public class JPSPathFinder extends PathFinder {
 
     public JPSPathFinder(double worldSizeX, double worldSizeY) {
         super("JPS");
-        this.worldSizeX = worldSizeX + PathfinderConfig.BOUNDARY_EXTENSION * 2;
-        this.worldSizeY = worldSizeY + PathfinderConfig.BOUNDARY_EXTENSION * 2;
+        this.worldSizeX = worldSizeX + GvcPathfinder.BOUNDARY_EXTENSION * 2;
+        this.worldSizeY = worldSizeY + GvcPathfinder.BOUNDARY_EXTENSION * 2;
 
         convert = new Gridify(
-                new Vec2D(PathfinderConfig.NODE_DIAMETER, PathfinderConfig.NODE_DIAMETER),
-                new Vec2D(PathfinderConfig.NODE_RADIUS - this.worldSizeX / 2,
-                        PathfinderConfig.NODE_RADIUS - this.worldSizeY / 2),
+                new Vec2D(GvcPathfinder.NODE_DIAMETER, GvcPathfinder.NODE_DIAMETER),
+                new Vec2D(GvcPathfinder.NODE_RADIUS - this.worldSizeX / 2,
+                        GvcPathfinder.NODE_RADIUS - this.worldSizeY / 2),
                 false, true);
 
         // Upper-left and Bottom-right corners
@@ -67,7 +67,7 @@ public class JPSPathFinder extends PathFinder {
         for (Circle2D obstacle : obstacles) {
             double x = obstacle.center.x;
             double y = obstacle.center.y;
-            double r = obstacle.radius + PathfinderConfig.SAFE_DIST;
+            double r = obstacle.radius + GvcPathfinder.SAFE_DIST;
 
             // Upper-left and Bottom-right corners
             int[] ul = convert.fromPos(new Vec2D(x - r, y + r));
@@ -79,7 +79,7 @@ public class JPSPathFinder extends PathFinder {
             for (int col = ul[0]; col <= br[0]; col++) {
                 for (int row = ul[1]; row <= br[1]; row++) {
                     double dist = Math.sqrt(Math.pow((col - ce[0]), 2) + Math.pow((row - ce[1]), 2));
-                    if (dist * PathfinderConfig.NODE_DIAMETER < r) {
+                    if (dist * GvcPathfinder.NODE_DIAMETER < r) {
                         nodeList.get(row).get(col).setWalkable(false);
                         lastObstacles.add(nodeList.get(row).get(col));
                     }
@@ -166,8 +166,8 @@ public class JPSPathFinder extends PathFinder {
         for (int i = 0; i < 8; i++) {
             paths[i] = new ArrayList<>();
         }
-        int searchBound = (int) Math.max(PathfinderConfig.SAFE_DIST, PathfinderConfig.BOUNDARY_EXTENSION)
-                / PathfinderConfig.NODE_RADIUS;
+        int searchBound = (int) Math.max(GvcPathfinder.SAFE_DIST, GvcPathfinder.BOUNDARY_EXTENSION)
+                / GvcPathfinder.NODE_RADIUS;
 
         for (int i = 0; i <= searchBound; i++) {
             int arrInd = 0;
@@ -231,9 +231,9 @@ public class JPSPathFinder extends PathFinder {
         Vec2D pointB = convert.fromInd(nodeB.getX(), nodeB.getY());
         Line2D line = new Line2D(pointA, pointB);
         double totalDist = line.length();
-        int moveCount = (int) totalDist / PathfinderConfig.NODE_RADIUS;
+        int moveCount = (int) totalDist / GvcPathfinder.NODE_RADIUS;
         Vec2D dir = line.getDir();
-        Vec2D moveAdd = dir.scale(PathfinderConfig.NODE_RADIUS);
+        Vec2D moveAdd = dir.scale(GvcPathfinder.NODE_RADIUS);
 
         Vec2D currentPos = new Vec2D(pointA);
         for (int i = 0; i < moveCount; i++) {

@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
-import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.RobotData;
 
@@ -16,8 +16,8 @@ import java.net.Socket;
 public class RobotTCPConnection {
     private final String ip;
     private final int port;
-    private final int ID;
-    private final Publisher<Boolean> dribStatPub;
+    private final int id;
+    private final Publisher<Boolean> isDribbledPub;
     private final Subscriber<RobotData> allySub;
     private final Publisher<String> tcpCommandPub;
     private final Subscriber<String> tcpCommandSub;
@@ -35,18 +35,18 @@ public class RobotTCPConnection {
      *
      * @param ip   ip of connection
      * @param port to connect to
-     * @param ID   ID of robot
+     * @param id   ID of robot
      */
-    public RobotTCPConnection(String ip, int port, int ID) {
+    public RobotTCPConnection(String ip, int port, int id, Team myTeam) {
         this.ip = ip;
         this.port = port;
-        this.ID = ID;
+        this.id = id;
 
-        dribStatPub = new FieldPublisher<>("Ally drib", "" + ID, false);
-        allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
-        tcpCommandPub = new MQPublisher<>("tcpCommand", "" + ID);
-        tcpCommandSub = new MQSubscriber<>("tcpCommand", "" + ID);
-        tcpInitPub = new FieldPublisher<>("tcpInit", "" + ID, true);
+        isDribbledPub = new FieldPublisher<>("Ally drib", "" + id, false);
+        allySub = new FieldSubscriber<>("detection", myTeam.name() + id);
+        tcpCommandPub = new MQPublisher<>("tcpCommand", "" + id);
+        tcpCommandSub = new MQSubscriber<>("tcpCommand", "" + id);
+        tcpInitPub = new FieldPublisher<>("tcpInit", "" + id, true);
     }
 
     /**
@@ -55,17 +55,27 @@ public class RobotTCPConnection {
      * @return true if connection was successfully established
      */
     public boolean connect() throws IOException {
-        clientSocket = new Socket(ip, port);
+        boolean isTcpConnected = false;
+        do {
+            try {
+                clientSocket = new Socket(ip, port);
+                isTcpConnected = true;
+            } catch (IOException e) {
+                System.out.println("Failed at connecting Tritonbot(cpp)'s tcp port, will retry connection");
+            }
+        } while(!isTcpConnected);
+
+
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
         String line = in.readLine();
-        System.out.printf("Ally %d TCP : %s\n", ID, line);
+        System.out.printf("Ally %d TCP : %s\n", id, line);
         if (line.equals("CONNECTION ESTABLISHED")) {
             isConnected = true;
 
             sendTCP = new SendTCPRunnable(out);
-            receiveTCP = new ReceiveTCPRunnable(in, ID);
+            receiveTCP = new ReceiveTCPRunnable(in, id);
             return true;
         }
         return false;
@@ -170,8 +180,8 @@ public class RobotTCPConnection {
                     //System.out.printf("Ally %d TCP : %s\n", ID, line);
 
                     switch (line) {
-                        case "BallOnHold" -> dribStatPub.publish(true);
-                        case "BallOffHold" -> dribStatPub.publish(false);
+                        case "BallOnHold" -> isDribbledPub.publish(true);
+                        case "BallOffHold" -> isDribbledPub.publish(false);
                         case "Initialized" -> tcpInitPub.publish(true);
                     }
 

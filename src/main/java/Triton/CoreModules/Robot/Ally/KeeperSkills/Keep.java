@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot.Ally.KeeperSkills;
 
-import Triton.Config.OldConfigs.PathfinderConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.Matrix.Vec2D;
@@ -14,7 +14,7 @@ public class Keep {
         Vec2D ballPos = ball.getPos();
         double y = -FIELD_LENGTH / 2 + 150;
 
-        if (currPos.sub(ballPos).mag() < PathfinderConfig.AUTOCAP_DIST_THRESH) {
+        if (currPos.sub(ballPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
             ally.getBall(ball);
         } else {
             double x;

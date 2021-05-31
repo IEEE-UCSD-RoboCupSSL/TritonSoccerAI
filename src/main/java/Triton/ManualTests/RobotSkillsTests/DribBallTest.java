@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 
 import java.util.Scanner;
 
-import static Triton.Config.OldConfigs.PathfinderConfig.DRIB_ROTATE_DIST;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.DRIB_ROTATE_DIST;
 
 @AllArgsConstructor
 public class DribBallTest extends RobotSkillsTest {

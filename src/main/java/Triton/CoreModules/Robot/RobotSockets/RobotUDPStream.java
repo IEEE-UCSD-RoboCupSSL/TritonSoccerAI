@@ -1,7 +1,7 @@
 package Triton.CoreModules.Robot.RobotSockets;
 
 import Proto.RemoteAPI;
-import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -20,7 +20,7 @@ public class RobotUDPStream implements Module {
     protected DatagramSocket socket;
 
     protected int port;
-    protected int ID;
+    protected int id;
 
     private final Subscriber<RemoteAPI.CommandData> commandsSub;
     private final Subscriber<RobotData> allySub;
@@ -33,14 +33,14 @@ public class RobotUDPStream implements Module {
      *
      * @param ip ip of UDP stream
      * @param port port of UDP stream
-     * @param ID   ID of robot
+     * @param id   ID of robot
      */
-    public RobotUDPStream(String ip, int port, int ID) {
+    public RobotUDPStream(String ip, int port, int id, Team myTeam) {
         this.port = port;
-        this.ID = ID;
+        this.id = id;
 
-        commandsSub = new MQSubscriber<>("commands", "" + ID, 10);
-        allySub = new FieldSubscriber<>("detection", ObjectConfig.MY_TEAM.name() + ID);
+        commandsSub = new MQSubscriber<>("commands", "" + id, 10);
+        allySub = new FieldSubscriber<>("detection", myTeam.name() + id);
         ballSub = new FieldSubscriber<>("detection", "ball");
 
         try {

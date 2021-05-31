@@ -1,14 +1,11 @@
 package Triton.PeriphModules.Display;
 
-import Triton.Config.OldConfigs.DisplayConfig;
-import Triton.Config.OldConfigs.GeometryConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Geometry.Circle2D;
-import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
@@ -21,9 +18,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static Triton.Config.OldConfigs.GeometryConfig.*;
 import static Triton.PeriphModules.Display.PaintOption.*;
@@ -76,7 +70,7 @@ public class Display extends JPanel implements Runnable {
     public void start() {
         subscribe();
 
-        convert = new Gridify(new Vec2D(1 / DisplayConfig.SCALE, 1 / DisplayConfig.SCALE),
+        convert = new Gridify(new Vec2D(1 / GvcDisplay.SCALE, 1 / GvcDisplay.SCALE),
                 new Vec2D(-FIELD_WIDTH / 2.0, -FULL_FIELD_LENGTH / 2.0), false, true);
         windowWidth = convert.numCols(FIELD_WIDTH);
         windowHeight = convert.numRows(FULL_FIELD_LENGTH);
@@ -153,7 +147,7 @@ public class Display extends JPanel implements Runnable {
         });
 
         int[] centerPos = convert.fromPos(new Vec2D(FIELD_CIRCLE_CENTER.x, FIELD_CIRCLE_CENTER.y));
-        int centerRadius = (int) (FIELD_CIRCLE_RADIUS * DisplayConfig.SCALE);
+        int centerRadius = (int) (FIELD_CIRCLE_RADIUS * GvcDisplay.SCALE);
 
         g2d.drawArc(centerPos[0] - centerRadius, centerPos[1] - centerRadius, centerRadius * 2,
                 centerRadius * 2, 0, 360);
