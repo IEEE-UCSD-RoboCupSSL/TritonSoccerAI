@@ -17,8 +17,6 @@ public final class ObjectConfig {
     public static final double DIR_PRECISION = 10; // +-10degree tolerance
     public static double MAX_KICK_VEL = 6.5;
 
-
-    public static Team MY_TEAM = Team.BLUE;
     public static int MAX_POS_LIST_CAPACITY = 15;
     public static double DRIBBLER_OFFSET = 105;
 }

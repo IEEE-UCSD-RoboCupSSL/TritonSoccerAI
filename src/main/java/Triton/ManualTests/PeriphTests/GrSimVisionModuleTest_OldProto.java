@@ -9,7 +9,7 @@ import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
-import Triton.PeriphModules.Vision.SSLVisionModule;
+import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.Util;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 
@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
-public class SSLVisionModuleTest implements TritonTestable {
+public class GrSimVisionModuleTest_OldProto implements TritonTestable {
     public boolean test(Config config) {
-        SSLVisionModule sslVisionModule = new SSLVisionModule(config);
+        GrSimVisionModule_OldProto grSimVisionModuleOldProto = new GrSimVisionModule_OldProto(config);
         App.threadPool.scheduleAtFixedRate(
-                sslVisionModule,
+                grSimVisionModuleOldProto,
             0, Util.toPeriod(GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         Subscriber<SSL_DetectionFrame> visionSub =

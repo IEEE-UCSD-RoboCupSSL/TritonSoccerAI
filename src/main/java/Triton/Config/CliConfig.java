@@ -25,9 +25,6 @@ public class CliConfig {
     @Option(names = {"-t", "--test"}, description = "run in interactive test mode")
     public boolean isTestMode = false;
 
-    @Option(names = {"--testtritonbot"}, description = "run in test-tritonbot(.cpp) mode")
-    public boolean isTestTritonBotMode = false;
-
     @Parameters( description = "one or more .ini file(s) for various types of configurations")
     public File[] iniFiles;
 
@@ -51,11 +48,6 @@ public class CliConfig {
             System.out.println("Error: must select a team color, run with -h or --help for more details");
             throw new RuntimeException();
         }
-        if(isTestMode && isTestTritonBotMode) {
-            System.out.println("Error: must choose one between test mode and test-tritonbot mode");
-            throw new RuntimeException();
-        }
-
 
     }
 
@@ -66,7 +58,6 @@ public class CliConfig {
                 ", \nisYellowTeam=" + isYellowTeam +
                 ", \nisVirtualMode=" + isVirtualMode +
                 ", \nisTestMode=" + isTestMode +
-                ", \nisTestTritonBotMode=" + isTestTritonBotMode +
                 ", \niniFiles=" + Arrays.toString(iniFiles) +
                 ", \nsimulator='" + simulator + '\'' + "\n" +
                 '}';

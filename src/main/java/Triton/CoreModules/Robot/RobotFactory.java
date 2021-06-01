@@ -6,12 +6,12 @@ import Triton.CoreModules.Robot.Foe.Foe;
 
 public class RobotFactory {
 
-    /* Don't include goalkeeper bot */
+    /* Not including goalkeeper bot */
     public static RobotList<Ally> createAllyFielderBots(Config config) {
         /* Instantiate & run Our Robots (Ally) modules */
         RobotList<Ally> allies = new RobotList<Ally>();
-        for (int i = 0; i < config.connConfig.numRobots - 1; i++) {
-            Ally ally = new Ally(config, i);
+        for (int id = 0; id < config.connConfig.numRobots - 1; id++) {
+            Ally ally = new Ally(config, id);
             allies.add(ally);
         }
         return allies;
@@ -26,8 +26,8 @@ public class RobotFactory {
     public static RobotList<Foe> createFoeBotsForTracking(Config config) {
         /* Instantiate & run Opponent Robots (Foe) modules */
         RobotList<Foe> foes = new RobotList<Foe>();
-        for (int i = 0; i < config.connConfig.numRobots; i++) {
-            Foe foe = new Foe(config, i);
+        for (int id = 0; id < config.connConfig.numRobots; id++) {
+            Foe foe = new Foe(config, id);
             foes.add(foe);
         }
         return foes;

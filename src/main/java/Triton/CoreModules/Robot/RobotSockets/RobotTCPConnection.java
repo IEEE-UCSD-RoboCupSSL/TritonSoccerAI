@@ -23,8 +23,8 @@ public class RobotTCPConnection {
     private final Subscriber<String> tcpCommandSub;
     private final Publisher<Boolean> tcpInitPub;
     private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private PrintWriter socketOut;
+    private BufferedReader socketIn;
     private boolean isConnected;
 
     private SendTCPRunnable sendTCP;
@@ -61,21 +61,21 @@ public class RobotTCPConnection {
                 clientSocket = new Socket(ip, port);
                 isTcpConnected = true;
             } catch (IOException e) {
-                System.out.println("Failed at connecting Tritonbot(cpp)'s tcp port, will retry connection");
+                System.out.println("Failed at connecting TritonBot(cpp)'s tcp port, will retry connection");
             }
         } while(!isTcpConnected);
 
 
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        socketOut = new PrintWriter(clientSocket.getOutputStream(), true);
+        socketIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        String line = in.readLine();
+        String line = socketIn.readLine();
         System.out.printf("Ally %d TCP : %s\n", id, line);
         if (line.equals("CONNECTION ESTABLISHED")) {
             isConnected = true;
 
-            sendTCP = new SendTCPRunnable(out);
-            receiveTCP = new ReceiveTCPRunnable(in, id);
+            sendTCP = new SendTCPRunnable(socketOut);
+            receiveTCP = new ReceiveTCPRunnable(socketIn, id);
             return true;
         }
         return false;
@@ -128,10 +128,10 @@ public class RobotTCPConnection {
      * Runnable to send TCP packets
      */
     private class SendTCPRunnable implements Runnable {
-        private final PrintWriter out;
+        private final PrintWriter socketOut;
 
-        public SendTCPRunnable(PrintWriter out) {
-            this.out = out;
+        public SendTCPRunnable(PrintWriter socketOut) {
+            this.socketOut = socketOut;
         }
 
         @Override
@@ -142,7 +142,7 @@ public class RobotTCPConnection {
                 while (true) { // delay added
                     String msg = tcpCommandSub.getMsg();
                     // System.out.println(msg);
-                    out.println(msg);
+                    socketOut.println(msg);
 
                     Thread.sleep(1);
                 }
@@ -164,11 +164,11 @@ public class RobotTCPConnection {
      * Runnable to receive TCP packets
      */
     private class ReceiveTCPRunnable implements Runnable {
-        private final BufferedReader in;
+        private final BufferedReader socketIn;
         private final int ID;
 
-        public ReceiveTCPRunnable(BufferedReader in, int ID) {
-            this.in = in;
+        public ReceiveTCPRunnable(BufferedReader socketIn, int ID) {
+            this.socketIn = socketIn;
             this.ID = ID;
         }
 
@@ -176,7 +176,7 @@ public class RobotTCPConnection {
         public void run() {
             try {
                 while (true) { // delay added
-                    String line = in.readLine();
+                    String line = socketIn.readLine();
                     //System.out.printf("Ally %d TCP : %s\n", ID, line);
 
                     switch (line) {

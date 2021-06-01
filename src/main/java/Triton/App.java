@@ -10,14 +10,15 @@ import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Vision.SSLVisionModule;
+import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
+import Triton.VirtualBot.VirtualBotFactory;
+import Triton.VirtualBot.VirtualBotList;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
-import static Triton.CoreModules.Robot.Team.BLUE;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
 import static Triton.Util.delay;
 
@@ -60,6 +61,22 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         boolean toRunTest = false;
         boolean toTestTritonBot = false;
+        ArrayList<ScheduledFuture<?>> virtualBotsFutures = null;
+
+        if(config.cliConfig.isVirtualMode) {
+            System.out.println("VirtualEnabled: waiting for TritonBot to connect to TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect TritonBot on regular TCP & UDP ports");
+            /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
+             *      what VirtualBot really does is mocking the firmware layer of a real robot, whereas
+             *      Robot(Ally/Foe) are internal OOP representation of a robot
+            delay(1000);
+             *  */
+            VirtualBotList virtualBots = VirtualBotFactory.createVirtualBots(config);
+            virtualBotsFutures = virtualBots.runAll();
+            while(!virtualBots.areAllConnectedToTritonBots()) {
+                delay(100);
+            }
+            delay(500);
+        }
         
         GeometryConfig.initGeo(); // To-do: refactor this
 
@@ -78,14 +95,10 @@ public class App {
                 default -> System.out.println("Invalid Input");
             }
         }
-        if(config.cliConfig.isTestTritonBotMode) {
-            testTritonBotMode(scanner);
-            Util.sleepForever();
-        }
-        
+
         /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
         ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(
-                    new SSLVisionModule(config),
+                    new GrSimVisionModule_OldProto(config),
                 0, Util.toPeriod(GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(
@@ -157,60 +170,12 @@ public class App {
         if(goalKeeperFuture != null) {
             goalKeeperFuture.cancel(toInterrupt);
         }
-        
-        
-        
-        
-        
-        
-        
-        
 
-
-
-
-
-
-
-
-
-        /*
-        for (int i = 0; i < ROBOT_COUNT; i++) {
-            ScheduledFuture<?> tritonBotReceiveModuleFuture = App.threadPool.scheduleAtFixedRate(
-                    new TritonBotReceiveModule(TRITON_IP, TRITON_PORT, i),
-                    0, Util.toPeriod(ModuleFreqConfig.TRITON_BOT_RECEIVE_FREQ, TimeUnit.NANOSECONDS),
-                    TimeUnit.NANOSECONDS);
-        }*/
-
-
-        /*
-        // Schedule VirtualBot modules
-        switch (SystemConfig.SIM) {
-            case GRSIM -> {
-                ScheduledFuture<?> grSimProcessingFuture = App.threadPool.scheduleAtFixedRate(
-                        new GrSimProcessingModule(),
-                        0, Util.toPeriod(ModuleFreqConfig.GRSIM_PROCESSING_FREQ, TimeUnit.NANOSECONDS),
-                        TimeUnit.NANOSECONDS);
-
-                ScheduledFuture<?> grSimSendFuture = App.threadPool.scheduleAtFixedRate(
-                        new GrSimSendModule(GRSIM_SEND_IP, GRSIM_SEND_PORT),
-                        0, Util.toPeriod(ModuleFreqConfig.GRSIM_SEND_FREQ, TimeUnit.NANOSECONDS),
-                        TimeUnit.NANOSECONDS);
-            }
-            case ERFORCE -> {
-                ScheduledFuture<?> grSimProcessingFuture = App.threadPool.scheduleAtFixedRate(
-                        new ErForceProcessingModule(),
-                        0, Util.toPeriod(ModuleFreqConfig.ERFORCE_PROCESSING_FREQ, TimeUnit.NANOSECONDS),
-                        TimeUnit.NANOSECONDS);
-
-                ScheduledFuture<?> grSimSendFuture = App.threadPool.scheduleAtFixedRate(
-                        new ErForceSendModule(GRSIM_SEND_IP, GRSIM_SEND_PORT),
-                        0, Util.toPeriod(ModuleFreqConfig.ERFORCE_SEND_FREQ, TimeUnit.NANOSECONDS),
-                        TimeUnit.NANOSECONDS);
+        if(virtualBotsFutures != null) {
+            for (ScheduledFuture<?> future : virtualBotsFutures) {
+                future.cancel(toInterrupt);
             }
         }
-
-         */
 
 //        Display display = new Display();
 //        ArrayList<PaintOption> paintOptions = new ArrayList<>();
@@ -230,104 +195,4 @@ public class App {
 //        future.cancel(false);
 
     }
-
-    private static void testTritonBotMode(Scanner scanner) {
-        System.out.println("Test Started!");
-
-//
-//        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-//        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(new GrSimVisionModule(),
-//                0, Util.toPeriod(ModuleFreqConfig.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-//
-//        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(new DetectionModule(),
-//                0, Util.toPeriod(ModuleFreqConfig.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-//
-//
-//        Ball ball = new Ball();
-//        ball.subscribe();
-//
-//        final Ally ally = new Ally(ObjectConfig.MY_TEAM, 0);
-//        ally.connect();
-//
-//        App.threadPool.scheduleAtFixedRate(ally,
-//                0, Util.toPeriod(ModuleFreqConfig.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-//
-//
-//        try {
-//            Thread.sleep(1500);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        TreeMap<String, TritonTestable> testMap = new TreeMap<>();
-//        testMap.put("PrimitiveMotion", (new PrimitiveMotionTest(ally)));
-//        testMap.put("PrintHoldBall", new TritonTestable() {
-//            @Override
-//            public boolean test() {
-//                System.out.println("This test will quit in 5 seconds");
-//                long t0 = System.currentTimeMillis();
-//                while(System.currentTimeMillis() - t0 < 5000) {
-//                    System.out.println(ally.isHoldingBall());
-//                }
-//                return true;
-//            }
-//        });
-//
-//
-//        System.out.println("Available Tests:");
-//        for (String test : testMap.keySet()) {
-//            System.out.printf("- %s \n", test);
-//        }
-//        System.out.println();
-//
-//        String prevTestName = "";
-//        while (true) {
-//            boolean result = false;
-//            System.out.println(">> ENTER TEST NAME:");
-//            String testName = scanner.nextLine();
-//            if (testName.equals("")) {
-//                testName = prevTestName;
-//            } else if (testName.equals("quit")) {
-//                break;
-//            }
-//
-//            TritonTestable test = testMap.get(testName);
-//            Optional<TritonTestable> test1 = Optional.ofNullable(test);
-//
-//            if (test1.isEmpty()) {
-//                System.out.println("Invalid Test Name");
-//                continue;
-//            } else {
-//                result = test1.get().test();
-//            }
-//
-//            prevTestName = testName;
-//            System.out.println(result ? "Test Success" : "Test Fail");
-//        }
-        Util.sleepForever();
-    }
-
 }
-
-
-// TCP connection: listener, each robot connects to the listener, and the
-// server keeps the robot's port information [for further udp command sending]
-// and then the server send each robot the same geometry data through TCP
-// we should write a geometry protobuf
-
-// Multicast connection: broadcaster, use the data from the vision connection,
-// broadcast it
-// in our own vision protobuf format (processed vision)
-
-// UDP connection: sender, we have the robot port info when the tcp connection
-// is established
-
-// Each robot: listen high-level command on a port, send UDP EKF data to the
-// same port
-// Server: listen UDP EFK data on a port, host a multicast Vision port, listen
-// TCP on a port
-// send high-level command to one of 12 ports
-
-// 12(robot udp command listener) + 1(multicast vision) + 1(server udp ekf data
-// listener)
-// + 1(server tcp connection listener)

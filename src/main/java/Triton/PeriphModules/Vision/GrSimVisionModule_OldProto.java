@@ -3,10 +3,8 @@ package Triton.PeriphModules.Vision;
 import Triton.Config.Config;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslWrapper.SSL_WrapperPacket;
-import Triton.Config.OldConfigs.jsonConfig;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
-import Triton.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,7 +13,7 @@ import java.net.*;
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
  */
-public class SSLVisionModule extends VisionModule {
+public class GrSimVisionModule_OldProto extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
     private final Publisher<SSL_DetectionFrame> visionPub;
@@ -25,7 +23,7 @@ public class SSLVisionModule extends VisionModule {
     /**
      * Constructs a VisionModule listening on default ip and port inside ConnectionjsonConfig
      */
-    public SSLVisionModule(Config config) {
+    public GrSimVisionModule_OldProto(Config config) {
         this(config.connConfig.sslVisionConn.ipAddr, config.connConfig.sslVisionConn.port);
     }
 
@@ -35,7 +33,7 @@ public class SSLVisionModule extends VisionModule {
      * @param ip   ip to receive from
      * @param port port to receive from
      */
-    public SSLVisionModule(String ip, int port) {
+    public GrSimVisionModule_OldProto(String ip, int port) {
         visionPub = new MQPublisher<>("vision", "detection");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
@@ -54,31 +52,17 @@ public class SSLVisionModule extends VisionModule {
         }
     }
 
-    /**
-     * Repeatedly to collect data
-     */
-    @Override
-    public void run() {
-        try {
-            update();
-        } catch (SocketTimeoutException e) {
-            System.err.println("GrSim Vision Multicast Timeout");
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-    }
 
     /**
-     * Receive a single packet
+     * Receive a single packet, and publish it to proper subscribers
      */
+    @Override
     protected void update() throws IOException {
         socket.receive(packet);
-        ByteArrayInputStream input = new ByteArrayInputStream(packet.getData(),
+        ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData(),
                 packet.getOffset(), packet.getLength());
         SSL_WrapperPacket SSLPacket =
-                SSL_WrapperPacket.parseFrom(input);
+                SSL_WrapperPacket.parseFrom(bais);
 
         if (SSLPacket.hasDetection()) {
             visionPub.publish(SSLPacket.getDetection());

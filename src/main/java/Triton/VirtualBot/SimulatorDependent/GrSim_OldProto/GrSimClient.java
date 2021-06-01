@@ -1,4 +1,4 @@
-package Triton.VirtualBot.GrSim;
+package Triton.VirtualBot.SimulatorDependent.GrSim_OldProto;
 
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimCommands;
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimPacket;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 
-public class GrSimSendModule implements Module {
+public class GrSimClient implements Module {
     protected InetAddress address;
     protected DatagramSocket socket;
 
@@ -22,7 +22,7 @@ public class GrSimSendModule implements Module {
 
     private boolean isFirstRun = true;
 
-    public GrSimSendModule(String ip, int port) {
+    public GrSimClient(String ip, int port) {
         this.port = port;
         this.ID = ID;
 
