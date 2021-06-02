@@ -51,6 +51,15 @@ public class RobotList<T> extends ArrayList<T> {
         }
     }
 
+    public T get(int id) {
+        for(T bot : this) {
+            if(((Robot) bot).ID == id) {
+                return bot;
+            }
+        }
+        return null;
+    }
+
     public static int getFoeKeeperID() {
         return 5;
     }

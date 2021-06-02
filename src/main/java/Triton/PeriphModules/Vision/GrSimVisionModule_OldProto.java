@@ -59,10 +59,10 @@ public class GrSimVisionModule_OldProto extends VisionModule {
     @Override
     protected void update() throws IOException {
         socket.receive(packet);
-        ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData(),
+        ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
                 packet.getOffset(), packet.getLength());
         SSL_WrapperPacket SSLPacket =
-                SSL_WrapperPacket.parseFrom(bais);
+                SSL_WrapperPacket.parseFrom(stream);
 
         if (SSLPacket.hasDetection()) {
             visionPub.publish(SSLPacket.getDetection());

@@ -16,6 +16,7 @@ import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
+import Triton.ManualTests.VirtualBotTests.VirtualMcuTopModuleTest;
 import Triton.SoccerObjects;
 
 import java.util.TreeMap;
@@ -28,7 +29,7 @@ public class VirtualBotTestFactory {
         Ally keeper = soccerObjects.keeper;
         RobotList<Foe> foes = soccerObjects.foes;
         Ball ball = soccerObjects.ball;
-        // virtualBotTestMap.put("pmotion", new PrimitiveMotionTest(fielders.get(3)));
+        virtualBotTestMap.put("vmcutop", new VirtualMcuTopModuleTest(soccerObjects));
 
     }
 

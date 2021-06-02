@@ -1,6 +1,50 @@
 package Triton.ManualTests.VirtualBotTests;
 
-public class VirtualMcuTopModuleTest {
+import Proto.FirmwareAPI;
+import Triton.Config.Config;
+import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
+import Triton.ManualTests.TritonTestable;
+import Triton.ManualTests.VirtualBotTestRunner;
+import Triton.Misc.ModulePubSubSystem.FieldPublisher;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
+import Triton.SoccerObjects;
 
+import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
+import static Triton.Util.delay;
+
+public class VirtualMcuTopModuleTest implements TritonTestable {
+    private final  SoccerObjects soccerObjects;
+    private FieldSubscriber<String> debugStrSub;
+
+    public VirtualMcuTopModuleTest(SoccerObjects soccerObjects) {
+        this.soccerObjects = soccerObjects;
+    }
+
+    @Override
+    public boolean test(Config config) {
+        Scanner scanner = new Scanner(System.in);
+        int chosenBotId = 3;
+        /* virtualbot modules have already been instantiate and run in App.java before calling this test */
+        FieldSubscriber<FirmwareAPI.FirmwareCommand> cmdSub =
+                new FieldSubscriber<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + chosenBotId);
+
+        debugStrSub = new FieldSubscriber<>("VirtualMcuTopModule", "DebugString " + chosenBotId);
+
+        try {
+            cmdSub.subscribe(1000);
+            debugStrSub.subscribe(1000);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+
+        while (true) {
+            VirtualBotTestRunner.sendPrimitiveCommand(scanner, soccerObjects.fielders.get(chosenBotId));
+            System.out.println("Command VirtualBot Received: >>>>>>>>>>");
+            //System.out.println(cmdSub.getMsg());
+            System.out.println(debugStrSub.getMsg());
+            System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        }
+    }
 }

@@ -16,20 +16,21 @@ public class VirtualBot implements Module {
     private VirtualMcuTopModule mcuTopModule;
 
     /* prepare the main pubsubs */
-    private FieldPubSubPair<FirmwareAPI.FirmwareCommand> firmCmdPubSubPair =
-                new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmCmd",
-                        FirmwareAPI.FirmwareCommand.newBuilder()
-                                .setInit(false).setVx(0.0f).setVy(0.0f).setW(0.0f)
-                                .setKx(0.0f).setKz(0.0f).setDribbler(false).build()
-                );
-    private FieldPubSubPair<FirmwareAPI.FirmwareData> firmDataPubSubPair =
-            new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmData",
-                        FirmwareAPI.FirmwareData.newBuilder()
-                            .setEncX(0.0f).setEncY(0.0f).setImuTheta(0.0f).setImuOmega(0.0f)
-                            .setImuAx(0.0f).setImuAy(0.0f).setIsHoldingball(false).build()
-                );
+    private FieldPubSubPair<FirmwareAPI.FirmwareCommand> firmCmdPubSubPair;
+
+    private FieldPubSubPair<FirmwareAPI.FirmwareData> firmDataPubSubPair;
 
     public VirtualBot(Config config, int id) {
+        firmCmdPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + id,
+                FirmwareAPI.FirmwareCommand.newBuilder()
+                        .setInit(false).setVx(0.0f).setVy(0.0f).setW(0.0f)
+                        .setKx(0.0f).setKz(0.0f).setDribbler(false).build()
+        );
+        firmDataPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmData " + id,
+                FirmwareAPI.FirmwareData.newBuilder()
+                        .setEncX(0.0001f).setEncY(0.0001f).setImuTheta(0.0001f).setImuOmega(0.0001f)
+                        .setImuAx(0.0001f).setImuAy(0.0001f).setIsHoldingball(false).build()
+        );
         mcuTopModule = new VirtualMcuTopModule(config, id, firmCmdPubSubPair.pub, firmDataPubSubPair.sub);
     }
 

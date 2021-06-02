@@ -3,11 +3,8 @@ package Triton;
 import Triton.Config.*;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.*;
-import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.*;
-import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
+import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
@@ -124,6 +121,7 @@ public class App {
                             SoccerObjects soccerObjects = new SoccerObjects(config);
                             moduleFutures.addAll(soccerObjects.runModules());
 
+                            VirtualBotTestRunner.runVirtualBotTest(config, scanner, soccerObjects);
 
                         } else {
                             System.err.println("Test V mode require this program to be running virtual mode");
