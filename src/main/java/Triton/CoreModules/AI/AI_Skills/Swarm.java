@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.AI_Skills;
 
-import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
@@ -13,13 +14,15 @@ import java.util.Comparator;
 public class Swarm extends Skills {
 
     private final RobotList<Ally> botList;
+    private final Config config;
 
-    public Swarm(RobotList<Ally> botList) {
+    public Swarm(RobotList<Ally> botList, Config config) {
         this.botList = botList;
+        this.config = config;
     }
 
     public void lineUp(RobotList<Ally> botList, Vec2D dir, double gap, Vec2D center) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+        if (botList.size() > config.numAllyRobots - 1) {
             System.out.println("botList has invalid size");
         }
         ArrayList<Vec2D> locList = new ArrayList<>();
@@ -35,7 +38,7 @@ public class Swarm extends Skills {
     }
 
     public void roundUp(RobotList<Ally> botList, Line2D line, double gap, Vec2D center) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+        if (botList.size() > config.numAllyRobots - 1) {
             System.out.println("botList has invalid size");
         }
         // To-do
@@ -45,7 +48,7 @@ public class Swarm extends Skills {
 
     // To-do: make Curve2D
     public void CurveUp(RobotList<Ally> botList /*...*/) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1) {
+        if (botList.size() > config.numAllyRobots - 1) {
             System.out.println("botList has invalid size");
         }
 
@@ -82,7 +85,7 @@ public class Swarm extends Skills {
      * */
     public boolean groupTo(ArrayList<Vec2D> posList,
                            ArrayList<Double> dirList, Vec2D priorityRefPoint) {
-        if (botList.size() > ObjectConfig.ROBOT_COUNT - 1 || botList.size() != posList.size()
+        if (botList.size() > config.numAllyRobots - 1 || botList.size() != posList.size()
                 || (dirList != null && posList.size() != dirList.size())) {
             System.out.println("Inputs have invalid size(s)");
         }

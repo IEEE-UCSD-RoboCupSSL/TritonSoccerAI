@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassInfo;
@@ -19,9 +20,11 @@ public class DefendPlanA extends Tactics {
     private final double GUARD_GOAL_GAP = 300; // mm
     protected final BasicEstimator basicEstimator;
     protected final PassInfo passInfo;
+    private final Config config;
 
-    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, double foeBlockOffset) {
+    public DefendPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, double foeBlockOffset, Config config) {
         super(fielders, keeper, foes, ball);
+        this.config = config;
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passInfo = new PassInfo(fielders, foes, ball);
         this.foeBlockOffset = foeBlockOffset;
@@ -73,7 +76,7 @@ public class DefendPlanA extends Tactics {
                 attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
             }
 
-            new Swarm(guardFoeFielders).groupTo(attackingFoePos, ball.getPos());
+            new Swarm(guardFoeFielders, config).groupTo(attackingFoePos, ball.getPos());
 
             /* Delegate the rest of fielders to lineup in the midpoint of foe shoot line*/
             Robot holder = basicEstimator.getBallHolder();
@@ -96,7 +99,7 @@ public class DefendPlanA extends Tactics {
             Line2D holderShootLine = new Line2D(holderPos, new Vec2D(x, y));
             Vec2D holderShootLineMidPoint = holderShootLine.midpoint();
             Vec2D defenseVec = holderFaceVec.rotate(90);
-            new Swarm(guardGoalFielders).lineUp(guardGoalFielders, defenseVec, GUARD_GOAL_GAP, holderShootLineMidPoint);
+            new Swarm(guardGoalFielders, config).lineUp(guardGoalFielders, defenseVec, GUARD_GOAL_GAP, holderShootLineMidPoint);
             return true;
         } else {
             ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
@@ -110,7 +113,7 @@ public class DefendPlanA extends Tactics {
                 attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
             }
 
-            new Swarm(fielders).groupTo(attackingFoePos, ball.getPos());
+            new Swarm(fielders, config).groupTo(attackingFoePos, ball.getPos());
             return true;
         }
     }

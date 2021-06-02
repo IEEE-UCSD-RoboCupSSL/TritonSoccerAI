@@ -3,7 +3,6 @@ package Triton.PeriphModules.Detection;
 import Triton.Config.Config;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot;
-import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
@@ -37,14 +36,14 @@ public class DetectionModule implements Module {
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
-        for (int i = 0; i < config.connConfig.numRobots; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             yellowRobotsData.add(new RobotData(Team.YELLOW, i));
             blueRobotsData.add(new RobotData(Team.BLUE, i));
         }
 
         yellowRobotPubs = new ArrayList<>();
         blueRobotPubs = new ArrayList<>();
-        for (int i = 0; i < config.connConfig.numRobots; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             blueRobotPubs.add(new FieldPublisher<>("detection", Team.BLUE.name() + i, blueRobotsData.get(i)));
             yellowRobotPubs.add(new FieldPublisher<>("detection", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
         }

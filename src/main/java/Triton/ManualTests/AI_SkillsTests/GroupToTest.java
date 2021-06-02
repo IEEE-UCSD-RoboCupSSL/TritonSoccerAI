@@ -25,7 +25,7 @@ public class GroupToTest extends RobotSkillsTest {
     public boolean test(Config config) {
         try {
 
-            Swarm swarm = new Swarm(allies);
+            Swarm swarm = new Swarm(allies, config);
 
             /* To-do: fix sprintTo */
             ArrayList<Double> dirList = new ArrayList<>();

@@ -3,6 +3,7 @@ package Triton.CoreModules.Robot.Ally;
 import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -63,9 +64,11 @@ public class Ally extends Robot implements AllySkills {
     private boolean isFirstRun = true;
 
     private AsyncProcedure asyncProcedure = null;
+    private Config config;
 
     public Ally(Config config, int id) {
         super(config.myTeam, id);
+        this.config = config;
         this.threadPool = App.threadPool;
 
         asyncProcedure = new AsyncProcedure(this.threadPool);
@@ -74,7 +77,7 @@ public class Ally extends Robot implements AllySkills {
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
             yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
         }
@@ -365,12 +368,12 @@ public class Ally extends Robot implements AllySkills {
      */
     private ArrayList<Circle2D> getObstacles() {
         ArrayList<RobotData> blueRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             blueRobots.add(blueRobotSubs.get(i).getMsg());
         }
 
         ArrayList<RobotData> yellowRobots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             yellowRobots.add(yellowRobotSubs.get(i).getMsg());
         }
 
@@ -406,7 +409,7 @@ public class Ally extends Robot implements AllySkills {
             try {
                 subscribe();
                 super.run();
-                pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH);
+                pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH, config);
 
                 ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getSendTCP(),
                         0,
@@ -463,7 +466,7 @@ public class Ally extends Robot implements AllySkills {
     protected void subscribe() {
         super.subscribe();
         try {
-            for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+            for (int i = 0; i < config.numAllyRobots; i++) {
                 yellowRobotSubs.get(i).subscribe(1000);
                 blueRobotSubs.get(i).subscribe(1000);
             }

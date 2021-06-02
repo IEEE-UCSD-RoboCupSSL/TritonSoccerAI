@@ -11,17 +11,24 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
 
 public class BasicPlayTest implements TritonTestable {
-    private final GapFinder gapFinder;
-    private final PassFinder passFinder;
+    private GapFinder gapFinder;
+    private PassFinder passFinder;
     BasicPlay basicPlay;
+    private final RobotList<Ally> fielders;
+    private final Ally keeper;
+    private final RobotList<Foe> foes;
+    private final Ball ball;
     public BasicPlayTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
-
-        gapFinder = new GapFinder(fielders, foes, ball);
-        passFinder = new PassFinder(fielders, foes, ball);
-        basicPlay = new BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder);
+        this.fielders = fielders;
+        this.keeper = keeper;
+        this.foes = foes;
+        this.ball = ball;
     }
 
     public boolean test(Config config) {
+        gapFinder = new GapFinder(fielders, foes, ball);
+        passFinder = new PassFinder(fielders, foes, ball);
+        basicPlay = new BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder, config);
         try {
             while (true) {
                 basicPlay.play();

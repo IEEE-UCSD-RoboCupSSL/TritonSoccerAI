@@ -16,7 +16,7 @@ public class ConnectionConfig {
     public ArrayList<BotConn> botConns = null;
     public UdpMulticastConn sslVisionConn = null;
     public UdpMulticastConn gcConn = null;
-    public int numRobots = 6;
+    public int numAllyRobots = 6;
 
     public void processFromParsingIni(File iniFIle) throws IOException {
         Wini iniParser = new Wini(iniFIle);
@@ -30,9 +30,9 @@ public class ConnectionConfig {
         gcConn.port = iniParser.get("ssl-game-controller", "mc-port", int.class);
 
         // robot connections
-        numRobots = iniParser.get("robot-connections", "num-robots", int.class);
+        numAllyRobots = iniParser.get("robot-connections", "num-robots", int.class);
         String queryStr = "robot-";
-        for(int id = 0; id < numRobots; id++) {
+        for(int id = 0; id < numAllyRobots; id++) {
             BotConn botConn = new BotConn(id);
             botConn.ipAddr = iniParser.get("robot-connections", queryStr + id + "-ip", String.class);
             int portBase = iniParser.get("robot-connections", "robot-port-base", int.class);
@@ -55,7 +55,7 @@ public class ConnectionConfig {
                 "\nbotConns=" + botConns +
                 ",\n sslVisionConn=" + sslVisionConn +
                 ",\n gcConn=" + gcConn +
-                ",\n numRobots=" + numRobots +
+                ",\n numRobots=" + numAllyRobots +
                 '}';
     }
 

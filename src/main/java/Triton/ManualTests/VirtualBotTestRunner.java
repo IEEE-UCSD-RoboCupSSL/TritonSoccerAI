@@ -1,33 +1,15 @@
 package Triton.ManualTests;
 
 import Triton.Config.Config;
-import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.CoreModules.Robot.Foe.Foe;
-import Triton.CoreModules.Robot.RobotList;
 import Triton.SoccerObjects;
 
 import java.util.Optional;
 import java.util.Scanner;
 
-
-/**
- * Test runner for core tests. When manual test mode is enabled. It outputs a list of currently registered tests
- * and prompts the user for input. It simply executes corresponding test given a test name.
- *
- * --> Writing New Tests <--
- * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
- */
-public class CoreTestRunner {
-    public static void runCoreTest(Config config, SoccerObjects soccerObjects, Scanner scanner) {
+public class VirtualBotTestRunner {
+    public static void runVirtualBotTest(Config config, Scanner scanner, SoccerObjects soccerObjects) {
         try {
-            Thread.sleep(1000);
-            CoreTestFactory testFactory = new CoreTestFactory(soccerObjects, config);
-
-            TritonTestable defaultFormation = testFactory.getTest("defaultFormation");
-            Optional<TritonTestable> defaultFormation1 = Optional.of(defaultFormation);
-            defaultFormation1.get().test(config);
-
+            VirtualBotTestFactory testFactory = new VirtualBotTestFactory(soccerObjects, config);
             String prevTestName = "";
 
             while (true) {
@@ -61,6 +43,6 @@ public class CoreTestRunner {
             e.printStackTrace();
         }
 
-        System.out.println("CoreTest TestRunner Ended");
+        System.out.println("VirtualBot Ended");
     }
 }

@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
+import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.*;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
@@ -31,10 +32,12 @@ public class AttackPlanA extends Tactics {
     private PassFinder passFinder;
     private Dodging dodging;
     final private double interAllyClearance = 600; // mm
+    private Config config;
 
     public AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
-                       Ball ball, GapFinder gapFinder, PassFinder passFinder) {
+                       Ball ball, GapFinder gapFinder, PassFinder passFinder, Config config) {
         super(fielders, keeper, foes, ball);
+        this.config = config;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passInfo = new PassInfo(fielders, foes, ball);
@@ -116,7 +119,7 @@ public class AttackPlanA extends Tactics {
                 gapPosDir.add(ball.getPos().sub(pos).toPlayerAngle());
             }
 
-            new Swarm(restFielders).groupTo(gapPos, gapPosDir, priorityAnchor); // ballPos used as priorityAnchor
+            new Swarm(restFielders, config).groupTo(gapPos, gapPosDir, priorityAnchor); // ballPos used as priorityAnchor
         }
     }
 
@@ -175,7 +178,7 @@ public class AttackPlanA extends Tactics {
             sidePos.add(new Vec2D(2800, 0));
             sidePos.add(new Vec2D(-2800, 500));
             sidePos.add(new Vec2D(-2800, 0));
-            new Swarm(restFielders).groupTo(sidePos);
+            new Swarm(restFielders, config).groupTo(sidePos);
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {

@@ -18,6 +18,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
+import Triton.SoccerObjects;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
 
@@ -40,23 +41,19 @@ public class AI implements Module {
 
     private Config config;
 
-    public AI(Config config, RobotList<Ally> fielders, Ally keeper,
-              RobotList<Foe> foes, Ball ball, GameCtrlModule gameCtrl) {
+    public AI(Config config, SoccerObjects soccerObjects, GameCtrlModule gameCtrl) {
+        this.fielders = soccerObjects.fielders;
+        this.keeper = soccerObjects.keeper;
+        this.foes = soccerObjects.foes;
+        this.ball = soccerObjects.ball;
         if (fielders == null || keeper == null || foes == null || ball == null || gameCtrl == null) {
             throw new NullPointerException();
         }
         this.config = config;
-        this.fielders = fielders;
-        this.keeper = keeper;
-        this.foes = foes;
-        this.ball = ball;
         this.gameCtrl = gameCtrl;
-
-        gapFinder = new GapFinder(fielders, foes, ball);
-        passFinder = new PassFinder(fielders, foes, ball);
-
-        strategyToPlay = new BasicPlay(fielders, keeper, foes, ball,
-                                gapFinder, passFinder);
+        gapFinder = new GapFinder(soccerObjects);
+        passFinder = new PassFinder(soccerObjects);
+        strategyToPlay = new BasicPlay(config, soccerObjects, gapFinder, passFinder);
     }
 
     @Override
@@ -235,7 +232,7 @@ public class AI implements Module {
             }
             fielders.stopAll();
         } else {
-            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 1000);
+            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 1000, config);
             fielders.stopAll();
 
             long t0 = System.currentTimeMillis();

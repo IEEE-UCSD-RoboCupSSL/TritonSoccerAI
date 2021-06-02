@@ -13,8 +13,7 @@ import java.util.Scanner;
  * Refer to `CoreTestFactory` or `PeriphMiscTestFactory` for how to register new tests.
  */
 public class PeriphMiscTestRunner {
-    public static void runPeriphMiscTest(Config config) {
-        Scanner scanner = new Scanner(System.in);
+    public static void runPeriphMiscTest(Config config, Scanner scanner) {
         try {
             PeriphMiscTestFactory testFactory = new PeriphMiscTestFactory(config);
             String prevTestName = "";
@@ -51,6 +50,5 @@ public class PeriphMiscTestRunner {
         }
 
         System.out.println("PeriphTest Ended");
-        System.out.println("Automatically run CoreTest TestRunner next\n");
     }
 }

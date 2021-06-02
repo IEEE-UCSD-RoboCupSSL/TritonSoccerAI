@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DisplayTest implements TritonTestable {
     public boolean test(Config config) {
-        Display display = new Display();
+        Display display = new Display(config);
         ScheduledFuture<?> future = App.threadPool.scheduleAtFixedRate(display,
                 0,
                 Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),

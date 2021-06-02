@@ -1,5 +1,6 @@
 package Triton.PeriphModules.Display;
 
+import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -16,8 +17,8 @@ public class JPSPathfinderDisplay extends Display {
     /**
      * Construct a display with additional path and obstacles
      */
-    public JPSPathfinderDisplay(JPSPathFinder JPS) {
-        super();
+    public JPSPathfinderDisplay(JPSPathFinder JPS, Config config) {
+        super(config);
         this.JPS = JPS;
     }
 

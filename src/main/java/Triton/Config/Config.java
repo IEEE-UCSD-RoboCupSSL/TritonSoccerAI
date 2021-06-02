@@ -1,4 +1,5 @@
 package Triton.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import org.ini4j.Wini;
@@ -21,6 +22,7 @@ public class Config {
     public RobotConfig botConfig = null;
     public Team myTeam = Team.BLUE; // default, subject to change in body code
     public Team foeTeam = Team.YELLOW; // default, subject to change in  body code
+    public int numAllyRobots = 6; // default, subject to change in body code
 
     public void processAllConfigs() throws IOException {
         cliConfig.processCliArgs(args);
@@ -37,6 +39,7 @@ public class Config {
             foeTeam = Team.BLUE;
             PerspectiveConverter.setTeam(myTeam);
         }
+        this.numAllyRobots = connConfig.numAllyRobots;
     }
 
     private File getIniFileByType(String type) throws IOException {

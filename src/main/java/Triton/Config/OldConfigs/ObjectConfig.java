@@ -6,7 +6,6 @@ import Triton.CoreModules.Robot.Team;
  * Config file for various objects
  */
 public final class ObjectConfig {
-    public static int ROBOT_COUNT = 6;
     public static double ROBOT_RADIUS = 90.0;
     public static double ROBOT_MIN_RADIUS = ROBOT_RADIUS - 15;
     public static double ROBOT_DRIB_WIDTH = 80.0;

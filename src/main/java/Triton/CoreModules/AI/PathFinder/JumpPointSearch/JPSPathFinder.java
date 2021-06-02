@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
+import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.Misc.Math.Coordinates.Gridify;
@@ -24,9 +25,11 @@ public class JPSPathFinder extends PathFinder {
     private final int[] ul;
     private final int[] br;
     private ArrayList<Vec2D> path = new ArrayList<>();
+    private final Config config;
 
-    public JPSPathFinder(double worldSizeX, double worldSizeY) {
+    public JPSPathFinder(double worldSizeX, double worldSizeY, Config config) {
         super("JPS");
+        this.config = config;
         this.worldSizeX = worldSizeX + GvcPathfinder.BOUNDARY_EXTENSION * 2;
         this.worldSizeY = worldSizeY + GvcPathfinder.BOUNDARY_EXTENSION * 2;
 
@@ -247,7 +250,7 @@ public class JPSPathFinder extends PathFinder {
     }
 
     public void display() {
-        new JPSPathfinderDisplay(this);
+        new JPSPathfinderDisplay(this, config);
     }
 
     public int getNumRows() {

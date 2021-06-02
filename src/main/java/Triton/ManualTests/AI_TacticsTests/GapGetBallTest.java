@@ -19,18 +19,29 @@ import static Triton.PeriphModules.Display.PaintOption.*;
 
 public class GapGetBallTest implements TritonTestable {
 
-    private final BasicEstimator basicEstimator;
-    private final FillGapGetBall fillGapGetBall;
+    private BasicEstimator basicEstimator;
+    private FillGapGetBall fillGapGetBall;
 
+    private final RobotList<Ally> fielders;
+    private final Ally keeper;
+    private final RobotList<Foe> foes;
+    private final Ball ball;
 
     public GapGetBallTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
-        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        fillGapGetBall = new FillGapGetBall(fielders, keeper, foes, ball,
-                new GapFinder(fielders, foes, ball));
+        this.fielders = fielders;
+        this.keeper = keeper;
+        this.foes = foes;
+        this.ball = ball;
+
     }
 
     public boolean test(Config config) {
-        Display display = new Display();
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
+        fillGapGetBall = new FillGapGetBall(fielders, keeper, foes, ball,
+                new GapFinder(fielders, foes, ball), config);
+
+
+        Display display = new Display(config);
         ArrayList<PaintOption> paintOptions = new ArrayList<>();
         paintOptions.add(GEOMETRY);
         paintOptions.add(OBJECTS);

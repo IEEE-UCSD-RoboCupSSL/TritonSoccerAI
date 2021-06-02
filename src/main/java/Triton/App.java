@@ -9,6 +9,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.ManualTests.CoreTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.VirtualBotFactory;
@@ -35,14 +36,24 @@ import static Triton.Util.delay;
  *
  * compile to a jar: mvn clean compile assembly:single
  * then use java -jar to execute the jar
+ *
+ *
+ * Recommended Intellij config command line arg: "compile assembly:single"
  */
 public class App {
     /* declare a global threadpool*/
     public static FieldPubSubPair<Boolean> appCanceller = new FieldPubSubPair<>("App", "Canceller", false);
     public static ScheduledExecutorService threadPool;
+    public static ArrayList<ScheduledFuture<?>> moduleFutures = new ArrayList<>();
     static {
         /* Prepare a Thread Pool*/
         threadPool = new ScheduledThreadPoolExecutor(TotalNumOfThreads);
+    }
+
+    public static ScheduledFuture<?> runModule(Module module, double frequencyInHz) {
+         return App.threadPool.scheduleAtFixedRate(
+                module,
+            0, Util.toPeriod(frequencyInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
     }
 
     public static void main(String[] args) {
@@ -59,10 +70,6 @@ public class App {
         // ...
         System.out.println("==============================================================");
         Scanner scanner = new Scanner(System.in);
-        boolean toRunTest = false;
-        boolean toTestTritonBot = false;
-        ArrayList<ScheduledFuture<?>> virtualBotsFutures = null;
-
         if(config.cliConfig.isVirtualMode) {
             System.out.println("VirtualEnabled: waiting for TritonBot to connect to TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect TritonBot on regular TCP & UDP ports");
             /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
@@ -71,70 +78,74 @@ public class App {
             delay(1000);
              *  */
             VirtualBotList virtualBots = VirtualBotFactory.createVirtualBots(config);
-            virtualBotsFutures = virtualBots.runAll();
+            moduleFutures.addAll(virtualBots.runAll());
             while(!virtualBots.areAllConnectedToTritonBots()) {
                 delay(100);
             }
-            delay(500);
+            delay(1000);
         }
         
         GeometryConfig.initGeo(); // To-do: refactor this
 
         if(config.cliConfig.isTestMode) {
-            System.out.println(">> Enter [Y] for CoreTest Mode, or Enter [N] for PeriphTest Mode");
-            String testMode = scanner.nextLine();
-            switch (testMode) {
-                /* CoreTest Mode */
-                case "Y" -> toRunTest = true;
-                /* PeriphTest Mode */
-                case "N" -> {
-                    System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                    runPeriphMiscTest(config);
-                    toRunTest = true;
+            boolean toQuit = false;
+            do {
+                System.out.println(">> Enter [C] for CoreTest Mode, [P] for PeriphTest Mode, [V] for VirtualBotTest Mode, or [quit] to exit");
+                String testMode = scanner.nextLine();
+                switch (testMode) {
+                    case "quit" -> toQuit = true;
+                    /* PeriphTest Mode */
+                    case "p", "P" -> {
+                        System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
+                        runPeriphMiscTest(config, scanner);
+                    }
+                    /* CoreTest Mode */
+                    case "c", "C" -> {
+                        System.out.println("[CoreTest Mode]: Testing for CoreModules");
+
+                        /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                        moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
+                        moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
+                        delay(1000);
+                        SoccerObjects soccerObjects = new SoccerObjects(config);
+                        moduleFutures.addAll(soccerObjects.runModules());
+
+                        System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
+                        CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
+                    }
+                    case "v", "V" -> {
+                        if (config.cliConfig.isVirtualMode) {
+                            System.out.println("[VirtualBotTest Mode]: Testing VirtualBotModules(a.k.a the virtual firmware modules)");
+
+                            /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                            moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
+                            moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
+                            delay(1000);
+                            SoccerObjects soccerObjects = new SoccerObjects(config);
+                            moduleFutures.addAll(soccerObjects.runModules());
+
+
+                        } else {
+                            System.err.println("Test V mode require this program to be running virtual mode");
+                        }
+                    }
+                    default -> System.out.println("Invalid Input");
                 }
-                default -> System.out.println("Invalid Input");
-            }
-        }
-
-        /* Instantiate & Run each independent modules in a separate thread from the thread threadPool */
-        ScheduledFuture<?> visionFuture = App.threadPool.scheduleAtFixedRate(
-                    new GrSimVisionModule_OldProto(config),
-                0, Util.toPeriod(GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-        ScheduledFuture<?> detectFuture = App.threadPool.scheduleAtFixedRate(
-                    new DetectionModule(config),
-                0, Util.toPeriod(GvcModuleFreqs.DETECTION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-
-        delay(1000);
-        
-        Ball ball = new Ball();
-        ball.subscribe();
-
-        // instantiate robots
-        ArrayList<ScheduledFuture<?>> allyFieldersFutures = null;
-        ArrayList<ScheduledFuture<?>> foesFutures = null;
-        ScheduledFuture<?> goalKeeperFuture = null;
-        RobotList<Ally> fielders = RobotFactory.createAllyFielderBots(config);
-        Ally goalKeeper = RobotFactory.createGoalKeeperBot(config);
-        RobotList<Foe> foes = RobotFactory.createFoeBotsForTracking(config);
-        // our/ally robots == fielders + 1 goalkeeper
-        if (fielders.connectAll() == config.connConfig.numRobots - 1 && goalKeeper.connect()) {
-            allyFieldersFutures = fielders.runAll();
-            goalKeeperFuture = App.threadPool.scheduleAtFixedRate(
-                        goalKeeper,
-                    0, Util.toPeriod(GvcModuleFreqs.ROBOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+            } while(!toQuit);
+            System.exit(0);  // do expect some error message got printed out because both this & cpp part
+                                  // haven't handle socket exceptions smartly which have them reconnect upon exception
+                                  // occurring, use ctrl+c to exit
         } else {
-            System.out.println("Error Connecting to Robots (in App.java)");
-        }
-        // opponent/foe robots: foes = foeFielders + 1 foeGoalKeeper
-        foesFutures = foes.runAll(); // submit all to threadPool
+            /* Normally Running a Game Mode */
 
+            /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+            moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
+            moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
+            delay(1000);
+            SoccerObjects soccerObjects = new SoccerObjects(config);
+            moduleFutures.addAll(soccerObjects.runModules());
 
-        if (toRunTest) {
-            System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-            CoreTestRunner.runCoreTest(config, fielders, goalKeeper, foes, ball);
-        } else {
-            System.out.println("Temporarily Down, Please Use Test Mode");
+            System.out.println("Temporarily suspended, Please Use Test Mode for now");
             /* Run the actual game program */
 //
 //            int port = (config.team == BLUE) ? 6543 : 6544;
@@ -148,35 +159,20 @@ public class App {
 //
 //            /* Instantiate & Run the main AI module, which is the core of this software */
 //            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
+
+
+
+            Util.sleepForever(appCanceller.sub);
         }
 
 
+//        for(ScheduledFuture<?> future : moduleFutures) {
+//            future.cancel(true);
+//        }
 
-        Util.sleepForever(appCanceller.sub);
 
-        boolean toInterrupt = true;
-        visionFuture.cancel(toInterrupt);
-        detectFuture.cancel(toInterrupt);
-        if(allyFieldersFutures != null) {
-            for (ScheduledFuture<?> future : allyFieldersFutures) {
-                future.cancel(toInterrupt);
-            }
-        }
-        if(foesFutures != null) {
-            for (ScheduledFuture<?> future : foesFutures) {
-                future.cancel(toInterrupt);
-            }
-        }
-        if(goalKeeperFuture != null) {
-            goalKeeperFuture.cancel(toInterrupt);
-        }
 
-        if(virtualBotsFutures != null) {
-            for (ScheduledFuture<?> future : virtualBotsFutures) {
-                future.cancel(toInterrupt);
-            }
-        }
-
+// OLD CODE:
 //        Display display = new Display();
 //        ArrayList<PaintOption> paintOptions = new ArrayList<>();
 //        paintOptions.add(GEOMETRY);
@@ -195,4 +191,6 @@ public class App {
 //        future.cancel(false);
 
     }
+
+
 }

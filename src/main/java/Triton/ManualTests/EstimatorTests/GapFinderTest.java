@@ -24,7 +24,7 @@ public class GapFinderTest implements TritonTestable {
     }
 
     public boolean test(Config config) {
-        Display display = new Display();
+        Display display = new Display(config);
         ArrayList<PaintOption> paintOptions = new ArrayList<>();
         paintOptions.add(GEOMETRY);
         paintOptions.add(OBJECTS);

@@ -7,6 +7,7 @@ import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.RWLockee;
+import Triton.SoccerObjects;
 
 import java.util.HashMap;
 
@@ -28,6 +29,13 @@ public class PassFinder extends GapFinder {
     protected RWLockee<double[][]> gWrapper = new RWLockee<>(null);
     protected RWLockee<int[][]> rWrapper = new RWLockee<>(null);
 
+    public PassFinder(SoccerObjects soccerObjects) {
+        this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
+    }
+
+    public PassFinder(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
+        this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball, resolutionStepSize, evalWindowSize);
+    }
 
     public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 400, 20);

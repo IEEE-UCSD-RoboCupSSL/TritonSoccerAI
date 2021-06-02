@@ -1,7 +1,8 @@
 package Triton.PeriphModules.Display;
 
+import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
-import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
@@ -36,14 +37,16 @@ public class Display extends JPanel implements Runnable {
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
+    private Config config;
 
     /* Construct a display with robot, ball, and field */
-    public Display() {
+    public Display(Config config) {
         super();
+        this.config = config;
 
         yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
             yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
         }
@@ -160,7 +163,7 @@ public class Display extends JPanel implements Runnable {
      */
     private void paintObjects(Graphics2D g2d) {
         ArrayList<RobotData> robots = new ArrayList<>();
-        for (int i = 0; i < ObjectConfig.ROBOT_COUNT; i++) {
+        for (int i = 0; i < config.numAllyRobots; i++) {
             robots.add(yellowRobotSubs.get(i).getMsg());
             robots.add(blueRobotSubs.get(i).getMsg());
         }

@@ -9,6 +9,7 @@ import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.RWLockee;
+import Triton.SoccerObjects;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -40,6 +41,13 @@ public class GapFinder extends ProbFinder {
     protected RWLockee<Vec2D[][]> localMaxPosWrapper = new RWLockee<>(null);
     protected RWLockee<double[][]> localMaxScoreWrapper = new RWLockee<>(null);
 
+    public GapFinder(SoccerObjects soccerObjects) {
+        this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
+    }
+
+    public GapFinder(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
+        this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball, resolutionStepSize, evalWindowSize);
+    }
 
     public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 100, 10);

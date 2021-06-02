@@ -1,5 +1,6 @@
 package Triton.ManualTests;
 
+import Triton.Config.Config;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -16,6 +17,8 @@ import Triton.ManualTests.EstimatorTests.PassFinderTest;
 
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
+import Triton.SoccerObjects;
+
 import java.util.TreeMap;
 
 /**
@@ -34,12 +37,12 @@ public class CoreTestFactory {
     /**
      * Constructor created to accommodate existing tests at the time of refactoring.
      *
-     * @param fielders Argument needed by existing tests.
-     * @param keeper Argument needed by existing tests.
-     * @param foes Argument needed by existing tests.
-     * @param ball Argument needed by existing tests.
      */
-    public CoreTestFactory(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public CoreTestFactory(SoccerObjects soccerObjects, Config config) {
+        RobotList<Ally> fielders = soccerObjects.fielders;
+        Ally keeper = soccerObjects.keeper;
+        RobotList<Foe> foes = soccerObjects.foes;
+        Ball ball = soccerObjects.ball;
         coreTestMap.put("pmotion", new PrimitiveMotionTest(fielders.get(3)));
         coreTestMap.put("amotion", new AdvancedMotionTest(fielders.get(1)));
         coreTestMap.put("getball", new GetBallTest(fielders.get(3), ball));
