@@ -15,6 +15,7 @@ import Triton.Util;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,7 @@ public class VirtualMcuTopModule implements Module {
         isConnectedToTritonBotPubSub =
                 new FieldPubSubPair<>("Internal:VirtualMcuTopModule",
                                       "isConnectedToTritonBot " + id, false);
-        debugStrPub = new FieldPublisher<>("VirtualMcuTopModule", "DebugString " + id, "");
+        debugStrPub = new FieldPublisher<>("VirtualMcuTopModule", "DebugString " + id, "???");
 
         for(ConnectionConfig.BotConn conn : config.connConfig.botConns) {
             if(conn.id == id) {
@@ -66,7 +67,7 @@ public class VirtualMcuTopModule implements Module {
             severSocket = new ServerSocket(port);
             socket = severSocket.accept();
             socketOut = new PrintWriter(socket.getOutputStream(), true);
-            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
             System.out.println("VirtualBot " + id + " successfully accepted TritonBot(cpp)'s tcp connection request");
             isConnectedToTritonBotPubSub.pub.publish(true);
         } catch (IOException e) {
@@ -106,14 +107,15 @@ public class VirtualMcuTopModule implements Module {
         /* Get commands meant to be sent to the firmware layer (adapter program named McuTop)
          *  from TritonBot, this class is meant to mock that McuTop as a virtual mode version of McuTop */
         try {
-            String line = socketIn.readLine();
-            debugStrPub.publish(line);
-            line = line.substring(0, line.length() - 1);
-//            ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.UTF_8), 0, line.length());
-//            FirmwareAPI.FirmwareCommand receivedCmd =
-//                    FirmwareAPI.FirmwareCommand.parseFrom(stream);
-//
-//            cmdPub.publish(receivedCmd);
+            String line;
+            line = socketIn.readLine();
+            //debugStrPub.publish(line);
+            //line = line.substring(0, line.length() - 1);
+            ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.US_ASCII));
+            FirmwareAPI.FirmwareCommand receivedCmd =
+                    FirmwareAPI.FirmwareCommand.parseFrom(stream);
+
+            cmdPub.publish(receivedCmd);
 
             // Must check init command here
 

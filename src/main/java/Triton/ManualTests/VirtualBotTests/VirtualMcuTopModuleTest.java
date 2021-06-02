@@ -9,6 +9,7 @@ import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.SoccerObjects;
 
+import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
@@ -24,6 +25,7 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
 
     @Override
     public boolean test(Config config) {
+        System.out.println("Default Charset: " + Charset.defaultCharset());
         Scanner scanner = new Scanner(System.in);
         int chosenBotId = 3;
         /* virtualbot modules have already been instantiate and run in App.java before calling this test */
@@ -41,9 +43,12 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
 
         while (true) {
             VirtualBotTestRunner.sendPrimitiveCommand(scanner, soccerObjects.fielders.get(chosenBotId));
+
+            delay(100);
+
             System.out.println("Command VirtualBot Received: >>>>>>>>>>");
-            //System.out.println(cmdSub.getMsg());
-            System.out.println(debugStrSub.getMsg());
+            System.out.println(cmdSub.getMsg());
+            //System.out.println(debugStrSub.getMsg());
             System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
