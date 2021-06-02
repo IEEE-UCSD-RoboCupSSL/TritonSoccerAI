@@ -9,6 +9,8 @@ import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
+import Triton.VirtualBot.SimClientModule;
+import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
 import Triton.VirtualBot.VirtualBotFactory;
 import Triton.VirtualBot.VirtualBotList;
 
@@ -68,7 +70,15 @@ public class App {
         System.out.println("==============================================================");
         Scanner scanner = new Scanner(System.in);
         if(config.cliConfig.isVirtualMode) {
-            System.out.println("VirtualEnabled: waiting for TritonBot to connect to TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect TritonBot on regular TCP & UDP ports");
+            System.out.println("\033[0;32m VirtualEnabled: waiting for TritonBot to connect to " +
+                    "TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect " +
+                    "TritonBot on regular TCP & UDP ports \033[0m");
+
+            SimClientModule simClientModule = null;
+            if(config.cliConfig.simulator.equals("grsim")) {
+                simClientModule = new GrSimClientModule(config);
+            }
+            App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
             /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
              *      what VirtualBot really does is mocking the firmware layer of a real robot, whereas
              *      Robot(Ally/Foe) are internal OOP representation of a robot

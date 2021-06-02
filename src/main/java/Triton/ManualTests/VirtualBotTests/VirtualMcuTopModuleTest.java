@@ -2,10 +2,8 @@ package Triton.ManualTests.VirtualBotTests;
 
 import Proto.FirmwareAPI;
 import Triton.Config.Config;
-import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.TritonTestable;
 import Triton.ManualTests.VirtualBotTestRunner;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.SoccerObjects;
 
@@ -17,7 +15,7 @@ import static Triton.Util.delay;
 
 public class VirtualMcuTopModuleTest implements TritonTestable {
     private final  SoccerObjects soccerObjects;
-    private FieldSubscriber<String> debugStrSub;
+    // private FieldSubscriber<String> debugStrSub;
 
     public VirtualMcuTopModuleTest(SoccerObjects soccerObjects) {
         this.soccerObjects = soccerObjects;
@@ -25,18 +23,17 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
 
     @Override
     public boolean test(Config config) {
-        System.out.println("Default Charset: " + Charset.defaultCharset());
         Scanner scanner = new Scanner(System.in);
         int chosenBotId = 3;
         /* virtualbot modules have already been instantiate and run in App.java before calling this test */
         FieldSubscriber<FirmwareAPI.FirmwareCommand> cmdSub =
                 new FieldSubscriber<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + chosenBotId);
 
-        debugStrSub = new FieldSubscriber<>("VirtualMcuTopModule", "DebugString " + chosenBotId);
+        // debugStrSub = new FieldSubscriber<>("VirtualMcuTopModule", "DebugString " + chosenBotId);
 
         try {
             cmdSub.subscribe(1000);
-            debugStrSub.subscribe(1000);
+            // debugStrSub.subscribe(1000);
         } catch (TimeoutException e) {
             e.printStackTrace();
         }

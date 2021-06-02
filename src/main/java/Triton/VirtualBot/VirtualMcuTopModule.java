@@ -4,7 +4,6 @@ import Proto.FirmwareAPI;
 import Triton.App;
 import Triton.Config.Config;
 import Triton.Config.ConnectionConfig;
-import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
@@ -15,7 +14,6 @@ import Triton.Util;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
@@ -32,14 +30,14 @@ public class VirtualMcuTopModule implements Module {
     private FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
     private FieldPubSubPair<Boolean> isConnectedToTritonBotPubSub;
 
-    private FieldPublisher<String> debugStrPub;
+    // private FieldPublisher<String> debugStrPub;
     public VirtualMcuTopModule(Config config, int id,
                                FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub,
                                FieldSubscriber<FirmwareAPI.FirmwareData> dataSub) {
         isConnectedToTritonBotPubSub =
                 new FieldPubSubPair<>("Internal:VirtualMcuTopModule",
                                       "isConnectedToTritonBot " + id, false);
-        debugStrPub = new FieldPublisher<>("VirtualMcuTopModule", "DebugString " + id, "???");
+        // debugStrPub = new FieldPublisher<>("VirtualMcuTopModule", "DebugString " + id, "???");
 
         for(ConnectionConfig.BotConn conn : config.connConfig.botConns) {
             if(conn.id == id) {
@@ -68,7 +66,8 @@ public class VirtualMcuTopModule implements Module {
             socket = severSocket.accept();
             socketOut = new PrintWriter(socket.getOutputStream(), true);
             socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
-            System.out.println("VirtualBot " + id + " successfully accepted TritonBot(cpp)'s tcp connection request");
+            System.out.println("\033[0;32m VirtualBot " + id + " successfully accepted " +
+                    "TritonBot(cpp)'s tcp connection request \033[0m");
             isConnectedToTritonBotPubSub.pub.publish(true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -108,17 +107,17 @@ public class VirtualMcuTopModule implements Module {
          *  from TritonBot, this class is meant to mock that McuTop as a virtual mode version of McuTop */
         try {
             String line;
-            line = socketIn.readLine();
+            line = socketIn.readLine(); // newline char already dropped by readLine()
             //debugStrPub.publish(line);
-            //line = line.substring(0, line.length() - 1);
             ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.US_ASCII));
             FirmwareAPI.FirmwareCommand receivedCmd =
                     FirmwareAPI.FirmwareCommand.parseFrom(stream);
 
+
+            // No need to process init command here because it's in virtual mode
+            // if(receivedCmd.getInit()) { }
+
             cmdPub.publish(receivedCmd);
-
-            // Must check init command here
-
         } catch (IOException e) {
             // To-do: handle disconnect
             e.printStackTrace();
