@@ -1,10 +1,10 @@
 package Triton.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
-import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.ProgramMode;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
 
 import java.io.File;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import java.util.Arrays;
 
 public class CliConfig {
     // initialized with default values, these values are subject to change based on config files &/ cli args
-
     @Option(names = {"-b", "--blue"}, description = "set team color to be blue")
     public boolean isBlueTeam = false;
 
@@ -20,16 +19,21 @@ public class CliConfig {
     public boolean isYellowTeam = false;
 
     @Option(names = {"-v", "--virtual"}, description = "run this program for virtual setup (i.e. with a simulator instead of real robots)")
-    public boolean isVirtualMode = false;
+    public boolean isVirtualSetup = false;
 
-    @Option(names = {"-t", "--test"}, description = "run in interactive test mode")
-    public boolean isTestMode = false;
 
-    @Parameters( description = "one or more .ini file(s) for various types of configurations")
-    public File[] iniFiles;
+    @Option(names = {"-m", "--mode"}, description = "designate a mode: [normal, test, test-tb]")
+    private String progModeStr = "test";
 
-    @Option(names = {"-s", "--simulator"}, description = "enter name of the simulator to run this program with: (grsim, erforcesim)")
-    public String simulator = "grsim";
+
+    @Parameters( description = "one or more .ini file path(s) for various types of configurations")
+    public File[] iniFiles = null;
+
+    @Option(names = {"-s", "--simulator"}, description = "enter name of the simulator to run this program with: [grsim, erforcesim]")
+    private String simulatorStr = "grsim";
+
+    public ProgramMode progMode = ProgramMode.Normal;
+    public SimulatorName simulator = SimulatorName.GrSim;
 
     public void processCliArgs(String[] args) {
         CommandLine commandLine = new CommandLine(this);
@@ -39,14 +43,38 @@ public class CliConfig {
             System.exit(0);
         }
 
-        if(!Arrays.asList(GvcGeneral.supportedSimulators).contains(simulator)) {
-            System.out.println("Error: unknown simulators, supported simulators are: " + Arrays.toString(GvcGeneral.supportedSimulators));
+        if(iniFiles == null) {
+            iniFiles = new File[1];
+            iniFiles[0] = new File("example-mainsetup.ini");
+        }
+
+        switch (progModeStr) {
+            case "normal" -> progMode = ProgramMode.Normal;
+            case "test" -> progMode = ProgramMode.Test;
+            case "test-tb" -> progMode = ProgramMode.TestTritonBot;
+            default -> {
+                System.out.println("Error: unknown program mode");
+                throw new RuntimeException();
+            }
+        }
+
+        switch (simulatorStr) {
+            case "grsim" -> simulator = SimulatorName.GrSim;
+            case "erforcesim" -> simulator = SimulatorName.ErForceSim;
+            default -> {
+                System.out.println("Error: unknown simulators");
+                throw new RuntimeException();
+            }
+        }
+
+        if(isBlueTeam && isYellowTeam) {
+            System.err.println("Error: can only select one team color, run with -h or --help for more details");
             throw new RuntimeException();
         }
 
         if(!isBlueTeam && !isYellowTeam) {
-            System.out.println("Error: must select a team color, run with -h or --help for more details");
-            throw new RuntimeException();
+            isBlueTeam = true;
+            System.out.println("Warning: team color set as default: blue");
         }
 
     }
@@ -56,10 +84,10 @@ public class CliConfig {
         return "CliConfig{" +
                 "\nisBlueTeam=" + isBlueTeam +
                 ", \nisYellowTeam=" + isYellowTeam +
-                ", \nisVirtualMode=" + isVirtualMode +
-                ", \nisTestMode=" + isTestMode +
+                ", \nisVirtualMode=" + isVirtualSetup +
+                ", \nprogMode='" + progModeStr + '\'' +
                 ", \niniFiles=" + Arrays.toString(iniFiles) +
-                ", \nsimulator='" + simulator + '\'' + "\n" +
+                ", \nsimulator='" + simulatorStr + '\'' + "\n" +
                 '}';
     }
 

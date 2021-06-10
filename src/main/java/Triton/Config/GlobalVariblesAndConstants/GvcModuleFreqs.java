@@ -2,7 +2,7 @@ package Triton.Config.GlobalVariblesAndConstants;
 
 public class GvcModuleFreqs {
     /* Unit: Hz */
-    public static final double GRSIM_VISION_MODULE_FREQ = 500;
+    public static final double VISION_MODULE_FREQ = 500;
     public static final double DETECTION_MODULE_FREQ = 1000;
     public static final double DISPLAY_MODULE_FREQ = 100;
     public static final double GAME_CTRL_MODULE_FREQ = 100;

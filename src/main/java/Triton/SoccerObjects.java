@@ -59,5 +59,4 @@ public class SoccerObjects {
         }
         return futures;
     }
-
 }

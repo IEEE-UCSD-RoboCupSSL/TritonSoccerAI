@@ -10,9 +10,11 @@ import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.SimClientModule;
+import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
 import Triton.VirtualBot.VirtualBotFactory;
 import Triton.VirtualBot.VirtualBotList;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
 
 import java.io.IOException;
 import java.util.*;
@@ -31,7 +33,7 @@ import static Triton.Util.delay;
  *  * run:
  *      * mvn exec:java
  *      * or if with args: mvn exec:java -Dexec.args="arg1 arg2 ..."
- *  Example: mvn exec:java -Dexec.args="-bvt ini/Setups/DevelopmentSetups/virtual-grsim-6v6.ini ini/RobotConfig/triton-2021-grsim.ini"
+ *  Example: mvn exec:java -Dexec.args="-bvm test"
  *
  * compile to a jar: mvn clean compile assembly:single
  * then use java -jar to execute the jar
@@ -69,13 +71,13 @@ public class App {
         // ...
         System.out.println("==============================================================");
         Scanner scanner = new Scanner(System.in);
-        if(config.cliConfig.isVirtualMode) {
+        if(config.cliConfig.isVirtualSetup) {
             System.out.println("\033[0;32m VirtualEnabled: waiting for TritonBot to connect to " +
                     "TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect " +
                     "TritonBot on regular TCP & UDP ports \033[0m");
 
             SimClientModule simClientModule = null;
-            if(config.cliConfig.simulator.equals("grsim")) {
+            if(config.cliConfig.simulator == SimulatorName.GrSim) {
                 simClientModule = new GrSimClientModule(config);
             }
             App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
@@ -94,89 +96,32 @@ public class App {
         
         GeometryConfig.initGeo(); // To-do: refactor this
 
-        if(config.cliConfig.isTestMode) {
-            boolean toQuit = false;
-            do {
-                System.out.println(">> Enter [C] for CoreTest Mode, [P] for PeriphTest Mode, [V] for VirtualBotTest Mode, or [quit] to exit");
-                String testMode = scanner.nextLine();
-                switch (testMode) {
-                    case "quit" -> toQuit = true;
-                    /* PeriphTest Mode */
-                    case "p", "P" -> {
-                        System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
-                        runPeriphMiscTest(config, scanner);
-                    }
-                    /* CoreTest Mode */
-                    case "c", "C" -> {
-                        System.out.println("[CoreTest Mode]: Testing for CoreModules");
+        switch (config.cliConfig.progMode) {
+            case Normal -> {
+                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                createAndRunPeriphModules(config, true);
+                SoccerObjects soccerObjects = new SoccerObjects(config);
+                moduleFutures.addAll(soccerObjects.runModules());
 
-                        /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
-                        moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
-                        moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-                        delay(1000);
-                        SoccerObjects soccerObjects = new SoccerObjects(config);
-                        moduleFutures.addAll(soccerObjects.runModules());
+                System.err.println("Error: WorkInProgress");
+                /* Run the actual game program */
 
-                        System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
-                        CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
-                    }
-                    case "v", "V" -> {
-                        if (config.cliConfig.isVirtualMode) {
-                            System.out.println("[VirtualBotTest Mode]: Testing VirtualBotModules(a.k.a the virtual firmware modules)");
-
-                            /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
-                            moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
-                            moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-                            delay(1000);
-                            SoccerObjects soccerObjects = new SoccerObjects(config);
-                            moduleFutures.addAll(soccerObjects.runModules());
-
-                            VirtualBotTestRunner.runVirtualBotTest(config, scanner, soccerObjects);
-
-                        } else {
-                            System.err.println("Test V mode require this program to be running virtual mode");
-                        }
-                    }
-                    default -> System.out.println("Invalid Input");
-                }
-            } while(!toQuit);
-            System.exit(0);  // do expect some error message got printed out because both this & cpp part
-                                  // haven't handle socket exceptions smartly which have them reconnect upon exception
-                                  // occurring, use ctrl+c to exit
-        } else {
-            /* Normally Running a Game Mode */
-
-            /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
-            moduleFutures.add(App.runModule(new GrSimVisionModule_OldProto(config), GvcModuleFreqs.GRSIM_VISION_MODULE_FREQ));
-            moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-            delay(1000);
-            SoccerObjects soccerObjects = new SoccerObjects(config);
-            moduleFutures.addAll(soccerObjects.runModules());
-
-            System.out.println("Temporarily suspended, Please Use Test Mode for now");
-            /* Run the actual game program */
-//
-//            int port = (config.team == BLUE) ? 6543 : 6544;
-//
-//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-////            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
-////            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-//            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(
-//                    gameCtrlModule,
-//                0, Util.toPeriod(GvcModuleFreqs.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-//
 //            /* Instantiate & Run the main AI module, which is the core of this software */
 //            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
-
-
-
-            Util.sleepForever(appCanceller.sub);
+                Util.sleepForever(appCanceller.sub);
+            }
+            case Test -> {
+                handleTestMode(config, scanner);
+            }
+            case TestTritonBot -> {
+                handleTestTritonBotMode();
+            }
         }
 
-
-//        for(ScheduledFuture<?> future : moduleFutures) {
-//            future.cancel(true);
-//        }
+        // cancel not working yet, need extra mechanism,
+        for(ScheduledFuture<?> future : moduleFutures) {
+            future.cancel(true);
+        }
 
 
 
@@ -198,6 +143,88 @@ public class App {
 
 //        future.cancel(false);
 
+    }
+
+
+    public static void createAndRunPeriphModules(Config config, boolean runGameCtrl) {
+        if(config.cliConfig.isVirtualSetup) {
+            switch (config.cliConfig.simulator) {
+                case GrSim -> moduleFutures.add(App.runModule(
+                        new GrSimVisionModule_OldProto(config), GvcModuleFreqs.VISION_MODULE_FREQ));
+                case ErForceSim -> System.err.println("Error: WorkInProgress");
+            }
+        } else {
+            System.err.println("Error: WorkInProgress");
+        }
+
+        moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
+
+        if(runGameCtrl) {
+            //
+//            int port = (config.team == BLUE) ? 6543 : 6544;
+//
+//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
+////            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
+////            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+//            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(
+//                    gameCtrlModule,
+//                0, Util.toPeriod(GvcModuleFreqs.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+//
+            System.err.println("Error: WorkInProgress");
+        }
+
+        delay(1000);
+    }
+
+    public static void handleTestMode(Config config, Scanner scanner) {
+        boolean toQuit = false;
+        do {
+            System.out.println(">> Enter [C] for CoreTest Mode, [P] for PeriphTest Mode, [V] for VirtualBotTest Mode, or [quit] to exit");
+            String testMode = scanner.nextLine();
+            switch (testMode) {
+                case "quit" -> toQuit = true;
+                /* PeriphTest Mode */
+                case "p", "P" -> {
+                    System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
+                    runPeriphMiscTest(config, scanner);
+                }
+                /* CoreTest Mode */
+                case "c", "C" -> {
+                    System.out.println("[CoreTest Mode]: Testing for CoreModules");
+
+                    /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                    createAndRunPeriphModules(config, false);
+                    SoccerObjects soccerObjects = new SoccerObjects(config);
+                    moduleFutures.addAll(soccerObjects.runModules());
+
+                    System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
+                    CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
+                }
+                case "v", "V" -> {
+                    if (config.cliConfig.isVirtualSetup) {
+                        System.out.println("[VirtualBotTest Mode]: Testing VirtualBotModules(a.k.a the virtual firmware modules)");
+
+                        /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                        createAndRunPeriphModules(config, false);
+                        SoccerObjects soccerObjects = new SoccerObjects(config);
+                        moduleFutures.addAll(soccerObjects.runModules());
+
+                        VirtualBotTestRunner.runVirtualBotTest(config, scanner, soccerObjects);
+                    } else {
+                        System.err.println("Test V mode require this program to be running virtual mode");
+                    }
+                }
+                default -> System.out.println("Invalid Input");
+            }
+        } while(!toQuit);
+        System.exit(0);  // do expect some error message got printed out because both this & cpp part
+        // haven't handle socket exceptions smartly which have them reconnect upon exception
+        // occurring, use ctrl+c to exit
+    }
+
+
+    public static void handleTestTritonBotMode() {
+        System.err.println("Error: WorkInProgress");
     }
 
 
