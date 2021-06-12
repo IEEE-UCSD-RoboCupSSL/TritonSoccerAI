@@ -1,17 +1,20 @@
 package Triton;
 
 import Triton.Config.*;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.*;
+import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTestRunner;
+import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.SimClientModule;
-import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
+import Triton.VirtualBot.VirtualBot;
 import Triton.VirtualBot.VirtualBotFactory;
 import Triton.VirtualBot.VirtualBotList;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
@@ -70,51 +73,33 @@ public class App {
         System.out.println(config.connConfig);
         // ...
         System.out.println("==============================================================");
-        Scanner scanner = new Scanner(System.in);
-        if(config.cliConfig.isVirtualSetup) {
-            System.out.println("\033[0;32m VirtualEnabled: waiting for TritonBot to connect to " +
-                    "TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect " +
-                    "TritonBot on regular TCP & UDP ports \033[0m");
 
-            SimClientModule simClientModule = null;
-            if(config.cliConfig.simulator == SimulatorName.GrSim) {
-                simClientModule = new GrSimClientModule(config);
-            }
-            App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
-            /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
-             *      what VirtualBot really does is mocking the firmware layer of a real robot, whereas
-             *      Robot(Ally/Foe) are internal OOP representation of a robot
-            delay(1000);
-             *  */
-            VirtualBotList virtualBots = VirtualBotFactory.createVirtualBots(config);
-            moduleFutures.addAll(virtualBots.runAll());
-            while(!virtualBots.areAllConnectedToTritonBots()) {
-                delay(100);
-            }
-            delay(1000);
+
+
+        Scanner scanner = new Scanner(System.in);
+        if(config.cliConfig.isVirtualSetup && config.cliConfig.progMode != GvcGeneral.ProgramMode.TestTritonBot) {
+            setupInternalVirtualBots(config);
         }
         
         GeometryConfig.initGeo(); // To-do: refactor this
 
         switch (config.cliConfig.progMode) {
             case Normal -> {
-                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
-                createAndRunPeriphModules(config, true);
-                SoccerObjects soccerObjects = new SoccerObjects(config);
-                moduleFutures.addAll(soccerObjects.runModules());
-
+//                /* Run the actual game program */
+//                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+//                createAndRunPeriphModules(config, true);
+//                SoccerObjects soccerObjects = new SoccerObjects(config);
+//                moduleFutures.addAll(soccerObjects.runModules());
+////            /* Instantiate & Run the main AI module, which is the core of this software */
+////            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
+//                Util.sleepForever(appCanceller.sub);
                 System.err.println("Error: WorkInProgress");
-                /* Run the actual game program */
-
-//            /* Instantiate & Run the main AI module, which is the core of this software */
-//            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
-                Util.sleepForever(appCanceller.sub);
             }
             case Test -> {
                 handleTestMode(config, scanner);
             }
             case TestTritonBot -> {
-                handleTestTritonBotMode();
+                handleTestTritonBotMode(config, scanner);
             }
         }
 
@@ -144,7 +129,6 @@ public class App {
 //        future.cancel(false);
 
     }
-
 
     public static void createAndRunPeriphModules(Config config, boolean runGameCtrl) {
         if(config.cliConfig.isVirtualSetup) {
@@ -223,8 +207,80 @@ public class App {
     }
 
 
-    public static void handleTestTritonBotMode() {
-        System.err.println("Error: WorkInProgress");
+    public static void handleTestTritonBotMode(Config config, Scanner scanner) {
+        int id = 0;
+        createAndRunPeriphModules(config, false);
+        setupOneInternalVirtualBot(config, id);
+        Ally bot;
+        System.out.println("......");
+        bot = new Ally(config, id);
+        bot.connect();
+        moduleFutures.add(
+                App.runModule(bot, GvcModuleFreqs.ROBOT_FREQ)
+        );
+        delay(1500);
+
+        System.out.println(">> Enter [pm] to run primitive motion, [ph] to print hold-ball, or [quit] to exit");
+        String testMode = scanner.nextLine();
+        switch (testMode) {
+            case "pm" -> {
+                new PrimitiveMotionTest(bot).test(config);
+            }
+            case "ph" -> {
+                System.out.println("This test will quit in 5 seconds");
+                long t0 = System.currentTimeMillis();
+                while(System.currentTimeMillis() - t0 < 5000) {
+                    System.out.println(bot.isHoldingBall());
+                    delay(100);
+                }
+            }
+            case "quit" -> System.exit(0);
+            default -> {
+                System.err.println("Unknown Mode");
+            }
+        }
+    }
+
+    public static void setupInternalVirtualBots(Config config) {
+        System.out.println("\033[0;32m VirtualEnabled: waiting for TritonBot to connect to " +
+                "TritonSoccerAI's VirtualBots, then TritonSoccerAI will connect " +
+                "TritonBot on regular TCP & UDP ports \033[0m");
+
+        SimClientModule simClientModule = null;
+        if(config.cliConfig.simulator == SimulatorName.GrSim) {
+            simClientModule = new GrSimClientModule(config);
+        }
+        App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
+        /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
+         *      what VirtualBot really does is mocking the firmware layer of a real robot, whereas
+         *      Robot(Ally/Foe) are internal OOP representation of a robot
+         *  */
+        VirtualBotList virtualBots = VirtualBotFactory.createVirtualBots(config);
+        moduleFutures.addAll(virtualBots.runAll());
+        while(!virtualBots.areAllConnectedToTritonBots()) {
+            delay(100);
+        }
+        delay(1000);
+    }
+
+    private static void setupOneInternalVirtualBot(Config config, int id) {
+        System.out.println("~~~~~~");
+
+        SimClientModule simClientModule = null;
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+            simClientModule = new GrSimClientModule(config);
+        }
+        App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
+        /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
+         *      what VirtualBot really does is mocking the firmware layer of a real robot, whereas
+         *      Robot(Ally/Foe) are internal OOP representation of a robot
+         *  */
+
+        VirtualBot vbot = new VirtualBot(config, id);
+        ScheduledFuture<?> robotFuture = App.threadPool.scheduleAtFixedRate(
+                vbot,
+                0, Util.toPeriod(GvcModuleFreqs.VIRTUAL_BOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+        delay(1000);
     }
 
 
