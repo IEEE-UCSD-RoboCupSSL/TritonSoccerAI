@@ -46,7 +46,6 @@ public class GrSimClientModule implements SimClientModule {
             isFirstRun = false;
         }
 
-//        delay(1000);
         sendCmds();
     }
 
@@ -61,26 +60,59 @@ public class GrSimClientModule implements SimClientModule {
     }
 
     private void sendCmds() {
-        GrSimPacket.grSim_Packet.Builder packet = GrSimPacket.grSim_Packet.newBuilder();
-        GrSimCommands.grSim_Commands.Builder grSimCommands = GrSimCommands.grSim_Commands.newBuilder();
 
-        for (int i = 0; i < config.numAllyRobots; i++) {
-            GrSimCommands.grSim_Robot_Command.Builder grSimRobotCommands =
-                    GrSimCommands.grSim_Robot_Command.newBuilder();
+        System.out.println("1");
+        GrSimCommands.grSim_Robot_Command command = GrSimCommands.grSim_Robot_Command.newBuilder()
+                .setId(0)
+                .setWheel2(0)
+                .setWheel1(0)
+                .setWheel3(0)
+                .setWheel4(0)
+                .setKickspeedx(0)
+                .setKickspeedz(0)
+                .setVeltangent(5)
+                .setVelnormal(5)
+                .setVelangular(0)
+                .setSpinner(false)
+                .setWheelsspeed(false)
+                .build();
 
-            VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
-            grSimRobotCommands.setId(cmd.getId());
-            grSimRobotCommands.setVeltangent(cmd.getVelX());
-            grSimRobotCommands.setVelnormal(cmd.getVelAng());
-            grSimRobotCommands.setVelangular(cmd.getVelY());
+        System.out.println("2");
+        GrSimCommands.grSim_Commands command2 = GrSimCommands.grSim_Commands.newBuilder()
+//                .setTimestamp(0)
+                .setIsteamyellow(false)
+                .addRobotCommands(command).build();
 
-            grSimCommands.setRobotCommands(i, grSimRobotCommands);
-        }
+        System.out.println("3");
+        GrSimPacket.grSim_Packet packet = GrSimPacket.grSim_Packet.newBuilder()
+                .setCommands(command2)
+                .build();
 
-        packet.setCommands(grSimCommands);
+//            GrSimPacket.grSim_Packet.Builder packet = GrSimPacket.grSim_Packet.newBuilder();
+//            GrSimCommands.grSim_Commands.Builder grSimCommands = GrSimCommands.grSim_Commands.newBuilder();
+//            grSimCommands.setIsteamyellow(config.myTeam == Team.YELLOW);
+//            grSimCommands.setTimestamp(0);
+//
+////        for (int i = 0; i < config.numAllyRobots; i++) {
+//            GrSimCommands.grSim_Robot_Command.Builder grSimRobotCommands =
+//                    GrSimCommands.grSim_Robot_Command.newBuilder();
+//
+//            VirtualBotCmds cmd = virtualBotCmdSubs.get(0).getMsg();
+//            grSimRobotCommands.setId(cmd.getId());
+//            grSimRobotCommands.setVeltangent(cmd.getVelX());
+//            grSimRobotCommands.setVelnormal(cmd.getVelAng());
+//            grSimRobotCommands.setVelangular(cmd.getVelY());
+//            grSimRobotCommands
+//
+//            System.out.println("1");
+//            grSimCommands.addRobotCommands(grSimRobotCommands.build());
+//            System.out.println("2");
+////        }
+//
+//            packet.setCommands(grSimCommands.build());
 
         byte[] bytes;
-        bytes = packet.build().toByteArray();
+        bytes = packet.toByteArray();
         send(bytes);
     }
 
@@ -90,8 +122,10 @@ public class GrSimClientModule implements SimClientModule {
      * @param msg message to send as byte array
      */
     private void send(byte[] msg) {
-        DatagramPacket packet = new DatagramPacket(msg, msg.length, address, port);
         try {
+            DatagramPacket packet =
+                    new DatagramPacket(msg, msg.length, InetAddress.getByName(config.connConfig.simCmdEndpoint.ipAddr),
+                            config.connConfig.simCmdEndpoint.port);
             socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();

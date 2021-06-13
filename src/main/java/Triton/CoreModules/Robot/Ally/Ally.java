@@ -96,7 +96,7 @@ public class Ally extends Robot implements AllySkills {
         holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + id);
 
         isDribbledSub = new FieldSubscriber<>("Ally drib", "" + id);
-        commandsPub = new MQPublisher<>("From:Ally", "AllyCmd" + id);
+        commandsPub = new MQPublisher<>("commands", "" + id);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();

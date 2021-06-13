@@ -28,9 +28,9 @@ public class GrSimClientModuleTest implements TritonTestable {
             int id = scanner.nextInt();
             System.out.printf("velX: ");
             float velX = scanner.nextFloat();
-            System.out.println("velY: ");
+            System.out.print("velY: ");
             float velY = scanner.nextFloat();
-            System.out.println("velAng: ");
+            System.out.print("velAng: ");
             float velAng = scanner.nextFloat();
 
             VirtualBotCmds botCmds = new VirtualBotCmds(id);

@@ -5,9 +5,12 @@ import Triton.App;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Util;
 
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +22,8 @@ public class VirtualBot implements Module {
     private FieldPubSubPair<FirmwareAPI.FirmwareCommand> firmCmdPubSubPair;
 
     private FieldPubSubPair<FirmwareAPI.FirmwareData> firmDataPubSubPair;
+
+    private final ArrayList<Publisher<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
 
     public VirtualBot(Config config, int id) {
         firmCmdPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + id,
@@ -32,6 +37,9 @@ public class VirtualBot implements Module {
                         .setImuAx(0.0001f).setImuAy(0.0001f).setIsHoldingball(false).build()
         );
         mcuTopModule = new VirtualMcuTopModule(config, id, firmCmdPubSubPair.pub, firmDataPubSubPair.sub);
+
+        virtualBotCmdSubs.add(new FieldPublisher<VirtualBotCmds>("From:GrSimCmdTest", "Cmd " + id,
+                new VirtualBotCmds(id)));
     }
 
     public boolean isConnectedToTritonBot() {

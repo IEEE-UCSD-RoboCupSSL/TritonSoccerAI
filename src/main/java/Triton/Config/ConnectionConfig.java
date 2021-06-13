@@ -10,12 +10,14 @@ public class ConnectionConfig {
         botConns = new ArrayList<BotConn>();
         sslVisionConn = new UdpMulticastConn();
         gcConn = new UdpMulticastConn();
+        simCmdEndpoint = new UdpConn();
     }
 
     // initialized with default values, these values are subject to change based on config files &/ cli args
     public ArrayList<BotConn> botConns = null;
     public UdpMulticastConn sslVisionConn = null;
     public UdpMulticastConn gcConn = null;
+    public UdpConn simCmdEndpoint = null;
     public int numAllyRobots = 6;
 
     public void processFromParsingIni(File iniFIle) throws IOException {
@@ -24,6 +26,9 @@ public class ConnectionConfig {
         // ssl-vision (could be either the actual hardware ssl-vision system, or the simulated ssl-vision within a simulator)
         sslVisionConn.ipAddr = iniParser.get("ssl-vision", "mc-addr", String.class);
         sslVisionConn.port = iniParser.get("ssl-vision", "mc-port", int.class);
+
+        simCmdEndpoint.ipAddr = iniParser.get("simulator", "cmd-addr", String.class);
+        simCmdEndpoint.port = iniParser.get("simulator", "cmd-port", int.class);
 
         // ssl-game-controller (performs start/pause game, command free kicks/penalty kicks, game log, tracking, and auto-referee, etc )
         gcConn.ipAddr = iniParser.get("ssl-game-controller", "mc-addr", String.class);
@@ -52,16 +57,13 @@ public class ConnectionConfig {
     @Override
     public String toString() {
         return "ConnectionConfig{" +
-                "\nbotConns=" + botConns +
-                ",\n sslVisionConn=" + sslVisionConn +
-                ",\n gcConn=" + gcConn +
-                ",\n numRobots=" + numAllyRobots +
+                "botConns=" + botConns +
+                ", sslVisionConn=" + sslVisionConn +
+                ", gcConn=" + gcConn +
+                ", simCmdEndpoint=" + simCmdEndpoint +
+                ", numAllyRobots=" + numAllyRobots +
                 '}';
     }
-
-
-
-
 
     public static class BotConn {
         public BotConn(int id) {
@@ -85,6 +87,7 @@ public class ConnectionConfig {
                     '}';
         }
     }
+
     public static class UdpMulticastConn {
         // initialized with default values, these values are subject to change based on config files &/ cli args
         public String ipAddr = "224.5.23.2";
@@ -99,4 +102,17 @@ public class ConnectionConfig {
         }
     }
 
+    public static class UdpConn {
+        // initialized with default values, these values are subject to change based on config files &/ cli args
+        public String ipAddr = "127.0.0.1";
+        public int port = 20011;
+
+        @Override
+        public String toString() {
+            return "UdpConn{" +
+                    "ipAddr='" + ipAddr + '\'' +
+                    ", port=" + port +
+                    '}';
+        }
+    }
 }
