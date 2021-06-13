@@ -16,6 +16,7 @@ import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
+import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
 import Triton.ManualTests.VirtualBotTests.VirtualMcuTopModuleTest;
 import Triton.SoccerObjects;
 
@@ -30,6 +31,7 @@ public class VirtualBotTestFactory {
         RobotList<Foe> foes = soccerObjects.foes;
         Ball ball = soccerObjects.ball;
         virtualBotTestMap.put("vmcutop", new VirtualMcuTopModuleTest(soccerObjects));
+        virtualBotTestMap.put("grsim", new GrSimClientModuleTest(config));
 
     }
 

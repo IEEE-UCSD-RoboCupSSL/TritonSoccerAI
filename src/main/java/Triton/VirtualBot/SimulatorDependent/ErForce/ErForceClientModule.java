@@ -1,5 +1,12 @@
 package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
-public class ErForceClientModule {
+import Triton.VirtualBot.SimClientModule;
+
+public class ErForceClientModule implements SimClientModule {
+
+    @Override
+    public void run() {
+
+    }
 }
