@@ -39,6 +39,7 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
         }
 
         while (true) {
+            System.out.println("Arbitrarily chosen bot's id: " + chosenBotId);
             VirtualBotTestRunner.sendPrimitiveCommand(scanner, soccerObjects.fielders.get(chosenBotId));
 
             delay(100);
