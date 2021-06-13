@@ -17,7 +17,7 @@ public class GrSimClientModule implements SimClientModule {
 
     protected InetAddress address;
     protected DatagramSocket socket;
-    protected int port, id;
+    protected int port;
 
     private final ArrayList<Subscriber<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class GrSimClientModule implements SimClientModule {
         }
 
         for (int i = 0; i < config.numAllyRobots; i++) {
-            virtualBotCmdSubs.add(new FieldSubscriber<>("From:VirtualBot", "Cmd " + id));
+            virtualBotCmdSubs.add(new FieldSubscriber<>("From:VirtualBot", "Cmd " + i));
         }
     }
 
@@ -64,8 +64,6 @@ public class GrSimClientModule implements SimClientModule {
         ArrayList<GrSimCommands.grSim_Robot_Command> robotCommandsArr = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
-
-            System.out.println(cmd.toString());
 
             GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
                     .setId(i)

@@ -27,8 +27,8 @@ public class ConnectionConfig {
         sslVisionConn.ipAddr = iniParser.get("ssl-vision", "mc-addr", String.class);
         sslVisionConn.port = iniParser.get("ssl-vision", "mc-port", int.class);
 
-        simCmdEndpoint.ipAddr = iniParser.get("simulator", "cmd-addr", String.class);
-        simCmdEndpoint.port = iniParser.get("simulator", "cmd-port", int.class);
+        simCmdEndpoint.ipAddr = iniParser.get("simulator-console", "cmd-addr", String.class);
+        simCmdEndpoint.port = iniParser.get("simulator-console", "cmd-port", int.class);
 
         // ssl-game-controller (performs start/pause game, command free kicks/penalty kicks, game log, tracking, and auto-referee, etc )
         gcConn.ipAddr = iniParser.get("ssl-game-controller", "mc-addr", String.class);
