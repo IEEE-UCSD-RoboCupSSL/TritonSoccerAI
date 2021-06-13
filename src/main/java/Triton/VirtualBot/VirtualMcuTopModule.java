@@ -65,7 +65,7 @@ public class VirtualMcuTopModule implements Module {
             severSocket = new ServerSocket(port);
             socket = severSocket.accept();
             socketOut = new PrintWriter(socket.getOutputStream(), true);
-            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.ISO_8859_1));
             System.out.println("\033[0;32m VirtualBot " + id + " successfully accepted " +
                     "TritonBot(cpp)'s tcp connection request \033[0m");
             isConnectedToTritonBotPubSub.pub.publish(true);
@@ -109,7 +109,7 @@ public class VirtualMcuTopModule implements Module {
             String line;
             line = socketIn.readLine(); // newline char already dropped by readLine()
             //debugStrPub.publish(line);
-            ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.US_ASCII));
+            ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.ISO_8859_1));
             FirmwareAPI.FirmwareCommand receivedCmd =
                     FirmwareAPI.FirmwareCommand.parseFrom(stream);
 
