@@ -19,8 +19,7 @@ public class RobotUDPStream implements Module {
     protected InetAddress address;
     protected DatagramSocket socket;
 
-    protected int port;
-    protected int id;
+    protected int port, id;
 
     private final Subscriber<RemoteAPI.CommandData> commandsSub;
     private final Subscriber<RobotData> allySub;

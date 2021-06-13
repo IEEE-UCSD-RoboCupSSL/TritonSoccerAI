@@ -68,7 +68,6 @@ public class CoreTestFactory {
         coreTestMap.put("capDetect", new CapDetectionTest(fielders.get(3), ball));
         coreTestMap.put("spsdemo", new SimpleProceduralSkillDemo(fielders, ball));
         coreTestMap.put("defaultFormation", new FormationTest("tester", fielders));
-
     }
 
     public String[] getAvailableTestNames() {
