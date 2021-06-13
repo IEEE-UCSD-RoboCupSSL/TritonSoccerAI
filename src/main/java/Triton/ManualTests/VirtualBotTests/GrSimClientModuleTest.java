@@ -14,8 +14,8 @@ public class GrSimClientModuleTest implements TritonTestable {
 
     public GrSimClientModuleTest(Config config) {
         for (int i = 0; i < config.numAllyRobots; i++) {
-            virtualBotCmdSubs.add(new FieldPublisher<VirtualBotCmds>("From:GrSimCmdTest", "Cmd " + i,
-                    new VirtualBotCmds(i)));
+            virtualBotCmdSubs.add(new FieldPublisher<VirtualBotCmds>("From:VirtualBot", "Cmd " + i,
+                    new VirtualBotCmds()));
         }
     }
 
@@ -25,15 +25,19 @@ public class GrSimClientModuleTest implements TritonTestable {
 
         while (true) {
             System.out.print("id: ");
-            int id = scanner.nextInt();
+//            int id = scanner.nextInt();
+            int id = 3;
             System.out.printf("velX: ");
-            float velX = scanner.nextFloat();
+//            float velX = scanner.nextFloat();
+            float velX = 10;
             System.out.print("velY: ");
-            float velY = scanner.nextFloat();
+//            float velY = scanner.nextFloat();
+            float velY = 10;
             System.out.print("velAng: ");
-            float velAng = scanner.nextFloat();
+//            float velAng = scanner.nextFloat();
+            float velAng = 1;
 
-            VirtualBotCmds botCmds = new VirtualBotCmds(id);
+            VirtualBotCmds botCmds = new VirtualBotCmds();
             botCmds.setVelX(velX);
             botCmds.setVelY(velY);
             botCmds.setVelAng(velAng);

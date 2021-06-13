@@ -1,5 +1,6 @@
 package Triton.VirtualBot.SimulatorDependent.GrSim_OldProto;
 import Triton.Config.Config;
+import Triton.CoreModules.Robot.Team;
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimCommands;
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimPacket;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
@@ -35,7 +36,7 @@ public class GrSimClientModule implements SimClientModule {
         }
 
         for (int i = 0; i < config.numAllyRobots; i++) {
-            virtualBotCmdSubs.add(new FieldSubscriber<>("From:GrSimCmdTest", "Cmd " + id));
+            virtualBotCmdSubs.add(new FieldSubscriber<>("From:VirtualBot", "Cmd " + id));
         }
     }
 
@@ -60,60 +61,43 @@ public class GrSimClientModule implements SimClientModule {
     }
 
     private void sendCmds() {
+        ArrayList<GrSimCommands.grSim_Robot_Command> robotCommandsArr = new ArrayList<>();
+        for (int i = 0; i < config.numAllyRobots; i++) {
+            VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
 
-        System.out.println("1");
-        GrSimCommands.grSim_Robot_Command command = GrSimCommands.grSim_Robot_Command.newBuilder()
-                .setId(0)
-                .setWheel2(0)
-                .setWheel1(0)
-                .setWheel3(0)
-                .setWheel4(0)
-                .setKickspeedx(0)
-                .setKickspeedz(0)
-                .setVeltangent(5)
-                .setVelnormal(5)
-                .setVelangular(0)
-                .setSpinner(false)
-                .setWheelsspeed(false)
-                .build();
+            System.out.println(cmd.toString());
 
-        System.out.println("2");
+            GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
+                    .setId(i)
+                    .setWheel2(0)
+                    .setWheel1(0)
+                    .setWheel3(0)
+                    .setWheel4(0)
+                    .setKickspeedx(0)
+                    .setKickspeedz(0)
+                    .setVeltangent(cmd.getVelX())
+                    .setVelnormal(cmd.getVelY())
+                    .setVelangular(cmd.getVelAng())
+                    .setSpinner(false)
+                    .setWheelsspeed(false)
+                    .build();
+
+            robotCommandsArr.add(robotCommands);
+        }
+
         GrSimCommands.grSim_Commands command2 = GrSimCommands.grSim_Commands.newBuilder()
-//                .setTimestamp(0)
+                .setTimestamp(System.currentTimeMillis())
                 .setIsteamyellow(false)
-                .addRobotCommands(command).build();
+                .addAllRobotCommands(robotCommandsArr).build();
 
-        System.out.println("3");
         GrSimPacket.grSim_Packet packet = GrSimPacket.grSim_Packet.newBuilder()
                 .setCommands(command2)
                 .build();
 
-//            GrSimPacket.grSim_Packet.Builder packet = GrSimPacket.grSim_Packet.newBuilder();
-//            GrSimCommands.grSim_Commands.Builder grSimCommands = GrSimCommands.grSim_Commands.newBuilder();
-//            grSimCommands.setIsteamyellow(config.myTeam == Team.YELLOW);
-//            grSimCommands.setTimestamp(0);
-//
-////        for (int i = 0; i < config.numAllyRobots; i++) {
-//            GrSimCommands.grSim_Robot_Command.Builder grSimRobotCommands =
-//                    GrSimCommands.grSim_Robot_Command.newBuilder();
-//
-//            VirtualBotCmds cmd = virtualBotCmdSubs.get(0).getMsg();
-//            grSimRobotCommands.setId(cmd.getId());
-//            grSimRobotCommands.setVeltangent(cmd.getVelX());
-//            grSimRobotCommands.setVelnormal(cmd.getVelAng());
-//            grSimRobotCommands.setVelangular(cmd.getVelY());
-//            grSimRobotCommands
-//
-//            System.out.println("1");
-//            grSimCommands.addRobotCommands(grSimRobotCommands.build());
-//            System.out.println("2");
-////        }
-//
-//            packet.setCommands(grSimCommands.build());
-
         byte[] bytes;
         bytes = packet.toByteArray();
         send(bytes);
+
     }
 
     /**

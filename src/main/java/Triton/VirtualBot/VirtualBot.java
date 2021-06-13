@@ -23,7 +23,7 @@ public class VirtualBot implements Module {
 
     private FieldPubSubPair<FirmwareAPI.FirmwareData> firmDataPubSubPair;
 
-    private final ArrayList<Publisher<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
+    private final Publisher<VirtualBotCmds> virtualBotCmdPub;
 
     public VirtualBot(Config config, int id) {
         firmCmdPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + id,
@@ -38,8 +38,8 @@ public class VirtualBot implements Module {
         );
         mcuTopModule = new VirtualMcuTopModule(config, id, firmCmdPubSubPair.pub, firmDataPubSubPair.sub);
 
-        virtualBotCmdSubs.add(new FieldPublisher<VirtualBotCmds>("From:GrSimCmdTest", "Cmd " + id,
-                new VirtualBotCmds(id)));
+        virtualBotCmdPub = new FieldPublisher<VirtualBotCmds>("From:VirtualBot", "Cmd " + id,
+                new VirtualBotCmds());
     }
 
     public boolean isConnectedToTritonBot() {

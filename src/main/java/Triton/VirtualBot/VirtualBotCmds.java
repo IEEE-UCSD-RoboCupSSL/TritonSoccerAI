@@ -3,22 +3,12 @@ package Triton.VirtualBot;
 import Triton.Misc.Math.Matrix.Vec2D;
 
 public class VirtualBotCmds {
-    private int id;
     private float velX, velY, velAng;
 
-    public VirtualBotCmds(int id) {
-        this.id = id;
+    public VirtualBotCmds() {
         velX = 0;
         velY = 0;
         velAng = 0;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public float getVelX() {
@@ -43,5 +33,14 @@ public class VirtualBotCmds {
 
     public void setVelAng(float velAng) {
         this.velAng = velAng;
+    }
+
+    @Override
+    public String toString() {
+        return "VirtualBotCmds{" +
+                "velX=" + velX +
+                ", velY=" + velY +
+                ", velAng=" + velAng +
+                '}';
     }
 }
