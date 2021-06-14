@@ -5,8 +5,8 @@ import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.OldConfigs.GeometryConfig.FIELD_LENGTH;
-import static Triton.Config.OldConfigs.GeometryConfig.FIELD_WIDTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_WIDTH;
 
 /**
  * c5: Location x is reliable for pass reception

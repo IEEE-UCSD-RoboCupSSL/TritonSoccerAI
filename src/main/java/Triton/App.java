@@ -1,9 +1,9 @@
 package Triton;
 
 import Triton.Config.*;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
-import Triton.Config.OldConfigs.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.initGeo;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
 import static Triton.Util.delay;
 
@@ -74,14 +75,10 @@ public class App {
         // ...
         System.out.println("==============================================================");
 
-
-
         Scanner scanner = new Scanner(System.in);
         if(config.cliConfig.isVirtualSetup && config.cliConfig.progMode != GvcGeneral.ProgramMode.TestTritonBot) {
             setupInternalVirtualBots(config);
         }
-        
-        GeometryConfig.initGeo(); // To-do: refactor this
 
         switch (config.cliConfig.progMode) {
             case Normal -> {

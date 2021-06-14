@@ -1,12 +1,26 @@
 package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
+import Triton.Config.Config;
 import Triton.VirtualBot.SimClientModule;
+import Triton.VirtualBot.VirtualBotCmds;
 
-public class ErForceClientModule implements SimClientModule {
+import java.util.ArrayList;
+
+public class ErForceClientModule extends SimClientModule {
+
+    public ErForceClientModule(Config config) {
+        super(config);
+    }
 
     @Override
-    public void run() {
+    protected void sendCmds() {
+        for (int i = 0; i < config.numAllyRobots; i++) {
+            VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
+        }
 
+//        byte[] bytes;
+//        bytes = packet.toByteArray();
+//        send(bytes);
     }
 }

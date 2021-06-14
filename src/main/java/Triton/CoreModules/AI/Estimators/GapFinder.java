@@ -14,7 +14,7 @@ import Triton.SoccerObjects;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import static Triton.Config.OldConfigs.GeometryConfig.*;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 

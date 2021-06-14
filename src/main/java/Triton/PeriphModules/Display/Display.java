@@ -2,7 +2,6 @@ package Triton.PeriphModules.Display;
 
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
-import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
@@ -20,7 +19,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import static Triton.Config.OldConfigs.GeometryConfig.*;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.PeriphModules.Display.PaintOption.*;
 
 /**
@@ -140,7 +139,7 @@ public class Display extends JPanel implements Runnable {
      */
     private void paintGeo(Graphics2D g2d) {
         FIELD_LINES.forEach((name, line) -> {
-            if (name.equals("CENTER_LINE"))
+            if (name.equals("CenterLine"))
                 return;
             int[] p1 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p1));
             int[] p2 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p2));

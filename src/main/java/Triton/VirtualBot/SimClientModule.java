@@ -1,13 +1,77 @@
 package Triton.VirtualBot;
 
+import Triton.Config.Config;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Subscriber;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
-public interface SimClientModule extends Module {
+public abstract class SimClientModule implements Module {
 
+    protected InetAddress address;
+    protected DatagramSocket socket;
+    protected int port;
 
+    protected final ArrayList<Subscriber<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
+
+    protected boolean isFirstRun = true;
+
+    protected Config config;
+
+    public SimClientModule(Config config) {
+        this.config = config;
+
+        try {
+            socket = new DatagramSocket();
+            address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
+        } catch (SocketException | UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < config.numAllyRobots; i++) {
+            virtualBotCmdSubs.add(new FieldSubscriber<>("From:VirtualBot", "Cmd " + i));
+        }
+    }
+
+    @Override
+    public void run() {
+        if (isFirstRun) {
+            setup();
+            isFirstRun = false;
+        }
+
+        sendCmds();
+    }
+
+    private void setup() {
+        for (Subscriber allyCmdSub : virtualBotCmdSubs) {
+            try {
+                allyCmdSub.subscribe(1000);
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    protected abstract void sendCmds();
+
+    /**
+     * Sends a packet
+     *
+     * @param msg message to send as byte array
+     */
+    protected void send(byte[] msg) {
+        try {
+            DatagramPacket packet =
+                    new DatagramPacket(msg, msg.length, InetAddress.getByName(config.connConfig.simCmdEndpoint.ipAddr),
+                            config.connConfig.simCmdEndpoint.port);
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

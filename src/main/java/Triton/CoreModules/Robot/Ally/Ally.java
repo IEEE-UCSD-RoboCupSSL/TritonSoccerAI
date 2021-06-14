@@ -3,7 +3,6 @@ package Triton.CoreModules.Robot.Ally;
 import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.Config;
-import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -32,8 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static Triton.Config.OldConfigs.GeometryConfig.FIELD_LENGTH;
-import static Triton.Config.OldConfigs.GeometryConfig.FIELD_WIDTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_WIDTH;
 import static Triton.Config.OldConfigs.ObjectConfig.*;
 import static Triton.CoreModules.Robot.MotionMode.*;
 import static Triton.CoreModules.Robot.MotionState.*;

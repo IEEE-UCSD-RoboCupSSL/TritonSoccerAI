@@ -5,8 +5,8 @@ import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
 import Triton.Misc.Math.Matrix.Vec2D;
 
-import static Triton.Config.OldConfigs.GeometryConfig.*;
-import static Triton.Config.OldConfigs.GeometryConfig.GOAL_LENGTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.GOAL_LENGTH;
 
 /**
  * g1: Shots from x can reach the opposing goal faster than their goalkeeper can block them.

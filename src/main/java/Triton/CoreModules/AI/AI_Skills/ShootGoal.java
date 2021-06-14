@@ -10,7 +10,7 @@ import Triton.Misc.Math.Matrix.Vec2D;
 
 import java.util.ArrayList;
 
-import static Triton.Config.OldConfigs.GeometryConfig.*;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.Config.OldConfigs.ObjectConfig.EXCESSIVE_DRIBBLING_DIST;
 import static Triton.Config.OldConfigs.ObjectConfig.MAX_KICK_VEL;
 
