@@ -5,20 +5,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.ini4j.*;
 
-public class ConnectionConfig {
-    public ConnectionConfig() {
-        botConns = new ArrayList<BotConn>();
-        sslVisionConn = new UdpMulticastConn();
-        gcConn = new UdpMulticastConn();
-        simCmdEndpoint = new UdpConn();
-    }
-
+public class ConnectionConfig implements IniConfig {
     // initialized with default values, these values are subject to change based on config files &/ cli args
     public ArrayList<BotConn> botConns = null;
     public UdpMulticastConn sslVisionConn = null;
     public UdpMulticastConn gcConn = null;
     public UdpConn simCmdEndpoint = null;
     public int numAllyRobots = 6;
+
+    public ConnectionConfig() {
+        botConns = new ArrayList<BotConn>();
+        sslVisionConn = new UdpMulticastConn();
+        gcConn = new UdpMulticastConn();
+        simCmdEndpoint = new UdpConn();
+    }
 
     public void processFromParsingIni(File iniFIle) throws IOException {
         Wini iniParser = new Wini(iniFIle);

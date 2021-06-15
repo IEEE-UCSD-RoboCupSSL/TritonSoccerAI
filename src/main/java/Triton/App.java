@@ -8,15 +8,14 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.VirtualBotTestRunner;
+import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
-import Triton.VirtualBot.SimClientModule;
+import Triton.VirtualBot.*;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
-import Triton.VirtualBot.VirtualBot;
-import Triton.VirtualBot.VirtualBotFactory;
-import Triton.VirtualBot.VirtualBotList;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
 
 import java.io.IOException;
@@ -181,6 +180,7 @@ public class App {
                     System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
                     CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
                 }
+                /* VirtualBot Test Mode */
                 case "v", "V" -> {
                     if (config.cliConfig.isVirtualSetup) {
                         System.out.println("[VirtualBotTest Mode]: Testing VirtualBotModules(a.k.a the virtual firmware modules)");
@@ -262,6 +262,10 @@ public class App {
 
     private static void setupOneInternalVirtualBot(Config config, int id) {
         System.out.println("~~~~~~");
+
+        /* just taking advantage of this tester's constructor, which constructs the publishers
+           matching those subscribers inside simClientModule, preventing subscribe timeout exception */
+        new GrSimClientModuleTest(config);
 
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
