@@ -69,9 +69,10 @@ public class VirtualBot implements Module {
         double wmax = config.botConfig.robotMaxAngularSpeed;
 
         VirtualBotCmds cmd = new VirtualBotCmds();
-        cmd.setVelX((float)(firmCmd.getVx() / xmax));
-        cmd.setVelY((float)(firmCmd.getVy() / ymax));
-        cmd.setVelAng((float) (firmCmd.getW() / wmax));
+        // firmCmd's <vx, vy, w> are unit-less, which is represented as percentage of the maximum
+        cmd.setVelX((float)((firmCmd.getVx() / 100.00f) * xmax));
+        cmd.setVelY((float)((firmCmd.getVy() / 100.00f) * ymax));
+        cmd.setVelAng((float)((firmCmd.getW() / 100.00f)* wmax));
 
 
         virtualBotCmdPub.publish(cmd);

@@ -4,38 +4,28 @@ import Proto.FirmwareAPI;
 import Triton.App;
 import Triton.Config.Config;
 import Triton.Config.ConnectionConfig;
-import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Util;
-import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Ints;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
+import java.net.*;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs.VIRTUAL_MCU_TOP_FREQ;
 import static Triton.Util.delay;
 
 public class VirtualMcuTopModule implements Module {
     private boolean isFirstRun = true;
-    private ServerSocket severSocket;
     private Socket socket = null;
-    private String ip = null;
-    private int id;
+    private final int id;
     private int port;
-    private PrintWriter socketOut;
-    private BufferedReader socketIn;
-    private FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub;
-    private FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
-    private FieldPubSubPair<Boolean> isConnectedToTritonBotPubSub;
-    private Config config;
+    //private PrintWriter socketOut;
+    //private BufferedReader socketIn;
+    private final FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub;
+    private final FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
+    private final FieldPubSubPair<Boolean> isConnectedToTritonBotPubSub;
+    private final Config config;
 
     // private FieldPublisher<String> debugStrPub;
     public VirtualMcuTopModule(Config config, int id,
@@ -47,6 +37,7 @@ public class VirtualMcuTopModule implements Module {
                         "isConnectedToTritonBot " + id, false);
         // debugStrPub = new FieldPublisher<>("From:VirtualMcuTopModule", "DebugString " + id, "???");
 
+        String ip = null;
         for (ConnectionConfig.BotConn conn : config.connConfig.botConns) {
             if (conn.id == id) {
                 ip = conn.ipAddr;
@@ -70,10 +61,10 @@ public class VirtualMcuTopModule implements Module {
 
     private void setup() {
         try {
-            severSocket = new ServerSocket(port);
+            ServerSocket severSocket = new ServerSocket(port);
             socket = severSocket.accept();
-            socketOut = new PrintWriter(socket.getOutputStream(), true);
-            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.ISO_8859_1));
+            //socketOut = new PrintWriter(socket.getOutputStream(), true);
+            //socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.ISO_8859_1));
             System.out.println("\033[0;32m VirtualBot " + id + " successfully accepted " +
                     "TritonBot(cpp)'s tcp connection request \033[0m");
             isConnectedToTritonBotPubSub.pub.publish(true);
@@ -82,8 +73,8 @@ public class VirtualMcuTopModule implements Module {
         }
 
 
-        App.runModule(new VirtualBotSend(config, id, dataSub), VIRTUAL_MCU_TOP_FREQ);
-        App.runModule(new VirtualBotReceive(config, id, cmdPub), VIRTUAL_MCU_TOP_FREQ);
+        App.runModule(new VirtualBotUdpSend(config, id, dataSub), VIRTUAL_MCU_TOP_FREQ);
+        App.runModule(new VirtualBotUdpReceive(config, id, cmdPub), VIRTUAL_MCU_TOP_FREQ);
 
 
     }
@@ -95,7 +86,7 @@ public class VirtualMcuTopModule implements Module {
             setup();
             isFirstRun = false;
         }
-        if (socket == null || socketIn == null) {
+        if (socket == null) {
             isFirstRun = true;
             System.out.println("Something went wrong in VirtualMcuTopModule.java");
             return;
@@ -105,6 +96,78 @@ public class VirtualMcuTopModule implements Module {
 
 
     }
+
+
+    private static class VirtualBotUdpSend implements Module {
+        private final int port;
+        private DatagramSocket socketOut;
+        private InetAddress inetAddress;
+
+        private final FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
+
+        public VirtualBotUdpSend(Config config, int id, FieldSubscriber<FirmwareAPI.FirmwareData> dataSub) {
+            String ip = config.connConfig.botConns.get(id).ipAddr;
+            this.port = config.connConfig.botConns.get(id).virtualBotUdpSendPort;
+            this.dataSub = dataSub;
+            try {
+                socketOut = new DatagramSocket();
+                inetAddress = InetAddress.getByName(ip);
+            } catch (SocketException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            if (socketOut == null) return;
+            byte[] msg = dataSub.getMsg().toByteArray();
+            try {
+                socketOut.send(new DatagramPacket(msg, msg.length, inetAddress, port));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class VirtualBotUdpReceive implements Module {
+        private String ip = null;
+        private final int port;
+        private DatagramSocket socket;
+        private final FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub;
+
+        public VirtualBotUdpReceive(Config config, int id, FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub) {
+            this.ip = config.connConfig.botConns.get(id).ipAddr;
+            this.port = config.connConfig.botConns.get(id).virtualBotUdpReceivePort;
+            this.cmdPub = cmdPub;
+            try {
+                InetAddress inetAddress = InetAddress.getByName(ip);
+                socket = new DatagramSocket(port, inetAddress);
+            } catch (SocketException | UnknownHostException e) {
+                System.err.println(">>>" + port);
+            }
+        }
+
+        @Override
+        public void run() {
+            if (socket == null) return;
+            try {
+                byte[] buf = new byte[1024];
+                DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
+                socket.receive(datagramPacket);
+
+                ByteArrayInputStream stream = new ByteArrayInputStream(datagramPacket.getData(),
+                        datagramPacket.getOffset(), datagramPacket.getLength());
+                FirmwareAPI.FirmwareCommand receivedCmd =
+                        FirmwareAPI.FirmwareCommand.parseFrom(stream);
+
+                cmdPub.publish(receivedCmd);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
 
 }
