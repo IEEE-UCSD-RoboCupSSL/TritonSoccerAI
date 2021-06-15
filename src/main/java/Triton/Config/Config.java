@@ -27,7 +27,7 @@ public class Config {
     public void processAllConfigs() throws IOException {
         cliConfig.processCliArgs(args);
         connConfig.processFromParsingIni(getIniFileByType("main-setup"));
-        // botConfig //...
+        botConfig.processFromParsingIni(getIniFileByType("robot-specs"));
         // ...
 
         if(cliConfig.isBlueTeam) {

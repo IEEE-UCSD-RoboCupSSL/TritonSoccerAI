@@ -79,10 +79,6 @@ public class VirtualMcuTopModule implements Module {
                     @Override
                     public void run() {
                         if(socket == null || socketOut == null) return;
-                        /* Since TritonBot program doesn't use this data at all when in virtual mode,
-                         * so a default/dummy data packet is repeatedly sent to keep
-                         * TritonBot's tcp loop running, because dataSub's pairing publisher is never used
-                         * except for initializing the internal message channel with this dataSub */
                         socketOut.println(dataSub.getMsg().toByteString());
                     }
                 }

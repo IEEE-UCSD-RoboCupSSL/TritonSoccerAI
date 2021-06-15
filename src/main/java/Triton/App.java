@@ -71,6 +71,7 @@ public class App {
         }
         System.out.println(config.cliConfig);
         System.out.println(config.connConfig);
+        System.out.println(config.botConfig);
         // ...
         System.out.println("==============================================================");
 

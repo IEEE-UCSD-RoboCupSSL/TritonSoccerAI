@@ -26,6 +26,7 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
         Scanner scanner = new Scanner(System.in);
         int chosenBotId = 3;
         /* virtualbot modules have already been instantiate and run in App.java before calling this test */
+
         FieldSubscriber<FirmwareAPI.FirmwareCommand> cmdSub =
                 new FieldSubscriber<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + chosenBotId);
 

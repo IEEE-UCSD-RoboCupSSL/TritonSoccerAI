@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class VirtualBot implements Module {
     private boolean isFirstRun = true;
     private VirtualMcuTopModule mcuTopModule;
+    private Config config;
 
     /* prepare the main pubsubs */
     private FieldPubSubPair<FirmwareAPI.FirmwareCommand> firmCmdPubSubPair;
@@ -26,6 +27,7 @@ public class VirtualBot implements Module {
     private final Publisher<VirtualBotCmds> virtualBotCmdPub;
 
     public VirtualBot(Config config, int id) {
+        this.config = config;
         firmCmdPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + id,
                 FirmwareAPI.FirmwareCommand.newBuilder()
                         .setInit(false).setVx(0.0f).setVy(0.0f).setW(0.0f)
@@ -60,8 +62,19 @@ public class VirtualBot implements Module {
             isFirstRun = false;
         }
 
+        FirmwareAPI.FirmwareCommand firmCmd = firmCmdPubSubPair.sub.getMsg();
+
+        double xmax = config.botConfig.robotMaxHorizontalSpeed;
+        double ymax = config.botConfig.robotMaxVerticalSpeed;
+        double wmax = config.botConfig.robotMaxAngularSpeed;
+
+        VirtualBotCmds cmd = new VirtualBotCmds();
+        cmd.setVelX((float)(firmCmd.getVx() / xmax));
+        cmd.setVelY((float)(firmCmd.getVy() / ymax));
+        cmd.setVelAng((float) (firmCmd.getW() / wmax));
 
 
+        virtualBotCmdPub.publish(cmd);
 
     }
 }
