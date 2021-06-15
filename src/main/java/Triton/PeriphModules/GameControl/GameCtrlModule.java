@@ -12,8 +12,8 @@ public abstract class GameCtrlModule implements Module {
     protected FieldSubscriber<GameState> gsSub;
 
     protected GameCtrlModule(String gcName) {
-        gsPub = new FieldPublisher<>("game state", gcName, new UnknownGameState());
-        gsSub = new FieldSubscriber<>("game state", gcName);
+        gsPub = new FieldPublisher<>("From:GameCtrlModule", "GameState " + gcName, new UnknownGameState());
+        gsSub = new FieldSubscriber<>("From:GameCtrlModule", "GameState " + gcName);
     }
 
 

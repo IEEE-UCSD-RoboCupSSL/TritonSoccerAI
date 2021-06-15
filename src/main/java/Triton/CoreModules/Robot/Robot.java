@@ -14,7 +14,7 @@ public abstract class Robot implements Module {
         this.team = team;
         this.ID = ID;
 
-        dataSub = new FieldSubscriber<>("detection", team.name() + ID);
+        dataSub = new FieldSubscriber<>("From:DetectionModule", team.name() + ID);
     }
 
     synchronized public Vec2D getPos() {

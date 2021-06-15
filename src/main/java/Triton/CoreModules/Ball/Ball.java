@@ -11,7 +11,7 @@ public class Ball {
     private final FieldSubscriber<BallData> dataSub;
 
     public Ball() {
-        dataSub = new FieldSubscriber<>("detection", "ball");
+        dataSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
     }
 
     synchronized public Vec2D getTrajectoryConstraint() {

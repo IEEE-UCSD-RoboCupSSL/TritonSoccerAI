@@ -29,7 +29,7 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
         FieldSubscriber<FirmwareAPI.FirmwareCommand> cmdSub =
                 new FieldSubscriber<>("[Pair]DefinedIn:VirtualBot", "FirmCmd " + chosenBotId);
 
-        // debugStrSub = new FieldSubscriber<>("VirtualMcuTopModule", "DebugString " + chosenBotId);
+        // debugStrSub = new FieldSubscriber<>("From:VirtualMcuTopModule", "DebugString " + chosenBotId);
 
         try {
             cmdSub.subscribe(1000);

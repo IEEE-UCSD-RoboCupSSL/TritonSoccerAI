@@ -31,7 +31,7 @@ public class SimpleProceduralSkillDemo implements TritonTestable {
         ExampleProceduralTaskB taskB = new ExampleProceduralTaskB(ball); // another example side thread job
 
         /* use a separate thread to monitor keyboard input cmd */
-        FieldPubSubPair<String> cmdPubSub = new FieldPubSubPair<>("SPSDemo", "cmd", "");
+        FieldPubSubPair<String> cmdPubSub = new FieldPubSubPair<>("From:SimpleProceduralSkillDemo", "Cmd", "");
         Future<Boolean> cmdFuture = App.threadPool.submit(() -> {
             while(true) {
                 System.out.println(">>> (For TaskA Only) Enter q to quit, +/- to (in/de)crease spin speed, " +
@@ -141,7 +141,7 @@ public class SimpleProceduralSkillDemo implements TritonTestable {
 
 
         public ExampleProceduralTaskA() {
-            spinSpeedPubSub = new FieldPubSubPair<>("SPSDemo", "Speed", 0.00);
+            spinSpeedPubSub = new FieldPubSubPair<>("From:SimpleProceduralSkillDemo", "Speed", 0.00);
         }
 
         public void setSpinSpeed(double spd) {
