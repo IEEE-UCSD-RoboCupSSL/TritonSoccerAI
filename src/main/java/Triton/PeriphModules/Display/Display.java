@@ -46,10 +46,10 @@ public class Display extends JPanel implements Runnable {
         yellowRobotSubs = new ArrayList<>();
         blueRobotSubs = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
-            blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
-            yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
+            blueRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.BLUE.name() + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.YELLOW.name() + i));
         }
-        ballSub = new FieldSubscriber<>("detection", "ball");
+        ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
 
         ImgLoader.generateImages();
 

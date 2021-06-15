@@ -43,7 +43,7 @@ public class GrSimVisionModule_OldProto extends VisionModule {
      * @param port port to receive from
      */
     public GrSimVisionModule_OldProto(String ip, int port) {
-        visionPub = new MQPublisher<>("vision", "detection");
+        visionPub = new MQPublisher<>("From:GrSimVisionModule_OldProto", "Detection");
 
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 

@@ -53,7 +53,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean asyncOnePubToOneSub() {
         final FieldPubSubPair<String> xxxPubSub =
-                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+                new FieldPubSubPair<>("From:PubSubTests", "xxx", "");
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -82,7 +82,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean asyncOnePubToManySub() {
         final FieldPubSubPair<String> xxxPubSub =
-                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+                new FieldPubSubPair<>("From:PubSubTests", "xxx", "");
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -117,7 +117,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean asyncManyPubToOneSub() {
         final FieldPubSubPair<String> xxxPubSub =
-                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+                new FieldPubSubPair<>("From:PubSubTests", "xxx", "");
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -151,7 +151,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean asyncManyPubToManySub() {
         final FieldPubSubPair<String> xxxPubSub =
-                new FieldPubSubPair<>("PubSubTests", "xxx", "");
+                new FieldPubSubPair<>("From:PubSubTests", "xxx", "");
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -203,7 +203,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean syncOnePubToOneSub(int queueSize) {
         final MQPubSubPair<String> xxxPubSub =
-                new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
+                new MQPubSubPair<>("From:PubSubTests", "xxx", queueSize);
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -235,7 +235,7 @@ public class PubSubTests implements TritonTestable {
     private boolean syncOnePubToManySub(int queueSize) {
         System.out.println("Sync 1-m Now running");
         final MQPubSubPair<String> xxxPubSub =
-                new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
+                new MQPubSubPair<>("From:PubSubTests", "xxx", queueSize);
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -273,7 +273,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean syncManyPubToOneSub(int queueSize) {
         final MQPubSubPair<String> xxxPubSub =
-                new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
+                new MQPubSubPair<>("From:PubSubTests", "xxx", queueSize);
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 
@@ -309,7 +309,7 @@ public class PubSubTests implements TritonTestable {
 
     private boolean syncManyPubToManySub(int queueSize) {
         final MQPubSubPair<String> xxxPubSub =
-                new MQPubSubPair<>("PubSubTests", "xxx", queueSize);
+                new MQPubSubPair<>("From:PubSubTests", "xxx", queueSize);
         long threadAFreqInHz = 1000;
         long threadBFreqInHz = 100;
 

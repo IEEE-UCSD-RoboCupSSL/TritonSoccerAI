@@ -37,7 +37,7 @@ public class VirtualMcuTopModule implements Module {
         isConnectedToTritonBotPubSub =
                 new FieldPubSubPair<>("Internal:VirtualMcuTopModule",
                                       "isConnectedToTritonBot " + id, false);
-        // debugStrPub = new FieldPublisher<>("VirtualMcuTopModule", "DebugString " + id, "???");
+        // debugStrPub = new FieldPublisher<>("From:VirtualMcuTopModule", "DebugString " + id, "???");
 
         for(ConnectionConfig.BotConn conn : config.connConfig.botConns) {
             if(conn.id == id) {

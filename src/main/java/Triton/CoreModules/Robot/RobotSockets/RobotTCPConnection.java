@@ -42,11 +42,11 @@ public class RobotTCPConnection {
         this.port = port;
         this.id = id;
 
-        isDribbledPub = new FieldPublisher<>("Ally drib", "" + id, false);
-        allySub = new FieldSubscriber<>("detection", myTeam.name() + id);
-        tcpCommandPub = new MQPublisher<>("tcpCommand", "" + id);
-        tcpCommandSub = new MQSubscriber<>("tcpCommand", "" + id);
-        tcpInitPub = new FieldPublisher<>("tcpInit", "" + id, true);
+        isDribbledPub = new FieldPublisher<>("From:RobotTCPConnection", "Drib " + id, false);
+        allySub = new FieldSubscriber<>("From:DetectionModule", myTeam.name() + id);
+        tcpCommandPub = new MQPublisher<>("From:RobotTCPConnection", "TcpCommand " + id);
+        tcpCommandSub = new MQSubscriber<>("From:RobotTCPConnection", "TcpCommand " + id);
+        tcpInitPub = new FieldPublisher<>("From:RobotTCPConnection", "TcpInit " + id, true);
     }
 
     /**

@@ -23,8 +23,8 @@ public class FutureTaskTest implements TritonTestable {
     public boolean test(Config config) {
 
         threadPool.submit(() ->{
-            FieldPublisher<Double> valPub = new FieldPublisher<>("FutureTaskTest", "val", val);
-            FieldSubscriber<Double> valSub = new FieldSubscriber<>("FutureTaskTest", "val");
+            FieldPublisher<Double> valPub = new FieldPublisher<>("From:FutureTaskTest", "Val", val);
+            FieldSubscriber<Double> valSub = new FieldSubscriber<>("From:FutureTaskTest", "Val");
             valSub.subscribe();
 
             ReentrantLock printLock = new ReentrantLock();

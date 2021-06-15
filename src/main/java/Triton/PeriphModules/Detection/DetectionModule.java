@@ -32,7 +32,7 @@ public class DetectionModule implements Module {
      * Constructs a DetectionModule
      */
     public DetectionModule(Config config) {
-        visionSub = new MQSubscriber<>("vision", "detection");
+        visionSub = new MQSubscriber<>("From:GrSimVisionModule_OldProto", "Detection");
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
@@ -44,12 +44,12 @@ public class DetectionModule implements Module {
         yellowRobotPubs = new ArrayList<>();
         blueRobotPubs = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
-            blueRobotPubs.add(new FieldPublisher<>("detection", Team.BLUE.name() + i, blueRobotsData.get(i)));
-            yellowRobotPubs.add(new FieldPublisher<>("detection", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
+            blueRobotPubs.add(new FieldPublisher<>("From:DetectionModule", Team.BLUE.name() + i, blueRobotsData.get(i)));
+            yellowRobotPubs.add(new FieldPublisher<>("From:DetectionModule", Team.YELLOW.name() + i, yellowRobotsData.get(i)));
         }
 
         ballData = new BallData();
-        ballPub = new FieldPublisher<>("detection", "ball", ballData);
+        ballPub = new FieldPublisher<>("From:DetectionModule", "Ball", ballData);
     }
 
     /**

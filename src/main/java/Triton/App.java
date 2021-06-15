@@ -46,7 +46,7 @@ import static Triton.Util.delay;
  */
 public class App {
     /* declare a global threadpool*/
-    public static FieldPubSubPair<Boolean> appCanceller = new FieldPubSubPair<>("App", "Canceller", false);
+    public static FieldPubSubPair<Boolean> appCanceller = new FieldPubSubPair<>("From:App", "Canceller", false);
     public static ScheduledExecutorService threadPool;
     public static ArrayList<ScheduledFuture<?>> moduleFutures = new ArrayList<>();
     static {

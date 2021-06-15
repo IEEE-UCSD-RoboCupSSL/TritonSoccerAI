@@ -77,25 +77,25 @@ public class Ally extends Robot implements AllySkills {
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
-            blueRobotSubs.add(new FieldSubscriber<>("detection", Team.BLUE.name() + i));
-            yellowRobotSubs.add(new FieldSubscriber<>("detection", Team.YELLOW.name() + i));
+            blueRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.BLUE.name() + i));
+            yellowRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.YELLOW.name() + i));
         }
-        ballSub = new FieldSubscriber<>("detection", "ball");
+        ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
 
-        statePub = new FieldPublisher<>("Ally state", "" + id, MOVE_TVRV);
-        pointPub = new FieldPublisher<>("Ally point", "" + id, new Vec2D(0, 0));
-        angPub = new FieldPublisher<>("Ally ang", "" + id, 0.0);
-        kickVelPub = new FieldPublisher<>("Ally kickVel", "" + id, new Vec2D(0, 0));
-        holdBallPosPub = new FieldPublisher<>("Ally holdBallPos", "" + id, null);
+        statePub = new FieldPublisher<>("From:Ally", "State " + id, MOVE_TVRV);
+        pointPub = new FieldPublisher<>("From:Ally", "Point " + id, new Vec2D(0, 0));
+        angPub = new FieldPublisher<>("From:Ally", "Ang " + id, 0.0);
+        kickVelPub = new FieldPublisher<>("From:Ally", "KickVel " + id, new Vec2D(0, 0));
+        holdBallPosPub = new FieldPublisher<>("From:Ally", "HoldBallPos " + id, null);
 
-        stateSub = new FieldSubscriber<>("Ally state", "" + id);
-        pointSub = new FieldSubscriber<>("Ally point", "" + id);
-        angSub = new FieldSubscriber<>("Ally ang", "" + id);
-        kickVelSub = new FieldSubscriber<>("Ally kickVel", "" + id);
-        holdBallPosSub = new FieldSubscriber<>("Ally holdBallPos", "" + id);
+        stateSub = new FieldSubscriber<>("From:Ally", "State " + id);
+        pointSub = new FieldSubscriber<>("From:Ally", "Point " + id);
+        angSub = new FieldSubscriber<>("From:Ally", "Ang " + id);
+        kickVelSub = new FieldSubscriber<>("From:Ally", "KickVel " + id);
+        holdBallPosSub = new FieldSubscriber<>("From:Ally", "HoldBallPos " + id);
 
-        isDribbledSub = new FieldSubscriber<>("Ally drib", "" + id);
-        commandsPub = new MQPublisher<>("commands", "" + id);
+        isDribbledSub = new FieldSubscriber<>("From:RobotTCPConnection", "Drib " + id);
+        commandsPub = new MQPublisher<>("From:Ally", "Commands " + id);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
