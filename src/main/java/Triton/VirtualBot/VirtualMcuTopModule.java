@@ -16,6 +16,8 @@ import static Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs.VIRTUAL_MC
 import static Triton.Util.delay;
 
 public class VirtualMcuTopModule implements Module {
+
+    protected final static int MAX_BUFFER_SIZE = 67108864;
     private boolean isFirstRun = true;
     private Socket socket = null;
     private final int id;
@@ -130,6 +132,7 @@ public class VirtualMcuTopModule implements Module {
     }
 
     private static class VirtualBotUdpReceive implements Module {
+        private final DatagramPacket datagramPacket;
         private String ip = null;
         private final int port;
         private DatagramSocket socket;
@@ -143,16 +146,16 @@ public class VirtualMcuTopModule implements Module {
                 InetAddress inetAddress = InetAddress.getByName(ip);
                 socket = new DatagramSocket(port, inetAddress);
             } catch (SocketException | UnknownHostException e) {
-                System.err.println(">>>" + port);
+                e.printStackTrace();
             }
+            byte[] buf = new byte[MAX_BUFFER_SIZE];
+            datagramPacket = new DatagramPacket(buf, buf.length);
         }
 
         @Override
         public void run() {
             if (socket == null) return;
             try {
-                byte[] buf = new byte[1024];
-                DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
                 socket.receive(datagramPacket);
 
                 ByteArrayInputStream stream = new ByteArrayInputStream(datagramPacket.getData(),

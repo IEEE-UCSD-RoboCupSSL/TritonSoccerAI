@@ -14,7 +14,7 @@ public class ErForceClientModule extends SimClientModule {
     }
 
     @Override
-    protected void sendCmds() {
+    protected void sendCommandsToSim() {
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
         }

@@ -10,6 +10,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
+import static Triton.Util.delay;
+
 public abstract class SimClientModule implements Module {
 
     protected InetAddress address;
@@ -25,13 +27,6 @@ public abstract class SimClientModule implements Module {
     public SimClientModule(Config config) {
         this.config = config;
 
-        try {
-            socket = new DatagramSocket();
-            address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
-        } catch (SocketException | UnknownHostException e) {
-            e.printStackTrace();
-        }
-
         for (int i = 0; i < config.numAllyRobots; i++) {
             virtualBotCmdSubs.add(new FieldSubscriber<>("From:VirtualBot", "Cmd " + i));
         }
@@ -44,27 +39,36 @@ public abstract class SimClientModule implements Module {
             isFirstRun = false;
         }
 
-        sendCmds();
+        sendCommandsToSim();
     }
 
     private void setup() {
-        for (Subscriber allyCmdSub : virtualBotCmdSubs) {
+        for (Subscriber<VirtualBotCmds> allyCmdSub : virtualBotCmdSubs) {
             try {
                 allyCmdSub.subscribe(1000);
             } catch (TimeoutException e) {
                 e.printStackTrace();
             }
         }
+
+        try {
+            socket = new DatagramSocket();
+            address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
+        } catch (SocketException | UnknownHostException e) {
+            e.printStackTrace();
+        }
+        delay(1000);
+
     }
 
-    protected abstract void sendCmds();
+    protected abstract void sendCommandsToSim();
 
     /**
      * Sends a packet
      *
      * @param msg message to send as byte array
      */
-    protected void send(byte[] msg) {
+    protected void sendUdpPacket(byte[] msg) {
         try {
             DatagramPacket packet =
                     new DatagramPacket(msg, msg.length, InetAddress.getByName(config.connConfig.simCmdEndpoint.ipAddr),

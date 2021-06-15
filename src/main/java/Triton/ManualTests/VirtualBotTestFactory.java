@@ -17,6 +17,7 @@ import Triton.ManualTests.EstimatorTests.PassFinderTest;
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
+import Triton.ManualTests.VirtualBotTests.TdrdTest;
 import Triton.ManualTests.VirtualBotTests.VirtualBotModuleTest;
 import Triton.ManualTests.VirtualBotTests.VirtualMcuTopModuleTest;
 import Triton.SoccerObjects;
@@ -34,7 +35,7 @@ public class VirtualBotTestFactory {
         virtualBotTestMap.put("vmcutop", new VirtualMcuTopModuleTest(soccerObjects));
         virtualBotTestMap.put("grsim-client", new GrSimClientModuleTest(config));
         virtualBotTestMap.put("vbot", new VirtualBotModuleTest(soccerObjects));
-
+        virtualBotTestMap.put("tdrd", new TdrdTest(soccerObjects));
     }
 
     public String[] getAvailableTestNames() {
