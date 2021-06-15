@@ -21,8 +21,8 @@ public class VirtualBot implements Module {
 
     /* prepare the main pubsubs */
     private FieldPubSubPair<FirmwareAPI.FirmwareCommand> firmCmdPubSubPair;
-
     private FieldPubSubPair<FirmwareAPI.FirmwareData> firmDataPubSubPair;
+    private FieldPubSubPair<Boolean> vbotPauseCmdPair;
 
     private final Publisher<VirtualBotCmds> virtualBotCmdPub;
 
@@ -38,6 +38,7 @@ public class VirtualBot implements Module {
                         .setEncX(0.0001f).setEncY(0.0001f).setImuTheta(0.0001f).setImuOmega(0.0001f)
                         .setImuAx(0.0001f).setImuAy(0.0001f).setIsHoldingball(false).build()
         );
+        vbotPauseCmdPair = new FieldPubSubPair<>("[Pair]DefinedIn:VirtualBot", "PauseBot " + id, false);
         mcuTopModule = new VirtualMcuTopModule(config, id, firmCmdPubSubPair.pub, firmDataPubSubPair.sub);
 
         virtualBotCmdPub = new FieldPublisher<VirtualBotCmds>("From:VirtualBot", "Cmd " + id,
@@ -48,6 +49,12 @@ public class VirtualBot implements Module {
         return mcuTopModule.isConnectedToTritonBot();
     }
 
+    public void pauseBot() {
+        vbotPauseCmdPair.pub.publish(true);
+    }
+    public void resumeBot() {
+        vbotPauseCmdPair.pub.publish(false);
+    }
 
     private void setup() {
         ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(
@@ -74,8 +81,8 @@ public class VirtualBot implements Module {
         cmd.setVelY((float)((firmCmd.getVy() / 100.00f) * ymax));
         cmd.setVelAng((float)((firmCmd.getW() / 100.00f)* wmax));
 
-
-        virtualBotCmdPub.publish(cmd);
-
+        if(!vbotPauseCmdPair.sub.getMsg()) {
+            virtualBotCmdPub.publish(cmd);
+        }
     }
 }

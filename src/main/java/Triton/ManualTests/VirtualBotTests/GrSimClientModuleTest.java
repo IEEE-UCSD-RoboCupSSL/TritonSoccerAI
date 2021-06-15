@@ -5,6 +5,7 @@ import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.VirtualBot.VirtualBotCmds;
+import Triton.VirtualBot.VirtualBotFactory;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,6 +23,7 @@ public class GrSimClientModuleTest implements TritonTestable {
     @Override
     public boolean test(Config config) {
         Scanner scanner = new Scanner(System.in);
+        VirtualBotFactory.pauseAllVirtualBots();
 
         while (true) {
             System.out.print("id: ");
@@ -36,6 +38,8 @@ public class GrSimClientModuleTest implements TritonTestable {
             System.out.print("velAng: ");
             float velAng = scanner.nextFloat();
             // float velAng = 1;
+
+
 
             VirtualBotCmds botCmds = new VirtualBotCmds();
             botCmds.setVelX(velX);

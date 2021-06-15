@@ -89,11 +89,11 @@ public class ConnectionConfig implements IniConfig {
                     "id=" + id +
                     ", ipAddr='" + ipAddr + '\'' +
                     ", tritonBotTcpPort=" + tritonBotTcpPort +
-                    ", tritonBotUdpPort=" + tritonBotUdpPort +
-                    ", virtualBotTcpPort=" + virtualBotTcpPort +
-                    ", virtualBotUdpSendPort=" + virtualBotUdpSendPort +
-                    ", getVirtualBotUdpReceivePort=" + virtualBotUdpReceivePort +
-                    '}';
+                    ",\n tritonBotUdpPort=" + tritonBotUdpPort +
+                    ",\n virtualBotTcpPort=" + virtualBotTcpPort +
+                    ",\n virtualBotUdpSendPort=" + virtualBotUdpSendPort +
+                    ",\n virtualBotUdpReceivePort=" + virtualBotUdpReceivePort +
+                    "\n" + '}' + "\n";
         }
     }
 
