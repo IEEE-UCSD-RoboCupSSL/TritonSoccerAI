@@ -10,12 +10,18 @@ import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Util;
+import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Ints;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import static Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs.VIRTUAL_MCU_TOP_FREQ;
+import static Triton.Util.delay;
 
 public class VirtualMcuTopModule implements Module {
     private boolean isFirstRun = true;
@@ -29,23 +35,25 @@ public class VirtualMcuTopModule implements Module {
     private FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub;
     private FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
     private FieldPubSubPair<Boolean> isConnectedToTritonBotPubSub;
+    private Config config;
 
     // private FieldPublisher<String> debugStrPub;
     public VirtualMcuTopModule(Config config, int id,
                                FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub,
                                FieldSubscriber<FirmwareAPI.FirmwareData> dataSub) {
+        this.config = config;
         isConnectedToTritonBotPubSub =
                 new FieldPubSubPair<>("Internal:VirtualMcuTopModule",
-                                      "isConnectedToTritonBot " + id, false);
+                        "isConnectedToTritonBot " + id, false);
         // debugStrPub = new FieldPublisher<>("From:VirtualMcuTopModule", "DebugString " + id, "???");
 
-        for(ConnectionConfig.BotConn conn : config.connConfig.botConns) {
-            if(conn.id == id) {
+        for (ConnectionConfig.BotConn conn : config.connConfig.botConns) {
+            if (conn.id == id) {
                 ip = conn.ipAddr;
                 port = conn.virtualBotTcpPort;
             }
         }
-        if(ip == null) {
+        if (ip == null) {
             throw new RuntimeException("can't find a IP config with matching bot id");
         }
         this.id = id;
@@ -56,7 +64,7 @@ public class VirtualMcuTopModule implements Module {
 
     public boolean isConnectedToTritonBot() {
         Boolean result = isConnectedToTritonBotPubSub.sub.getMsg();
-        if(result == null) return false;
+        if (result == null) return false;
         return result;
     }
 
@@ -73,53 +81,30 @@ public class VirtualMcuTopModule implements Module {
             e.printStackTrace();
         }
 
-        /* background thread */
-        App.threadPool.scheduleAtFixedRate(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if(socket == null || socketOut == null) return;
-                        socketOut.println(dataSub.getMsg().toByteString());
-                    }
-                }
-                , 0, Util.toPeriod(GvcModuleFreqs.VIRTUAL_BOT_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+        App.runModule(new VirtualBotSend(config, id, dataSub), VIRTUAL_MCU_TOP_FREQ);
+        App.runModule(new VirtualBotReceive(config, id, cmdPub), VIRTUAL_MCU_TOP_FREQ);
+
 
     }
 
     @Override
     public void run() {
 
-        if(isFirstRun) {
+        if (isFirstRun) {
             setup();
             isFirstRun = false;
         }
-        if(socket == null || socketIn == null) {
+        if (socket == null || socketIn == null) {
             isFirstRun = true;
             System.out.println("Something went wrong in VirtualMcuTopModule.java");
             return;
         }
 
-        /* Get commands meant to be sent to the firmware layer (adapter program named McuTop)
-         *  from TritonBot, this class is meant to mock that McuTop as a virtual mode version of McuTop */
-        try {
-            String line;
-            line = socketIn.readLine(); // newline char already dropped by readLine()
-            //debugStrPub.publish(line);
-            ByteArrayInputStream stream = new ByteArrayInputStream(line.getBytes(StandardCharsets.ISO_8859_1));
-            FirmwareAPI.FirmwareCommand receivedCmd =
-                    FirmwareAPI.FirmwareCommand.parseFrom(stream);
+        delay(5000);
 
 
-            // No need to process init command here because it's in virtual mode
-            // if(receivedCmd.getInit()) { }
-
-            cmdPub.publish(receivedCmd);
-        } catch (IOException e) {
-            // To-do: handle disconnect
-            e.printStackTrace();
-        }
     }
-
 
 
 }

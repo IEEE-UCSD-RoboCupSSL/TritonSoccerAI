@@ -45,9 +45,14 @@ public class ConnectionConfig implements IniConfig {
             int tritonBotTcpPortOffset = iniParser.get("robot-connections", "tritonbot-tcp-port-offset", int.class);
             int tritonBotUdpPortOffset = iniParser.get("robot-connections", "tritonbot-udp-port-offset", int.class);
             int vBotTcpPortOffset = iniParser.get("robot-connections", "virtual-robot-tcp-port-offset", int.class);
+            int vBotUdpSendPortOffset = iniParser.get("robot-connections", "virtual-robot-udp-read-port-offset", int.class);
+            int vBotUdpReceivePortOffset = iniParser.get("robot-connections", "virtual-robot-udp-write-port-offset", int.class);
             botConn.tritonBotTcpPort = portBase + (id * idOffset) + tritonBotTcpPortOffset;
             botConn.tritonBotUdpPort = portBase + (id * idOffset) + tritonBotUdpPortOffset;
             botConn.virtualBotTcpPort = portBase + (id * idOffset) + vBotTcpPortOffset;
+            botConn.virtualBotUdpSendPort = portBase + (id * idOffset) + vBotUdpSendPortOffset;
+            botConn.virtualBotUdpReceivePort = portBase + (id * idOffset) + vBotUdpReceivePortOffset;
+
             botConns.add(botConn);
         }
 
@@ -75,15 +80,19 @@ public class ConnectionConfig implements IniConfig {
         public int tritonBotTcpPort = 6000;
         public int tritonBotUdpPort = 6001;
         public int virtualBotTcpPort = 6002; // only applicable in virtual mode
+        public int virtualBotUdpSendPort = 6003;
+        public int virtualBotUdpReceivePort = 6004;
 
         @Override
         public String toString() {
-            return "\nBotConn{" +
+            return "BotConn{" +
                     "id=" + id +
                     ", ipAddr='" + ipAddr + '\'' +
                     ", tritonBotTcpPort=" + tritonBotTcpPort +
                     ", tritonBotUdpPort=" + tritonBotUdpPort +
                     ", virtualBotTcpPort=" + virtualBotTcpPort +
+                    ", virtualBotUdpSendPort=" + virtualBotUdpSendPort +
+                    ", getVirtualBotUdpReceivePort=" + virtualBotUdpReceivePort +
                     '}';
         }
     }
