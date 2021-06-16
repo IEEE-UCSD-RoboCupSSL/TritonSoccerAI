@@ -13,6 +13,8 @@ import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.GameControl.GameCtrlModule;
+import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.*;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;

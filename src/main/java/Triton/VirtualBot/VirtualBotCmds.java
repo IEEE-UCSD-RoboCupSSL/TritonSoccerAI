@@ -1,9 +1,8 @@
 package Triton.VirtualBot;
 
-import Triton.Misc.Math.Matrix.Vec2D;
-
 public class VirtualBotCmds {
-    private float velX, velY, velAng;
+    private float velX, velY, velAng, kickX, kickZ;
+    private boolean spinner;
 
     public VirtualBotCmds() {
         velX = 0;
@@ -35,12 +34,39 @@ public class VirtualBotCmds {
         this.velAng = velAng;
     }
 
+    public float getKickX() {
+        return kickX;
+    }
+
+    public void setKickX(float kickX) {
+        this.kickX = kickX;
+    }
+
+    public float getKickZ() {
+        return kickZ;
+    }
+
+    public void setKickZ(float kickZ) {
+        this.kickZ = kickZ;
+    }
+
+    public boolean isSpinner() {
+        return spinner;
+    }
+
+    public void setSpinner(boolean spinner) {
+        this.spinner = spinner;
+    }
+
     @Override
     public String toString() {
         return "VirtualBotCmds{" +
                 "velX=" + velX +
                 ", velY=" + velY +
                 ", velAng=" + velAng +
+                ", kickX=" + kickX +
+                ", kickZ=" + kickZ +
+                ", spinner=" + spinner +
                 '}';
     }
 }

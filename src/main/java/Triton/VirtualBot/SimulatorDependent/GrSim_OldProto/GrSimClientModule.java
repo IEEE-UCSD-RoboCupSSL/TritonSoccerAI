@@ -35,12 +35,12 @@ public class GrSimClientModule extends SimClientModule {
                     .setWheel1(0)
                     .setWheel3(0)
                     .setWheel4(0)
-                    .setKickspeedx(0)
-                    .setKickspeedz(0)
+                    .setKickspeedx(cmd.getKickX())
+                    .setKickspeedz(cmd.getKickZ())
                     .setVeltangent((float) audienceVel.x)
                     .setVelnormal((float) audienceVel.y)
                     .setVelangular(cmd.getVelAng())
-                    .setSpinner(false)
+                    .setSpinner(cmd.isSpinner())
                     .setWheelsspeed(false)
                     .build();
 

@@ -23,7 +23,6 @@ public class SSLGameCtrlModule extends GameCtrlModule {
 
     public SSLGameCtrlModule(Config config) {
         super("ssl game controller");
-
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGcNetIf());
@@ -58,8 +57,8 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                     packet.getOffset(), packet.getLength());
 
             SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
-            //System.out.println(input);
-//                System.err.println(gcOutput);
+            System.out.println(input);
+            System.err.println(gcOutput);
             parseGcOutput(gcOutput);
         } catch (SocketTimeoutException e) {
 //                System.err.println("SSL Game Controller Multicast Timeout");
