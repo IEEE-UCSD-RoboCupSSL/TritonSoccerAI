@@ -266,7 +266,7 @@ public class App {
 
         /* just taking advantage of this tester's constructor, which constructs the publishers
            matching those subscribers inside simClientModule, preventing subscribe timeout exception */
-        new GrSimClientModuleTest(config);
+        new GrSimClientModuleTest();
 
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {

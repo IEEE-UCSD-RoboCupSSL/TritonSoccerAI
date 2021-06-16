@@ -33,7 +33,7 @@ public class VirtualBotTestFactory {
         RobotList<Foe> foes = soccerObjects.foes;
         Ball ball = soccerObjects.ball;
         virtualBotTestMap.put("vmcutop", new VirtualMcuTopModuleTest(soccerObjects));
-        virtualBotTestMap.put("grsim-client", new GrSimClientModuleTest(config));
+        virtualBotTestMap.put("grsim-client", new GrSimClientModuleTest());
         virtualBotTestMap.put("vbot", new VirtualBotModuleTest(soccerObjects));
         virtualBotTestMap.put("tdrd", new TdrdTest(soccerObjects));
     }

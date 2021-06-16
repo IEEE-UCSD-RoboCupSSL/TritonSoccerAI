@@ -37,7 +37,8 @@ public class RobotConfig implements IniConfig {
     public double wheelMaxTorque; // N*m
     public double wheelMaxLinearSpeed; // m/s
     public double wheelMaxLinearAcceleration; // m/s^2
-    public double robotMaxAbsoluteSpeed; // m/s
+    public double robotMaxAbsoluteLinearSpeed; // m/s
+    public double robotMaxStableLinearSpeed;
     public double robotMaxVerticalSpeed; // m/s
     public double robotMaxHorizontalSpeed; // m/s
     public double robotMaxAcceleration; // m/s^2
@@ -46,6 +47,7 @@ public class RobotConfig implements IniConfig {
 
     public SimpleMatrix wheelToBodyTransform;
     public SimpleMatrix bodyToWheelTransform;
+
 
 
 
@@ -82,7 +84,6 @@ public class RobotConfig implements IniConfig {
 
         double theta = Math.toRadians(frontIncAngle / 2);
         double phi = Math.toRadians(backIncAngle / 2);
-
         wheelToBodyTransform = new SimpleMatrix(new double[][]{
                 new double[]{Math.cos(theta)/2.0, -Math.cos(phi)/2, -Math.cos(phi)/2, Math.cos(theta)/2},
                 new double[]{Math.sin(theta)/2.0, Math.sin(phi)/2, -Math.sin(phi)/2, -Math.sin(theta)/2},
@@ -131,7 +132,8 @@ public class RobotConfig implements IniConfig {
 
         robotMaxVerticalSpeed = wheelToBodyTransform.mult(wNorthMax).get(1, 0);
         robotMaxHorizontalSpeed = wheelToBodyTransform.mult(wEastMax).get(0, 0);
-        robotMaxAbsoluteSpeed = Math.max(robotMaxVerticalSpeed, robotMaxHorizontalSpeed);
+        robotMaxAbsoluteLinearSpeed = Math.max(robotMaxVerticalSpeed, robotMaxHorizontalSpeed);
+        robotMaxStableLinearSpeed = Math.min(robotMaxVerticalSpeed, robotMaxHorizontalSpeed);
         robotMaxAngularSpeed = wheelToBodyTransform.mult(wCounterClockwiseMax).get(2, 0);
 
 
@@ -171,7 +173,8 @@ public class RobotConfig implements IniConfig {
                 "wheelMaxTorque=" + wheelMaxTorque + "\n" +
                 "wheelMaxLinearSpeed=" + wheelMaxLinearSpeed + " m/s\n" +
                 "wheelMaxLinearAcceleration=" + wheelMaxLinearAcceleration + " m/s^2\n" +
-                "robotMaxSpeed=" + robotMaxAbsoluteSpeed + " m/s\n" +
+                "robotMaxAbsoluteLinearSpeed=" + robotMaxAbsoluteLinearSpeed + " m/s\n" +
+                "robotMaxStableLinearSpeed=" + robotMaxStableLinearSpeed + " m/s\n" +
                 "robotVerticalMaxSpeed=" + robotMaxVerticalSpeed + " m/s\n" +
                 "robotHorizontalMaxSpeed=" + robotMaxHorizontalSpeed + " m/s\n" +
                 "robotMaxAcceleration=" + robotMaxAcceleration + " m/s^2 \n" +

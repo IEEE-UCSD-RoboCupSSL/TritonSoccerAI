@@ -12,9 +12,9 @@ public class GvcModuleFreqs {
     public static final double ROBOT_FREQ = 500;
 
     /* Virtual Bot */
-    public static final double VIRTUAL_BOT_FREQ = 500;
+    public static final double VIRTUAL_BOT_FREQ = 250;
     public static final double VIRTUAL_MCU_TOP_FREQ = 500;
-    public static final double SIM_CLIENT_FREQ = 500;
+    public static final double SIM_CLIENT_FREQ = 100;
 
 
 }

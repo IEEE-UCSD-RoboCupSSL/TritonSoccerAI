@@ -13,15 +13,14 @@ import java.util.Scanner;
 public class GrSimClientModuleTest implements TritonTestable {
     private final ArrayList<Publisher<VirtualBotCmds>> virtualBotCmdPubs = new ArrayList<>();
 
-    public GrSimClientModuleTest(Config config) {
+    @Override
+    public boolean test(Config config) {
         for (int i = 0; i < config.numAllyRobots; i++) {
             virtualBotCmdPubs.add(new FieldPublisher<VirtualBotCmds>("From:VirtualBot", "Cmd " + i,
                     new VirtualBotCmds()));
         }
-    }
 
-    @Override
-    public boolean test(Config config) {
+
         Scanner scanner = new Scanner(System.in);
         VirtualBotFactory.pauseAllVirtualBots();
 

@@ -160,9 +160,10 @@ public class VirtualMcuTopModule implements Module {
 
                 ByteArrayInputStream stream = new ByteArrayInputStream(datagramPacket.getData(),
                         datagramPacket.getOffset(), datagramPacket.getLength());
+
+
                 FirmwareAPI.FirmwareCommand receivedCmd =
                         FirmwareAPI.FirmwareCommand.parseFrom(stream);
-
                 cmdPub.publish(receivedCmd);
             } catch (IOException e) {
                 e.printStackTrace();

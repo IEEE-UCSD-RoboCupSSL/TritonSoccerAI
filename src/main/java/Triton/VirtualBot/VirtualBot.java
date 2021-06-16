@@ -71,15 +71,14 @@ public class VirtualBot implements Module {
 
         FirmwareAPI.FirmwareCommand firmCmd = firmCmdPubSubPair.sub.getMsg();
 
-        double xmax = config.botConfig.robotMaxHorizontalSpeed;
-        double ymax = config.botConfig.robotMaxVerticalSpeed;
-        double wmax = config.botConfig.robotMaxAngularSpeed;
+        double transMax = config.botConfig.robotMaxStableLinearSpeed;
+        double rotatMax = config.botConfig.robotMaxAngularSpeed;
 
         VirtualBotCmds cmd = new VirtualBotCmds();
         // firmCmd's <vx, vy, w> are unit-less, which is represented as percentage of the maximum
-        cmd.setVelX((float)((firmCmd.getVx() / 100.00f) * xmax));
-        cmd.setVelY((float)((firmCmd.getVy() / 100.00f) * ymax));
-        cmd.setVelAng((float)((firmCmd.getW() / 100.00f)* wmax));
+        cmd.setVelX((float)((firmCmd.getVx() / 100.00f) * transMax));
+        cmd.setVelY((float)((firmCmd.getVy() / 100.00f) * transMax));
+        cmd.setVelAng((float)((firmCmd.getW() / 100.00f)* rotatMax));
 
         if(!vbotPauseCmdPair.sub.getMsg()) {
             virtualBotCmdPub.publish(cmd);

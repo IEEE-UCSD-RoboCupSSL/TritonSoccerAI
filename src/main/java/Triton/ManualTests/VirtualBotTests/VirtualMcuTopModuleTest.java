@@ -46,7 +46,10 @@ public class VirtualMcuTopModuleTest implements TritonTestable {
             delay(100);
 
             System.out.println("Command VirtualBot Received: >>>>>>>>>>");
-            System.out.println(cmdSub.getMsg());
+            long t0 = System.currentTimeMillis();
+            while(System.currentTimeMillis() - t0 < 1000) {
+                System.out.println(cmdSub.getMsg());
+            }
             //System.out.println(debugStrSub.getMsg());
             System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
