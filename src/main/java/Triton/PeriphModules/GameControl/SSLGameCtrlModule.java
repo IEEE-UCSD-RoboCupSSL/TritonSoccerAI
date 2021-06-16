@@ -16,33 +16,26 @@ public class SSLGameCtrlModule extends GameCtrlModule {
     private final static int MAX_BUFFER_SIZE = 67108864;
 
     //private MulticastSocket socket;
-    private DatagramSocket socket;
+    private MulticastSocket socket;
     private DatagramPacket packet;
 
     private boolean isFirstRun = true;
 
     public SSLGameCtrlModule(Config config) {
         super("ssl game controller");
-
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
-        NetworkInterface netIf = Util.getNetIf(jsonConfig.conn().getGcNetIf());
-        socket = Util.mcSocket(jsonConfig.conn().getGcMcAddr(),
-                jsonConfig.conn().getGcMcPort(),
-                netIf);
-        packet = new DatagramPacket(buffer, buffer.length);
-//
-//        int port = config.connConfig.gcConn.port;
-//        String ip = config.connConfig.gcConn.ipAddr;
-//        try {
-//            socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
-//            socket.joinGroup(new InetSocketAddress(ip, port),
-//                NetworkInterface.getByInetAddress(InetAddress.getByName(ip)));
-//
-//            packet = new DatagramPacket(buffer, buffer.length);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        int port = config.connConfig.gcConn.port;
+        String ip = config.connConfig.gcConn.ipAddr;
+        try {
+            socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
+            socket.joinGroup(new InetSocketAddress(ip, port),
+                NetworkInterface.getByInetAddress(InetAddress.getByName(ip)));
+
+            packet = new DatagramPacket(buffer, buffer.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -58,11 +51,11 @@ public class SSLGameCtrlModule extends GameCtrlModule {
                     packet.getOffset(), packet.getLength());
 
             SslGcRefereeMessage.Referee gcOutput = SslGcRefereeMessage.Referee.parseFrom(input);
-            //System.out.println(input);
-//                System.err.println(gcOutput);
+//            System.out.println(input);
+//            System.err.println(gcOutput);
             parseGcOutput(gcOutput);
         } catch (SocketTimeoutException e) {
-//                System.err.println("SSL Game Controller Multicast Timeout");
+                System.err.println("SSL Game Controller Multicast Timeout");
         } catch (IOException e) {
             e.printStackTrace();
             return;

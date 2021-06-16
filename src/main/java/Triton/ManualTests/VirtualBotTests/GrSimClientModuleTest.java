@@ -27,23 +27,26 @@ public class GrSimClientModuleTest implements TritonTestable {
         while (true) {
             System.out.print("id: ");
             int id = scanner.nextInt();
-            // int id = 3;
+            System.out.print("kickX: ");
+            float kickX = scanner.nextFloat();
+            System.out.print("kickZ: ");
+            float kickZ = scanner.nextFloat();
             System.out.printf("velX: ");
             float velX = scanner.nextFloat();
-            // float velX = 10;
             System.out.print("velY: ");
             float velY = scanner.nextFloat();
-            // float velY = 10;
             System.out.print("velAng: ");
             float velAng = scanner.nextFloat();
-            // float velAng = 1;
-
-
+            System.out.println("spinner (true/false): ");
+            boolean spinner = scanner.nextBoolean();
 
             VirtualBotCmds botCmds = new VirtualBotCmds();
+            botCmds.setKickX(kickX);
+            botCmds.setKickZ(kickZ);
             botCmds.setVelX(velX);
             botCmds.setVelY(velY);
             botCmds.setVelAng(velAng);
+            botCmds.setSpinner(spinner);
 
             virtualBotCmdPubs.get(id).publish(botCmds);
         }

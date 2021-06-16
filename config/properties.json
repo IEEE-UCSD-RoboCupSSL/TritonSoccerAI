@@ -5,7 +5,7 @@
         "grsim-net-if": "null",
         "tcp-offset": 0,
         "udp-offset": 1,
-        "gc-mc-addr": "224.5.23.2",
+        "gc-mc-addr": "224.5.23.1",
         "gc-mc-port": 10003,
         "gc-net-if": "en",
         "mc-timeout": 5,
