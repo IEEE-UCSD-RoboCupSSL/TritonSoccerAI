@@ -13,6 +13,8 @@ import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
@@ -27,6 +29,7 @@ import java.util.concurrent.*;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.initGeo;
 import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
+import static Triton.PeriphModules.Display.PaintOption.*;
 import static Triton.Util.delay;
 
 
@@ -142,13 +145,28 @@ public class App {
 
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
 
+        Display display = new Display(config);
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        paintOptions.add(PROBABILITY);
+        paintOptions.add(PREDICTION);
+        display.setPaintOptions(paintOptions);
+
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
+
         if(runGameCtrl) {
-            //
+            App.runModule(new SSLGameCtrlModule(config), GvcModuleFreqs.GAME_CTRL_MODULE_FREQ);
+
 //            int port = (config.team == BLUE) ? 6543 : 6544;
 //
 //            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-////            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
-////            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
+//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
+//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
 //            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(
 //                    gameCtrlModule,
 //                0, Util.toPeriod(GvcModuleFreqs.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
