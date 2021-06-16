@@ -20,7 +20,7 @@ public class GoalKeeping {
     }
 
     public void moveToStart() {
-        keeper.sprintTo(new Vec2D(0, -4200), 0);
+        keeper.curveTo(new Vec2D(0, -4200), 0);
     }
 
     public void passiveGuarding() {
