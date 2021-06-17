@@ -5,7 +5,7 @@ import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.TritonTestable;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public class AutoCapTest implements TritonTestable {
 
