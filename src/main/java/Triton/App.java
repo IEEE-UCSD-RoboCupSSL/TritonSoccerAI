@@ -11,7 +11,6 @@ import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
