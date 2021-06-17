@@ -9,9 +9,13 @@ import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
+import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
@@ -124,19 +128,25 @@ public class App {
 
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
 
-//        Display display = new Display(config);
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
-//        paintOptions.add(INFO);
-//        paintOptions.add(PROBABILITY);
-//        paintOptions.add(PREDICTION);
-//        display.setPaintOptions(paintOptions);
-//
-//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-//                0,
-//                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
-//                TimeUnit.NANOSECONDS);
+        Display display = new Display(config);
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        paintOptions.add(PROBABILITY);
+        paintOptions.add(PREDICTION);
+        display.setPaintOptions(paintOptions);
+
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
+
+//        Publisher<ArrayList<Line2D>> linesPub = new FieldPublisher<>("[Pair]DefinedIn:Display", "DrawLines", new ArrayList<>());
+//        ArrayList<Line2D> lines = new ArrayList<>();
+//        Line2D line = new Line2D(new Vec2D(0, 0), new Vec2D(500, 500));
+//        lines.add(line);
+//        linesPub.publish(lines);
 
         if(runGameCtrl) {
             App.runModule(new SSLGameCtrlModule(config), GvcModuleFreqs.GAME_CTRL_MODULE_FREQ);
