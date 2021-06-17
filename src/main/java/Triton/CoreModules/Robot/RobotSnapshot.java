@@ -1,6 +1,6 @@
 package Triton.CoreModules.Robot;
 
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

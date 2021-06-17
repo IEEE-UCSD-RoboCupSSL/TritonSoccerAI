@@ -1,11 +1,10 @@
 package Triton.CoreModules.AI.AI_Skills;
 
 import Triton.Config.Config;
-import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;

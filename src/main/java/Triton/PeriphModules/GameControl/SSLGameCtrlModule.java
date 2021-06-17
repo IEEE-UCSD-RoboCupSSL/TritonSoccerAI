@@ -2,11 +2,9 @@ package Triton.PeriphModules.GameControl;
 
 import Proto.SslGcRefereeMessage;
 import Triton.Config.Config;
-import Triton.Config.OldConfigs.jsonConfig;
 import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.PeriphModules.GameControl.GameStates.*;
-import Triton.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

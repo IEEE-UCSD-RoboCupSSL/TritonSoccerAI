@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.Estimators.TimeEstimator;
 
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.function.Function;

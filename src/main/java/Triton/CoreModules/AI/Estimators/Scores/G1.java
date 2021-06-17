@@ -3,7 +3,7 @@ package Triton.CoreModules.AI.Estimators.Scores;
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.GOAL_LENGTH;

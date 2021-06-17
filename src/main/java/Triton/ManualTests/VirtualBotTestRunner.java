@@ -2,7 +2,7 @@ package Triton.ManualTests;
 
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.SoccerObjects;
 
 import java.util.Optional;

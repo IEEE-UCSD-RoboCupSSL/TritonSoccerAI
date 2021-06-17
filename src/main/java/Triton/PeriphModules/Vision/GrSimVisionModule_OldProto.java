@@ -3,11 +3,10 @@ package Triton.PeriphModules.Vision;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslGeometry;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
 
@@ -15,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
-import java.util.List;
 
 import static Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslGeometry.*;
 

@@ -1,7 +1,7 @@
 package Triton.ManualTests.RobotSkillsTests;
 
 import Triton.CoreModules.Ball.Ball;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

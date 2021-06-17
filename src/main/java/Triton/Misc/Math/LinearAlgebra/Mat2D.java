@@ -1,4 +1,4 @@
-package Triton.Misc.Math.Matrix;
+package Triton.Misc.Math.LinearAlgebra;
 
 import org.ejml.simple.SimpleMatrix;
 

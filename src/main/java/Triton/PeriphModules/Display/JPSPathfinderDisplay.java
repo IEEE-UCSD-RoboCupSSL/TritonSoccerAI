@@ -5,7 +5,7 @@ import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.Node;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.awt.*;
 import java.util.ArrayList;

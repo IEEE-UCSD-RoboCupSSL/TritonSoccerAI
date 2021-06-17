@@ -6,7 +6,7 @@ import Triton.App;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;

@@ -1,12 +1,11 @@
 package Triton.CoreModules.AI;
 
 import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class Formation {
 

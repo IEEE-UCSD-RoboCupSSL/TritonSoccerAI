@@ -1,4 +1,4 @@
-package Triton.Misc.Math.Matrix;
+package Triton.Misc.Math.LinearAlgebra;
 
 import Proto.RemoteAPI;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;

@@ -1,8 +1,6 @@
 package Triton.PeriphModules.GameControl;
 
-import Proto.SslGcRefereeMessage;
 import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Matrix.Vec2D;
 import Triton.PeriphModules.GameControl.GameStates.*;
 
 import java.util.Scanner;

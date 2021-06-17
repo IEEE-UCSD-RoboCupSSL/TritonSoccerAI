@@ -4,12 +4,10 @@ import Proto.FirmwareAPI;
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.TritonTestable;
-import Triton.ManualTests.VirtualBotTestRunner;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.SoccerObjects;
 
-import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
 import static Triton.Util.delay;

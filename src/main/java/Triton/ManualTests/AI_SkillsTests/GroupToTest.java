@@ -6,10 +6,9 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class GroupToTest extends RobotSkillsTest {
     RobotList<Ally> allies;

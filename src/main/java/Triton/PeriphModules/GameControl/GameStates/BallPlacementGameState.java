@@ -1,7 +1,7 @@
 package Triton.PeriphModules.GameControl.GameStates;
 
 import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public class BallPlacementGameState extends GameState {
     private Team team;

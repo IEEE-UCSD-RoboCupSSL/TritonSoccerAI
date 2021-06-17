@@ -1,9 +1,7 @@
 package Triton.Misc.Math.Coordinates;
 
-import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Matrix.Vec2D;
-import Triton.VirtualBot.VirtualBotCmds;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public class PerspectiveConverter {
     private static Team myTeam = Team.BLUE; // default 
