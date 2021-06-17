@@ -15,8 +15,6 @@ public class CurveTo {
 
     public static void exec(Ally ally, Vec2D endPoint, double angle) {
         double targetAngle = normAng(angle);
-        double angDiff = calcAngDiff(targetAngle, ally.getDir());
-        double absAngleDiff = Math.abs(angDiff);
 
         ally.spinTo(targetAngle);
 

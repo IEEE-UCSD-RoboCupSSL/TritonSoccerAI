@@ -21,7 +21,7 @@ public class MiscTest extends RobotSkillsTest {
 
         System.out.println("moving to 0, 0");
         while (!ally.isPosArrived(new Vec2D(0, 0))) {
-            ally.sprintTo(new Vec2D(0, 0));
+            ally.curveTo(new Vec2D(0, 0));
         }
 
         System.out.println("rotating to 0");

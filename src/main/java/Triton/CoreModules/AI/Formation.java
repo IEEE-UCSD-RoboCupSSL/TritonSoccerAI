@@ -113,7 +113,7 @@ public class Formation {
             int botID = ally.getID();
             Vec2D targetPos = formationPoints.get(botID);
             double targetAngle = formationAngle.get(botID);
-            ally.sprintTo(targetPos, targetAngle);
+            ally.curveTo(targetPos, targetAngle);
         }
 
         // return false when any robot is outside of their designated formation point
@@ -146,7 +146,7 @@ public class Formation {
         if (!moveToFormation(formationPoints, formationAngle, bots)) {
             return false;
         }
-        keeper.sprintTo(keeperPoint, keeperAngle);
+        keeper.curveTo(keeperPoint, keeperAngle);
         return keeper.isPosArrived(keeperPoint) && keeper.isDirAimed(keeperAngle);
     }
 
