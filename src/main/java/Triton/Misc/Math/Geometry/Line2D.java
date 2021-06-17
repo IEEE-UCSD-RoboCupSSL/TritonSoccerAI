@@ -1,11 +1,14 @@
 package Triton.Misc.Math.Geometry;
 
+import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.awt.*;
 
 /**
  * Represents a 2D line
  */
-public class Line2D {
+public class Line2D implements Drawable2D {
 
     public final Vec2D p1;
     public final Vec2D p2;
@@ -157,5 +160,12 @@ public class Line2D {
         String s = "";
         s += "[" + p1 + ", " + p2 + "]";
         return s;
+    }
+
+    @Override
+    public void draw(Graphics2D g2d, Gridify convert) {
+        int[] displayPoint1 = convert.fromPos(p1);
+        int[] displayPoint2 = convert.fromPos(p2);
+        g2d.drawLine(displayPoint1[0], displayPoint1[1], displayPoint2[0], displayPoint2[1]);
     }
 }

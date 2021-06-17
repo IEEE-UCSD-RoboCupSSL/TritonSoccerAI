@@ -6,7 +6,11 @@ import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
+import Triton.Misc.Math.Geometry.Drawable2D;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
@@ -29,6 +33,7 @@ public class Display extends JPanel implements Runnable {
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
     private final Subscriber<BallData> ballSub;
+    private final FieldPubSubPair<ArrayList<Drawable2D>> drawablesPubSub;
     private final JFrame frame;
     protected Gridify convert;
     ProbFinder probFinder;
@@ -50,6 +55,8 @@ public class Display extends JPanel implements Runnable {
             yellowRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.YELLOW.name() + i));
         }
         ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
+
+        drawablesPubSub = new FieldPubSubPair<>("[Pair]DefinedIn:Display", "Drawables", new ArrayList<>());
 
         ImgLoader.generateImages();
 
@@ -95,6 +102,7 @@ public class Display extends JPanel implements Runnable {
             for (Subscriber<RobotData> robotSub : blueRobotSubs)
                 robotSub.subscribe(1000);
             ballSub.subscribe(1000);
+            drawablesPubSub.sub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,6 +135,8 @@ public class Display extends JPanel implements Runnable {
                 paintObjects(g2d);
             if (paintOptions.contains(INFO))
                 paintInfo(g2d);
+            if (paintOptions.contains(DRAWABLES))
+                paintDrawables(g2d);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -274,6 +284,11 @@ public class Display extends JPanel implements Runnable {
                 windowHeight - 50);
     }
 
+    private void paintDrawables(Graphics2D g2d) {
+        for (Drawable2D drawable : drawablesPubSub.getSub().getMsg()) {
+            drawable.draw(g2d, convert);
+        }
+    }
 
     public void setPaintOptions(ArrayList<PaintOption> paintOptions) {
         this.paintOptions = paintOptions;

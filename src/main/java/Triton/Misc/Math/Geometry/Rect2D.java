@@ -1,6 +1,9 @@
 package Triton.Misc.Math.Geometry;
 
+import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.awt.*;
 
 /**
  * Represents a 2D rectangle
@@ -61,6 +64,14 @@ public class Rect2D extends Geometry2D {
         double dx = Math.max(Math.max(anchor.x - pos.x, pos.x - (anchor.x + width)), 0.0);
         double dy = Math.max(Math.max(anchor.y - pos.y, pos.y - (anchor.y + height)), 0.0);
         return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    @Override
+    public void draw(Graphics2D g2d, Gridify convert) {
+        int[] displayAnchor = convert.fromPos(anchor);
+        int displayWidth = convert.numCols(width);
+        int displayHeight = convert.numRows(height);
+        g2d.fillRect(displayAnchor[0], displayAnchor[1], displayWidth, displayHeight);
     }
 }
         

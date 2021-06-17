@@ -5,7 +5,7 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 /**
  * Abstract point to represent various 2D shapes
  */
-public abstract class Geometry2D {
+public abstract class Geometry2D implements Drawable2D{
     /**
      * Returns true if point is within shape
      *

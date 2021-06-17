@@ -5,5 +5,6 @@ public enum PaintOption {
     OBJECTS,
     PROBABILITY,
     PREDICTION,
-    INFO
+    INFO,
+    DRAWABLES;
 }
