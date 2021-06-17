@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class DynamicInterceptBallTest extends RobotSkillsTest {
+public class FlankBallTest extends RobotSkillsTest {
     Ally ally;
     Ball ball;
 

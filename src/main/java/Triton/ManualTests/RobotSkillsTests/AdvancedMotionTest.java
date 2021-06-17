@@ -74,12 +74,12 @@ public class AdvancedMotionTest extends RobotSkillsTest {
                     case "fast-curve" -> {
                         if (targetDir == null) {
                             while (!bot.isPosArrived(targetPos)) {
-                                bot.fastCurveTo(targetPos);
+                                bot.curveTo(targetPos);
                                 Thread.sleep(1);
                             }
                         } else {
                             while (!bot.isPosArrived(targetPos) && !bot.isDirAimed(targetDir)) {
-                                bot.fastCurveTo(targetPos, targetDir);
+                                bot.curveTo(targetPos, targetDir);
                                 Thread.sleep(1);
                             }
                         }

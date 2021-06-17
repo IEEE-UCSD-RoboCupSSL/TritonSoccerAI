@@ -37,7 +37,7 @@ public class Keep {
             x = Math.max(x, GOAL_LEFT);
             x = Math.min(x, GOAL_RIGHT);
             Vec2D targetPos = new Vec2D(x, y);
-            ally.fastCurveTo(targetPos);
+            ally.curveTo(targetPos);
         }
     }
 

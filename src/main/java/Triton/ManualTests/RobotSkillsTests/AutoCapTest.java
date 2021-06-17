@@ -7,6 +7,8 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
+import java.time.LocalDateTime;
+
 public class AutoCapTest implements TritonTestable {
 
     private final Ally ally;
@@ -19,12 +21,15 @@ public class AutoCapTest implements TritonTestable {
 
     @Override
     public boolean test(Config config) {
-        Vec2D ballLoc = ball.getPos();
-        Vec2D currPos = ally.getPos();
-        Vec2D currPosToBall = ballLoc.sub(currPos);
-        while(!ally.isHoldingBall()) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime later = now.plusSeconds(20);
+
+        while(!ally.isHoldingBall() && LocalDateTime.now().isBefore(later)) {
             ally.autoCap();
         }
+
         return true;
     }
 }

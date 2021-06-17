@@ -50,7 +50,7 @@ public class VirtualBotCmds {
         this.kickZ = kickZ;
     }
 
-    public boolean isSpinner() {
+    public boolean getSpinner() {
         return spinner;
     }
 

@@ -52,7 +52,7 @@ public class CoreTestFactory {
         coreTestMap.put("group", new GroupToTest(fielders, ball));
         coreTestMap.put("drib", new DribBallTest(fielders.get(1), ball));
         coreTestMap.put("vel", new VelTest(fielders.get(0)));
-        coreTestMap.put("inter", new DynamicInterceptBallTest(fielders.get(1), ball));
+        coreTestMap.put("inter", new FlankBallTest(fielders.get(1), ball));
         coreTestMap.put("collect", new DataCollector(fielders, keeper, ball));
         coreTestMap.put("reset", new FormationTest("tester", fielders));
         coreTestMap.put("formation", new FormationTest(fielders, keeper));

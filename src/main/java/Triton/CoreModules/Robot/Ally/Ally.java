@@ -304,7 +304,7 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     synchronized public void dynamicIntercept(Ball ball, double faceDir) {
-        DynamicIntercept.exec(this, ball, faceDir);
+        FlankBall.exec(this, ball, faceDir);
     }
 
     @Override

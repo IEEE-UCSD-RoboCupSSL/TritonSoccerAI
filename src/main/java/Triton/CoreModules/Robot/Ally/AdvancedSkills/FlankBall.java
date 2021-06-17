@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
 import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.INTERCEPT_CIRCLE_RADIUS;
 
-public class DynamicIntercept {
+public class FlankBall {
 
     public static void exec(Ally ally, Ball ball, double faceDir) {
         Vec2D currPos = ally.getPos();

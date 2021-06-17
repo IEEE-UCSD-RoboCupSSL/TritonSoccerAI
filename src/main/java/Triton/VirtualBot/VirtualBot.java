@@ -84,6 +84,9 @@ public class VirtualBot implements Module {
         cmd.setVelX((float)vec.get(0, 0));
         cmd.setVelY((float)vec.get(1, 0));
         cmd.setVelAng((float)vec.get(2, 0));
+        cmd.setKickX(firmCmd.getKx());
+        cmd.setKickZ(firmCmd.getKz());
+        cmd.setSpinner(firmCmd.getDribbler());
 
         if(!vbotPauseCmdPair.sub.getMsg()) {
             virtualBotCmdPub.publish(cmd);

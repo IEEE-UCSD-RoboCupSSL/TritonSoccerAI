@@ -13,7 +13,7 @@ public class GetBall {
         if (currPosToBall.mag() <= GvcPathfinder.AUTOCAP_DIST_THRESH) {
             ally.autoCap();
         } else {
-            ally.fastCurveTo(ballLoc, currPosToBall.toPlayerAngle());
+            ally.curveTo(ballLoc, currPosToBall.toPlayerAngle());
             //dynamicIntercept(ball, 0);
         }
     }
