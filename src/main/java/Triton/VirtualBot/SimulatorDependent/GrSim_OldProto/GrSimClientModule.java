@@ -5,7 +5,7 @@ import Triton.CoreModules.Robot.Team;
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimCommands;
 import Triton.Legacy.OldGrSimProto.protosrcs.GrSimPacket;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.VirtualBot.SimClientModule;
 import Triton.VirtualBot.VirtualBotCmds;
 import org.ejml.data.DMatrixRMaj;
@@ -46,23 +46,23 @@ public class GrSimClientModule extends SimClientModule {
             }
 
 
-            GrSimCommands.grSim_Robot_Command robotCommands =
-                    debugAsWheelCommands(i, cmd.getVelX(), cmd.getVelY(), cmd.getVelAng(), config);
+//            GrSimCommands.grSim_Robot_Command robotCommands =
+//                    debugAsWheelCommands(i, cmd.getVelX(), cmd.getVelY(), cmd.getVelAng(), config);
 
-//            GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
-//                    .setId(i)
-//                    .setWheel2(0)
-//                    .setWheel1(0)
-//                    .setWheel3(0)
-//                    .setWheel4(0)
-//                    .setKickspeedx(0)
-//                    .setKickspeedz(0)
-//                    .setVeltangent((float) audienceVel.x)
-//                    .setVelnormal((float) audienceVel.y)
-//                    .setVelangular(cmd.getVelAng())
-//                    .setSpinner(false)
-//                    .setWheelsspeed(false)
-//                    .build();
+            GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
+                    .setId(i)
+                    .setWheel2(0)
+                    .setWheel1(0)
+                    .setWheel3(0)
+                    .setWheel4(0)
+                    .setKickspeedx(0)
+                    .setKickspeedz(0)
+                    .setVeltangent((float) audienceVel.x)
+                    .setVelnormal((float) audienceVel.y)
+                    .setVelangular(cmd.getVelAng())
+                    .setSpinner(false)
+                    .setWheelsspeed(false)
+                    .build();
 
             robotCommandsArr.add(robotCommands);
         }

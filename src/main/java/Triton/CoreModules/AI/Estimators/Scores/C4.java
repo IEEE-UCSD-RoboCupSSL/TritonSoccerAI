@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.Estimators.Scores;
 
 import Triton.CoreModules.AI.Estimators.ProbFinder;
 import Triton.CoreModules.AI.Estimators.Score;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 /**
  * c4: The pass is short enough to be performed accurately

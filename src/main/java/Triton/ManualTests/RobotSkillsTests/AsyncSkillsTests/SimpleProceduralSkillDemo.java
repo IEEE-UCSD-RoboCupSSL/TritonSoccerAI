@@ -7,7 +7,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 
 import java.util.Scanner;

@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.PathFinder;
 
 import Triton.Misc.Math.Geometry.Circle2D;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.ArrayList;
 

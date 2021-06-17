@@ -7,7 +7,7 @@ import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.RWLockee;
 import Triton.SoccerObjects;
 

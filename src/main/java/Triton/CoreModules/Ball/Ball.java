@@ -1,6 +1,6 @@
 package Triton.CoreModules.Ball;
 
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.PeriphModules.Detection.BallData;
 

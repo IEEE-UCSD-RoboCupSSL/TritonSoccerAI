@@ -2,7 +2,7 @@ package Triton.CoreModules.Robot.Ally.AdvancedSkills;
 
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.*;
 

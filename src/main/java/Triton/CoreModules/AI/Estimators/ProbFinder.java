@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.Estimators;
 
 import Triton.App;
 import Triton.CoreModules.Robot.RobotSnapshot;
-import Triton.Misc.Math.Matrix.Vec2D;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.RWLockee;
 
 import java.util.ArrayList;

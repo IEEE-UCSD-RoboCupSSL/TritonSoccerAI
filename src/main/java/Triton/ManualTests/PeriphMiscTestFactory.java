@@ -3,6 +3,7 @@ package Triton.ManualTests;
 import Triton.App;
 
 import Triton.Config.Config;
+import Triton.ManualTests.MiscTests.ConstraintMappingMathTests;
 import Triton.ManualTests.MiscTests.FutureTaskTest;
 import Triton.ManualTests.MiscTests.PubSubTests;
 import Triton.ManualTests.PeriphTests.GrSimVisionModuleTest_OldProto;
@@ -28,6 +29,7 @@ public class PeriphMiscTestFactory {
         periphTestMap.put("pubsub", new PubSubTests(App.threadPool));
         periphTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
         periphTestMap.put("SSL", new SSLGameCtrlModuleTest());
+        periphTestMap.put("vbotmath", new ConstraintMappingMathTests());
     }
 
     public String[] getAvailableTestNames() {
