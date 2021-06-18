@@ -20,7 +20,6 @@ public class RobotList<T> extends ArrayList<T> {
             if (bot instanceof Ally) {
                 if (((Ally) bot).connect()) {
                     numSuccessConnect++;
-                    delay(100);
                 }
             } else {
                 System.out.println("Invalid Type");

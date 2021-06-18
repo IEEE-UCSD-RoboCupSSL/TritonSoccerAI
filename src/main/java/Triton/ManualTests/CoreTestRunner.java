@@ -21,12 +21,12 @@ import java.util.Scanner;
 public class CoreTestRunner {
     public static void runCoreTest(Config config, SoccerObjects soccerObjects, Scanner scanner) {
         try {
-            Thread.sleep(1000);
             CoreTestFactory testFactory = new CoreTestFactory(soccerObjects, config);
-
+            Thread.sleep(1000);
             TritonTestable defaultFormation = testFactory.getTest("defaultFormation");
             Optional<TritonTestable> defaultFormation1 = Optional.of(defaultFormation);
             defaultFormation1.get().test(config);
+            //defaultFormation.test(config);
 
             String prevTestName = "";
 

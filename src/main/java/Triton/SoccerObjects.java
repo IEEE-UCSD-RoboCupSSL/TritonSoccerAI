@@ -40,7 +40,6 @@ public class SoccerObjects {
         ScheduledFuture<?> goalKeeperFuture = null;
         // our/ally robots == fielders + 1 goalkeeper
         if (fielders.connectAll() == config.numAllyRobots - 1 && keeper.connect()) {
-            delay(100);
             allyFieldersFutures = fielders.runAll();
             goalKeeperFuture = App.threadPool.scheduleAtFixedRate(
                     keeper,

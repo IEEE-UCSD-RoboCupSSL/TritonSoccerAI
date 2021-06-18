@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.Scanner;
 
+import static Triton.Util.delay;
+
 public class FormationTest extends RobotSkillsTest {
 
     RobotList<Ally> fielders;
@@ -46,12 +48,12 @@ public class FormationTest extends RobotSkillsTest {
         System.out.println(">> ENTER FORMATION TO MOVE TO:");
         formationName = scanner.nextLine();
 
-        while (!Formation.getInstance().moveToFormation(formationName, fielders, keeper)) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        try {
+            while (!Formation.getInstance().moveToFormation(formationName, fielders, keeper)) {
+                delay(3);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return true;
     }
