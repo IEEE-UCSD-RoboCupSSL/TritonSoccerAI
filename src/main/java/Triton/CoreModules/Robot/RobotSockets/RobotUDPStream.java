@@ -38,7 +38,7 @@ public class RobotUDPStream implements Module {
         this.port = port;
         this.id = id;
 
-        commandsSub = new MQSubscriber<>("From:Ally", "Commands " + id, 10);
+        commandsSub = new FieldSubscriber<>("From:Ally", "Commands " + id);
         allySub = new FieldSubscriber<>("From:DetectionModule", myTeam.name() + id);
         ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
 

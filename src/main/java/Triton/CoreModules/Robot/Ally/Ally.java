@@ -95,7 +95,10 @@ public class Ally extends Robot implements AllySkills {
         holdBallPosSub = new FieldSubscriber<>("From:Ally", "HoldBallPos " + id);
 
         isDribbledSub = new FieldSubscriber<>("From:RobotTCPConnection", "Drib " + id);
-        commandsPub = new MQPublisher<>("From:Ally", "Commands " + id);
+
+        RemoteAPI.CommandData standbyCmd = createStandbyCmd();
+
+        commandsPub = new FieldPublisher<>("From:Ally", "Commands " + id, standbyCmd);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
@@ -518,6 +521,22 @@ public class Ally extends Robot implements AllySkills {
 
     private RemoteAPI.CommandData createTVRDCmd() {
         return createPrimitiveCmdBuilder(TVRD);
+    }
+
+    private RemoteAPI.CommandData createStandbyCmd() {
+        RemoteAPI.CommandData.Builder builder = RemoteAPI.CommandData.newBuilder();
+        builder.setIsWorldFrame(false);
+        builder.setEnableBallAutoCapture(false);
+        builder.setMode(TVRV.ordinal());
+
+        RemoteAPI.Vec3D.Builder motionSetPoint = RemoteAPI.Vec3D.newBuilder();
+        motionSetPoint.setX(0);
+        motionSetPoint.setY(0);
+        double angle = 0;
+        motionSetPoint.setZ(angle);
+        builder.setMotionSetPoint(motionSetPoint);
+
+        return builder.build();
     }
 
     private RemoteAPI.CommandData createTVRVCmd() {
