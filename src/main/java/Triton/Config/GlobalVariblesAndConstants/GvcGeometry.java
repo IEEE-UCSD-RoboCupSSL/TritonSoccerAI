@@ -50,6 +50,10 @@ public class GvcGeometry {
     public static double GOAL_DEPTH = 200;
     public static double FULL_FIELD_LENGTH = FIELD_LENGTH + 2 * GOAL_DEPTH;
 
+    // Other
+    public static Vec2D GOAL_CENTER_TEAM = new Vec2D(0, -FIELD_LENGTH / 2);
+    public static Vec2D GOAL_CENTER_FOE = new Vec2D(0, FIELD_LENGTH / 2);
+
     public static void initGeo() {
         FIELD_LINES.put("TopTouchLine", TOP_TOUCH_LINE);
         FIELD_LINES.put("BottomTouchLine", BOTTOM_TOUCH_LINE);
