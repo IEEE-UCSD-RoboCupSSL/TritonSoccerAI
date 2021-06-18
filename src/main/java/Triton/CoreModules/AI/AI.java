@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI;
 
 import Triton.Config.Config;
-import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
+import Triton.CoreModules.AI.AI_Strategies.DEPRECATED_BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
@@ -53,7 +53,7 @@ public class AI implements Module {
         this.gameCtrl = gameCtrl;
         gapFinder = new GapFinder(soccerObjects);
         passFinder = new PassFinder(soccerObjects);
-        strategyToPlay = new BasicPlay(config, soccerObjects, gapFinder, passFinder);
+        strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, gapFinder, passFinder);
     }
 
     @Override

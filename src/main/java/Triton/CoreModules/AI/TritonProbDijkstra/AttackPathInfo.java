@@ -1,4 +1,4 @@
-package Triton.CoreModules.AI.Algorithms;
+package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

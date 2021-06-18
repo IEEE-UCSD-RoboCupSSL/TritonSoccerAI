@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import static Triton.Config.OldConfigs.ObjectConfig.MAX_KICK_VEL;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
-public class AttackPlanA extends Tactics {
+public class DEPRECATED_AttackPlanA extends Tactics {
 
     private static final double SHOOT_THRESHOLD = 0.6;
     private static final double PASS_THRESHOLD = 0.45;
@@ -34,8 +34,8 @@ public class AttackPlanA extends Tactics {
     final private double interAllyClearance = 600; // mm
     private Config config;
 
-    public AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
-                       Ball ball, GapFinder gapFinder, PassFinder passFinder, Config config) {
+    public DEPRECATED_AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
+                                  Ball ball, GapFinder gapFinder, PassFinder passFinder, Config config) {
         super(fielders, keeper, foes, ball);
         this.config = config;
 

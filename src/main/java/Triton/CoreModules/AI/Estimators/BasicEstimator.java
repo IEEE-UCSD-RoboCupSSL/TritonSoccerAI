@@ -72,6 +72,17 @@ public class BasicEstimator {
         return null;
     }
 
+    public boolean isAllyHavingTheBall() {
+        boolean rtn = false;
+
+        Robot holder = getBallHolder();
+        if (holder instanceof Ally) {
+            rtn = true;
+        }
+        return rtn;
+    }
+
+
     /* Ball under our control means more than just holding the ball,
      * which includes the temporarily releasing the ball during pass,
      * */
@@ -96,8 +107,28 @@ public class BasicEstimator {
     /* if no one holds the ball, return true if t_ally_nearest_robot(ball_loc) < t_foe_nearest_robot(ball_loc)
      * if an opponent holds the ball, return false */
     public boolean isBallWithinOurReach() {
-        // To-do
-        return false;
+        Robot holder = getBallHolder();
+        if(holder instanceof  Ally) {
+            return true;
+        }
+        if (holder instanceof Foe) {
+            return false;
+        }
+        Vec2D ballPos = ball.getPos();
+
+        double minDistAlly = Double.MAX_VALUE;
+        for(Ally fielder : fielders) {
+            double dist = ballPos.sub(fielder.getPos()).mag();
+            if(dist < minDistAlly) minDistAlly = dist;
+        }
+
+        double minDistFoe = Double.MAX_VALUE;
+        for(Foe foe : foes) {
+            double dist = ballPos.sub(foe.getPos()).mag();
+            if(dist < minDistFoe) minDistFoe = dist;
+        }
+
+        return minDistAlly < minDistFoe;
     }
 
 

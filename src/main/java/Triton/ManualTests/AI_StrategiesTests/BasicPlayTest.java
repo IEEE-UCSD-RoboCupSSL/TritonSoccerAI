@@ -1,7 +1,7 @@
 package Triton.ManualTests.AI_StrategiesTests;
 
 import Triton.Config.Config;
-import Triton.CoreModules.AI.AI_Strategies.BasicPlay;
+import Triton.CoreModules.AI.AI_Strategies.DEPRECATED_BasicPlay;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.Ball.Ball;
@@ -13,7 +13,7 @@ import Triton.ManualTests.TritonTestable;
 public class BasicPlayTest implements TritonTestable {
     private GapFinder gapFinder;
     private PassFinder passFinder;
-    BasicPlay basicPlay;
+    DEPRECATED_BasicPlay basicPlay;
     private final RobotList<Ally> fielders;
     private final Ally keeper;
     private final RobotList<Foe> foes;
@@ -28,7 +28,7 @@ public class BasicPlayTest implements TritonTestable {
     public boolean test(Config config) {
         gapFinder = new GapFinder(fielders, foes, ball);
         passFinder = new PassFinder(fielders, foes, ball);
-        basicPlay = new BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder, config);
+        basicPlay = new DEPRECATED_BasicPlay(fielders, keeper, foes, ball, gapFinder, passFinder, config);
         try {
             while (true) {
                 basicPlay.play();
