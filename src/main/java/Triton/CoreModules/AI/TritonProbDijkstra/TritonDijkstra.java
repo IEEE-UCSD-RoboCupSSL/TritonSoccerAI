@@ -1,10 +1,12 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 public class TritonDijkstra {
@@ -29,6 +31,19 @@ public class TritonDijkstra {
             return 0;
         }
     }
+
+    public static class Output {
+        public ArrayList<PUAG.Node> maxProbPath;
+        public double TotalProbabilityProduct = 1.0;
+        public ArrayList<ReceptionPoint> receptionPoints;
+    }
+
+    public static class ReceptionPoint {
+        public Vec2D receptionPoint;
+        public double angle;
+    }
+
+
 
 
 }
