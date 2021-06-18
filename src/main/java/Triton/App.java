@@ -127,19 +127,19 @@ public class App {
 
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
 
-        Display display = new Display(config);
-        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-        paintOptions.add(GEOMETRY);
-        paintOptions.add(OBJECTS);
-        paintOptions.add(INFO);
-        paintOptions.add(PROBABILITY);
-        paintOptions.add(PREDICTION);
-        display.setPaintOptions(paintOptions);
-
-        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-                0,
-                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
-                TimeUnit.NANOSECONDS);
+//        Display display = new Display(config);
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
+//        paintOptions.add(INFO);
+//        paintOptions.add(PROBABILITY);
+//        paintOptions.add(PREDICTION);
+//        display.setPaintOptions(paintOptions);
+//
+//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+//                0,
+//                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+//                TimeUnit.NANOSECONDS);
 
 //        Publisher<ArrayList<Line2D>> linesPub = new FieldPublisher<>("[Pair]DefinedIn:Display", "DrawLines", new ArrayList<>());
 //        ArrayList<Line2D> lines = new ArrayList<>();
