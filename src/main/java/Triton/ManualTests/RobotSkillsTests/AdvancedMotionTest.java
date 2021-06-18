@@ -59,6 +59,7 @@ public class AdvancedMotionTest extends RobotSkillsTest {
                         }
                     }
                     case "curve" -> {
+
                         if (targetDir == null) {
                             while (!bot.isPosArrived(targetPos)) {
                                 bot.curveTo(targetPos);
