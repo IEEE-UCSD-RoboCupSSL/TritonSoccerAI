@@ -191,8 +191,10 @@ public class App {
 
                     /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
                     createAndRunPeriphModules(config, false);
+                    delay(500);
                     SoccerObjects soccerObjects = new SoccerObjects(config);
                     moduleFutures.addAll(soccerObjects.runModules());
+                    delay(500);
 
                     System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
                     CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
@@ -204,9 +206,10 @@ public class App {
 
                         /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
                         createAndRunPeriphModules(config, false);
+                        delay(500);
                         SoccerObjects soccerObjects = new SoccerObjects(config);
                         moduleFutures.addAll(soccerObjects.runModules());
-
+                        delay(500);
                         VirtualBotTestRunner.runVirtualBotTest(config, scanner, soccerObjects);
                     } else {
                         System.err.println("Test V mode require this program to be running virtual mode");

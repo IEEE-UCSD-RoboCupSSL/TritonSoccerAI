@@ -20,10 +20,10 @@ public class Formation {
     public static final Map<String, FormationType> preset = Map.of(
             "default", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -1000),
-                            new Vec2D(-1000.00, -2000),
-                            new Vec2D(1000.00, -2000),
                             new Vec2D(-2000.00, -3000),
+                            new Vec2D(-1000.00, -2000),
+                            new Vec2D(0.00, -1000),
+                            new Vec2D(1000.00, -2000),
                             new Vec2D(2000.00, -3000)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0))
@@ -129,11 +129,11 @@ public class Formation {
         return true;
     }
 
-    public boolean moveToFormation(String str, ArrayList<Ally> bots, Ally keeper) {
+    public boolean moveToFormation(String str, ArrayList<Ally> bots, Ally keeper) throws NullPointerException{
         return moveToFormation(preset.get(str), bots, keeper);
     }
 
-    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots, Ally keeper) {
+    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots, Ally keeper) throws NullPointerException{
         if (!formation.keeper || keeper == null) {
             return moveToFormation(formation.points, formation.angles, bots);
         }
@@ -142,7 +142,7 @@ public class Formation {
     }
 
     public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots,
-                                   Vec2D keeperPoint, Double keeperAngle, Ally keeper) {
+                                   Vec2D keeperPoint, Double keeperAngle, Ally keeper) throws NullPointerException {
         if (!moveToFormation(formationPoints, formationAngle, bots)) {
             return false;
         }

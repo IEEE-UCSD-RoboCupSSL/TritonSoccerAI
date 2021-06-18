@@ -16,21 +16,23 @@ import java.util.ArrayList;
 
 public class GrSimClientModule extends SimClientModule {
     private static SimpleMatrix bodyToWheelTransform;
+    private long t0;
     public GrSimClientModule(Config config) {
         super(config);
-        double theta = Math.toRadians(45);
-        double phi = Math.toRadians(45);
-        SimpleMatrix wheelToBodyTransform = new SimpleMatrix(new double[][]{
-                new double[]{Math.cos(theta)/2.0, -Math.cos(phi)/2, -Math.cos(phi)/2, Math.cos(theta)/2},
-                new double[]{Math.sin(theta)/2.0, Math.sin(phi)/2, -Math.sin(phi)/2, -Math.sin(theta)/2},
-                new double[]{-1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius)}
-        });
-        DMatrixRMaj wtb = wheelToBodyTransform.copy().getMatrix();
-        DMatrixRMaj btw = wheelToBodyTransform.copy().getMatrix();;
-        SolvePseudoInverseSvd_DDRM moorePenrosePseudoInverseSolver = new SolvePseudoInverseSvd_DDRM(3, 4);
-        moorePenrosePseudoInverseSolver.setA(wtb);
-        moorePenrosePseudoInverseSolver.invert(btw);
-        bodyToWheelTransform = SimpleMatrix.wrap(btw);
+        t0 = System.currentTimeMillis();
+//        double theta = Math.toRadians(45);
+//        double phi = Math.toRadians(45);
+//        SimpleMatrix wheelToBodyTransform = new SimpleMatrix(new double[][]{
+//                new double[]{Math.cos(theta)/2.0, -Math.cos(phi)/2, -Math.cos(phi)/2, Math.cos(theta)/2},
+//                new double[]{Math.sin(theta)/2.0, Math.sin(phi)/2, -Math.sin(phi)/2, -Math.sin(theta)/2},
+//                new double[]{-1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius), -1.0 / (4 * config.botConfig.robotRadius)}
+//        });
+//        DMatrixRMaj wtb = wheelToBodyTransform.copy().getMatrix();
+//        DMatrixRMaj btw = wheelToBodyTransform.copy().getMatrix();;
+//        SolvePseudoInverseSvd_DDRM moorePenrosePseudoInverseSolver = new SolvePseudoInverseSvd_DDRM(3, 4);
+//        moorePenrosePseudoInverseSolver.setA(wtb);
+//        moorePenrosePseudoInverseSolver.invert(btw);
+//        bodyToWheelTransform = SimpleMatrix.wrap(btw);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class GrSimClientModule extends SimClientModule {
         }
 
         GrSimCommands.grSim_Commands command2 = GrSimCommands.grSim_Commands.newBuilder()
-                .setTimestamp(System.currentTimeMillis())
+                .setTimestamp(System.currentTimeMillis() - t0)
                 .setIsteamyellow(config.myTeam == Team.YELLOW)
                 .addAllRobotCommands(robotCommandsArr).build();
 
@@ -82,26 +84,26 @@ public class GrSimClientModule extends SimClientModule {
     }
 
 
-    private static GrSimCommands.grSim_Robot_Command debugAsWheelCommands(int i, double x, double y, double w, Config config) {
-
-
-        SimpleMatrix bodyVec = new SimpleMatrix(new double[][]{new double[]{x, y, w}}).transpose();
-        SimpleMatrix wheelVec = bodyToWheelTransform.mult(bodyVec);
-
-        GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
-                .setId(i)
-                .setWheel1(-(float)(wheelVec.get(0, 0) / config.botConfig.wheelRadius))
-                .setWheel2(-(float)(wheelVec.get(1, 0) / config.botConfig.wheelRadius))
-                .setWheel3(-(float)(wheelVec.get(2, 0) / config.botConfig.wheelRadius))
-                .setWheel4(-(float)(wheelVec.get(3, 0) / config.botConfig.wheelRadius))
-                .setKickspeedx(0)
-                .setKickspeedz(0)
-                .setVeltangent(0)
-                .setVelnormal(0)
-                .setVelangular(0)
-                .setSpinner(false)
-                .setWheelsspeed(true)
-                .build();
-        return robotCommands;
-    }
+//    private static GrSimCommands.grSim_Robot_Command debugAsWheelCommands(int i, double x, double y, double w, Config config) {
+//
+//
+//        SimpleMatrix bodyVec = new SimpleMatrix(new double[][]{new double[]{x, y, w}}).transpose();
+//        SimpleMatrix wheelVec = bodyToWheelTransform.mult(bodyVec);
+//
+//        GrSimCommands.grSim_Robot_Command robotCommands = GrSimCommands.grSim_Robot_Command.newBuilder()
+//                .setId(i)
+//                .setWheel1(-(float)(wheelVec.get(0, 0) / config.botConfig.wheelRadius))
+//                .setWheel2(-(float)(wheelVec.get(1, 0) / config.botConfig.wheelRadius))
+//                .setWheel3(-(float)(wheelVec.get(2, 0) / config.botConfig.wheelRadius))
+//                .setWheel4(-(float)(wheelVec.get(3, 0) / config.botConfig.wheelRadius))
+//                .setKickspeedx(0)
+//                .setKickspeedz(0)
+//                .setVeltangent(0)
+//                .setVelnormal(0)
+//                .setVelangular(0)
+//                .setSpinner(false)
+//                .setWheelsspeed(true)
+//                .build();
+//        return robotCommands;
+//    }
 }

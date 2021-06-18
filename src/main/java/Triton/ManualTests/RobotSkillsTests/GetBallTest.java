@@ -6,6 +6,8 @@ import Triton.CoreModules.Robot.Ally.Ally;
 
 import java.util.Scanner;
 
+import static Triton.Util.delay;
+
 
 public class GetBallTest extends RobotSkillsTest {
     Ally ally;
@@ -26,6 +28,7 @@ public class GetBallTest extends RobotSkillsTest {
 
         while (!ally.isHoldingBall()) {
             ally.getBall(ball);
+            delay(3);
         }
 
         ally.stop();

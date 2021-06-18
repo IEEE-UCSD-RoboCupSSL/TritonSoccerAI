@@ -17,7 +17,7 @@ public abstract class Robot implements Module {
         dataSub = new FieldSubscriber<>("From:DetectionModule", team.name() + ID);
     }
 
-    synchronized public Vec2D getPos() {
+    public Vec2D getPos() {
         return getData().getPos();
     }
 
@@ -25,15 +25,15 @@ public abstract class Robot implements Module {
         return dataSub.getMsg();
     }
 
-    synchronized public Vec2D getVel() {
+    public Vec2D getVel() {
         return getData().getVel();
     }
 
-    synchronized public double getDir() {
+    public double getDir() {
         return getData().getDir();
     }
 
-    synchronized public int timeToPoint() {
+    public int timeToPoint() {
         return 0;
     }
 
@@ -54,11 +54,10 @@ public abstract class Robot implements Module {
         }
     }
 
-    synchronized public Team getTeam() {
+    public Team getTeam() {
         return team;
     }
-
-    synchronized public int getID() {
+    public int getID() {
         return ID;
     }
 }
