@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.AI_Strategies;
 
 import Triton.Config.Config;
-import Triton.CoreModules.AI.AI_Tactics.AttackPlanA;
+import Triton.CoreModules.AI.AI_Tactics.DEPRECATED_AttackPlanA;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
@@ -14,7 +14,7 @@ import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.SoccerObjects;
 
-public class BasicPlay extends Strategies {
+public class DEPRECATED_BasicPlay extends Strategies {
 
     private final RobotList<Ally> fielders;
     private final RobotList<Foe> foes;
@@ -27,14 +27,14 @@ public class BasicPlay extends Strategies {
     private final GapFinder gapFinder;
     private final PassFinder passFinder;
 
-    public BasicPlay(Config config, SoccerObjects soccerObjects, GapFinder gapFinder, PassFinder passFinder) {
+    public DEPRECATED_BasicPlay(Config config, SoccerObjects soccerObjects, GapFinder gapFinder, PassFinder passFinder) {
         this(soccerObjects.fielders, soccerObjects.keeper, soccerObjects.foes, soccerObjects.ball,
                 gapFinder, passFinder, config);
     }
 
-    public BasicPlay(RobotList<Ally> fielders, Ally keeper,
-                     RobotList<Foe> foes, Ball ball,
-                     GapFinder gapFinder, PassFinder passFinder, Config config) {
+    public DEPRECATED_BasicPlay(RobotList<Ally> fielders, Ally keeper,
+                                RobotList<Foe> foes, Ball ball,
+                                GapFinder gapFinder, PassFinder passFinder, Config config) {
         super();
         this.fielders = fielders;
         this.foes = foes;
@@ -49,7 +49,7 @@ public class BasicPlay extends Strategies {
         goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
 
         // construct tactics
-        attack = new AttackPlanA(fielders, keeper, foes, ball, gapFinder, passFinder, config);
+        attack = new DEPRECATED_AttackPlanA(fielders, keeper, foes, ball, gapFinder, passFinder, config);
         getBall = new FillGapGetBall(fielders, keeper, foes, ball, gapFinder, config);
         defend = new DefendPlanA(fielders, keeper, foes, ball, 300, config);
     }

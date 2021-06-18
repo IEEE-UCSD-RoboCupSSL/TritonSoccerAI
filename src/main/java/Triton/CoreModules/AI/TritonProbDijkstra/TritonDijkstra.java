@@ -1,11 +1,10 @@
-package Triton.CoreModules.AI.Algorithms;
+package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 
 @Data
 public class TritonDijkstra {
