@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static Triton.Util.delay;
+
 public class SoccerObjects {
     public RobotList<Ally> fielders;
     public Ally keeper;
@@ -38,6 +40,7 @@ public class SoccerObjects {
         ScheduledFuture<?> goalKeeperFuture = null;
         // our/ally robots == fielders + 1 goalkeeper
         if (fielders.connectAll() == config.numAllyRobots - 1 && keeper.connect()) {
+            delay(100);
             allyFieldersFutures = fielders.runAll();
             goalKeeperFuture = App.threadPool.scheduleAtFixedRate(
                     keeper,

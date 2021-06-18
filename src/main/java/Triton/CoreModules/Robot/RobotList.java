@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static Triton.Util.delay;
+
 public class RobotList<T> extends ArrayList<T> {
 
     /* return the number of successful connections */
@@ -18,6 +20,7 @@ public class RobotList<T> extends ArrayList<T> {
             if (bot instanceof Ally) {
                 if (((Ally) bot).connect()) {
                     numSuccessConnect++;
+                    delay(100);
                 }
             } else {
                 System.out.println("Invalid Type");
