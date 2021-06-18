@@ -9,7 +9,10 @@ import Triton.ManualTests.CoreTestRunner;
 import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
 import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
+import Triton.Misc.Math.Geometry.Circle2D;
+import Triton.Misc.Math.Geometry.Drawable2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
@@ -126,7 +129,7 @@ public class App {
         }
 
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-
+//
 //        Display display = new Display(config);
 //        ArrayList<PaintOption> paintOptions = new ArrayList<>();
 //        paintOptions.add(GEOMETRY);
@@ -134,6 +137,7 @@ public class App {
 //        paintOptions.add(INFO);
 //        paintOptions.add(PROBABILITY);
 //        paintOptions.add(PREDICTION);
+//        paintOptions.add(DRAWABLES);
 //        display.setPaintOptions(paintOptions);
 //
 //        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
@@ -141,11 +145,15 @@ public class App {
 //                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
 //                TimeUnit.NANOSECONDS);
 
-//        Publisher<ArrayList<Line2D>> linesPub = new FieldPublisher<>("[Pair]DefinedIn:Display", "DrawLines", new ArrayList<>());
-//        ArrayList<Line2D> lines = new ArrayList<>();
+//        Publisher<ArrayList<Drawable2D>> drawablePub = new FieldPublisher<>("[Pair]DefinedIn:Display", "Drawables", new ArrayList<>());
+//        ArrayList<Drawable2D> drawables = new ArrayList<>();
+//        Circle2D circle = new Circle2D(new Vec2D(0, 0), 100);
+//        drawables.add(circle);
 //        Line2D line = new Line2D(new Vec2D(0, 0), new Vec2D(500, 500));
-//        lines.add(line);
-//        linesPub.publish(lines);
+//        drawables.add(line);
+//        Rect2D rect = new Rect2D(new Vec2D(100, 100), 200, 200);
+//        drawables.add(rect);
+//        drawablePub.publish(drawables);
 
         if(runGameCtrl) {
             App.runModule(new SSLGameCtrlModule(config), GvcModuleFreqs.GAME_CTRL_MODULE_FREQ);
