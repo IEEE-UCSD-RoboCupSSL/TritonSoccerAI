@@ -19,8 +19,10 @@ import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
 import Triton.SoccerObjects;
+import com.google.protobuf.DescriptorProtos;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
+import static Triton.Util.delay;
 
 
 public class AI implements Module {
@@ -61,20 +63,13 @@ public class AI implements Module {
         try {
             while (true) { // delay added
                 GameState currGameState = gameCtrl.getGameState();
-
                 // Decision Trees
                 if (currGameState != prevState) {
                     runNewState(currGameState);
                     prevState = currGameState;
                 }
                 runCurrentState(currGameState);
-
-                try { // avoid starving other threads
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                delay(3);
             }
         } catch (Exception e) {
             e.printStackTrace();

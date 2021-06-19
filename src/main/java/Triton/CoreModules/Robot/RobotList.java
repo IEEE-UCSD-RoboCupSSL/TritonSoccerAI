@@ -62,6 +62,12 @@ public class RobotList<T> extends ArrayList<T> {
         return null;
     }
 
+    public RobotList<T> copy() {
+        RobotList<T> list = new RobotList<>();
+        list.addAll(this);
+        return list;
+    }
+
     public static int getFoeKeeperID() {
         return 5;
     }
