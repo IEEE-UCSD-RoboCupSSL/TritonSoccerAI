@@ -51,7 +51,6 @@ public class AsyncProcedure {
     public void cancel() {
         if(task != null) {
             task.sendCancelSignal(true);
-            /* don't use FutureTask's built-in cancel, or else strange bug occurs */ //futureTask.cancel(false);
         }
     }
 

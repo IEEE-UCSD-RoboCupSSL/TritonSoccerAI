@@ -2,13 +2,9 @@ package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.CoreModules.Robot.Robot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.ejml.All;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -83,26 +79,36 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     @Getter
     @Setter
-    public static class AllyNode extends Node {
-        private final Ally bot;
+    public static class AllyRecepNode extends AllyNode {
         private Vec2D receptionPoint;
         private double angle;
         private Vec2D kickVec;
 
-        public AllyNode(Ally bot) {
-            this.bot = bot;
+        public AllyRecepNode(Ally bot) {
+            super(bot);
+
         }
     }
 
     @Getter
     @Setter
-    public static class AllyHolderNode extends Node {
-        private final Ally bot;
+    public static class AllyPassNode extends AllyNode {
         private Vec2D passPoint;
         private double angle;
         private Vec2D kickVec;
 
-        public AllyHolderNode(Ally bot) {
+        public AllyPassNode(Ally bot) {
+            super(bot);
+
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class AllyNode extends Node{
+        private final Ally bot;
+
+        public AllyNode(Ally bot) {
             this.bot = bot;
         }
     }

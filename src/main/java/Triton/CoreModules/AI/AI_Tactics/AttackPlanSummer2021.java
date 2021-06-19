@@ -18,6 +18,8 @@ import Triton.CoreModules.Robot.RobotList;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import static Triton.Util.delay;
+
 public class AttackPlanSummer2021 extends Tactics {
 
     private static final double SHOOT_THRESHOLD = 0.6;
@@ -75,6 +77,7 @@ public class AttackPlanSummer2021 extends Tactics {
     @Override
     public boolean exec() {
         while(currState != States.Exit) {
+            delay(2);
             switch (currState) {
                 case Start -> {
                     ballHolder = basicEstimator.getBallHolder();
@@ -85,9 +88,9 @@ public class AttackPlanSummer2021 extends Tactics {
                         restFielders.remove((Ally) holder);
                         ArrayList<PUAG.Node> middleNodes = new ArrayList<>();
                         for (Ally bot : restFielders) {
-                            middleNodes.add(new PUAG.AllyNode(bot));
+                            middleNodes.add(new PUAG.AllyRecepNode(bot));
                         }
-                        graph = new PUAG(new PUAG.AllyHolderNode((Ally) ballHolder),
+                        graph = new PUAG(new PUAG.AllyPassNode((Ally) ballHolder),
                                          new PUAG.GoalNode(),
                                          middleNodes);
                         currState = States.Dijkstra;
@@ -103,10 +106,11 @@ public class AttackPlanSummer2021 extends Tactics {
                     } else {
                         decoys = new RobotList<>();
                         attackerNodes = tdksOutput.getMaxProbPath();
-
                         decoys = fielders.copy();
                         for (PUAG.Node attackerNode : attackerNodes) {
-                            decoys.remove(attacker);
+                            if(attackerNode instanceof PUAG.AllyNode) {
+                                decoys.remove(((PUAG.AllyNode) attackerNode).getBot());
+                            }
                         }
                         runDecoyBackGndTasks();
                         if (tdksOutput.getTotalProbabilityProduct() > toPassThreshold) {
@@ -126,30 +130,36 @@ public class AttackPlanSummer2021 extends Tactics {
                 }
                 case ExecutePassPath -> {
 
-                    ArrayList<ReceptionPoint> receptionPoints = tdksOutput.getReceptionPoints();
-                    if(tdksOutput.getMaxProbPath().get(1) instanceof PUAG.GoalNode) {
+                    if(attackerNodes.get(1) instanceof PUAG.GoalNode) {
                         /* Shoot Goal */
                     } else {
-                        /* Pass to Next */
-                        CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
+                        if(attackerNodes.get(0) instanceof PUAG.AllyPassNode
+                                && attackerNodes.get(1) instanceof PUAG.AllyRecepNode) {
 
-                        /* The first reception point is treated as the pass point the passer needs to go to */
-                        CoordinatedPass cp = new CoordinatedPass(attackerNodes.get(0), attackerNodes.get(1),
-                                                                    receptionPoints.get(0), receptionPoints.get(1), ball);
-                        try {
-                            while (passResult == CoordinatedPass.PassShootResult.Executing) {
-                                passResult = cp.execute();
-                                for (int i = 2; i < receptionPoints.size(); i++) {
-                                    ReceptionPoint rp = receptionPoints.get(i);
-                                    attackerNodes.get(i).curveTo(rp.getPoint(), rp.getAngle());
+                            /* Pass to Next */
+                            CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
+                            CoordinatedPass cp = new CoordinatedPass((PUAG.AllyPassNode) attackerNodes.get(0),
+                                    (PUAG.AllyRecepNode) attackerNodes.get(1), ball, basicEstimator);
+                            try {
+                                while (passResult == CoordinatedPass.PassShootResult.Executing) {
+                                    passResult = cp.execute();
+                                    for (int i = 2; i < attackerNodes.size(); i++) {
+                                        if(attackerNodes.get(i) instanceof PUAG.AllyRecepNode) {
+                                            PUAG.AllyRecepNode recepNode = ((PUAG.AllyRecepNode) attackerNodes.get(i));
+                                            recepNode.getBot().curveTo(recepNode.getReceptionPoint(), recepNode.getAngle());
+                                        }
+                                    }
+                                    delay(3);
                                 }
+                            } catch (ExecutionException | InterruptedException e) {
+                                e.printStackTrace();
                             }
-                        } catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        switch (passResult) {
-                            case success -> currState = States.Start;
-                            case fail -> currState = States.Exit;
+                            switch (passResult) {
+                                case success -> currState = States.Start;
+                                case fail -> currState = States.Exit;
+                            }
+                        } else {
+                            System.out.println("\\033[31mError in AttackPlanSummer2021\\033[0m");
                         }
                     }
                 }
@@ -157,6 +167,9 @@ public class AttackPlanSummer2021 extends Tactics {
         }
 
         /* Exit State */
+        for(Ally fielder : fielders) {
+            fielder.cancelProceduralTask();
+        }
         currState = States.Start;
         return false;
     }

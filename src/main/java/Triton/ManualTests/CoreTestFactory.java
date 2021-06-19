@@ -5,10 +5,7 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
-import Triton.ManualTests.AI_SkillsTests.DEPRECATED_CPassTest;
-import Triton.ManualTests.AI_SkillsTests.DodgingTest;
-import Triton.ManualTests.AI_SkillsTests.GroupToTest;
-import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
+import Triton.ManualTests.AI_SkillsTests.*;
 import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
 import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
@@ -51,7 +48,7 @@ public class CoreTestFactory {
         coreTestMap.put("getball", new GetBallTest(fielders.get(3), ball));
         coreTestMap.put("kick", new KickTest(fielders.get(3), ball));
         coreTestMap.put("misc", new MiscTest(fielders.get(3), ball));
-        coreTestMap.put("cpass", new DEPRECATED_CPassTest(fielders, keeper, foes, ball));
+        coreTestMap.put("cpass", new CoordinatedPassTest(fielders, keeper, foes, ball));
         coreTestMap.put("group", new GroupToTest(fielders, ball));
         coreTestMap.put("drib", new DribBallTest(fielders.get(1), ball));
         coreTestMap.put("vel", new VelTest(fielders.get(0)));
@@ -74,7 +71,6 @@ public class CoreTestFactory {
         coreTestMap.put("autocap", new AutoCapTest(fielders.get(3), ball));
         coreTestMap.put("rotateAll", new RotateAllRobots(fielders));
         coreTestMap.put("stopAll", new StopAllRobots(fielders));
-        coreTestMap.put("pqTest", new CustomPriorityQueueTest());
     }
 
     public String[] getAvailableTestNames() {
