@@ -13,7 +13,6 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
@@ -79,78 +78,77 @@ public class AttackPlanSummer2021 extends Tactics {
 
     @Override
     public boolean exec() {
-
-        switch (currState) {
-            case Exit -> {
-                currState = States.Start;
-                return false;
-            }
-            case Start -> {
-                ballHolder = basicEstimator.getBallHolder();
-                if (!(ballHolder instanceof Ally)) {
-                    currState = States.Exit;
-                } else {
-                    RobotList<Ally> restFielders = fielders.copy();
-                    restFielders.remove((Ally)holder);
-                    ArrayList<PUAG.Node> middleNodes = new ArrayList<>();
-                    for(Ally bot : restFielders) {
-                        middleNodes.add(new PUAG.AllyNode(bot));
+        while(currState != States.Exit) {
+            switch (currState) {
+                case Start -> {
+                    ballHolder = basicEstimator.getBallHolder();
+                    if (!(ballHolder instanceof Ally)) {
+                        currState = States.Exit;
+                    } else {
+                        RobotList<Ally> restFielders = fielders.copy();
+                        restFielders.remove((Ally) holder);
+                        ArrayList<PUAG.Node> middleNodes = new ArrayList<>();
+                        for (Ally bot : restFielders) {
+                            middleNodes.add(new PUAG.AllyNode(bot));
+                        }
+                        graph = new PUAG(new PUAG.AllyHolderNode((Ally) ballHolder),
+                                         new PUAG.GoalNode(),
+                                         middleNodes);
+                        currState = States.Dijkstra;
                     }
-                    graph = new PUAG(new PUAG.AllyHolderNode((Ally) ballHolder),
-                                     new PUAG.GoalNode(),
-                                     middleNodes);
-                    currState = States.Dijkstra;
                 }
-            }
-            case Dijkstra -> {
-                tdksOutput = (new TritonDijkstra(graph).compute());
-                currState = States.Preparation;
-            }
-            case Preparation -> {
-                if(!basicEstimator.isAllyHavingTheBall()) {
-                    currState = States.Exit;
-                } else {
-                    attackers = new RobotList<>();
-                    decoys = new RobotList<>();
-                    for (PUAG.Node node : tdksOutput.maxProbPath) {
-                        if (node instanceof PUAG.AllyNode && !(node instanceof PUAG.AllyHolderNode)) {
-                            attackers.add(((PUAG.AllyNode) node).bot);
+                case Dijkstra -> {
+                    tdksOutput = (new TritonDijkstra(graph).compute());
+                    currState = States.Preparation;
+                }
+                case Preparation -> {
+                    if(!basicEstimator.isAllyHavingTheBall()) {
+                        currState = States.Exit;
+                    } else {
+                        attackers = new RobotList<>();
+                        decoys = new RobotList<>();
+                        for (PUAG.Node node : tdksOutput.getMaxProbPath()) {
+                            if (node instanceof PUAG.AllyNode && !(node instanceof PUAG.AllyHolderNode)) {
+                                attackers.add(((PUAG.AllyNode) node).getBot());
+                            }
+                        }
+                        decoys = fielders.copy();
+                        decoys.remove((Ally) holder);
+                        for (Ally attacker : attackers) {
+                            decoys.remove(attacker);
+                        }
+                        runDecoyBackGndTasks();
+                        if (tdksOutput.getTotalProbabilityProduct() > toPassThreshold) {
+                            currState = States.ExecutePassPath;
+                        } else {
+                            currState = States.SDB;
+                            SDB_t0 = System.currentTimeMillis();
                         }
                     }
-                    decoys = fielders.copy();
-                    decoys.remove((Ally) holder);
-                    for (Ally attacker : attackers) {
-                        decoys.remove(attacker);
-                    }
-                    runDecoyBackGndTasks();
-                    if(tdksOutput.TotalProbabilityProduct > toPassThreshold) {
-                        currState = States.ExecutePassPath;
-                    } else {
-                        currState = States.SDB;
-                        SDB_t0 = System.currentTimeMillis();
-                    }
                 }
-            }
-            case SDB -> { // SDB: Standby/Dodging/BackPass
-                if(System.currentTimeMillis() > SDB_delay) {
-                    currState = States.Start;
+                case SDB -> { // SDB: Standby/Dodging/BackPass
+                    if (System.currentTimeMillis() > SDB_delay) {
+                        currState = States.Start;
+                    }
+                    /* Execute SDB */
+                    // To-do
                 }
-                /* Execute SDB */
-                // To-do
-            }
-            case ExecutePassPath -> {
-                PassShootResult result = PassShootResult.fail;
-                /* Execute Pass/Shoot */
-                // To-do
-                // Don't forget to assign passResult
-                switch (result) {
-                    case success -> currState = States.Start;
-                    case fail, goalShot -> currState = States.Exit;
+                case ExecutePassPath -> {
+                    PassShootResult result = PassShootResult.fail;
+                    /* Execute Pass/Shoot */
+                    // To-do
+                    // Don't forget to assign passResult
+                    switch (result) {
+                        case success -> currState = States.Start;
+                        case fail, goalShot -> currState = States.Exit;
+                    }
                 }
             }
         }
 
-        return true;
+        /* Exit State */
+        currState = States.Start;
+        return false;
     }
 
     private void runDecoyBackGndTasks() {

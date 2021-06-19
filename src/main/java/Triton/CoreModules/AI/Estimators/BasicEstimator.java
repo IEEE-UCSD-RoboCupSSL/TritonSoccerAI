@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.Estimators;
 
 
 import Triton.Config.GlobalVariblesAndConstants.GvcAI;
-import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
+import Triton.CoreModules.AI.AI_Skills.DEPRECATED_CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -95,8 +95,8 @@ public class BasicEstimator {
         }
 
         // Use getPassStates() in CoordinatedPass.java to deal with passing situation
-        if (CoordinatedPass.getPassState() != PassState.FAILED
-            && CoordinatedPass.getPassState() != PassState.PENDING) {
+        if (DEPRECATED_CoordinatedPass.getPassState() != PassState.FAILED
+            && DEPRECATED_CoordinatedPass.getPassState() != PassState.PENDING) {
             // during some valid pass states while ball is traveling, no body holds the ball
             rtn = true;
         }
