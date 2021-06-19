@@ -3,11 +3,9 @@ package Triton.ManualTests.VirtualBotTests;
 import Proto.FirmwareAPI;
 import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;
-import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.SoccerObjects;
 
-import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 

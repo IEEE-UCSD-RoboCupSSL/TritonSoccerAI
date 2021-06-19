@@ -55,11 +55,13 @@ public class CoordinatedPass {
             passer.executeProceduralTask(passTask);
         } else {
             if(passer.isProcedureCancelled()) {
+                passer.resetProceduralTask();
                 return PassShootResult.fail;
             }
             if(passer.getProcedureReturnStatus()) {
                 passer.stop();
             } else {
+                passer.resetProceduralTask();
                 return PassShootResult.fail;
             }
             passer.resetProceduralTask();
@@ -69,6 +71,7 @@ public class CoordinatedPass {
             receiver.executeProceduralTask(receiveTask);
         } else {
             if(receiver.isProcedureCancelled()) {
+                receiver.resetProceduralTask();
                 return PassShootResult.fail;
             }
             PassShootResult rtn;

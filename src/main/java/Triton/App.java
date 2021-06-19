@@ -1,27 +1,16 @@
 package Triton;
 
 import Triton.Config.*;
-import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Ally.Ally;
-import Triton.ManualTests.CoreTestRunner;
-import Triton.ManualTests.RobotSkillsTests.PrimitiveMotionTest;
-import Triton.ManualTests.VirtualBotTestRunner;
+import Triton.ManualTests.CoreTests.CoreTestRunner;
+import Triton.ManualTests.CoreTests.RobotSkillsTests.PrimitiveMotionTest;
+import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
-import Triton.Misc.Math.Geometry.Circle2D;
-import Triton.Misc.Math.Geometry.Drawable2D;
-import Triton.Misc.Math.Geometry.Line2D;
-import Triton.Misc.Math.Geometry.Rect2D;
-import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
-import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.PeriphModules.Detection.DetectionModule;
-import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.PaintOption;
-import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.*;
@@ -33,9 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
-import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.initGeo;
-import static Triton.ManualTests.PeriphMiscTestRunner.runPeriphMiscTest;
-import static Triton.PeriphModules.Display.PaintOption.*;
+import static Triton.ManualTests.PeriphMiscTests.PeriphMiscTestRunner.runPeriphMiscTest;
 import static Triton.Util.delay;
 
 
@@ -176,13 +163,13 @@ public class App {
     public static void handleTestMode(Config config, Scanner scanner) {
         boolean toQuit = false;
         do {
-            System.out.println(">> Enter [C] for CoreTest Mode, [P] for PeriphTest Mode, [V] for VirtualBotTest Mode, or [quit] to exit");
+            System.out.println(">> Enter [C] for CoreTest Mode, [P] for PeriphMiscTest Mode, [V] for VirtualBotTest Mode, or [quit] to exit");
             String testMode = scanner.nextLine();
             switch (testMode) {
                 case "quit" -> toQuit = true;
                 /* PeriphTest Mode */
                 case "p", "P" -> {
-                    System.out.println("[PeriphTest Mode]: Testing for PeriphModules or misc staff");
+                    System.out.println("[PeriphMiscTest Mode]: Testing for PeriphMiscModules or misc staff");
                     runPeriphMiscTest(config, scanner);
                 }
                 /* CoreTest Mode */
