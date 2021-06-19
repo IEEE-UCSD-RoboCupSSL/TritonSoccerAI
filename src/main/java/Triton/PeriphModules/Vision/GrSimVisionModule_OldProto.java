@@ -132,6 +132,13 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         // Other
         GvcGeometry.GOAL_CENTER_TEAM = new Vec2D(0, -GvcGeometry.FIELD_LENGTH / 2);
         GvcGeometry.GOAL_CENTER_FOE = new Vec2D(0, GvcGeometry.FIELD_LENGTH / 2);
+        GvcGeometry.PENALTY_STRETCH_WIDTH =
+                GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.y - GvcGeometry.LEFT_FIELD_RIGHT_PENALTY_STRETCH.p1.y;
+        GvcGeometry.PENALTY_STRETCH_LEFT = -GvcGeometry.PENALTY_STRETCH_WIDTH / 2;
+        GvcGeometry.PENALTY_STRETCH_RIGHT = GvcGeometry.PENALTY_STRETCH_WIDTH / 2;
+        GvcGeometry.PENALTY_STRETCH_DEPTH =
+                GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p2.x - GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.x;
+        GvcGeometry.PENALTY_STRETCH_Y = -GvcGeometry.FIELD_LENGTH / 2 + GvcGeometry.PENALTY_STRETCH_DEPTH;
 
         GvcGeometry.IS_GEO_INIT = true;
 
