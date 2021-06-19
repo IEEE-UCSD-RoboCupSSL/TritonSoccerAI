@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @Data
 public class TritonDijkstra {
@@ -33,7 +32,7 @@ public class TritonDijkstra {
     }
 
     public static class Output {
-        public ArrayList<PUAG.Node> maxProbPath;
+        public ArrayList<ProbUag.Node> maxProbPath;
         public double TotalProbabilityProduct = 1.0;
         public ArrayList<ReceptionPoint> receptionPoints;
     }
