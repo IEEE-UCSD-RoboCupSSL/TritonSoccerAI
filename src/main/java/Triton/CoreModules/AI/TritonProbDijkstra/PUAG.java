@@ -4,7 +4,10 @@ import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Robot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import lombok.Data;
+import lombok.Getter;
 import org.ejml.All;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -19,14 +22,14 @@ public class PUAG { //Probability Undirected Acyclic Graph
         this.endNode = endNode;
 
         startNode.addNeighbor(endNode);
-        for(Node node : middleNodes) {
+        for (Node node : middleNodes) {
             startNode.addNeighbor(node);
         }
 
-        for(Node node : middleNodes) {
+        for (Node node : middleNodes) {
             node.addNeighbor(endNode);
-            for(Node nextNode : middleNodes) {
-                if(!nextNode.equals(node)) {
+            for (Node nextNode : middleNodes) {
+                if (!nextNode.equals(node)) {
                     node.addNeighbor(nextNode);
                 }
             }
@@ -51,19 +54,28 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
 
     public abstract static class Node {
-        private List<Node> adjNodes = new LinkedList<>();
+
+        private final List<Node> adjNodes = new ArrayList<>();
+
         public List<Node> getAdjacentNodes() {
             return adjNodes;
         }
+
         public void addNeighbor(Node neighborNode) {
             adjNodes.add(neighborNode);
         }
     }
 
+
     public static class AllyNode extends Node {
-        public Ally bot;
+        private final Ally bot;
+
         public AllyNode(Ally bot) {
             this.bot = bot;
+        }
+
+        public Ally getBot() {
+            return bot;
         }
     }
 
