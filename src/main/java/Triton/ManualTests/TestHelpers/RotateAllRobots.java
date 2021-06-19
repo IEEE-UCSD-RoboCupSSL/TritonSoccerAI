@@ -1,12 +1,13 @@
-package Triton.ManualTests;
+package Triton.ManualTests.TestHelpers;
 
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.ManualTests.TritonTestable;
 
 import java.util.Scanner;
 
-public class RotateAllRobots implements TritonTestable{
+public class RotateAllRobots implements TritonTestable {
     private final RobotList<? extends Ally> allies;
 
     public RotateAllRobots(RobotList<? extends Ally> allies) {

@@ -7,6 +7,8 @@ import Triton.CoreModules.Robot.RobotList;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Scanner;
 
 import static Triton.Util.delay;
@@ -49,7 +51,14 @@ public class FormationTest extends RobotSkillsTest {
         formationName = scanner.nextLine();
 
         try {
+            LocalDateTime in10Secs = LocalDateTime.now().plusSeconds(10);
             while (!Formation.getInstance().moveToFormation(formationName, fielders, keeper)) {
+
+                if (!LocalDateTime.now().isBefore(in10Secs)){
+                    System.out.println("[Error] Moving to formation failed!");
+                    return false;
+                }
+
                 delay(3);
             }
         } catch (Exception e) {

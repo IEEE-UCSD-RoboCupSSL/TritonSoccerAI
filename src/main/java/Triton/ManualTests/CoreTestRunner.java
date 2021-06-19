@@ -55,6 +55,7 @@ public class CoreTestRunner {
                 }
 
                 prevTestName = testName;
+                System.out.printf("[%s] ", testName);
                 System.out.println(result ? "Test Success" : "Test Fail");
             }
         } catch (Exception e) {

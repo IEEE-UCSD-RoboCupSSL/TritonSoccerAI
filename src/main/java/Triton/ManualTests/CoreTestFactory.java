@@ -17,6 +17,8 @@ import Triton.ManualTests.EstimatorTests.PassFinderTest;
 
 import Triton.ManualTests.RobotSkillsTests.*;
 import Triton.ManualTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
+import Triton.ManualTests.TestHelpers.RotateAllRobots;
+import Triton.ManualTests.TestHelpers.StopAllRobots;
 import Triton.SoccerObjects;
 
 import java.util.TreeMap;
