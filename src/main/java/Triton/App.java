@@ -304,5 +304,11 @@ public class App {
         delay(1000);
     }
 
+    public static void enterKeyToContinue(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter any key to continue: ");
+        String s = scanner.nextLine();
+    }
+
 
 }

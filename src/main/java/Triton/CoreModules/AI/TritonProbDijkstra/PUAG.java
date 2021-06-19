@@ -6,6 +6,7 @@ import Triton.CoreModules.Robot.Robot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.ejml.All;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +69,8 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
         private final List<Node> adjNodes = new ArrayList<>();
 
+
+
         public List<Node> getAdjacentNodes() {
             return adjNodes;
         }
@@ -78,26 +81,36 @@ public class PUAG { //Probability Undirected Acyclic Graph
     }
 
 
+    @Getter
+    @Setter
     public static class AllyNode extends Node {
         private final Ally bot;
+        private Vec2D receptionPoint;
+        private double angle;
+        private Vec2D kickVec;
 
         public AllyNode(Ally bot) {
             this.bot = bot;
         }
-
-        public Ally getBot() {
-            return bot;
-        }
     }
 
-    public static class AllyHolderNode extends AllyNode {
+    @Getter
+    @Setter
+    public static class AllyHolderNode extends Node {
+        private final Ally bot;
+        private Vec2D passPoint;
+        private double angle;
+        private Vec2D kickVec;
+
         public AllyHolderNode(Ally bot) {
-            super(bot);
+            this.bot = bot;
         }
     }
 
+    @Getter
+    @Setter
     public static class GoalNode extends Node {
-        Vec2D goalCenter = GvcGeometry.GOAL_CENTER_FOE;
+        private Vec2D goalCenter = GvcGeometry.GOAL_CENTER_FOE;
     }
 
 }
