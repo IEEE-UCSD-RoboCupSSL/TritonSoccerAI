@@ -8,21 +8,21 @@ import lombok.Getter;
 public class ReceptionPoint {
     private final Vec2D receptionPoint;
     private final double angle;
-    private final KickType kickType;
-    private final boolean isDummy;
+    private final Vec2D kickVec;
+    private final boolean isStart;
 
     /**
      * If `isDummy` is true, then all other fields should be ignored as they contain dummy values
      *
      * @param receptionPoint
      * @param angle
-     * @param kickType
-     * @param isDummy
+     * @param kickVec
+     * @param isStart
      */
-    public ReceptionPoint(Vec2D receptionPoint, double angle, KickType kickType, boolean isDummy) {
+    public ReceptionPoint(Vec2D receptionPoint, double angle, Vec2D kickVec, boolean isStart) {
         this.receptionPoint = receptionPoint;
         this.angle = angle;
-        this.kickType = kickType;
-        this.isDummy = isDummy;
+        this.kickVec = kickVec;
+        this.isStart = isStart;
     }
 }
