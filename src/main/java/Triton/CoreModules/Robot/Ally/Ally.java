@@ -314,7 +314,7 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public void keep(Ball ball, Vec2D aimTraj) {
-        Keep.exec(this, ball, aimTraj);
+        Keep.exec(config, this, ball, aimTraj, blueRobotSubs, yellowRobotSubs);
     }
 
     @Override
