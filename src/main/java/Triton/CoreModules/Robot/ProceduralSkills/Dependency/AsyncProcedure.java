@@ -13,7 +13,7 @@ public class AsyncProcedure {
         this.threadPool = threadPool;
     }
 
-    /* execute the task or do nothing if already it has already been running */
+    /* execute the task or do nothing if it has already been running */
     public void execute(Ally thisRobot, ProceduralTask task) {
         if(futureTask == null || futureTask.isDone()) {
             this.task = task;

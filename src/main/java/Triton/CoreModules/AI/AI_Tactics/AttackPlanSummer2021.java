@@ -1,11 +1,13 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
 import Triton.Config.Config;
+import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.Dodging;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
+import Triton.CoreModules.AI.ReceptionPoint;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Ball.Ball;
@@ -15,6 +17,7 @@ import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class AttackPlanSummer2021 extends Tactics {
 
@@ -34,7 +37,7 @@ public class AttackPlanSummer2021 extends Tactics {
     private PUAG graph;
     private Robot ballHolder;
     private RobotList<Ally> restFielders;
-    private RobotList<Ally> attackers; // Note: excluding the ball holder
+    private ArrayList<Ally> attackers; // order matters, so using an arraylist
     private RobotList<Ally> decoys;
     private TritonDijkstra.AttackPathInfo tdksOutput;
     private final double toPassThreshold = 0.5;
@@ -57,12 +60,6 @@ public class AttackPlanSummer2021 extends Tactics {
         this.gapFinder = gapFinder;
         this.passFinder = passFinder;
         this.dodging = new Dodging(fielders, foes, ball, basicEstimator);
-    }
-
-    public static enum PassShootResult {
-        success,
-        fail,
-        goalShot
     }
 
     public static enum States {
@@ -108,12 +105,11 @@ public class AttackPlanSummer2021 extends Tactics {
                         attackers = new RobotList<>();
                         decoys = new RobotList<>();
                         for (PUAG.Node node : tdksOutput.getMaxProbPath()) {
-                            if (node instanceof PUAG.AllyNode && !(node instanceof PUAG.AllyHolderNode)) {
+                            if (node instanceof PUAG.AllyNode) {
                                 attackers.add(((PUAG.AllyNode) node).getBot());
                             }
                         }
                         decoys = fielders.copy();
-                        decoys.remove((Ally) holder);
                         for (Ally attacker : attackers) {
                             decoys.remove(attacker);
                         }
@@ -134,13 +130,30 @@ public class AttackPlanSummer2021 extends Tactics {
                     // To-do
                 }
                 case ExecutePassPath -> {
-                    PassShootResult result = PassShootResult.fail;
-                    /* Execute Pass/Shoot */
-                    // To-do
-                    // Don't forget to assign passResult
-                    switch (result) {
-                        case success -> currState = States.Start;
-                        case fail, goalShot -> currState = States.Exit;
+
+                    ArrayList<ReceptionPoint> receptionPoints = tdksOutput.getReceptionPoints();
+                    if(tdksOutput.getMaxProbPath().get(1) instanceof PUAG.GoalNode) {
+                        /* Shoot Goal */
+                    } else {
+                        /* Pass to Next */
+                        CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
+                        CoordinatedPass cp = new CoordinatedPass(attackers.get(0), attackers.get(1),
+                                                                    receptionPoints.get(1), ball);
+                        try {
+                            while (passResult == CoordinatedPass.PassShootResult.Executing) {
+                                passResult = cp.execute();
+                                for (int i = 2; i < receptionPoints.size(); i++) {
+                                    ReceptionPoint rp = receptionPoints.get(i);
+                                    attackers.get(i).curveTo(rp.getReceptionPoint(), rp.getAngle());
+                                }
+                            }
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        switch (passResult) {
+                            case success -> currState = States.Start;
+                            case fail -> currState = States.Exit;
+                        }
                     }
                 }
             }
