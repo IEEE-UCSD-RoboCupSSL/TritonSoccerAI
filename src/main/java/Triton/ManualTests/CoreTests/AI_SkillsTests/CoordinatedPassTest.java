@@ -43,16 +43,16 @@ public class CoordinatedPassTest extends RobotSkillsTest {
 
         while(!passer.isHoldingBall()) {
             passer.getBall(ball);
-            receiver.curveTo(new Vec2D(1000, 3000));
+            receiver.curveTo(new Vec2D(-1000, 3000));
             delay(1);
         }
         passer.stop();
         receiver.stop();
-        delay(500);
+        // delay(500);
 
 
         Vec2D passPoint = new Vec2D(passer.getPos().add(new Vec2D(-500, -500)));
-        Vec2D receptionPoint = new Vec2D(2000, 3000);
+        Vec2D receptionPoint = new Vec2D(-2000, 3000);
         double passDir = receptionPoint.sub(passPoint).toPlayerAngle();
         double receiveDir = passPoint.sub(receptionPoint).toPlayerAngle();
         Vec2D kickVec = new Vec2D(3, 2);
@@ -96,16 +96,17 @@ public class CoordinatedPassTest extends RobotSkillsTest {
                     System.out.println("Success!");
                     passer.stop();
                     receiver.stop();
+                    delay(2000);
                     return true;
                 }
                 case fail -> {
                     System.out.println("Failed");
                     passer.stop();
                     receiver.stop();
+                    delay(2000);
                     return false;
                 }
             }
         }
-
     }
 }

@@ -20,62 +20,62 @@ public class Formation {
     public static final Map<String, FormationType> preset = Map.of(
             "default", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(-2000.00, -3000),
-                            new Vec2D(-1000.00, -2000),
-                            new Vec2D(0.00, -1000),
-                            new Vec2D(1000.00, -2000),
-                            new Vec2D(2000.00, -3000)
+                            new Vec2D(-2000.00, -3000.00),
+                            new Vec2D(-1000.00, -2000.00),
+                            new Vec2D(0.00, -1000.00),
+                            new Vec2D(1000.00, -2000.00),
+                            new Vec2D(2000.00, -3000.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0))
             ),
 
             "tester", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -3000),
-                            new Vec2D(-1000.00, -3000),
-                            new Vec2D(1000.00, -3000),
-                            new Vec2D(-2000.00, -3000),
-                            new Vec2D(2000.00, -3000)
+                            new Vec2D(0.00, -3000.00),
+                            new Vec2D(-1000.00, -3000.00),
+                            new Vec2D(1000.00, -3000.00),
+                            new Vec2D(-2000.00, -3000.00),
+                            new Vec2D(2000.00, -3000.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0))
             ),
 
-            "out", new FormationType(
-                    new ArrayList<>(Arrays.asList(
-                            new Vec2D(4450.00, -3000),
-                            new Vec2D(4450.00, -2500),
-                            new Vec2D(4450.00, -2000),
-                            new Vec2D(4450.00, -1500),
-                            new Vec2D(4450.00, -1000)
-                    )),
-                    new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0)),
-                    new Vec2D(4450.00, -3500),
-                    0.0
-            ),
+//            "out", new FormationType(
+//                    new ArrayList<>(Arrays.asList(
+//                            new Vec2D(4450.00, -3000),
+//                            new Vec2D(4450.00, -2500),
+//                            new Vec2D(4450.00, -2000),
+//                            new Vec2D(4450.00, -1500),
+//                            new Vec2D(4450.00, -1000)
+//                    )),
+//                    new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0)),
+//                    new Vec2D(4450.00, -3500),
+//                    0.0
+//            ),
 
             "kickoff-offense", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -150),
-                            new Vec2D(600.00, -500),
-                            new Vec2D(1200.00, -100),
-                            new Vec2D(-600.00, -500),
-                            new Vec2D(-1200.00, -100)
+                            new Vec2D(0.00, -150.00),
+                            new Vec2D(600.00, -500.00),
+                            new Vec2D(1200.00, -100.00),
+                            new Vec2D(-600.00, -500.00),
+                            new Vec2D(-1200.00, -100.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
-                    new Vec2D(4450.00, -3500),
+                    new Vec2D(4450.00, -3500.00),
                     0.0
             ),
 
             "kickoff-defense", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -600),
-                            new Vec2D(600.00, -600),
-                            new Vec2D(1200.00, -900),
-                            new Vec2D(-600.00, -600),
-                            new Vec2D(-1200.00, -900)
+                            new Vec2D(0.00, -600.00),
+                            new Vec2D(600.00, -600.00),
+                            new Vec2D(1200.00, -900.00),
+                            new Vec2D(-600.00, -600.00),
+                            new Vec2D(-1200.00, -900.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
-                    new Vec2D(4450.00, -3500),
+                    new Vec2D(4450.00, -3500.00),
                     0.0
             )
     );
@@ -92,9 +92,6 @@ public class Formation {
         return formation;
     }
 
-    public static boolean xxxFormation(/*...*/) {
-        return false;
-    }
 
     public boolean moveToFormation(String str, ArrayList<Ally> bots) {
         return moveToFormation(preset.get(str), bots);

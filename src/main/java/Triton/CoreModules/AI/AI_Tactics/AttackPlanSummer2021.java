@@ -167,9 +167,9 @@ public class AttackPlanSummer2021 extends Tactics {
         }
 
         /* Exit State */
-        for(Ally fielder : fielders) {
-            fielder.cancelProceduralTask();
-        }
+//        for(Ally fielder : fielders) {
+//            fielder.cancelProceduralTask();
+//        }
         currState = States.Start;
         return false;
     }

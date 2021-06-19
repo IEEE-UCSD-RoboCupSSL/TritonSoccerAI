@@ -66,14 +66,14 @@ public class Ally extends Robot implements AllySkills {
     private AsyncProcedure asyncProcedure = null;
     private Config config;
 
-    public Ally(Config config, int id) {
-        super(config.myTeam, id);
+    public Ally(Config config, int ID) {
+        super(config.myTeam, ID);
         this.config = config;
         this.threadPool = App.threadPool;
 
         asyncProcedure = new AsyncProcedure(this.threadPool);
 
-        conn = new RobotConnection(config, id);
+        conn = new RobotConnection(config, ID);
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
@@ -83,23 +83,23 @@ public class Ally extends Robot implements AllySkills {
         }
         ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
 
-        statePub = new FieldPublisher<>("From:Ally", "State " + id, MOVE_TVRV);
-        pointPub = new FieldPublisher<>("From:Ally", "Point " + id, new Vec2D(0, 0));
-        angPub = new FieldPublisher<>("From:Ally", "Ang " + id, 0.0);
-        kickVelPub = new FieldPublisher<>("From:Ally", "KickVel " + id, new Vec2D(0, 0));
-        holdBallPosPub = new FieldPublisher<>("From:Ally", "HoldBallPos " + id, null);
+        statePub = new FieldPublisher<>("From:Ally", "State " + ID, MOVE_TVRV);
+        pointPub = new FieldPublisher<>("From:Ally", "Point " + ID, new Vec2D(0, 0));
+        angPub = new FieldPublisher<>("From:Ally", "Ang " + ID, 0.0);
+        kickVelPub = new FieldPublisher<>("From:Ally", "KickVel " + ID, new Vec2D(0, 0));
+        holdBallPosPub = new FieldPublisher<>("From:Ally", "HoldBallPos " + ID, null);
 
-        stateSub = new FieldSubscriber<>("From:Ally", "State " + id);
-        pointSub = new FieldSubscriber<>("From:Ally", "Point " + id);
-        angSub = new FieldSubscriber<>("From:Ally", "Ang " + id);
-        kickVelSub = new FieldSubscriber<>("From:Ally", "KickVel " + id);
-        holdBallPosSub = new FieldSubscriber<>("From:Ally", "HoldBallPos " + id);
+        stateSub = new FieldSubscriber<>("From:Ally", "State " + ID);
+        pointSub = new FieldSubscriber<>("From:Ally", "Point " + ID);
+        angSub = new FieldSubscriber<>("From:Ally", "Ang " + ID);
+        kickVelSub = new FieldSubscriber<>("From:Ally", "KickVel " + ID);
+        holdBallPosSub = new FieldSubscriber<>("From:Ally", "HoldBallPos " + ID);
 
-        isDribbledSub = new FieldSubscriber<>("From:RobotTCPConnection", "Drib " + id);
+        isDribbledSub = new FieldSubscriber<>("From:RobotTCPConnection", "Drib " + ID);
 
         RemoteAPI.CommandData standbyCmd = createStandbyCmd();
 
-        commandsPub = new FieldPublisher<>("From:Ally", "Commands " + id, standbyCmd);
+        commandsPub = new FieldPublisher<>("From:Ally", "Commands " + ID, standbyCmd);
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
