@@ -97,7 +97,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
     @Getter
     @Setter
     public static class AllyRecepNode extends AllyNode {
-        private Vec2D passPoint;
+        private Vec2D receptionPoint;
         private double angle;
 
         public AllyRecepNode(Ally bot) {
