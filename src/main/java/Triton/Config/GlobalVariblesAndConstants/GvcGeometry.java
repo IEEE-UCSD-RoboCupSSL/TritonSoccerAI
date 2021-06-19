@@ -53,6 +53,13 @@ public class GvcGeometry {
     // Other
     public static Vec2D GOAL_CENTER_TEAM = new Vec2D(0, -FIELD_LENGTH / 2);
     public static Vec2D GOAL_CENTER_FOE = new Vec2D(0, FIELD_LENGTH / 2);
+    public static double PENALTY_STRETCH_WIDTH =
+            LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.y - LEFT_FIELD_RIGHT_PENALTY_STRETCH.p1.y;
+    public static double PENALTY_STRETCH_LEFT = -PENALTY_STRETCH_WIDTH / 2;
+    public static double PENALTY_STRETCH_RIGHT = PENALTY_STRETCH_WIDTH / 2;
+    public static double PENALTY_STRETCH_DEPTH =
+            LEFT_FIELD_LEFT_PENALTY_STRETCH.p2.x - LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.x;
+    public static double PENALTY_STRETCH_Y = -FIELD_LENGTH / 2 + PENALTY_STRETCH_DEPTH;
 
     public static void initGeo() {
         FIELD_LINES.put("TopTouchLine", TOP_TOUCH_LINE);

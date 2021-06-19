@@ -15,6 +15,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     private Node startNode;
     private Node endNode;
+    private Set<Node> nodeSet;
 
     public PUAG(Node startNode, Node endNode, List<Node> middleNodes) {
         // construct graph
@@ -34,6 +35,10 @@ public class PUAG { //Probability Undirected Acyclic Graph
                 }
             }
         }
+
+        nodeSet.add(startNode);
+        nodeSet.add(endNode);
+        nodeSet.addAll(middleNodes);
     }
 
     public Node getStartNode() {
@@ -52,6 +57,12 @@ public class PUAG { //Probability Undirected Acyclic Graph
         this.endNode = endNode;
     }
 
+    public Set<Node> getNodeSet(){
+        return nodeSet;
+    }
+    public int getNumNodes(){
+        return nodeSet.size();
+    }
 
     public abstract static class Node {
 

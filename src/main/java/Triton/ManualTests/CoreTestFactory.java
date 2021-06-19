@@ -12,6 +12,7 @@ import Triton.ManualTests.AI_SkillsTests.ShootGoalTest;
 import Triton.ManualTests.AI_StrategiesTests.BasicPlayTest;
 import Triton.ManualTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.AI_TacticsTests.GapGetBallTest;
+import Triton.ManualTests.DijkstraTest.CustomPriorityQueueTest;
 import Triton.ManualTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.EstimatorTests.PassFinderTest;
 
@@ -73,6 +74,7 @@ public class CoreTestFactory {
         coreTestMap.put("autocap", new AutoCapTest(fielders.get(3), ball));
         coreTestMap.put("rotateAll", new RotateAllRobots(fielders));
         coreTestMap.put("stopAll", new StopAllRobots(fielders));
+        coreTestMap.put("pqTest", new CustomPriorityQueueTest());
     }
 
     public String[] getAvailableTestNames() {
