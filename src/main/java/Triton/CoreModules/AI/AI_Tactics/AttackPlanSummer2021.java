@@ -89,9 +89,9 @@ public class AttackPlanSummer2021 extends Tactics {
                         restFielders.remove((Ally) holder);
                         ArrayList<PUAG.Node> middleNodes = new ArrayList<>();
                         for (Ally bot : restFielders) {
-                            middleNodes.add(new PUAG.AllyNode(bot));
+                            middleNodes.add(new PUAG.AllyRecepNode(bot));
                         }
-                        graph = new PUAG(new PUAG.AllyHolderNode((Ally) ballHolder),
+                        graph = new PUAG(new PUAG.AllyPassNode((Ally) ballHolder),
                                          new PUAG.GoalNode(),
                                          middleNodes);
                         currState = States.Dijkstra;
@@ -108,8 +108,8 @@ public class AttackPlanSummer2021 extends Tactics {
                         attackers = new RobotList<>();
                         decoys = new RobotList<>();
                         for (PUAG.Node node : tdksOutput.getMaxProbPath()) {
-                            if (node instanceof PUAG.AllyNode && !(node instanceof PUAG.AllyHolderNode)) {
-                                attackers.add(((PUAG.AllyNode) node).getBot());
+                            if (node instanceof PUAG.AllyRecepNode ) {
+                                attackers.add(((PUAG.AllyRecepNode) node).getBot());
                             }
                         }
                         decoys = fielders.copy();
