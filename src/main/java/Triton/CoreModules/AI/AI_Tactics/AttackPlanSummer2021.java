@@ -13,7 +13,6 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
-import org.ejml.All;
 
 import java.util.ArrayList;
 
@@ -93,8 +92,8 @@ public class AttackPlanSummer2021 extends Tactics {
                             middleNodes.add(new PUAG.AllyNode(bot));
                         }
                         graph = new PUAG(new PUAG.AllyHolderNode((Ally) ballHolder),
-                                new PUAG.GoalNode(),
-                                middleNodes);
+                                         new PUAG.GoalNode(),
+                                         middleNodes);
                         currState = States.Dijkstra;
                     }
                 }
@@ -103,14 +102,14 @@ public class AttackPlanSummer2021 extends Tactics {
                     currState = States.Preparation;
                 }
                 case Preparation -> {
-                    if (!basicEstimator.isAllyHavingTheBall()) {
+                    if(!basicEstimator.isAllyHavingTheBall()) {
                         currState = States.Exit;
                     } else {
                         attackers = new RobotList<>();
                         decoys = new RobotList<>();
-                        for (PUAG.Node node : tdksOutput.maxProbPath) {
+                        for (PUAG.Node node : tdksOutput.getMaxProbPath()) {
                             if (node instanceof PUAG.AllyNode && !(node instanceof PUAG.AllyHolderNode)) {
-                                attackers.add(((PUAG.AllyNode) node).bot);
+                                attackers.add(((PUAG.AllyNode) node).getBot());
                             }
                         }
                         decoys = fielders.copy();
@@ -119,7 +118,7 @@ public class AttackPlanSummer2021 extends Tactics {
                             decoys.remove(attacker);
                         }
                         runDecoyBackGndTasks();
-                        if (tdksOutput.TotalProbabilityProduct > toPassThreshold) {
+                        if (tdksOutput.getTotalProbabilityProduct() > toPassThreshold) {
                             currState = States.ExecutePassPath;
                         } else {
                             currState = States.SDB;
