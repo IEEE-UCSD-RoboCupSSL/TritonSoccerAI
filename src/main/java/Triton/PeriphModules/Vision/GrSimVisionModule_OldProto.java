@@ -129,6 +129,10 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         GvcGeometry.GOAL_DEPTH = field.getGoalDepth();
         GvcGeometry.FULL_FIELD_LENGTH = GvcGeometry.FIELD_LENGTH + 2 * GvcGeometry.GOAL_DEPTH;
 
+        // Other
+        GvcGeometry.GOAL_CENTER_TEAM = new Vec2D(0, -GvcGeometry.FIELD_LENGTH / 2);
+        GvcGeometry.GOAL_CENTER_FOE = new Vec2D(0, GvcGeometry.FIELD_LENGTH / 2);
+
         GvcGeometry.IS_GEO_INIT = true;
 
 //        printGeoFields();

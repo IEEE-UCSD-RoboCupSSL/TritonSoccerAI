@@ -8,7 +8,7 @@ import java.awt.*;
 /**
  * Represents a 2D circle
  */
-public class Circle2D extends Geometry2D implements Drawable2D{
+public class Circle2D extends Geometry2D implements Drawable2D {
 
     public final Vec2D center;
     public final double radius;

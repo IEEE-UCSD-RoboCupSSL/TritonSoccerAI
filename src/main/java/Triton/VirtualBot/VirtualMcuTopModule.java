@@ -74,11 +74,8 @@ public class VirtualMcuTopModule implements Module {
             e.printStackTrace();
         }
 
-
         App.runModule(new VirtualBotUdpSend(config, id, dataSub), VIRTUAL_MCU_TOP_FREQ);
         App.runModule(new VirtualBotUdpReceive(config, id, cmdPub), VIRTUAL_MCU_TOP_FREQ);
-
-
     }
 
     @Override
@@ -95,8 +92,6 @@ public class VirtualMcuTopModule implements Module {
         }
 
         delay(5000);
-
-
     }
 
 
