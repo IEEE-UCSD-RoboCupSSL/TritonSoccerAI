@@ -1,9 +1,7 @@
 package Triton.ManualTests.VirtualBotTests;
 
-import Proto.FirmwareAPI;
 import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;
-import Triton.ManualTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.SoccerObjects;
@@ -12,8 +10,6 @@ import Triton.VirtualBot.VirtualBotCmds;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
-
-import static Triton.Util.delay;
 
 public class VirtualBotModuleTest implements TritonTestable {
     private final SoccerObjects soccerObjects;
