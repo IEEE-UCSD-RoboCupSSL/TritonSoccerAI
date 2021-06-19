@@ -16,7 +16,7 @@ import java.util.TreeMap;
  * of the test into `TestMaps`.
  *
  * PeriphMisc tests require no input therefore there is only a no-argument constructor for now.
- * If a new test requires some more inputs simply overloadthe constructor.
+ * If a new test requires some more inputs simply overload the constructor.
  *
  */
 public class PeriphMiscTestFactory {

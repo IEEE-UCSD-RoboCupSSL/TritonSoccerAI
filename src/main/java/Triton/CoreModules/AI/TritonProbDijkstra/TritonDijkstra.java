@@ -8,10 +8,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Getter
+@Setter
 public class TritonDijkstra {
     private final PUAG graph;
+    private ProbCompute probComp;
 
-    public TritonDijkstra(PUAG graph) {
+    public TritonDijkstra(PUAG graph, ProbCompute probComp) {
+        this.graph = graph;
+        this.probComp = probComp;
+    }
+
+    public TritonDijkstra(PUAG graph){
         this.graph = graph;
     }
 
@@ -38,7 +45,7 @@ public class TritonDijkstra {
                     return currPath;
                 }
 
-                List<PUAG.Node> adjacentNodes = tailNode.getAdjacentNodes();    // Get reachable neighbors from the tail
+                List<PUAG.Node> adjacentNodes = graph.getAdjacentNodes(tailNode);    // Get reachable neighbors from the tail
 
                 for (PUAG.Node adjacentNode : adjacentNodes) {
 
