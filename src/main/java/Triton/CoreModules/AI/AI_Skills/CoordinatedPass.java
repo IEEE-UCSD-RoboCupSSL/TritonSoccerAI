@@ -13,6 +13,7 @@ public class CoordinatedPass {
     private final Ally passer;
     private final Ally receiver;
     private final ReceptionPoint receptionPoint;
+    private final Vec2D passPoint;
     private final Ball ball;
 
     private FieldPubSubPair<Vec2D> ballPosPubSubPair;
@@ -25,10 +26,11 @@ public class CoordinatedPass {
         Executing
     }
 
-    public CoordinatedPass(Ally holder, Ally receiver, ReceptionPoint receptionPoint, Ball ball) {
+    public CoordinatedPass(Ally holder, Ally receiver, Vec2D passPoint, ReceptionPoint receptionPoint, Ball ball) {
         this.passer = holder;
         this.receiver = receiver;
         this.receptionPoint = receptionPoint;
+        this.passPoint = passPoint;
         this.ball = ball;
         ballPosPubSubPair = new FieldPubSubPair<>("[Pair]DefinedIn:CoordinatedPass", "ballPos", ball.getPos());
         passTask = new PassTask(passer);
@@ -68,7 +70,7 @@ public class CoordinatedPass {
 
     private static class PassTask extends ProceduralTask {
         private final Ally passer;
-        public PassTask(Ally passer) {
+        public PassTask(Ally passer, ) {
             this.passer = passer;
         }
 

@@ -137,14 +137,16 @@ public class AttackPlanSummer2021 extends Tactics {
                     } else {
                         /* Pass to Next */
                         CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
+
+                        /* The first reception point is treated as the pass point the passer needs to go to */
                         CoordinatedPass cp = new CoordinatedPass(attackers.get(0), attackers.get(1),
-                                                                    receptionPoints.get(1), ball);
+                                                                    receptionPoints.get(0), receptionPoints.get(1), ball);
                         try {
                             while (passResult == CoordinatedPass.PassShootResult.Executing) {
                                 passResult = cp.execute();
                                 for (int i = 2; i < receptionPoints.size(); i++) {
                                     ReceptionPoint rp = receptionPoints.get(i);
-                                    attackers.get(i).curveTo(rp.getReceptionPoint(), rp.getAngle());
+                                    attackers.get(i).curveTo(rp.getPoint(), rp.getAngle());
                                 }
                             }
                         } catch (ExecutionException | InterruptedException e) {
