@@ -127,12 +127,12 @@ public class DEPRECATED_AttackPlanA extends Tactics {
     private int launchPassReceive(PassInfo passInfo) {
 
         /*** pass & receive ***/
-        if (CoordinatedPass.getPassState() == PassState.PENDING) {
+        if (DEPRECATED_CoordinatedPass.getPassState() == PassState.PENDING) {
             /* determine which fielders to be the passer & receiver */
             passer = (Ally) holder;
             receiver = passInfo.getOptimalReceiver();
         }
-        PassState passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passInfo);
+        PassState passState = DEPRECATED_CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, passInfo);
         System.out.println(passState);
         switch (passState) {
             case PASSED -> {

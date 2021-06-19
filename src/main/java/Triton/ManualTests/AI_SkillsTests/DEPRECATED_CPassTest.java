@@ -1,7 +1,7 @@
 package Triton.ManualTests.AI_SkillsTests;
 
 import Triton.Config.Config;
-import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
+import Triton.CoreModules.AI.AI_Skills.DEPRECATED_CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.PassFinder;
@@ -14,7 +14,7 @@ import Triton.ManualTests.RobotSkillsTests.RobotSkillsTest;
 
 import java.util.Scanner;
 
-public class CPassTest extends RobotSkillsTest {
+public class DEPRECATED_CPassTest extends RobotSkillsTest {
     Scanner scanner;
     Ally __passer;
     RobotList<Ally> fielders;
@@ -24,7 +24,7 @@ public class CPassTest extends RobotSkillsTest {
     PassFinder passFinder;
     PassInfo info;
 
-    public CPassTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
+    public DEPRECATED_CPassTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
         this.ball = ball;
         this.fielders = fielders;
 
@@ -64,14 +64,14 @@ public class CPassTest extends RobotSkillsTest {
                             continue;
                         }
 
-                        if (CoordinatedPass.getPassState() == PassState.PENDING) {
+                        if (DEPRECATED_CoordinatedPass.getPassState() == PassState.PENDING) {
                             passer = (Ally) basicEstimator.getBallHolder();
                             receiver = info.getOptimalReceiver();
                             // System.out.println(receiver);
                             // passFinder.fixCandidate(receiver.getID()); // lock receiver
                         }
 
-                        passState = CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);
+                        passState = DEPRECATED_CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);
                         System.out.println(passState);
                         switch (passState) {
                             case PASSED -> {
