@@ -1,7 +1,7 @@
 package Triton.ManualTests.DijkstraTest;
 
+import Triton.App;
 import Triton.Config.Config;
-import Triton.CoreModules.AI.ReceptionPoint;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -23,20 +23,25 @@ public class CustomPriorityQueueTest implements TritonTestable {
         path.add(new PUAG.AllyNode(new Ally(config, 1)));
         path.add(new PUAG.AllyNode(new Ally(config, 2)));
 
-        ArrayList<ReceptionPoint> receptionPoints = new ArrayList<>();
-        receptionPoints.add(new ReceptionPoint(null, 0, null, true));
-        receptionPoints.add(new ReceptionPoint(null, 0, null, false));
-        receptionPoints.add(new ReceptionPoint(null, 0, null, false));
-
         attackPathInfo.setMaxProbPath(path);
-        attackPathInfo.setReceptionPoints(receptionPoints);
         attackPathInfo.setTotalProbabilityProduct(0.5);
 
         TritonDijkstra.AttackPathInfo attackPathInfo1 = attackPathInfo.replicatePath();
-        attackPathInfo1.appendAndUpdate(new PUAG.AllyNode(new Ally(config, 3)), null, 0.2);
+        attackPathInfo1.appendAndUpdate(new PUAG.AllyNode(new Ally(config, 3)), 0.2);
+
+        TritonDijkstra.AttackPathInfo attackPathInfo3 = new TritonDijkstra.AttackPathInfo();
+        ArrayList<PUAG.Node> path1 = new ArrayList<>();
+        path1.add(new PUAG.AllyHolderNode(new Ally(config, 0)));
+        path1.add(new PUAG.AllyNode(new Ally(config, 1)));
+        path1.add(new PUAG.AllyNode(new Ally(config, 2)));
+
+        attackPathInfo.setMaxProbPath(path1);
+        attackPathInfo.setTotalProbabilityProduct(0.11);
 
         TritonDijkstra.AttackPathInfo attackPathInfo2 = attackPathInfo.replicatePath();
-        attackPathInfo2.appendAndUpdate(new PUAG.AllyNode(new Ally(config, 4)), null, 0.9);
+        attackPathInfo2.appendAndUpdate(new PUAG.AllyNode(new Ally(config, 4)), 0.9);
+
+
 
         PriorityQueue<TritonDijkstra.AttackPathInfo> attackPathInfos = new PriorityQueue<>();
         attackPathInfos.add(attackPathInfo1);
@@ -53,10 +58,12 @@ public class CustomPriorityQueueTest implements TritonTestable {
         }
 
         if (isSuccess){
-            System.out.println("Test passed");
+            System.out.println("Test PASSED");
         }else{
-            System.out.println("Test failed");
+            System.out.println("Test FAILED");
         }
+
+        App.enterKeyToContinue();
 
         return isSuccess;
     }

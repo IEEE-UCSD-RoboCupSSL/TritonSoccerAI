@@ -7,7 +7,6 @@ import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
-import Triton.CoreModules.AI.ReceptionPoint;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Ball.Ball;
@@ -37,7 +36,7 @@ public class AttackPlanSummer2021 extends Tactics {
     private PUAG graph;
     private Robot ballHolder;
     private RobotList<Ally> restFielders;
-    private ArrayList<Ally> attackers; // order matters, so using an arraylist
+    private ArrayList<PUAG.Node> attackerNodes; // order matters, so using an arraylist
     private RobotList<Ally> decoys;
     private TritonDijkstra.AttackPathInfo tdksOutput;
     private final double toPassThreshold = 0.5;
@@ -102,15 +101,11 @@ public class AttackPlanSummer2021 extends Tactics {
                     if(!basicEstimator.isAllyHavingTheBall()) {
                         currState = States.Exit;
                     } else {
-                        attackers = new RobotList<>();
                         decoys = new RobotList<>();
-                        for (PUAG.Node node : tdksOutput.getMaxProbPath()) {
-                            if (node instanceof PUAG.AllyNode) {
-                                attackers.add(((PUAG.AllyNode) node).getBot());
-                            }
-                        }
+                        attackerNodes = tdksOutput.getMaxProbPath();
+
                         decoys = fielders.copy();
-                        for (Ally attacker : attackers) {
+                        for (PUAG.Node attackerNode : attackerNodes) {
                             decoys.remove(attacker);
                         }
                         runDecoyBackGndTasks();
@@ -139,14 +134,14 @@ public class AttackPlanSummer2021 extends Tactics {
                         CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
 
                         /* The first reception point is treated as the pass point the passer needs to go to */
-                        CoordinatedPass cp = new CoordinatedPass(attackers.get(0), attackers.get(1),
+                        CoordinatedPass cp = new CoordinatedPass(attackerNodes.get(0), attackerNodes.get(1),
                                                                     receptionPoints.get(0), receptionPoints.get(1), ball);
                         try {
                             while (passResult == CoordinatedPass.PassShootResult.Executing) {
                                 passResult = cp.execute();
                                 for (int i = 2; i < receptionPoints.size(); i++) {
                                     ReceptionPoint rp = receptionPoints.get(i);
-                                    attackers.get(i).curveTo(rp.getPoint(), rp.getAngle());
+                                    attackerNodes.get(i).curveTo(rp.getPoint(), rp.getAngle());
                                 }
                             }
                         } catch (ExecutionException | InterruptedException e) {

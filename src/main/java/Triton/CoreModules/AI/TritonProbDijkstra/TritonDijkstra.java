@@ -1,6 +1,5 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
-import Triton.CoreModules.AI.ReceptionPoint;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +22,7 @@ public class TritonDijkstra {
         PUAG.Node startNode = graph.getStartNode();
 
         AttackPathInfo attackPathInfo = new AttackPathInfo();
-        attackPathInfo.appendAndUpdate(startNode, new ReceptionPoint(null, 0, null, true), 1.0);
+        attackPathInfo.appendAndUpdate(startNode, 1.0);
 
         frontier.add(attackPathInfo);
 
@@ -34,9 +33,8 @@ public class TritonDijkstra {
             if (tailNode != null) {
                 if(tailNode.equals(graph.getEndNode())){
                     double prob = 1;    // These fields are to be provided
-                    ReceptionPoint recep = null;
 
-                    currPath.appendAndUpdate(graph.getEndNode(), recep, prob);
+                    currPath.appendAndUpdate(graph.getEndNode(), prob);
                     return currPath;
                 }
 
@@ -49,10 +47,9 @@ public class TritonDijkstra {
                     }
 
                     double prob = 1;    // These fields are to be provided
-                    ReceptionPoint recep = null;
 
                     AttackPathInfo newAttackPath = currPath.replicatePath();
-                    newAttackPath.appendAndUpdate(adjacentNode, recep, prob);
+                    newAttackPath.appendAndUpdate(adjacentNode, prob);
 
                     Optional<AttackPathInfo> first = frontier.stream().filter((a) -> a.equals(newAttackPath)).findFirst();
                     if (first.isPresent()){ // Check if the neighbor was already considered
@@ -82,7 +79,6 @@ public class TritonDijkstra {
     public static class AttackPathInfo implements Comparable<AttackPathInfo> {
         private ArrayList<PUAG.Node> maxProbPath = new ArrayList<>();
         private double totalProbabilityProduct = 1.0;
-        private ArrayList<ReceptionPoint> receptionPoints = new ArrayList<>();
 
         @Override
         public int compareTo(@NotNull TritonDijkstra.AttackPathInfo anotherAttackPathInfo) {
@@ -104,9 +100,8 @@ public class TritonDijkstra {
             return Double.compare(p1Inverse, p2Inverse);
         }
 
-        public void appendAndUpdate(PUAG.Node node, ReceptionPoint receptionPoint, Double prob) {
+        public void appendAndUpdate(PUAG.Node node, Double prob) {
             maxProbPath.add(node);
-            receptionPoints.add(receptionPoint);
             totalProbabilityProduct *= prob;
         }
 
@@ -123,7 +118,6 @@ public class TritonDijkstra {
         public AttackPathInfo replicatePath() {
             AttackPathInfo attackPathInfo = new AttackPathInfo();
             attackPathInfo.getMaxProbPath().addAll(this.maxProbPath);
-            attackPathInfo.getReceptionPoints().addAll(this.receptionPoints);
             attackPathInfo.setTotalProbabilityProduct(this.totalProbabilityProduct);
 
             return attackPathInfo;

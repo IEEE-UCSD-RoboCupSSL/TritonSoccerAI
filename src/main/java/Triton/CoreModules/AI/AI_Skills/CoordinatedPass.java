@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.AI_Skills;
 
-import Triton.CoreModules.AI.ReceptionPoint;
+import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
@@ -12,8 +12,8 @@ import java.util.concurrent.ExecutionException;
 public class CoordinatedPass {
     private final Ally passer;
     private final Ally receiver;
-    private final ReceptionPoint receptionPoint;
-    private final Vec2D passPoint;
+    private final PUAG.AllyNode receptionPoint;
+    private final PUAG.AllyHolderNode passPoint;
     private final Ball ball;
 
     private FieldPubSubPair<Vec2D> ballPosPubSubPair;
@@ -26,9 +26,9 @@ public class CoordinatedPass {
         Executing
     }
 
-    public CoordinatedPass(Ally holder, Ally receiver, Vec2D passPoint, ReceptionPoint receptionPoint, Ball ball) {
-        this.passer = holder;
-        this.receiver = receiver;
+    public CoordinatedPass(PUAG.AllyHolderNode passerNode, PUAG.AllyNode receiverNode, Ball ball) {
+        this.passer = passerNode.getBot();
+        this.receiver = receiverNode.getBot();
         this.receptionPoint = receptionPoint;
         this.passPoint = passPoint;
         this.ball = ball;
