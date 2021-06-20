@@ -84,12 +84,25 @@ public class PUAG { //Probability Undirected Acyclic Graph
         boolean isNode2NeighborOfNode1 = getAdjacentNodes(node1).contains(node2);
         boolean isNode1NeighborOfNode2 = getAdjacentNodes(node2).contains(node1);
 
+        boolean areNeighbors = isNode1NeighborOfNode2 && isNode2NeighborOfNode1;
+
         assert isNode1NeighborOfNode2 == isNode2NeighborOfNode1;
 
-        if(isNode1NeighborOfNode2) {
-            return adjMatrix[getIndexOfNode(node1)][getIndexOfNode(node2)];
-        } else {
-            throw new NoSuchEdgeException(node1, node2);
+        int indexOfNode1 = getIndexOfNode(node1);
+        int indexOfNode2 = getIndexOfNode(node2);
+
+        if(indexOfNode1 < indexOfNode2) {
+            if (areNeighbors) {
+                return adjMatrix[indexOfNode1][indexOfNode2];
+            } else {
+                throw new NoSuchEdgeException(node1, node2);
+            }
+        }else{
+            if (areNeighbors) {
+                return adjMatrix[indexOfNode2][indexOfNode1];
+            } else {
+                throw new NoSuchEdgeException(node2, node1);
+            }
         }
     }
 
