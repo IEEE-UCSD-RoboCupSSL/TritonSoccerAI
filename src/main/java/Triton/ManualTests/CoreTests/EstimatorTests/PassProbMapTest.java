@@ -1,6 +1,8 @@
 package Triton.ManualTests.CoreTests.EstimatorTests;
 
+import Triton.App;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -9,9 +11,12 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
 import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.PaintOption;
+import Triton.Util;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static Triton.PeriphModules.Display.PaintOption.*;
 import static Triton.PeriphModules.Display.PaintOption.PROBABILITY;
@@ -34,6 +39,11 @@ public class PassProbMapTest implements TritonTestable {
         paintOptions.add(PROBABILITY);
         display.setPaintOptions(paintOptions);
         display.setProbFinder(passProbMap);
+
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
 
         while(true) {
             Scanner scanner = new Scanner(System.in);

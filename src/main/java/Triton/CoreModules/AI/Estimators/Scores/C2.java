@@ -3,7 +3,10 @@ package Triton.CoreModules.AI.Estimators.Scores;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 /**
  * c2 : No opponent intercepts the pass.
@@ -11,9 +14,17 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 public class C2 extends Score {
 
     private static final int C2_INTERVAL = 5;
+    private final boolean fast;
 
-    public C2(ProbMapModule finder) {
+    public C2(ProbMapModule finder, boolean fast) {
         super(finder);
+        this.fast = fast;
+    }
+
+    public C2(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps, boolean fast) {
+        super(ballPos, fielderSnaps, foeSnaps);
+        this.fast = fast;
     }
 
     @Override
@@ -34,7 +45,7 @@ public class C2 extends Score {
                     foeTime = 0;
                     continue;
                 }
-                double ETA = calcETA(foeSnap, interceptPos);
+                double ETA = calcETA(foeSnap, interceptPos, fast);
                 foeTime = Math.min(ETA, foeTime);
             }
             c2 = Math.min(foeTime - ballTime, c2);

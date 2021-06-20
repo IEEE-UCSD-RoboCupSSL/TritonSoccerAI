@@ -15,6 +15,9 @@ public abstract class Score {
     protected static final double ROBOT_PADDING = 200.0;
     protected static final double FRONT_PADDING = 100.0;
 
+    private final double ROTATE_SPEED = 120.0;
+    private final double FORWARD_SPEED = 1000.0;
+
     protected Vec2D ballPos;
     protected ArrayList<RobotSnapshot> fielderSnaps, foeSnaps;
     protected double[] passMaxPair; // max distance and time ball travelled with vel
@@ -49,12 +52,18 @@ public abstract class Score {
      * Shortcut for calculating the estimated time from a robot to a destination
      * @param snap robot info
      * @param dest destination location
+     * @param fast whether simplify to a linear model
      * @return the estimated time, assuming zero final speed
      */
-    protected double calcETA(RobotSnapshot snap, Vec2D dest) {
-        return RobotMovement.calcETA(snap.getDir(), snap.getVel(), dest, snap.getPos());
+    protected double calcETA(RobotSnapshot snap, Vec2D dest, boolean fast) {
+        if (fast) {
+            Vec2D path = snap.getPos().sub(dest);
+            return path.mag() / FORWARD_SPEED +
+                    angDiff(snap.getDir(), path.toPlayerAngle()) / ROTATE_SPEED;
+        } else {
+            return RobotMovement.calcETA(snap.getDir(), snap.getVel(), dest, snap.getPos());
+        }
     }
-
 
     /**
      * Shortcut for checking whether an angle is in a range
