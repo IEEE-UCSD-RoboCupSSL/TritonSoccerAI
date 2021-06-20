@@ -2,15 +2,13 @@ package Triton.PeriphModules.Display;
 
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcDisplay;
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Drawable2D;
-import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.BallData;
@@ -36,7 +34,7 @@ public class Display extends JPanel implements Runnable {
     private final FieldPubSubPair<ArrayList<Drawable2D>> drawablesPubSub;
     private final JFrame frame;
     protected Gridify convert;
-    ProbFinder probFinder;
+    ProbMapModule probMapModule;
     private ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
@@ -207,15 +205,15 @@ public class Display extends JPanel implements Runnable {
         }
     }
 
-    public void setProbFinder(ProbFinder probFinder) {
-        this.probFinder = probFinder;
+    public void setProbFinder(ProbMapModule probMapModule) {
+        this.probMapModule = probMapModule;
     }
 
     private void paintProbFinder(Graphics2D g2d) {
-        if (probFinder == null)
+        if (probMapModule == null)
             return;
 
-        double[][] pmf = probFinder.getPMF();
+        double[][] pmf = probMapModule.getPMF();
         if(pmf == null) return;
 
         for (int x = 0; x < windowWidth; x++) {
@@ -228,7 +226,7 @@ public class Display extends JPanel implements Runnable {
                 clampedY = Math.min(clampedY, FIELD_LENGTH / 2);
                 Vec2D clampedWorldPos = new Vec2D(clampedX, clampedY);
 
-                double prob = probFinder.getProb(pmf, clampedWorldPos);
+                double prob = probMapModule.getProb(pmf, clampedWorldPos);
 
                 prob *= 0.8; // to prevent completely white out
 
@@ -238,7 +236,7 @@ public class Display extends JPanel implements Runnable {
         }
 
 
-        ArrayList<Vec2D> topMaxPos = probFinder.getTopNMaxPosWithClearance(4, 600);
+        ArrayList<Vec2D> topMaxPos = probMapModule.getTopNMaxPosWithClearance(4, 600);
 
         // System.out.println(topMaxPos);
 

@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Estimators.Scores;
 
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
@@ -13,7 +13,7 @@ public class C4 extends Score {
     private static final double C4_MIN_DIST = 2500.0;
     private static final double C4_DEV = 500.0;
 
-    public C4(ProbFinder finder) {
+    public C4(ProbMapModule finder) {
         super(finder);
     }
 

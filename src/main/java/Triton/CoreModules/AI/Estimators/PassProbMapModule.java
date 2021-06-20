@@ -11,7 +11,7 @@ import Triton.SoccerObjects;
 
 import java.util.HashMap;
 
-public class PassFinder extends GapFinder {
+public class PassProbMapModule extends ProbMapModule {
 
     private static final double C1_WEIGHT = 1.0;
     private static final double C2_WEIGHT = 1.0;
@@ -29,21 +29,21 @@ public class PassFinder extends GapFinder {
     protected RWLockee<double[][]> gWrapper = new RWLockee<>(null);
     protected RWLockee<int[][]> rWrapper = new RWLockee<>(null);
 
-    public PassFinder(SoccerObjects soccerObjects) {
+    public PassProbMapModule(SoccerObjects soccerObjects) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
     }
 
-    public PassFinder(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
+    public PassProbMapModule(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball, resolutionStepSize, evalWindowSize);
     }
 
-    public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
+    public PassProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 400, 20);
     }
 
 
-    public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
-                      int resolutionStepSize, int evalWindowSize) {
+    public PassProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
+                             int resolutionStepSize, int evalWindowSize) {
         super(fielders, foes, ball, resolutionStepSize, evalWindowSize);
     }
 
