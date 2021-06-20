@@ -7,6 +7,7 @@ import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
+import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
@@ -44,14 +45,11 @@ public class AttackPlanSummer2021 extends Tactics {
     private ArrayList<PUAG.Node> attackerNodes; // order matters, so using an arraylist
     private RobotList<Ally> decoys;
     private TritonDijkstra.AttackPathInfo tdksOutput;
+    private DijkCompute dijkCompute;
     private final double toPassThreshold = 0.5;
 
     private long SDB_t0;
     private long SDB_delay = 1000; // ms
-
-
-
-
 
     public AttackPlanSummer2021(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
                                 Ball ball, AttackSupportMapModule atkSupportMap, PassProbMapModule passProbMap, Config config) {
@@ -66,7 +64,7 @@ public class AttackPlanSummer2021 extends Tactics {
         this.dodging = new Dodging(fielders, foes, ball, basicEstimator);
     }
 
-    public static enum States {
+    public enum States {
         Start, // Construct PGUG
         Dijkstra, // Run Dijkstra
         Preparation, // Grouping ally bots & run background task
@@ -76,6 +74,10 @@ public class AttackPlanSummer2021 extends Tactics {
     }
 
     private States currState = States.Dijkstra;
+
+    public void setDijkCompute(DijkCompute dijkCompute){
+        this.dijkCompute = dijkCompute;
+    }
 
     @Override
     public boolean exec() {
@@ -100,7 +102,7 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case Dijkstra -> {
-                    tdksOutput = (new TritonDijkstra(graph, fielders, foes, ball).compute());   // Not finished with injection
+                    tdksOutput = (new TritonDijkstra(graph, dijkCompute, fielders, foes, ball).compute());
                     currState = States.Preparation;
                 }
                 case Preparation -> {

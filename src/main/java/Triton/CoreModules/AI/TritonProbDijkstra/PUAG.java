@@ -196,9 +196,6 @@ public class PUAG { //Probability Undirected Acyclic Graph
     @Setter
     @ToString
     public static class Edge {
-        private Vec2D passPoint;
-        private double angle;
-        private Vec2D kickVec;
         private double prob;
     }
 
