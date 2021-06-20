@@ -5,6 +5,8 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -81,21 +83,33 @@ public class PUAG { //Probability Undirected Acyclic Graph
         return true;
     }
 
+    @Getter
     public abstract static class Node {
+        @Nullable private final Ally bot;
+
+        public Node(@Nullable Ally bot) {
+            this.bot = bot;
+        }
+
+        public String getNodeBotIdString(){
+            if (bot == null){
+                return "Goal";
+            }
+
+            return Integer.toString(bot.getID());
+        }
     }
 
-    @Getter
-    @Setter
     public static class AllyNode extends Node {
-        private final Ally bot;
 
         public AllyNode(Ally bot) {
-            this.bot = bot;
+            super(bot);
         }
     }
 
     @Getter
     @Setter
+    @ToString
     public static class AllyRecepNode extends AllyNode {
         private Vec2D receptionPoint;
         private double angle;
@@ -107,6 +121,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     @Getter
     @Setter
+    @ToString
     public static class AllyPassNode extends AllyNode {
         private Vec2D passPoint;
         private double angle;
@@ -119,12 +134,18 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     @Getter
     @Setter
+    @ToString
     public static class GoalNode extends Node {
         private Vec2D goalCenter = GvcGeometry.GOAL_CENTER_FOE;
+
+        public GoalNode() {
+            super(null);
+        }
     }
 
     @Getter
     @Setter
+    @ToString
     public static class Edge {
         private Vec2D passPoint;
         private double angle;

@@ -1,4 +1,4 @@
-package Triton.ManualTests.PeriphMiscTests;
+package Triton.ManualTests.PeriphMiscTests.PeriphTests;
 
 import Triton.Config.Config;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall;

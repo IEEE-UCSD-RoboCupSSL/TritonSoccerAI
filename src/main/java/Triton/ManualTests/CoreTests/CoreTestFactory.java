@@ -9,10 +9,10 @@ import Triton.ManualTests.CoreTests.AI_SkillsTests.CoordinatedPassTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.CoreTests.AI_StrategiesTests.DEPRECATED_BasicPlayTest;
 import Triton.ManualTests.CoreTests.AI_StrategiesTests.Summer2021PlayTest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.GapGetBallTest;
+import Triton.ManualTests.CoreTests.DijkstraTest.DijkstraTest;
 import Triton.ManualTests.CoreTests.EstimatorTests.GapFinderTest;
 import Triton.ManualTests.CoreTests.EstimatorTests.PassFinderTest;
 
@@ -75,6 +75,7 @@ public class CoreTestFactory {
         coreTestMap.put("autocap", new AutoCapTest(fielders.get(3), ball));
         coreTestMap.put("rotateAll", new RotateAllRobots(fielders));
         coreTestMap.put("stopAll", new StopAllRobots(fielders));
+        coreTestMap.put("dijkstra-test", new DijkstraTest(soccerObjects));
     }
 
     public String[] getAvailableTestNames() {
