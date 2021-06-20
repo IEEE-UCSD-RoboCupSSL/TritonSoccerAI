@@ -24,9 +24,14 @@ public abstract class Score {
      * Init score calculator with necessary ball and robot info
      */
     public Score(ProbMapModule finder) {
-        ballPos = finder.ballPosWrapper.get();
-        fielderSnaps = finder.fielderSnaps;
-        foeSnaps = finder.foeSnaps;
+        this(finder.ballPosWrapper.get(), finder.fielderSnaps, finder.foeSnaps);
+    }
+
+    public Score(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+                 ArrayList<RobotSnapshot> foeSnaps) {
+        this.ballPos = ballPos;
+        this.fielderSnaps = fielderSnaps;
+        this.foeSnaps = foeSnaps;
 
         passMaxPair  = BallMovement.calcMaxDist(PASS_VEL);
         shootMaxPair = BallMovement.calcMaxDist(SHOOT_VEL);
