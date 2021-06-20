@@ -5,7 +5,6 @@ import Triton.App;
 import Triton.Config.Config;
 import Triton.ManualTests.PeriphMiscTests.MiscTests.ConstraintMappingMathTests;
 import Triton.ManualTests.PeriphMiscTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.PeriphMiscTests.MiscTests.MultimapTest;
 import Triton.ManualTests.PeriphMiscTests.MiscTests.PubSubTests;
 import Triton.ManualTests.PeriphMiscTests.PeriphTests.CustomPriorityQueueTest;
 import Triton.ManualTests.PeriphMiscTests.PeriphTests.GrSimVisionModuleTest_OldProto;
@@ -34,7 +33,6 @@ public class PeriphMiscTestFactory {
         periphMiscTestMap.put("SSL", new SSLGameCtrlModuleTest());
         periphMiscTestMap.put("vbotmath", new ConstraintMappingMathTests());
         periphMiscTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
-        periphMiscTestMap.put("hash-based-table-test", new MultimapTest());
     }
 
     public String[] getAvailableTestNames() {

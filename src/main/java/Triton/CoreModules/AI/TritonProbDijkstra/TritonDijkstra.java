@@ -4,6 +4,10 @@ import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
+import Triton.CoreModules.Robot.RobotSnapshot;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.RWLockee;
+import Triton.SoccerObjects;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,6 +30,11 @@ import java.util.*;
 public class TritonDijkstra {
     private final PUAG graph;
     private DijkCompute dijkComp;
+    SoccerObjects soccerObjects;
+
+    private RWLockee<Vec2D> ballPosWrapper;
+    private ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
+    private ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();
 
     /**
      * The preferred constructor. If the `TritonDijkstra` object is built using this constructor
@@ -38,9 +47,10 @@ public class TritonDijkstra {
      * @throws InvalidDijkstraGraphException The graph must have an end node and an start node
      *                                       * in the context of our program.
      */
-    public TritonDijkstra(PUAG graph, DijkCompute dijkComp) throws InvalidDijkstraGraphException {
+    public TritonDijkstra(PUAG graph, DijkCompute dijkComp, SoccerObjects soccerObjects) throws InvalidDijkstraGraphException {
         this.graph = graph;
         this.dijkComp = dijkComp;
+        this.soccerObjects = soccerObjects;
 
         if (graph.getEndNode() == null || graph.getStartNode() == null) {
             throw new InvalidDijkstraGraphException();
@@ -148,6 +158,7 @@ public class TritonDijkstra {
 
                     AttackPathInfo newAttackPath = currPath.replicatePath();
 //                    System.out.println("[compute7.1] Replicating path");
+
 
                     double prob = dijkComp.computeProb(tailNode, adjacentNode);
                     newAttackPath.appendAndUpdate(adjacentNode, prob);
