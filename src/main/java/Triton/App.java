@@ -183,6 +183,7 @@ public class App {
                     moduleFutures.addAll(soccerObjects.runModules());
                     delay(500);
 
+
                     System.out.println("[CoreTest Mode]: Running TestRunner for testing CoreModules");
                     CoreTestRunner.runCoreTest(config, soccerObjects, scanner);
                 }
