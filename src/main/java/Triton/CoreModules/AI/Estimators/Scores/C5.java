@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Estimators.Scores;
 
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -18,7 +18,7 @@ public class C5 extends Score {
     private final Rect2D allyPenaltyRegion;
     private final Rect2D foePenaltyRegion;
 
-    public C5(ProbFinder finder, Rect2D allyPenaltyRegion, Rect2D foePenaltyRegion) {
+    public C5(ProbMapModule finder, Rect2D allyPenaltyRegion, Rect2D foePenaltyRegion) {
         super(finder);
         this.allyPenaltyRegion = allyPenaltyRegion;
         this.foePenaltyRegion  = foePenaltyRegion;

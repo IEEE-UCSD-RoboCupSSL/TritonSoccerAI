@@ -2,12 +2,7 @@ package Triton.ManualTests.CoreTests.AI_SkillsTests;
 
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
-import Triton.CoreModules.AI.AI_Skills.DEPRECATED_CoordinatedPass;
-import Triton.CoreModules.AI.AI_Skills.PassState;
-import Triton.CoreModules.AI.AI_Tactics.AttackPlanSummer2021;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.PassFinder;
-import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;

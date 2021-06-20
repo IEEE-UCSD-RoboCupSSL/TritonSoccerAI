@@ -23,7 +23,7 @@ public abstract class Score {
     /**
      * Init score calculator with necessary ball and robot info
      */
-    public Score(ProbFinder finder) {
+    public Score(ProbMapModule finder) {
         ballPos = finder.ballPosWrapper.get();
         fielderSnaps = finder.fielderSnaps;
         foeSnaps = finder.foeSnaps;

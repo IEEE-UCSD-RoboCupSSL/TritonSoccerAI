@@ -93,9 +93,6 @@ public class CoordinatedPass {
         passer.resetProceduralTask();
     }
 
-
-
-
     private static class PassTask extends ProceduralTask {
         private final Ally passer;
         private final PUAG.AllyPassNode passNode;
@@ -154,8 +151,5 @@ public class CoordinatedPass {
         }
 
     }
-
-
-
 
 }

@@ -3,7 +3,7 @@ package Triton.ManualTests.CoreTests.AI_TacticsTests;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.GapFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -38,7 +38,7 @@ public class GapGetBallTest implements TritonTestable {
     public boolean test(Config config) {
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         fillGapGetBall = new FillGapGetBall(fielders, keeper, foes, ball,
-                new GapFinder(fielders, foes, ball), config);
+                new AttackSupportMapModule(fielders, foes, ball), config);
 
 
         Display display = new Display(config);
@@ -49,7 +49,7 @@ public class GapGetBallTest implements TritonTestable {
         paintOptions.add(PROBABILITY);
         display.setPaintOptions(paintOptions);
 
-        display.setProbFinder(fillGapGetBall.getGapFinder());
+        display.setProbFinder(fillGapGetBall.getatkSupportMap());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
