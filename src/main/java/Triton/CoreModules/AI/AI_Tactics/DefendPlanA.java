@@ -69,14 +69,16 @@ public class DefendPlanA extends Tactics {
 
             /* Delegate some of fielders to Hug-Guard Attacking Foes */
             ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
+            ArrayList<Double> attackingFoeAng = new ArrayList<>();
             for (Foe foe : attackingFoes) {
                 Vec2D foePos = foe.getPos();
-                Vec2D goalPos = new Vec2D(0, -4500);
-                Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
-                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
+                Vec2D ballPos = ball.getPos();
+                Vec2D foeToBallVec = ballPos.sub(foePos).normalized();
+                attackingFoeAng.add(foeToBallVec.toPlayerAngle());
+                attackingFoePos.add(foe.getPos().add(foeToBallVec.scale(foeBlockOffset)));
             }
 
-            new Swarm(guardFoeFielders, config).groupTo(attackingFoePos, ball.getPos());
+            new Swarm(guardFoeFielders, config).groupTo(attackingFoePos, attackingFoeAng, ball.getPos());
 
             /* Delegate the rest of fielders to lineup in the midpoint of foe shoot line*/
             Robot holder = basicEstimator.getBallHolder();
@@ -103,17 +105,20 @@ public class DefendPlanA extends Tactics {
             return true;
         } else {
             ArrayList<Vec2D> attackingFoePos = new ArrayList<>();
+            ArrayList<Double> attackingFoeAng = new ArrayList<>();
+
             for (Foe foe : foes) {
                 if (foe.getID() == RobotList.getFoeKeeperID())
                     continue;
 
                 Vec2D foePos = foe.getPos();
-                Vec2D goalPos = new Vec2D(0, -4500);
-                Vec2D foeToGoalVec = goalPos.sub(foePos).normalized();
-                attackingFoePos.add(foe.getPos().add(foeToGoalVec.scale(foeBlockOffset)));
+                Vec2D ballPos = ball.getPos();
+                Vec2D foeToBallVec = ballPos.sub(foePos).normalized();
+                attackingFoeAng.add(foeToBallVec.toPlayerAngle());
+                attackingFoePos.add(foe.getPos().add(foeToBallVec.scale(foeBlockOffset)));
             }
 
-            new Swarm(fielders, config).groupTo(attackingFoePos, ball.getPos());
+            new Swarm(fielders, config).groupTo(attackingFoePos, attackingFoeAng, ball.getPos());
             return true;
         }
     }

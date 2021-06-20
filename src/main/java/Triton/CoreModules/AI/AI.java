@@ -6,8 +6,8 @@ import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.GapFinder;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -19,7 +19,6 @@ import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
 import Triton.SoccerObjects;
-import com.google.protobuf.DescriptorProtos;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
 import static Triton.Util.delay;
@@ -36,8 +35,8 @@ public class AI implements Module {
     private final Strategies strategyToPlay;
     private final GameCtrlModule gameCtrl;
 
-    private final GapFinder gapFinder;
-    private final PassFinder passFinder;
+    private final AttackSupportMapModule atkSupportMap;
+    private final PassProbMapModule passProbMap;
 
     private GameState prevState;
 
@@ -53,9 +52,9 @@ public class AI implements Module {
         }
         this.config = config;
         this.gameCtrl = gameCtrl;
-        gapFinder = new GapFinder(soccerObjects);
-        passFinder = new PassFinder(soccerObjects);
-        strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, gapFinder, passFinder);
+        atkSupportMap = new AttackSupportMapModule(soccerObjects);
+        passProbMap = new PassProbMapModule(soccerObjects);
+        strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, atkSupportMap, passProbMap);
     }
 
     @Override

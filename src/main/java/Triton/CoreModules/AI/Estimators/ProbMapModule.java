@@ -1,11 +1,13 @@
 package Triton.CoreModules.AI.Estimators;
 
+import Triton.App;
 import Triton.CoreModules.Ball.Ball;
-import Triton.CoreModules.Robot.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
+import Triton.CoreModules.Robot.Robot;
+import Triton.CoreModules.Robot.RobotList;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Coordinates.Gridify;
-import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.RWLockee;
@@ -15,10 +17,16 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
-import static Triton.Misc.Math.Coordinates.PerspectiveConverter.normAng;
 
-public class GapFinder extends ProbFinder {
+public abstract class ProbMapModule {
+    protected abstract void calcProb();
+
+    protected RWLockee<Vec2D> ballPosWrapper;
+    protected ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
+    protected ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();
+
     protected final RobotList<Ally> fielders;
     protected final RobotList<Foe> foes;
     protected final Ball ball;
@@ -34,28 +42,28 @@ public class GapFinder extends ProbFinder {
 
     protected Rect2D allyPenaltyRegion, foePenaltyRegion;
 
-    protected double responseRange = 1000.0;
-    protected double interceptRange = 500.0;
 
     protected RWLockee<double[][]> pmfWrapper = new RWLockee<>(null);
     protected RWLockee<Vec2D[][]> localMaxPosWrapper = new RWLockee<>(null);
     protected RWLockee<double[][]> localMaxScoreWrapper = new RWLockee<>(null);
 
-    public GapFinder(SoccerObjects soccerObjects) {
+
+
+    public ProbMapModule(SoccerObjects soccerObjects) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
     }
 
-    public GapFinder(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
+    public ProbMapModule(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball, resolutionStepSize, evalWindowSize);
     }
 
-    public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
+    public ProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
         this(fielders, foes, ball, 100, 10);
     }
 
 
-    public GapFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
-                     int resolutionStepSize, int evalWindowSize) {
+    public ProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
+                        int resolutionStepSize, int evalWindowSize) {
         this.foes = foes;
         this.ball = ball;
         this.fielders = fielders;
@@ -117,6 +125,22 @@ public class GapFinder extends ProbFinder {
         }
     }
 
+
+    public void run() {
+        App.threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    calcProb();
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
 
     public ArrayList<Vec2D> getTopNMaxPosWithClearance(int n, double interAllyClearance) {
         ArrayList<Vec2D> potentialMaxPos = getTopNMaxPos(n * 3);
@@ -217,100 +241,104 @@ public class GapFinder extends ProbFinder {
         ballPosWrapper.set(ball.getPos());
     }
 
-
-    /**
-     * Calculate the pmf of optimal gap region for passing and attacking,
-     * the pmf are indexed by gridIdx instead of coordinates
-     */
-    @Override
-    protected void calcProb() {
-        // long t0 = System.currentTimeMillis();
-        Vec2D ballPos = ballPosWrapper.get();
-
-        double[][] pmf = new double[width][height];
-        Vec2D[][] localMaxPos = new Vec2D[evalWidth][evalHeight];
-        double[][] localMax = new double[evalWidth][evalHeight]; // all-zero by default
-        double[][] localMaxScore = new double[evalWidth][evalHeight]; // all-zero by default
-
-        for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
-            for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
-                Vec2D pos = grid.fromInd(gridX, gridY);
-                double prob = 1.0;
-
-                /* mask forbidden and unlikely regions */
-                // Penalty Region
-                if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos)) {
-                    pmf[gridX][gridY] = 0.0;
-                    continue;
-                }
-
-                /* away from foe bots */
-                double minDist = Double.MAX_VALUE;
-                for (RobotSnapshot foeSnap : foeSnaps) {
-                    double dist = pos.sub(foeSnap.getPos()).mag();
-                    if (dist < minDist) {
-                        minDist = dist;
-                    }
-                }
-                double ratio = minDist / responseRange;
-                if (ratio < 1.0) {
-                    prob *= ratio;
-                }
-
-                /* make it harder to be intercept between foe and ball */
-                double distFoeToIntercept = Double.MAX_VALUE;
-                Vec2D nearestFoePos = null;
-                /* find nearest foe dist to the potential passing line */
-                for (RobotSnapshot foeSnap : foeSnaps) {
-                    // enforce correct direction
-                    double dist = foeSnap.getPos().distToLine(new Line2D(pos, ballPos));
-                    if (dist < distFoeToIntercept) {
-                        distFoeToIntercept = dist;
-                        nearestFoePos = foeSnap.getPos();
-                    }
-                }
-
-                if (nearestFoePos != null &&
-                        Math.abs(normAng(nearestFoePos.sub(ballPos).toPlayerAngle()
-                                - pos.sub(ballPos).toPlayerAngle())) < 60) // To-do: magic number
-                {
-                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
-                    if (distFoeToIntercept < interceptRange) {
-                        prob *= distFoeToIntercept / interceptRange;
-                    }
-                }
-
-                double distToFrontEnd = FIELD_LENGTH / 2 - pos.y;
-                if (pos.y > ballPos.y) {
-                    /* make it keep a balanced position between ball and frontEndLine */
-                    double distToBall = pos.sub(ballPos).mag();
-                    double midDist = (distToFrontEnd + distToBall) / 2;
-                    prob *= Math.min(distToFrontEnd, distToBall) / midDist;
-                } else {
-                    /* make it go as front as possible */
-                    prob *= (FIELD_LENGTH - distToFrontEnd) / FIELD_LENGTH;
-                    prob *= 0.5; // lower this prob so that position satisfying pos.y > ballPos.y will have greater prob
-                }
-
-
-                pmf[gridX][gridY] = prob;
-
-                int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
-                if(prob > localMax[evalIdx[0]][evalIdx[1]]) {
-                    localMax[evalIdx[0]][evalIdx[1]] = prob;
-                    localMaxPos[evalIdx[0]][evalIdx[1]] = pos;
-                }
-                localMaxScore[evalIdx[0]][evalIdx[1]] += prob;
-            }
-        }
-
-        pmfWrapper.set(pmf);
-        localMaxPosWrapper.set(localMaxPos);
-        localMaxScoreWrapper.set(localMax);
-    }
-
     public int[] getIdxFromPos(Vec2D pos) {
         return grid.fromPos(pos);
     }
-
 }
+
+
+// DEPRECATED EXAMPLE
+//    /**
+//     * Calculate the pmf of optimal gap region for passing and attacking,
+//     * the pmf are indexed by gridIdx instead of coordinates
+//     */
+//    protected void calcProb() {
+//        // long t0 = System.currentTimeMillis();
+//        Vec2D ballPos = ballPosWrapper.get();
+//
+//        double[][] pmf = new double[width][height];
+//        Vec2D[][] localMaxPos = new Vec2D[evalWidth][evalHeight];
+//        double[][] localMax = new double[evalWidth][evalHeight]; // all-zero by default
+//        double[][] localMaxScore = new double[evalWidth][evalHeight]; // all-zero by default
+//
+//        for (int gridX = gridOrigin[0]; gridX < width; gridX++) {
+//            for (int gridY = gridOrigin[1]; gridY < height; gridY++) {
+//                Vec2D pos = grid.fromInd(gridX, gridY);
+//                double prob = 1.0;
+//
+//                /* mask forbidden and unlikely regions */
+//                // Penalty Region
+//                if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos)) {
+//                    pmf[gridX][gridY] = 0.0;
+//                    continue;
+//                }
+//
+//                /* away from foe bots */
+//                double minDist = Double.MAX_VALUE;
+//                for (RobotSnapshot foeSnap : foeSnaps) {
+//                    double dist = pos.sub(foeSnap.getPos()).mag();
+//                    if (dist < minDist) {
+//                        minDist = dist;
+//                    }
+//                }
+//                double ratio = minDist / responseRange;
+//                if (ratio < 1.0) {
+//                    prob *= ratio;
+//                }
+//
+//                /* make it harder to be intercept between foe and ball */
+//                double distFoeToIntercept = Double.MAX_VALUE;
+//                Vec2D nearestFoePos = null;
+//                /* find nearest foe dist to the potential passing line */
+//                for (RobotSnapshot foeSnap : foeSnaps) {
+//                    // enforce correct direction
+//                    double dist = foeSnap.getPos().distToLine(new Line2D(pos, ballPos));
+//                    if (dist < distFoeToIntercept) {
+//                        distFoeToIntercept = dist;
+//                        nearestFoePos = foeSnap.getPos();
+//                    }
+//                }
+//
+//                if (nearestFoePos != null &&
+//                        Math.abs(normAng(nearestFoePos.sub(ballPos).toPlayerAngle()
+//                                - pos.sub(ballPos).toPlayerAngle())) < 60) // To-do: magic number
+//                {
+//                    /* if greater, prob should be 100% for assuming foe can't intercept (indeed an assumption to make implementation simpler)*/
+//                    if (distFoeToIntercept < interceptRange) {
+//                        prob *= distFoeToIntercept / interceptRange;
+//                    }
+//                }
+//
+//                /* make it keep a balanced position between ball and frontEndLine  or  make it go as front as possible */
+//                double distToFrontEnd = FIELD_LENGTH / 2 - pos.y;
+//                if (pos.y > ballPos.y) {
+//                    /* make it keep a balanced position between ball and frontEndLine */
+//                    double distToBall = pos.sub(ballPos).mag();
+//                    double midDist = (distToFrontEnd + distToBall) / 2;
+//                    prob *= Math.min(distToFrontEnd, distToBall) / midDist;
+//                } else {
+//                    /* make it go as front as possible */
+//                    prob *= Math.abs(FIELD_LENGTH - distToFrontEnd) / FIELD_LENGTH;
+//                    prob *= 0.5; // lower this prob so that position satisfying pos.y > ballPos.y will have greater prob
+//                }
+//
+//
+//
+//
+//
+//                /* ======================================================= */
+//                pmf[gridX][gridY] = Math.abs(prob);
+//                int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
+//                if(prob > localMax[evalIdx[0]][evalIdx[1]]) {
+//                    localMax[evalIdx[0]][evalIdx[1]] = prob;
+//                    localMaxPos[evalIdx[0]][evalIdx[1]] = pos;
+//                }
+//                localMaxScore[evalIdx[0]][evalIdx[1]] += prob;
+//            }
+//        }
+//
+//        pmfWrapper.set(pmf);
+//        localMaxPosWrapper.set(localMaxPos);
+//        localMaxScoreWrapper.set(localMax);
+//    }
+

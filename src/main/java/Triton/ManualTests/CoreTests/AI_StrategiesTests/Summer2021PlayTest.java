@@ -2,8 +2,8 @@ package Triton.ManualTests.CoreTests.AI_StrategiesTests;
 
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Strategies.Summer2021Play;
-import Triton.CoreModules.AI.Estimators.GapFinder;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -11,8 +11,8 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
 
 public class Summer2021PlayTest implements TritonTestable  {
-    private GapFinder gapFinder;
-    private PassFinder passFinder;
+    private AttackSupportMapModule atkSupportMap;
+    private PassProbMapModule passProbMap;
     Summer2021Play play;
     private final RobotList<Ally> fielders;
     private final Ally keeper;
@@ -26,9 +26,9 @@ public class Summer2021PlayTest implements TritonTestable  {
     }
 
     public boolean test(Config config) {
-        gapFinder = new GapFinder(fielders, foes, ball);
-        passFinder = new PassFinder(fielders, foes, ball);
-        play = new Summer2021Play(fielders, keeper, foes, ball, gapFinder, passFinder, config);
+        atkSupportMap = new AttackSupportMapModule(fielders, foes, ball);
+        passProbMap = new PassProbMapModule(fielders, foes, ball);
+        play = new Summer2021Play(fielders, keeper, foes, ball, atkSupportMap, passProbMap, config);
         try {
             while (true) {
                 play.play();

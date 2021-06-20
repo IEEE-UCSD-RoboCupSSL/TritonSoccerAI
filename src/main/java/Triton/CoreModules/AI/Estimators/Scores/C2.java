@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Estimators.Scores;
 
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -12,7 +12,7 @@ public class C2 extends Score {
 
     private static final int C2_INTERVAL = 5;
 
-    public C2(ProbFinder finder) {
+    public C2(ProbMapModule finder) {
         super(finder);
     }
 

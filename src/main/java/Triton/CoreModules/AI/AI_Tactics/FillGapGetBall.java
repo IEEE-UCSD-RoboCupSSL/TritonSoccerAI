@@ -3,7 +3,7 @@ package Triton.CoreModules.AI.AI_Tactics;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.GapFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -19,19 +19,19 @@ public class FillGapGetBall extends Tactics {
     // private int state;
     private Ally nearestFielder = null;
     private RobotList<Ally> restFielders = null;
-    private GapFinder gapFinder;
+    private AttackSupportMapModule atkSupportMap;
     private final Config config;
 
-    public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, GapFinder gapFinder, Config config) {
+    public FillGapGetBall(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball, AttackSupportMapModule atkSupportMap, Config config) {
         super(fielders, keeper, foes, ball);
         this.config = config;
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        this.gapFinder = gapFinder;
+        this.atkSupportMap = atkSupportMap;
         //state = 0;
     }
 
-    public GapFinder getGapFinder() {
-        return gapFinder;
+    public AttackSupportMapModule getatkSupportMap() {
+        return atkSupportMap;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FillGapGetBall extends Tactics {
 
         Vec2D ballPos = ball.getPos();
 
-        ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
+        ArrayList<Vec2D> gapPos = atkSupportMap.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
         if(gapPos != null) {
             ArrayList<Double> gapPosDir = new ArrayList<>();
             for(Vec2D pos : gapPos) {
@@ -101,7 +101,7 @@ public class FillGapGetBall extends Tactics {
 //                    break;
 //                }
 //                nearestFielder.getBall(ball);
-//                ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
+//                ArrayList<Vec2D> gapPos = atkSupportMap.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
 //                if(gapPos != null) {
 //                    new Swarm(restFielders).groupTo(gapPos);
 //                }

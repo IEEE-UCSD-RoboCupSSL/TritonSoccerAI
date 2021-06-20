@@ -5,8 +5,8 @@ import Triton.CoreModules.AI.AI_Tactics.AttackPlanSummer2021;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.GapFinder;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.GoalKeeping.GoalKeeping;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -26,33 +26,33 @@ public class Summer2021Play extends Strategies {
     private final GoalKeeping goalKeeping;
 
 
-    private final GapFinder gapFinder;
-    private final PassFinder passFinder;
+    private final AttackSupportMapModule atkSupportMap;
+    private final PassProbMapModule passProbMap;
 
-    public Summer2021Play(Config config, SoccerObjects soccerObjects, GapFinder gapFinder, PassFinder passFinder) {
+    public Summer2021Play(Config config, SoccerObjects soccerObjects, AttackSupportMapModule atkSupportMap, PassProbMapModule passProbMap) {
         this(soccerObjects.fielders, soccerObjects.keeper, soccerObjects.foes, soccerObjects.ball,
-                gapFinder, passFinder, config);
+                atkSupportMap, passProbMap, config);
     }
 
     public Summer2021Play(RobotList<Ally> fielders, Ally keeper,
                           RobotList<Foe> foes, Ball ball,
-                          GapFinder gapFinder, PassFinder passFinder, Config config) {
+                          AttackSupportMapModule atkSupportMap, PassProbMapModule passProbMap, Config config) {
         super();
         this.fielders = fielders;
         this.foes = foes;
         this.keeper = keeper;
         this.ball = ball;
-        this.gapFinder = gapFinder;
-        this.passFinder = passFinder;
-        gapFinder.run();
-        passFinder.run();
+        this.atkSupportMap = atkSupportMap;
+        this.passProbMap = passProbMap;
+        atkSupportMap.run();
+        passProbMap.run();
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         goalKeeping = new GoalKeeping(keeper, ball, basicEstimator);
 
         // construct tactics
-        attack = new AttackPlanSummer2021(fielders, keeper, foes, ball, gapFinder, passFinder, config);
-        getBall = new FillGapGetBall(fielders, keeper, foes, ball, gapFinder, config);
+        attack = new AttackPlanSummer2021(fielders, keeper, foes, ball, atkSupportMap, passProbMap, config);
+        getBall = new FillGapGetBall(fielders, keeper, foes, ball, atkSupportMap, config);
         defend = new DefendPlanA(fielders, keeper, foes, ball, 300, config);
     }
 
@@ -91,14 +91,18 @@ public class Summer2021Play extends Strategies {
             }
             case GETBALL -> {
                 getBall.exec();
-                if(basicEstimator.isAllyHavingTheBall()) {
+                if(!basicEstimator.isAllyHavingTheBall()) {
                     currState = States.START;
                 }
             }
             case ATTACK -> {
-                if(!attack.exec()) {
-                    currState = States.START;
-                }
+                fielders.stopAll();
+                currState = States.START;
+
+//
+//                if(!attack.exec()) {
+//                    currState = States.START;
+//                }
             }
         }
 

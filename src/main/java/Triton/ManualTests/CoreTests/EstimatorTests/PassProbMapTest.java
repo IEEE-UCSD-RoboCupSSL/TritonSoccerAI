@@ -1,7 +1,7 @@
 package Triton.ManualTests.CoreTests.EstimatorTests;
 
 import Triton.Config.Config;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -16,13 +16,13 @@ import java.util.Scanner;
 import static Triton.PeriphModules.Display.PaintOption.*;
 import static Triton.PeriphModules.Display.PaintOption.PROBABILITY;
 
-public class PassFinderTest implements TritonTestable {
+public class PassProbMapTest implements TritonTestable {
 
-    PassFinder passFinder;
+    PassProbMapModule passProbMap;
 
-    public PassFinderTest(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
-        passFinder = new PassFinder(fielders, foes, ball);
-        passFinder.run();
+    public PassProbMapTest(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
+        passProbMap = new PassProbMapModule(fielders, foes, ball);
+        passProbMap.run();
     }
 
     public boolean test(Config config) {
@@ -33,7 +33,7 @@ public class PassFinderTest implements TritonTestable {
         paintOptions.add(INFO);
         paintOptions.add(PROBABILITY);
         display.setPaintOptions(paintOptions);
-        display.setProbFinder(passFinder);
+        display.setProbFinder(passProbMap);
 
         while(true) {
             Scanner scanner = new Scanner(System.in);
@@ -46,7 +46,7 @@ public class PassFinderTest implements TritonTestable {
                 return true;
             }
             scanner.nextLine();
-            passFinder.fixCandidate(candidate);
+            passProbMap.fixCandidate(candidate);
         }
     }
 
