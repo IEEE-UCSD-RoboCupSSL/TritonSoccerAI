@@ -8,7 +8,6 @@ import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
-import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 
 import java.util.concurrent.ExecutionException;
 
@@ -37,31 +36,28 @@ public class CoordinatedPass {
         this.passer = passerNode.getBot();
         this.receiver = receiverNode.getBot();
         this.ball = ball;
-        passTaskCanceller = new FieldPubSubPair<>("[Pair]DefinedIn:CoordinatedPass", "CancelPassTask", false);
-        receiveTaskCanceller = new FieldPubSubPair<>("[Pair]DefinedIn:CoordinatedPass", "CancelReceiveTask", false);
-
-        passTask = new PassTask(passerNode, passTaskCanceller.sub);
-        receiveTask = new ReceiveTask(receiverNode, ball, receiveTaskCanceller.sub);
+        passTask = new PassTask(passerNode);
+        receiveTask = new ReceiveTask(receiverNode, ball);
     }
 
     /* return null if it's in the middle of execution; return true if successfully compl*/
     public PassShootResult execute() throws ExecutionException, InterruptedException {
         if(basicEstimator.getBallHolder() instanceof Foe) {
-            passTaskCanceller.pub.publish(true);
-            receiveTaskCanceller.pub.publish(true);
+            passer.cancelProceduralTask();
+            receiver.cancelProceduralTask();
         }
         
         if(!passer.isProcedureCompleted()){
             passer.executeProceduralTask(passTask);
         } else {
             if(passer.isProcedureCancelled()) {
-                passer.resetProceduralTask();
+                cancelResetTasks();
                 return PassShootResult.fail;
             }
             if(passer.getProcedureReturnStatus()) {
                 passer.stop();
             } else {
-                passer.resetProceduralTask();
+                cancelResetTasks();
                 return PassShootResult.fail;
             }
             passer.resetProceduralTask();
@@ -71,20 +67,30 @@ public class CoordinatedPass {
             receiver.executeProceduralTask(receiveTask);
         } else {
             if(receiver.isProcedureCancelled()) {
-                receiver.resetProceduralTask();
+                cancelResetTasks();
                 return PassShootResult.fail;
             }
             PassShootResult rtn;
             if(receiver.getProcedureReturnStatus()){
-                receiver.stop();
                 rtn = PassShootResult.success;
             } else {
                 rtn = PassShootResult.fail;
             }
-            receiver.resetProceduralTask();
+            cancelResetTasks();
             return rtn;
         }
         return PassShootResult.Executing;
+    }
+
+    public void cancelResetTasks() {
+        passer.stop();
+        receiver.stop();
+        passer.cancelProceduralTask();
+        receiver.cancelProceduralTask();
+        while(!passer.isProcedureCancelled()) delay(3);
+        while(!receiver.isProcedureCancelled()) delay(3);
+        receiver.resetProceduralTask();
+        passer.resetProceduralTask();
     }
 
 
@@ -93,9 +99,7 @@ public class CoordinatedPass {
     private static class PassTask extends ProceduralTask {
         private final Ally passer;
         private final PUAG.AllyPassNode passNode;
-        private final FieldSubscriber<Boolean> canceller;
-        public PassTask(PUAG.AllyPassNode passerNode, FieldSubscriber<Boolean> canceller) {
-            this.canceller = canceller;
+        public PassTask(PUAG.AllyPassNode passerNode) {
             this.passer = passerNode.getBot();
             this.passNode = passerNode;
         }
@@ -106,7 +110,8 @@ public class CoordinatedPass {
             double targetDir = passNode.getAngle();
             
             while(!passer.isPosArrived(targetPoint) || !passer.isDirAimed(targetDir)) {
-                if(cancelConditions()) return false;
+                if(isCancelled()) return false;
+                if(!passer.isHoldingBall()) return false;
                 passer.curveTo(targetPoint, targetDir);
                 delay(3);
             }
@@ -115,16 +120,6 @@ public class CoordinatedPass {
             passer.stop();
             return true;
         }
-        
-        boolean cancelConditions() {
-            if(isCancelled()) return true;
-            if(canceller.getMsg()) {
-                canceller.forceSetMsg(false);
-                return true;
-            }
-            return false;
-        }
-        
     }
 
     private static class ReceiveTask extends ProceduralTask {
@@ -132,11 +127,9 @@ public class CoordinatedPass {
         private final PUAG.AllyRecepNode recepNode;
         private final Ball ball;
 
-        private final FieldSubscriber<Boolean> canceller;
-        public ReceiveTask(PUAG.AllyRecepNode recepNode, Ball ball, FieldSubscriber<Boolean> canceller) {
+        public ReceiveTask(PUAG.AllyRecepNode recepNode, Ball ball) {
             this.receiver = recepNode.getBot();
             this.recepNode = recepNode;
-            this.canceller = canceller;
             this.ball = ball;
         }
 
@@ -146,13 +139,13 @@ public class CoordinatedPass {
             double targetDir = recepNode.getAngle();
 
             while(!receiver.isPosArrived(targetPoint) || !receiver.isDirAimed(targetDir)) {
-                if(cancelConditions()) return false;
+                if(isCancelled()) return false;
                 receiver.curveTo(targetPoint, targetDir);
                 delay(3);
             }
 
             while(!receiver.isHoldingBall()) {
-                if(cancelConditions()) return false;
+                if(isCancelled()) return false;
                 receiver.dynamicIntercept(ball, targetDir);
                 delay(3);
             }
@@ -160,14 +153,6 @@ public class CoordinatedPass {
             return true;
         }
 
-        boolean cancelConditions() {
-            if(isCancelled()) return true;
-            if(canceller.getMsg()) {
-                canceller.forceSetMsg(false);
-                return true;
-            }
-            return false;
-        }
     }
 
 

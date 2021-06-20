@@ -9,7 +9,8 @@ import Triton.ManualTests.CoreTests.AI_SkillsTests.CoordinatedPassTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.CoreTests.AI_StrategiesTests.BasicPlayTest;
+import Triton.ManualTests.CoreTests.AI_StrategiesTests.DEPRECATED_BasicPlayTest;
+import Triton.ManualTests.CoreTests.AI_StrategiesTests.Summer2021PlayTest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.GapGetBallTest;
 import Triton.ManualTests.CoreTests.EstimatorTests.GapFinderTest;
@@ -67,7 +68,7 @@ public class CoreTestFactory {
         coreTestMap.put("defendA", new DefendPlanATest(fielders, keeper, foes, ball));
         coreTestMap.put("dodge", new DodgingTest(fielders, keeper, foes, ball));
         coreTestMap.put("holdballpos", new HoldBallPosTest(fielders.get(3), ball));
-        coreTestMap.put("basicplay", new BasicPlayTest(fielders, keeper, foes, ball));
+        coreTestMap.put("play", new Summer2021PlayTest(fielders, keeper, foes, ball));
         coreTestMap.put("capDetect", new CapDetectionTest(fielders.get(3), ball));
         coreTestMap.put("spsdemo", new SimpleProceduralSkillDemo(fielders, ball));
         coreTestMap.put("defaultFormation", new FormationTest("tester", fielders));
