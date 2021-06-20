@@ -1,18 +1,22 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
-import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Set;
 
 @Getter
 @Setter
-public class MockCompute implements ProbCompute, AngleCompute, KickVecCompute, PassPointCompute{
-    private HashMap<PUAG.Node, HashMap<PUAG.Node, Double>> probMatrix = new HashMap<>();
+public class MockCompute implements DijkCompute {
+    private final HashMap<PUAG.Node, HashMap<PUAG.Node, Double>> probMatrix = new HashMap<>();
+    private final HashMap<PUAG.Node, HashMap<PUAG.Node, Double>> angleMatrix = new HashMap<>();
+    private final HashMap<PUAG.Node, HashMap<PUAG.Node, Vec2D>> kickVecMatrix = new HashMap<>();
+    private final HashMap<PUAG.Node, HashMap<PUAG.Node, Vec2D>> passpointMatrix = new HashMap<>();
+    private final HashMap<PUAG.Node, HashMap<PUAG.Node, Vec2D>> recepPointMatrix = new HashMap<>();
+
+
     private PUAG graph;
 
     public MockCompute(PUAG graph) {
@@ -27,11 +31,6 @@ public class MockCompute implements ProbCompute, AngleCompute, KickVecCompute, P
         }
     }
 
-    @Override
-    public double computeProb(PUAG.Node n1, PUAG.Node n2) {
-        return probMatrix.get(n1).get(n2);
-    }
-
     public boolean setProb(PUAG.Node n1, PUAG.Node n2, Double prob) {
         try {
             probMatrix.get(n1).put(n2, prob);
@@ -41,18 +40,74 @@ public class MockCompute implements ProbCompute, AngleCompute, KickVecCompute, P
         return true;
     }
 
+    public boolean setAngle(PUAG.Node n1, PUAG.Node n2, Double angle) {
+        try {
+            angleMatrix.get(n1).put(n2, angle);
+        } catch (NullPointerException e){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean setKickVec(PUAG.Node n1, PUAG.Node n2, Vec2D kickVec) {
+        try {
+            kickVecMatrix.get(n1).put(n2, kickVec);
+        } catch (NullPointerException e){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean setPasspoint(PUAG.Node n1, PUAG.Node n2, Vec2D passpoint) {
+        try {
+            passpointMatrix.get(n1).put(n2, passpoint);
+        } catch (NullPointerException e){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean setRecepPoint(PUAG.Node n1, PUAG.Node n2, Vec2D recepPoint) {
+        try {
+            recepPointMatrix.get(n1).put(n2, recepPoint);
+        } catch (NullPointerException e){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public double computeProb(PUAG.Node n1, PUAG.Node n2) {
+        return probMatrix.get(n1).get(n2);
+    }
+
+    @Override
+    public double computeGoalProb(PUAG.Node n) {
+        return 0.7;
+    }
+
     @Override
     public double computeAngle(PUAG.Node n1, PUAG.Node n2) {
-        return 0;
+        return angleMatrix.get(n1).get(n2);
     }
 
     @Override
-    public Vec2D computeKickVec(PUAG.Node node1, PUAG.Node node2) {
-        return null;
+    public Vec2D computeKickVec(PUAG.Node n1, PUAG.Node n2) {
+        return kickVecMatrix.get(n1).get(n2);
     }
 
     @Override
-    public Vec2D computePassPoint(PUAG.Node node1, PUAG.Node node2) {
+    public Vec2D computePasspoint(PUAG.Node n1, PUAG.Node n2) {
+        return passpointMatrix.get(n1).get(n2);
+    }
+
+    @Override
+    public Vec2D computeRecepPoint(PUAG.Node n1, PUAG.Node n2) {
+        return recepPointMatrix.get(n1).get(n2);
+    }
+
+    @Override
+    public Vec2D computeGoalCenter(PUAG.Node n) {
         return null;
     }
 }
