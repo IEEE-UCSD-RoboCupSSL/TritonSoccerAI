@@ -29,12 +29,15 @@ public class ErForceClientModule extends SimClientModule {
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
 
-            Vec2D audienceVel = PerspectiveConverter.playerToAudience(new Vec2D(cmd.getVelX(), cmd.getVelY()));
-            if (config.myTeam == Team.BLUE) {
-                audienceVel.x = -audienceVel.x;
-                audienceVel.y = -audienceVel.y;
-            }
+//            Vec2D audienceVel = PerspectiveConverter.playerToAudience(new Vec2D(cmd.getVelX(), cmd.getVelY()));
+//            if (config.myTeam == Team.BLUE) {
+//                audienceVel.x = -audienceVel.x;
+//                audienceVel.y = -audienceVel.y;
+//            }
 
+            Vec2D kickXZ = new Vec2D(cmd.getKickX(), cmd.getKickZ());
+            float kickSpeed = (float) kickXZ.mag();
+            float kickAngle = (float) Math.atan2(kickXZ.y, kickXZ.x);
             RobotCommand robotCmd = RobotCommand.newBuilder()
                     .setId(i)
                     .setMoveCommand(RobotMoveCommand.newBuilder()
@@ -44,8 +47,8 @@ public class ErForceClientModule extends SimClientModule {
                                     .setLeft(-cmd.getVelX())
                                     .build())
                             .build())
-                    .setKickSpeed(cmd.getKickX())
-                    .setKickAngle(cmd.getKickZ())
+                    .setKickSpeed(kickSpeed)
+                    .setKickAngle(kickAngle)
                     .setDribblerSpeed(cmd.getSpinner() ? MAX_DRIB_SPEED : 0.0f)
                     .build();
 

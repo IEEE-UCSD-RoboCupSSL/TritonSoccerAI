@@ -1,16 +1,11 @@
 package Triton.ManualTests.PeriphMiscTests;
 
-import Proto.SslVisionDetection;
 import Triton.App;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Team;
 import Triton.ManualTests.TritonTestable;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
-import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
-import Triton.Misc.ModulePubSubSystem.Publisher;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.Detection.RobotData;
@@ -24,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 import static Triton.Util.delay;
 
 
-public class DetectionTest implements TritonTestable {
+public class DetectionTest_OldProto implements TritonTestable {
     private ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private ArrayList<Subscriber<RobotData>> blueRobotSubs;
 

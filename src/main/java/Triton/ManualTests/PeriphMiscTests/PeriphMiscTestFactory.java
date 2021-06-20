@@ -31,7 +31,7 @@ public class PeriphMiscTestFactory {
         periphTestMap.put("SSL", new SSLGameCtrlModuleTest());
         periphTestMap.put("vbotmath", new ConstraintMappingMathTests());
         periphTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
-        periphTestMap.put("detection", new DetectionTest());
+        periphTestMap.put("detection", new DetectionTest_OldProto());
     }
 
     public String[] getAvailableTestNames() {

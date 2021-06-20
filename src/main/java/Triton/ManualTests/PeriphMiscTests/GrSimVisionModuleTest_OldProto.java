@@ -28,7 +28,7 @@ public class GrSimVisionModuleTest_OldProto implements TritonTestable {
             0, Util.toPeriod(GvcModuleFreqs.VISION_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 
         Subscriber<SSL_DetectionFrame> visionSub =
-                new FieldSubscriber<SSL_DetectionFrame>("From:GrSimVisionModule_OldProto", "Detection");
+                new MQSubscriber<SSL_DetectionFrame>("From:GrSimVisionModule_OldProto", "Detection");
 
         try {
             visionSub.subscribe(1000);
