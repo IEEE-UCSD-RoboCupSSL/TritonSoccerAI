@@ -37,16 +37,16 @@ public class PassProbMapTest implements TritonTestable {
 
         while(true) {
             Scanner scanner = new Scanner(System.in);
-            System.out.println(">> ENTER CANDIDATE:");
-            int candidate;
+            System.out.println(">> ENTER SCORE:");
+            String score;
             try {
-                candidate = scanner.nextInt();
+                score = scanner.next();
             } catch(Exception e) {
                 System.out.println(">> QUIT");
                 return true;
             }
             scanner.nextLine();
-            passProbMap.fixCandidate(candidate);
+            passProbMap.fixScore(score);
         }
     }
 
