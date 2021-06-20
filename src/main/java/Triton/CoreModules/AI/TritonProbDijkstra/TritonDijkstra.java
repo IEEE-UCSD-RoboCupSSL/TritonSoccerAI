@@ -1,5 +1,9 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
+import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -11,18 +15,30 @@ import java.util.*;
 @Setter
 public class TritonDijkstra {
     private final PUAG graph;
-    private ProbCompute probComp;
+    private DijkCompute dijkComp;
 
-    public TritonDijkstra(PUAG graph, ProbCompute probComp) {
+    public TritonDijkstra(PUAG graph, DijkCompute dijkComp) throws InvalidDijkstraGraphException {
         this.graph = graph;
-        this.probComp = probComp;
+        this.dijkComp = dijkComp;
+
+        if(graph.getEndNode() == null || graph.getStartNode() == null){
+            throw new InvalidDijkstraGraphException();
+        }
     }
 
-    public TritonDijkstra(PUAG graph){
+    public TritonDijkstra(PUAG graph) throws InvalidDijkstraGraphException {
         this.graph = graph;
+
+        if(graph.getEndNode() == null || graph.getStartNode() == null){
+            throw new InvalidDijkstraGraphException();
+        }
     }
 
-    public AttackPathInfo compute() {
+    public AttackPathInfo compute() throws UnknownPuagNodeException, NoDijkComputeInjectionException {
+        if(dijkComp == null){
+            throw new NoDijkComputeInjectionException();
+        }
+
         PriorityQueue<AttackPathInfo> frontier = new PriorityQueue<>();
         HashSet<PUAG.Node> explored = new HashSet<>();
 
@@ -35,13 +51,33 @@ public class TritonDijkstra {
 
         while (!frontier.isEmpty()) {
             AttackPathInfo currPath = frontier.poll();  // Get the path with the highest prob so far
-            PUAG.Node tailNode = currPath.getTailNode();    // Get the tail node Of the returned path
+            PUAG.Node tailNode = currPath.getTailNode();    // Get the tail node of the returned path
 
             if (tailNode != null) {
                 if(tailNode.equals(graph.getEndNode())){
-                    double prob = 1;    // These fields are to be provided
+                    if(tailNode.getClass() == PUAG.AllyPassNode.class) {
+                        PUAG.AllyPassNode tailAllyPassNode = (PUAG.AllyPassNode)  tailNode;
+                        PUAG.Node secondTailNode = currPath.getSecondTailNode();
 
-                    currPath.appendAndUpdate(graph.getEndNode(), prob);
+                        tailAllyPassNode.setPassPoint(dijkComp.computePasspoint(secondTailNode, tailNode));
+                        tailAllyPassNode.setAngle(dijkComp.computeAngle(secondTailNode, tailNode));
+                        tailAllyPassNode.setKickVec(dijkComp.computeKickVec(secondTailNode, tailNode));
+                    }
+                    else if (tailNode.getClass() == PUAG.AllyRecepNode.class){
+                        PUAG.AllyRecepNode tailAllyRecepNode = (PUAG.AllyRecepNode) tailNode;
+                        PUAG.Node secondTailNode = currPath.getSecondTailNode();
+
+                        tailAllyRecepNode.setAngle(dijkComp.computeAngle(secondTailNode, tailNode));
+                        tailAllyRecepNode.setReceptionPoint(dijkComp.computeRecepPoint(secondTailNode, tailNode));
+                    }
+                    else if (tailNode.getClass() == PUAG.GoalNode.class){
+                        PUAG.GoalNode tailGoalNode = (PUAG.GoalNode) tailNode;
+                        tailGoalNode.setGoalCenter(dijkComp.computeGoalCenter(tailGoalNode));
+                    } else {
+                        throw new UnknownPuagNodeException(tailNode);
+                    }
+
+                    currPath.appendAndUpdate(graph.getEndNode(), 1.0);
                     return currPath;
                 }
 
@@ -120,6 +156,14 @@ public class TritonDijkstra {
                 return null;
             }
             return maxProbPath.get(maxProbPath.size() - 1);
+        }
+
+        public @Nullable PUAG.Node getSecondTailNode() {
+            if (maxProbPath.isEmpty()) {
+                return null;
+            }
+
+            return maxProbPath.get(maxProbPath.size() - 2);
         }
 
         public AttackPathInfo replicatePath() {

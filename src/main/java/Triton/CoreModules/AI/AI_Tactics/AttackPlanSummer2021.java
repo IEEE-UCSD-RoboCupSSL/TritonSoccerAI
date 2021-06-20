@@ -7,6 +7,9 @@ import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
 import Triton.CoreModules.AI.Estimators.PassInfo;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Ball.Ball;
@@ -97,7 +100,15 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case Dijkstra -> {
-                    tdksOutput = (new TritonDijkstra(graph).compute());
+                    try {
+                        tdksOutput = (new TritonDijkstra(graph).compute());
+                    } catch (UnknownPuagNodeException e) {
+                        e.printStackTrace();
+                    } catch (InvalidDijkstraGraphException e) {
+                        e.printStackTrace();
+                    } catch (NoDijkComputeInjectionException e) {
+                        e.printStackTrace();
+                    }
                     currState = States.Preparation;
                 }
                 case Preparation -> {
