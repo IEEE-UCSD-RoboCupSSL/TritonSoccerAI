@@ -32,7 +32,7 @@ public class DetectionModule implements Module {
      * Constructs a DetectionModule
      */
     public DetectionModule(Config config) {
-        visionSub = new MQSubscriber<>("From:GrSimVisionModule_OldProto", "Detection");
+        visionSub = new FieldSubscriber<>("From:ERForceVisionModule", "Detection");
 
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();

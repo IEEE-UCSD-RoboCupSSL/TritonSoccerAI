@@ -6,13 +6,13 @@ import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTests.CoreTestRunner;
 import Triton.ManualTests.CoreTests.RobotSkillsTests.PrimitiveMotionTest;
-import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
 import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
+import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
-import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
+import Triton.PeriphModules.Vision.ERForceVisionModule;
 import Triton.VirtualBot.*;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
@@ -108,7 +108,7 @@ public class App {
         if(config.cliConfig.isVirtualSetup) {
             switch (config.cliConfig.simulator) {
                 case GrSim -> moduleFutures.add(App.runModule(
-                        new GrSimVisionModule_OldProto(config), GvcModuleFreqs.VISION_MODULE_FREQ));
+                        new ERForceVisionModule(config), GvcModuleFreqs.VISION_MODULE_FREQ));
                 case ErForceSim -> System.err.println("Error: WorkInProgress");
             }
         } else {
