@@ -30,7 +30,7 @@ public class ErForceClientModule extends SimClientModule {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
 
             Vec2D audienceVel = PerspectiveConverter.playerToAudience(new Vec2D(cmd.getVelX(), cmd.getVelY()));
-            if (config.myTeam == Team.YELLOW) {
+            if (config.myTeam == Team.BLUE) {
                 audienceVel.x = -audienceVel.x;
                 audienceVel.y = -audienceVel.y;
             }
@@ -40,8 +40,8 @@ public class ErForceClientModule extends SimClientModule {
                     .setMoveCommand(RobotMoveCommand.newBuilder()
                             .setLocalVelocity(MoveLocalVelocity.newBuilder()
                                     .setAngular(cmd.getVelAng())
-                                    .setForward((float) audienceVel.y)
-                                    .setLeft((float) audienceVel.x)
+                                    .setForward(cmd.getVelY())
+                                    .setLeft(-cmd.getVelX())
                                     .build())
                             .build())
                     .setKickSpeed(cmd.getKickX())

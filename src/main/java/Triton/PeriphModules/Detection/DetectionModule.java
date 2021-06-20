@@ -6,6 +6,7 @@ import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_Det
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
+import io.grpc.netty.shaded.io.netty.internal.tcnative.SSL;
 
 import java.util.ArrayList;
 
@@ -66,7 +67,9 @@ public class DetectionModule implements Module {
             isFirstRun = false;
         }
 
-        update(visionSub.getMsg());
+        SSL_DetectionFrame frame = visionSub.getMsg();
+        System.out.println("subscribe: " + frame);
+        update(frame);
     }
 
     /**
@@ -86,11 +89,15 @@ public class DetectionModule implements Module {
      * @param frame SSL_Detection frame, sent from VisionModule
      */
     public void update(SSL_DetectionFrame frame) {
+        if (frame == null) return;
         double time = frame.getTCapture();
 
         for (SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
             int id = robotFrame.getRobotId();
             blueRobotsData.get(id).update(robotFrame, time);
+            if (id == 0) {
+                System.out.println(blueRobotsData.get(id).getPos());
+            }
             blueRobotPubs.get(id).publish(blueRobotsData.get(id));
         }
 

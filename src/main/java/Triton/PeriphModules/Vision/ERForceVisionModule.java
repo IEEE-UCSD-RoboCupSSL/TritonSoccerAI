@@ -70,13 +70,14 @@ public class ERForceVisionModule extends VisionModule {
         ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
                 packet.getOffset(), packet.getLength());
         SSL_WrapperPacket SSLPacket = SSL_WrapperPacket.parseFrom(stream);
-        System.out.println(SSLPacket);
 
         if (!GvcGeometry.IS_GEO_INIT && SSLPacket.hasGeometry()) {
             processGeometry(SSLPacket.getGeometry());
         }
 
         if (SSLPacket.hasDetection()) {
+            String s = SSLPacket.getDetection().toString();
+            System.out.println("publish: " + s.substring(0, s.indexOf('\n')));
             visionPub.publish(SSLPacket.getDetection());
         }
     }
