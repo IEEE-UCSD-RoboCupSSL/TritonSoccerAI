@@ -14,6 +14,7 @@ import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.ERForceVisionModule;
 import Triton.VirtualBot.*;
+import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
 
@@ -252,7 +253,8 @@ public class App {
 
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == SimulatorName.GrSim) {
-            simClientModule = new GrSimClientModule(config);
+            simClientModule = new ErForceClientModule(config);
+            // simClientModule = new GrSimClientModule(config);
         }
         App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
         /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
