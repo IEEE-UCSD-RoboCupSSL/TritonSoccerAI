@@ -4,6 +4,7 @@ import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Tactics.AttackPlanSummer2021;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
 import Triton.CoreModules.AI.AI_Tactics.FillGapGetBall;
+import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.GapFinder;
 import Triton.CoreModules.AI.Estimators.PassFinder;
@@ -91,14 +92,18 @@ public class Summer2021Play extends Strategies {
             }
             case GETBALL -> {
                 getBall.exec();
-                if(basicEstimator.isAllyHavingTheBall()) {
+                if(!basicEstimator.isAllyHavingTheBall()) {
                     currState = States.START;
                 }
             }
             case ATTACK -> {
-                if(!attack.exec()) {
-                    currState = States.START;
-                }
+                fielders.stopAll();
+                currState = States.START;
+
+//
+//                if(!attack.exec()) {
+//                    currState = States.START;
+//                }
             }
         }
 
