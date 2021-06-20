@@ -51,6 +51,15 @@ public class Config {
         }
 
         this.numAllyRobots = connConfig.numAllyRobots;
+
+        if(cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            if(myTeam == Team.BLUE) {
+                connConfig.simCmdEndpoint.port += 1;
+            } else {
+                connConfig.simCmdEndpoint.port += 2;
+            }
+        }
+
     }
 
     private File getIniFileByType(String type) throws IOException {
