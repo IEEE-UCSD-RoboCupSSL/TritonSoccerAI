@@ -70,7 +70,7 @@ public class RobotTCPConnection {
         socketIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
         String line = socketIn.readLine();
-        System.out.printf("Ally %d TCP : %s\n", id, line);
+        System.out.printf("\033[0;32mAlly %d TCP : %s\033[0m\n", id, line);
         if (line.equals("CONNECTION ESTABLISHED")) {
             isConnected = true;
 

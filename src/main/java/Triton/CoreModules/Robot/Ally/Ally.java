@@ -430,7 +430,7 @@ public class Ally extends Robot implements AllySkills {
                         Util.toPeriod(GvcModuleFreqs.UDP_STREAM_SEND_FREQ, TimeUnit.NANOSECONDS),
                         TimeUnit.NANOSECONDS);
 
-
+                delay(500);
                 conn.getTCPConnection().sendInit();
             } catch (Exception e) {
                 e.printStackTrace();
