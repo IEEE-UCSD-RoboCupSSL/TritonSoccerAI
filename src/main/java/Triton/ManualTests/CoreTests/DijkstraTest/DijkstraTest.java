@@ -134,14 +134,14 @@ public class DijkstraTest implements TritonTestable {
         mockCompute.setRecepPoint(n4, n5, new Vec2D(0.3, 0.4));
 
 
-        TritonDijkstra tritonDijkstra = new TritonDijkstra(puag, mockCompute);
+        TritonDijkstra tritonDijkstra = new TritonDijkstra(puag, mockCompute, so);
         TritonDijkstra.AttackPathInfo optimalPath = tritonDijkstra.compute();
         double actual = optimalPath.getTotalProbabilityProduct();
 
         TestUtil.testDoublesEq("Test if correct total prob is returned 0", 0.605625, actual, 0.01);
 
         mockCompute.setProb(n0, n5, 0.99);
-        TritonDijkstra tritonDijkstra1 = new TritonDijkstra(puag, mockCompute);
+        TritonDijkstra tritonDijkstra1 = new TritonDijkstra(puag, mockCompute, so);
         TritonDijkstra.AttackPathInfo optimalPath1 = tritonDijkstra1.compute();
         double actual1 = optimalPath1.getTotalProbabilityProduct();
 

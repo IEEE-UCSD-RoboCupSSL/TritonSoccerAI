@@ -2,12 +2,15 @@ package Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl;
 
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.RWLockee;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -234,5 +237,10 @@ public class MockCompute implements DijkCompute {
     @Override
     public Vec2D computeGoalCenter(PUAG.Node n) {
         return null;
+    }
+
+    @Override
+    public void setSnapShots(ArrayList<RobotSnapshot> allySnaps, ArrayList<RobotSnapshot> foeSnaps, RWLockee<Vec2D> ballSnap) {
+
     }
 }
