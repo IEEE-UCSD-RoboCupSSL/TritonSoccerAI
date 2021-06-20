@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
+import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;

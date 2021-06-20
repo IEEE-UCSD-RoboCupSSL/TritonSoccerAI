@@ -1,5 +1,7 @@
-package Triton.CoreModules.AI.TritonProbDijkstra;
+package Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl;
 
+import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import lombok.Getter;
 import lombok.Setter;
