@@ -1,12 +1,12 @@
 package Triton.PeriphModules.Detection;
 
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
 import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
-import io.grpc.netty.shaded.io.netty.internal.tcnative.SSL;
 
 import java.util.ArrayList;
 
@@ -33,8 +33,13 @@ public class DetectionModule implements Module {
      * Constructs a DetectionModule
      */
     public DetectionModule(Config config) {
-        visionSub = new FieldSubscriber<>("From:ERForceVisionModule", "Detection");
-
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            visionSub = new MQSubscriber<>("From:ERForceVisionModule", "Detection");
+        } else if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+            visionSub = new MQSubscriber<>("From:GrSimVisionModule_OldProto", "Detection");
+        } else {
+            visionSub = null;
+        }
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
@@ -63,13 +68,9 @@ public class DetectionModule implements Module {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             isFirstRun = false;
         }
-
-        SSL_DetectionFrame frame = visionSub.getMsg();
-        System.out.println("subscribe: " + frame);
-        update(frame);
+        update(visionSub.getMsg());
     }
 
     /**
@@ -95,9 +96,6 @@ public class DetectionModule implements Module {
         for (SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
             int id = robotFrame.getRobotId();
             blueRobotsData.get(id).update(robotFrame, time);
-            if (id == 0) {
-                System.out.println(blueRobotsData.get(id).getPos());
-            }
             blueRobotPubs.get(id).publish(blueRobotsData.get(id));
         }
 

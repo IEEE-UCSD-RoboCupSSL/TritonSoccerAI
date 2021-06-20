@@ -46,7 +46,7 @@ public class ERForceVisionModule extends VisionModule {
      * @param port port to receive from
      */
     public ERForceVisionModule(String ip, int port) {
-        visionPub = new FieldPublisher("From:ERForceVisionModule", "Detection", null);
+        visionPub = new MQPublisher("From:ERForceVisionModule", "Detection");
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         try {
@@ -76,9 +76,10 @@ public class ERForceVisionModule extends VisionModule {
         }
 
         if (SSLPacket.hasDetection()) {
-            String s = SSLPacket.getDetection().toString();
-            System.out.println("publish: " + s.substring(0, s.indexOf('\n')));
-            visionPub.publish(SSLPacket.getDetection());
+//            String s = SSLPacket.getDetection().toString();
+//            System.out.println("publish: " + s.substring(0, s.indexOf('\n')));
+            SSL_DetectionFrame detectionFrame = SSLPacket.getDetection();
+            visionPub.publish(detectionFrame);
         }
     }
 
