@@ -125,6 +125,28 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
             return Integer.toString(bot.getID());
         }
+
+        @Override
+        public int hashCode() {
+            if(bot == null){
+                return super.hashCode();
+            }
+
+            return bot.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(bot == null || obj == null){
+                return super.equals(obj);
+            }
+
+            if(!(obj instanceof Ally)){
+                return super.equals(obj);
+            }
+
+            return bot.getID() == ((Ally) obj).getID();
+        }
     }
 
     public static class AllyNode extends Node {

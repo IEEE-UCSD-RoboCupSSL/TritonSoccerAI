@@ -4,6 +4,7 @@ import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
+import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
@@ -33,7 +34,10 @@ import java.util.*;
 public class TritonDijkstra {
     private final PUAG graph;
     private DijkCompute dijkComp;
-    SoccerObjects soccerObjects;
+    RobotList<Ally> fielders;
+    RobotList<Foe> foes;
+    Ball ball;
+
 
     /**
      * The preferred constructor. If the `TritonDijkstra` object is built using this constructor
@@ -46,15 +50,31 @@ public class TritonDijkstra {
      * @throws InvalidDijkstraGraphException The graph must have an end node and an start node
      *                                       * in the context of our program.
      */
-    public TritonDijkstra(PUAG graph, DijkCompute dijkComp, SoccerObjects soccerObjects) throws InvalidDijkstraGraphException {
+    public TritonDijkstra(PUAG graph, DijkCompute dijkComp, RobotList<Ally> fielders, RobotList<Foe> foes,
+                          Ball ball) throws InvalidDijkstraGraphException {
         this.graph = graph;
         this.dijkComp = dijkComp;
-        this.soccerObjects = soccerObjects;
+        this.fielders = fielders;
+        this.foes = foes;
+        this.ball = ball;
 
         if (graph.getEndNode() == null || graph.getStartNode() == null) {
             throw new InvalidDijkstraGraphException();
         }
     }
+
+    public TritonDijkstra(PUAG graph, DijkCompute dijkComp, SoccerObjects so) throws InvalidDijkstraGraphException {
+        this.graph = graph;
+        this.dijkComp = dijkComp;
+        this.fielders = so.fielders;
+        this.foes = so.foes;
+        this.ball = so.ball;
+
+        if (graph.getEndNode() == null || graph.getStartNode() == null) {
+            throw new InvalidDijkstraGraphException();
+        }
+    }
+
 
     /**
      * A `DijkComp` object needs to be injected later using setter if using this constructor.
@@ -63,8 +83,12 @@ public class TritonDijkstra {
      * @throws InvalidDijkstraGraphException The graph must have an end node and an start node
      *                                       in the context of our program.
      */
-    public TritonDijkstra(PUAG graph) throws InvalidDijkstraGraphException {
+    public TritonDijkstra(PUAG graph, RobotList<Ally> fielders, RobotList<Foe> foes,
+                          Ball ball) throws InvalidDijkstraGraphException {
         this.graph = graph;
+        this.fielders = fielders;
+        this.foes = foes;
+        this.ball = ball;
 
         if (graph.getEndNode() == null || graph.getStartNode() == null) {
             throw new InvalidDijkstraGraphException();
@@ -97,7 +121,7 @@ public class TritonDijkstra {
         return new RWLockee<Vec2D>(so.ball.getPos());
     }
 
-    private void updateNode(PUAG.Node secondTailNode, PUAG.Node tailNode) {
+    private void updateTailNode(PUAG.Node secondTailNode, PUAG.Node tailNode) {
         if (tailNode.getClass() == PUAG.AllyPassNode.class) {
             PUAG.AllyPassNode tailAllyPassNode = (PUAG.AllyPassNode) tailNode;
 
@@ -116,6 +140,28 @@ public class TritonDijkstra {
             tailGoalNode.setGoalCenter(dijkComp.computeGoalCenter(tailGoalNode));
         } else {
             throw new UnknownPuagNodeException(tailNode);
+        }
+    }
+
+    private void updateNode(PUAG.Node node1, PUAG.Node node2) {
+        if (node1.getClass() == PUAG.AllyPassNode.class) {
+            PUAG.AllyPassNode node1PassNode = (PUAG.AllyPassNode) node1;
+
+            graph.setEdgeProb(node1, node2, dijkComp.computeProb(node1, node2));
+            node1PassNode.setPassPoint(dijkComp.computePasspoint(node1, node2));
+            node1PassNode.setAngle(dijkComp.computeAngle(node1, node2));
+            node1PassNode.setKickVec(dijkComp.computeKickVec(node1, node2));
+        } else if (node1.getClass() == PUAG.AllyRecepNode.class) {
+            PUAG.AllyRecepNode node1RecepNode = (PUAG.AllyRecepNode) node1;
+
+            graph.setEdgeProb(node1, node2, dijkComp.computeProb(node1, node2));
+            node1RecepNode.setAngle(dijkComp.computeAngle(node1, node2));
+            node1RecepNode.setReceptionPoint(dijkComp.computeRecepPoint(node1, node2));
+        } else if (node1.getClass() == PUAG.GoalNode.class) {
+            PUAG.GoalNode node1GoalNode = (PUAG.GoalNode) node1;
+            node1GoalNode.setGoalCenter(dijkComp.computeGoalCenter(node1GoalNode));
+        } else {
+            throw new UnknownPuagNodeException(node1);
         }
     }
 
@@ -139,34 +185,36 @@ public class TritonDijkstra {
         AttackPathInfo attackPathInfo = new AttackPathInfo();
         attackPathInfo.appendAndUpdate(startNode, 1.0);
 
-        System.out.println("[compute1 ] Initialized new path: " + attackPathInfo);
+//        System.out.println("[compute1 ] Initialized new path: " + attackPathInfo);
 
         frontier.add(attackPathInfo);
-        System.out.println("[compute2 ] Added path: [" + attackPathInfo.pathString() + "] to frontier with P = " + attackPathInfo.getTotalProbabilityProduct());
+//        System.out.println("[compute2 ] Added path: [" + attackPathInfo.pathString() + "] to frontier with P = " + attackPathInfo.getTotalProbabilityProduct());
 
         while (!frontier.isEmpty()) {
             AttackPathInfo currPath = frontier.poll();  // Get the path with the highest prob so far
-            System.out.println("[compute2.1 ] Popped path: [" + currPath.pathString() + "] out of frontier with P = " + currPath.getTotalProbabilityProduct());
+//            System.out.println("[compute2.1 ] Popped path: [" + currPath.pathString() + "] out of frontier with P = " + currPath.getTotalProbabilityProduct());
 
             PUAG.Node tailNode = currPath.getTailNode();    // Get the tail node of the returned path
 
             if (tailNode != null) {
                 if (tailNode.equals(graph.getEndNode())) {
                     PUAG.Node secondTailNode = currPath.getSecondTailNode();
-                    updateNode(secondTailNode, tailNode);
-                    if(secondTailNode == null) {
-                        System.out.println("[compute3 ] Second tail returned null.");
-                    }
-                    System.out.printf("[compute4 ] Updating node %s - %s \n", secondTailNode.getNodeBotIdString(), tailNode.getNodeBotIdString());
 
-                    currPath.appendAndUpdate(tailNode, 1.0);
-                    System.out.printf("[compute5 ] Append and update node %s with prob endNode\n", tailNode.getNodeBotIdString());
+                    if(secondTailNode == null) {
+//                        System.out.println("[compute3 ] Second tail returned null.");
+                    }
+                    assert secondTailNode != null;
+                    updateTailNode(secondTailNode, tailNode);
+
+//                    System.out.printf("[compute4 ] Updating node %s - tail: %s \n", secondTailNode.getNodeBotIdString(), tailNode.getNodeBotIdString());
+//                    System.out.printf("[compute5 ] Append and update node %s with prob endNode\n", tailNode.getNodeBotIdString());
+
 
                     return currPath;
                 }
 
                 List<PUAG.Node> adjacentNodes = graph.getAdjacentNodes(tailNode);    // Get reachable neighbors from the tail
-                System.out.printf("[compute6 ] Neighbors of %s are: [%s]\n", tailNode.getNodeBotIdString(), neighborsString(adjacentNodes));
+//                System.out.printf("[compute6 ] Neighbors of %s are: [%s]\n", tailNode.getNodeBotIdString(), neighborsString(adjacentNodes));
 
                 for (PUAG.Node adjacentNode : adjacentNodes) {
 
@@ -179,23 +227,23 @@ public class TritonDijkstra {
                     }
 
                     updateNode(tailNode, adjacentNode);
-                    System.out.printf("[compute7 ] Updating node %s - %s \n", currPath.getTailNode().getNodeBotIdString(), adjacentNode.getNodeBotIdString());
+//                    System.out.printf("[compute7 ] Updating node %s - %s \n", currPath.getTailNode().getNodeBotIdString(), adjacentNode.getNodeBotIdString());
 
                     AttackPathInfo newAttackPath = currPath.replicatePath();
-                    System.out.println("[compute7.1] Replicating path");
+//                    System.out.println("[compute7.1] Replicating path");
 
 
                     double prob = dijkComp.computeProb(tailNode, adjacentNode);
                     newAttackPath.appendAndUpdate(adjacentNode, prob);
-                    System.out.printf("[compute8 ] Append and update node %s with prob %f\n", adjacentNode.getNodeBotIdString(), prob);
+//                    System.out.printf("[compute8 ] Append and update node %s with prob %f\n", adjacentNode.getNodeBotIdString(), prob);
 
-                    System.out.printf("[compute8.1] The resulting path is [%s] with P = %f \n", newAttackPath.pathString(), newAttackPath.getTotalProbabilityProduct());
+//                    System.out.printf("[compute8.1] The resulting path is [%s] with P = %f \n", newAttackPath.pathString(), newAttackPath.getTotalProbabilityProduct());
 
 
                     Optional<AttackPathInfo> first = frontier.stream().filter((a) -> a.equals(newAttackPath)).findFirst();
                     if (first.isPresent()) { // Check if the neighbor was already considered
                         AttackPathInfo prevPath = first.get();
-                        System.out.printf("[compute9 ] Found existing path in frontier: [%s] with P = %f \n", prevPath.pathString(), prevPath.getTotalProbabilityProduct());
+//                        System.out.printf("[compute9 ] Found existing path in frontier: [%s] with P = %f \n", prevPath.pathString(), prevPath.getTotalProbabilityProduct());
 
                         double prevProb = prevPath.getTotalProbabilityProduct();
                         double currProb = currPath.getTotalProbabilityProduct() * prob;
@@ -204,12 +252,12 @@ public class TritonDijkstra {
                             // is better, replace prev path with curr path
                             frontier.remove(prevPath);
                             frontier.add(newAttackPath);
-                            System.out.println("[compute10] Replaced path: " + newAttackPath.pathString() + " to frontier");
+//                            System.out.println("[compute10] Replaced path: " + newAttackPath.pathString() + " to frontier");
 
                         }
                     } else {
                         frontier.add(newAttackPath);
-                        System.out.println("[compute11] Added path: [" + newAttackPath.pathString() + "] to frontier with P = " + newAttackPath.getTotalProbabilityProduct());
+//                        System.out.println("[compute11] Added path: [" + newAttackPath.pathString() + "] to frontier with P = " + newAttackPath.getTotalProbabilityProduct());
                     }
                 }
                 explored.add(tailNode);
@@ -277,7 +325,32 @@ public class TritonDijkstra {
 
         public AttackPathInfo replicatePath() {
             AttackPathInfo attackPathInfo = new AttackPathInfo();
-            attackPathInfo.getMaxProbPath().addAll(this.maxProbPath);
+
+            for (PUAG.Node node : this.maxProbPath) {
+                if(node.getClass() == PUAG.AllyPassNode.class) {
+                    PUAG.AllyPassNode passNode = (PUAG.AllyPassNode) node;
+                    PUAG.AllyPassNode newPassNode = new PUAG.AllyPassNode(passNode.getBot());
+                    newPassNode.setPassPoint(new Vec2D(passNode.getPassPoint()));
+                    newPassNode.setAngle(passNode.getAngle());
+                    newPassNode.setKickVec(new Vec2D(passNode.getKickVec()));
+                    attackPathInfo.getMaxProbPath().add(newPassNode);
+                    attackPathInfo.getConsideredNodes().add(newPassNode);
+                } else if (node.getClass() == PUAG.AllyRecepNode.class){
+                    PUAG.AllyRecepNode recepNode = (PUAG.AllyRecepNode) node;
+                    PUAG.AllyRecepNode newRecepNode = new PUAG.AllyRecepNode(recepNode.getBot());
+                    newRecepNode.setReceptionPoint(new Vec2D(recepNode.getReceptionPoint()));
+                    newRecepNode.setAngle(recepNode.getAngle());
+                    attackPathInfo.getMaxProbPath().add(newRecepNode);
+                    attackPathInfo.getConsideredNodes().add(newRecepNode);
+                } else if (node.getClass() == PUAG.GoalNode.class){
+                    PUAG.GoalNode goalNode = new PUAG.GoalNode();
+                    attackPathInfo.getMaxProbPath().add(goalNode);
+                    attackPathInfo.getConsideredNodes().add(goalNode);
+                } else {
+                    throw new UnknownPuagNodeException(node);
+                }
+            }
+
             attackPathInfo.setTotalProbabilityProduct(this.totalProbabilityProduct);
 
             return attackPathInfo;

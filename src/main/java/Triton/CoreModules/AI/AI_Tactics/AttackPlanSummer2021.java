@@ -100,7 +100,7 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case Dijkstra -> {
-                    tdksOutput = (new TritonDijkstra(graph).compute());
+                    tdksOutput = (new TritonDijkstra(graph, fielders, foes, ball).compute());   // Not finished with injection
                     currState = States.Preparation;
                 }
                 case Preparation -> {
