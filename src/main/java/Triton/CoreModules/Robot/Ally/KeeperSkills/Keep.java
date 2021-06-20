@@ -2,6 +2,7 @@ package Triton.CoreModules.Robot.Ally.KeeperSkills;
 
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
+import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
@@ -39,6 +40,13 @@ public class Keep {
             GoalPassTask goalPassTask = new GoalPassTask(ally, ball, passPos);
             if (!ally.isProcedureCompleted()) {
                 ally.executeProceduralTask(goalPassTask);
+            } else {
+                if (ally.isProcedureCancelled()) {
+                    ally.cancelProceduralTask();
+                }
+                if (ally.isProcedureCancelled()) {
+                    ally.cancelProceduralTask();
+                }
             }
         }
 
@@ -103,7 +111,6 @@ public class Keep {
                 ally.rotateTo(passAng);
 
             ally.kick(new Vec2D(2, 2));
-
             return true;
         }
     }
