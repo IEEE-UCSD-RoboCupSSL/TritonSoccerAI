@@ -100,15 +100,7 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case Dijkstra -> {
-                    try {
-                        tdksOutput = (new TritonDijkstra(graph).compute());
-                    } catch (UnknownPuagNodeException e) {
-                        e.printStackTrace();
-                    } catch (InvalidDijkstraGraphException e) {
-                        e.printStackTrace();
-                    } catch (NoDijkComputeInjectionException e) {
-                        e.printStackTrace();
-                    }
+                    tdksOutput = (new TritonDijkstra(graph).compute());
                     currState = States.Preparation;
                 }
                 case Preparation -> {

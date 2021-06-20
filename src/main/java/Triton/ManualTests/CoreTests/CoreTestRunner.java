@@ -43,13 +43,11 @@ public class CoreTestRunner {
                 }
 
                 TritonTestable test = testFactory.getTest(testName);
-                Optional<TritonTestable> test1 = Optional.ofNullable(test);
-
-                if (test1.isEmpty()) {
+                if(test == null) {
                     System.out.println("Invalid Test Name");
                     continue;
                 } else {
-                    result = test1.get().test(config);
+                    result = test.test(config);
                 }
 
                 prevTestName = testName;

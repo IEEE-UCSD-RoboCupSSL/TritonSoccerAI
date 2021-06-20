@@ -21,8 +21,6 @@ public class PUAG { //Probability Undirected Acyclic Graph
     private final Node endNode;
     private final HashMap<Node, Integer> nodeToIndexMap = new HashMap<>();
     private final HashMap<Node, Set<Node>> nodeNeighborSetMap = new HashMap<>();
-
-
     private final Edge[][] adjMatrix;
 
     public PUAG(Node startNode, Node endNode, List<Node> middleNodes) {
@@ -113,24 +111,6 @@ public class PUAG { //Probability Undirected Acyclic Graph
             }
 
             return Integer.toString(bot.getID());
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if(this.bot == null || obj == null){
-                return false;
-            }
-
-            if(obj instanceof Node){
-                Node node = (Node) obj;
-                Ally bot = node.getBot();
-                if( bot == null){
-                    return false;
-                }
-
-                return bot.equals(this.bot);
-            }
-            return false;
         }
     }
 

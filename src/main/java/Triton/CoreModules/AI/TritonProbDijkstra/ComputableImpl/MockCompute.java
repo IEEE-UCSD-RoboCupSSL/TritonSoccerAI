@@ -18,6 +18,13 @@ import java.util.Set;
 @Getter
 @Setter
 public class MockCompute implements DijkCompute {
+//    private final HashMap<PUAG.Node, Integer> nodeToIndexMap = new HashMap<>();
+//    private final Double[][] probMatrix;
+//    private final Double[][] angleMatrix;
+//    private final Vec2D[][] kickVecMatrix;
+//    private final Vec2D[][] passPointMatrix;
+//    private final Vec2D[][] recepPointMatrix;
+
     private final HashMap<PUAG.Node, HashMap<PUAG.Node, Double>> probMatrix = new HashMap<>();
     private final HashMap<PUAG.Node, HashMap<PUAG.Node, Double>> angleMatrix = new HashMap<>();
     private final HashMap<PUAG.Node, HashMap<PUAG.Node, Vec2D>> kickVecMatrix = new HashMap<>();

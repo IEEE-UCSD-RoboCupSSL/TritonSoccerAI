@@ -4,6 +4,9 @@ import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
+import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Foe.Foe;
+import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.RWLockee;
@@ -31,10 +34,6 @@ public class TritonDijkstra {
     private final PUAG graph;
     private DijkCompute dijkComp;
     SoccerObjects soccerObjects;
-
-    private RWLockee<Vec2D> ballPosWrapper;
-    private ArrayList<RobotSnapshot> fielderSnaps = new ArrayList<>();
-    private ArrayList<RobotSnapshot> foeSnaps = new ArrayList<>();
 
     /**
      * The preferred constructor. If the `TritonDijkstra` object is built using this constructor
@@ -70,6 +69,32 @@ public class TritonDijkstra {
         if (graph.getEndNode() == null || graph.getStartNode() == null) {
             throw new InvalidDijkstraGraphException();
         }
+    }
+
+    public List<RobotSnapshot> buildFielderSnaps(SoccerObjects so){
+        ArrayList<RobotSnapshot> robotSnapshots = new ArrayList<>();
+        RobotList<Ally> fielders = so.fielders;
+
+        for (Ally fielder : fielders) {
+            robotSnapshots.add(new RobotSnapshot(fielder));
+        }
+
+        return robotSnapshots;
+    }
+
+    public List<RobotSnapshot> buildFoeSnaps(SoccerObjects so){
+        ArrayList<RobotSnapshot> robotSnapshots = new ArrayList<>();
+        RobotList<Foe> foes = so.foes;
+
+        for (Foe foe : foes) {
+            robotSnapshots.add(new RobotSnapshot(foe));
+        }
+
+        return robotSnapshots;
+    }
+
+    public RWLockee<Vec2D> buildBallSnap(SoccerObjects so){
+        return new RWLockee<Vec2D>(so.ball.getPos());
     }
 
     private void updateNode(PUAG.Node secondTailNode, PUAG.Node tailNode) {
@@ -114,14 +139,14 @@ public class TritonDijkstra {
         AttackPathInfo attackPathInfo = new AttackPathInfo();
         attackPathInfo.appendAndUpdate(startNode, 1.0);
 
-//        System.out.println("[compute1 ] Initialized new path: " + attackPathInfo);
+        System.out.println("[compute1 ] Initialized new path: " + attackPathInfo);
 
         frontier.add(attackPathInfo);
-//        System.out.println("[compute2 ] Added path: [" + attackPathInfo.pathString() + "] to frontier with P = " + attackPathInfo.getTotalProbabilityProduct());
+        System.out.println("[compute2 ] Added path: [" + attackPathInfo.pathString() + "] to frontier with P = " + attackPathInfo.getTotalProbabilityProduct());
 
         while (!frontier.isEmpty()) {
             AttackPathInfo currPath = frontier.poll();  // Get the path with the highest prob so far
-//            System.out.println("[compute2.1 ] Popped path: [" + currPath.pathString() + "] out of frontier with P = " + currPath.getTotalProbabilityProduct());
+            System.out.println("[compute2.1 ] Popped path: [" + currPath.pathString() + "] out of frontier with P = " + currPath.getTotalProbabilityProduct());
 
             PUAG.Node tailNode = currPath.getTailNode();    // Get the tail node of the returned path
 
@@ -130,18 +155,18 @@ public class TritonDijkstra {
                     PUAG.Node secondTailNode = currPath.getSecondTailNode();
                     updateNode(secondTailNode, tailNode);
                     if(secondTailNode == null) {
-//                        System.out.println("[compute3 ] Second tail returned null.");
+                        System.out.println("[compute3 ] Second tail returned null.");
                     }
-//                    System.out.printf("[compute4 ] Updating node %s - %s \n", secondTailNode.getNodeBotIdString(), tailNode.getNodeBotIdString());
+                    System.out.printf("[compute4 ] Updating node %s - %s \n", secondTailNode.getNodeBotIdString(), tailNode.getNodeBotIdString());
 
                     currPath.appendAndUpdate(tailNode, 1.0);
-//                    System.out.printf("[compute5 ] Append and update node %s with prob endNode\n", tailNode.getNodeBotIdString());
+                    System.out.printf("[compute5 ] Append and update node %s with prob endNode\n", tailNode.getNodeBotIdString());
 
                     return currPath;
                 }
 
                 List<PUAG.Node> adjacentNodes = graph.getAdjacentNodes(tailNode);    // Get reachable neighbors from the tail
-//                System.out.printf("[compute6 ] Neighbors of %s are: [%s]\n", tailNode.getNodeBotIdString(), neighborsString(adjacentNodes));
+                System.out.printf("[compute6 ] Neighbors of %s are: [%s]\n", tailNode.getNodeBotIdString(), neighborsString(adjacentNodes));
 
                 for (PUAG.Node adjacentNode : adjacentNodes) {
 
@@ -154,23 +179,23 @@ public class TritonDijkstra {
                     }
 
                     updateNode(tailNode, adjacentNode);
-//                    System.out.printf("[compute7 ] Updating node %s - %s \n", currPath.getTailNode().getNodeBotIdString(), adjacentNode.getNodeBotIdString());
+                    System.out.printf("[compute7 ] Updating node %s - %s \n", currPath.getTailNode().getNodeBotIdString(), adjacentNode.getNodeBotIdString());
 
                     AttackPathInfo newAttackPath = currPath.replicatePath();
-//                    System.out.println("[compute7.1] Replicating path");
+                    System.out.println("[compute7.1] Replicating path");
 
 
                     double prob = dijkComp.computeProb(tailNode, adjacentNode);
                     newAttackPath.appendAndUpdate(adjacentNode, prob);
-//                    System.out.printf("[compute8 ] Append and update node %s with prob %f\n", adjacentNode.getNodeBotIdString(), prob);
+                    System.out.printf("[compute8 ] Append and update node %s with prob %f\n", adjacentNode.getNodeBotIdString(), prob);
 
-//                    System.out.printf("[compute8.1] The resulting path is [%s] with P = %f \n", newAttackPath.pathString(), newAttackPath.getTotalProbabilityProduct());
+                    System.out.printf("[compute8.1] The resulting path is [%s] with P = %f \n", newAttackPath.pathString(), newAttackPath.getTotalProbabilityProduct());
 
 
                     Optional<AttackPathInfo> first = frontier.stream().filter((a) -> a.equals(newAttackPath)).findFirst();
                     if (first.isPresent()) { // Check if the neighbor was already considered
                         AttackPathInfo prevPath = first.get();
-//                        System.out.printf("[compute9 ] Found existing path in frontier: [%s] with P = %f \n", prevPath.pathString(), prevPath.getTotalProbabilityProduct());
+                        System.out.printf("[compute9 ] Found existing path in frontier: [%s] with P = %f \n", prevPath.pathString(), prevPath.getTotalProbabilityProduct());
 
                         double prevProb = prevPath.getTotalProbabilityProduct();
                         double currProb = currPath.getTotalProbabilityProduct() * prob;
@@ -179,12 +204,12 @@ public class TritonDijkstra {
                             // is better, replace prev path with curr path
                             frontier.remove(prevPath);
                             frontier.add(newAttackPath);
-//                            System.out.println("[compute10] Replaced path: " + newAttackPath.pathString() + " to frontier");
+                            System.out.println("[compute10] Replaced path: " + newAttackPath.pathString() + " to frontier");
 
                         }
                     } else {
                         frontier.add(newAttackPath);
-//                        System.out.println("[compute11] Added path: [" + newAttackPath.pathString() + "] to frontier with P = " + newAttackPath.getTotalProbabilityProduct());
+                        System.out.println("[compute11] Added path: [" + newAttackPath.pathString() + "] to frontier with P = " + newAttackPath.getTotalProbabilityProduct());
                     }
                 }
                 explored.add(tailNode);
