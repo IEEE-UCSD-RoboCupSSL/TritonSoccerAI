@@ -1,7 +1,10 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidNodeIndexException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoSuchEdgeException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NodesNotUniqueException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -24,18 +27,27 @@ public class PUAG { //Probability Undirected Acyclic Graph
     private final Edge[][] adjMatrix;
 
     public PUAG(Node startNode, Node endNode, List<Node> middleNodes) {
+
+        if(!testNodeUnique(startNode, endNode, middleNodes)){
+            throw new NodesNotUniqueException(startNode, endNode, middleNodes);
+        }
         // construct graph
         this.startNode = startNode;
         this.endNode = endNode;
         int index = 0;
 
-        nodeToIndexMap.put(startNode, index++);
+        nodeToIndexMap.put(startNode, index);
+        System.out.printf("[PUAG1] map %s to index %d\n", startNode, index);
+        index++;
 
         for (Node middleNode : middleNodes) {
-            nodeToIndexMap.put(middleNode, index++);
+            nodeToIndexMap.put(middleNode, index);
+            System.out.printf("[PUAG1] map %s to index %d\n", middleNode, index);
+            index++;
         }
 
         nodeToIndexMap.put(endNode, index);
+        System.out.printf("[PUAG1] map %s to index %d\n", endNode, index);
 
         adjMatrix = new Edge[nodeToIndexMap.size()][nodeToIndexMap.size()];
 
@@ -55,9 +67,24 @@ public class PUAG { //Probability Undirected Acyclic Graph
     public int getIndexOfNode(Node node){
         Integer integer = nodeToIndexMap.get(node);
         if(integer == null){
-            return -1;
+            throw new NonExistentNodeException(node);
         }
+
+        if(integer >= getNumNodes()){
+            throw new InvalidNodeIndexException(nodeToIndexMap, node);
+        }
+
         return integer;
+    }
+
+    private boolean testNodeUnique(Node startNode, Node endNode, List<Node> middleNodes){
+        HashSet<Node> nodes = new HashSet<>();
+
+        nodes.add(startNode);
+        nodes.add(endNode);
+        nodes.addAll(middleNodes);
+
+        return nodes.size() >= middleNodes.size() + 2;
     }
 
     public Set<Node> getNodeSet() {
@@ -97,6 +124,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
             } else {
                 throw new NoSuchEdgeException(node1, node2);
             }
+
         }else{
             if (areNeighbors) {
                 return adjMatrix[indexOfNode2][indexOfNode1];
@@ -113,9 +141,15 @@ public class PUAG { //Probability Undirected Acyclic Graph
     @Getter
     public abstract static class Node {
         @Nullable private final Ally bot;
+        private final int relatedRobotId;
 
         public Node(@Nullable Ally bot) {
             this.bot = bot;
+            if(bot == null){
+                relatedRobotId = -1;
+            } else {
+                relatedRobotId = bot.getID();
+            }
         }
 
         public String getNodeBotIdString(){
@@ -129,23 +163,36 @@ public class PUAG { //Probability Undirected Acyclic Graph
         @Override
         public int hashCode() {
             if(bot == null){
+//                System.out.println("[hashCode] bot is null");
                 return super.hashCode();
             }
-
+//            System.out.println("[hashCode] bot is not null");
             return bot.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
             if(bot == null || obj == null){
+//                System.out.println("[equals] either bot or obj is null");
                 return super.equals(obj);
             }
 
-            if(!(obj instanceof Ally)){
+            if(!(obj instanceof Node)){
+//                System.out.println("[equals] obj is no instanceof Node");
                 return super.equals(obj);
             }
 
-            return bot.getID() == ((Ally) obj).getID();
+            Ally otherBot = ((Node) obj).getBot();
+
+            if(otherBot == null){
+                return super.equals(obj);
+            }
+
+            int id1 = this.bot.getID();
+            int id2 = otherBot.getID();
+
+//            System.out.printf("[equals] comparing if bot %d is equal to bot %d\n", id1, id2);
+            return id1 == id2;
         }
     }
 
@@ -189,6 +236,20 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
         public GoalNode() {
             super(null);
+        }
+
+        @Override
+        public int hashCode() {
+            return goalCenter.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(!(obj instanceof GoalNode)){
+                return false;
+            }
+
+            return this.goalCenter.equals(((GoalNode) obj).goalCenter);
         }
     }
 
