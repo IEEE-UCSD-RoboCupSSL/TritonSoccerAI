@@ -18,6 +18,8 @@ public abstract class SimClientModule implements Module {
     protected DatagramSocket socket;
     protected int port;
 
+    protected byte[] receiveBuffer = new byte[1024];
+
     protected final ArrayList<Subscriber<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
 
     protected boolean isFirstRun = true;
@@ -39,7 +41,7 @@ public abstract class SimClientModule implements Module {
             isFirstRun = false;
         }
 
-        sendCommandsToSim();
+        exec();
     }
 
     private void setup() {
@@ -52,7 +54,8 @@ public abstract class SimClientModule implements Module {
         }
 
         try {
-            socket = new DatagramSocket();
+            //socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
+            socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
             address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
         } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
@@ -61,7 +64,7 @@ public abstract class SimClientModule implements Module {
 
     }
 
-    protected abstract void sendCommandsToSim();
+    protected abstract void exec();
 
     /**
      * Sends a packet
@@ -77,5 +80,16 @@ public abstract class SimClientModule implements Module {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    protected DatagramPacket receiveUdpPacketFollowingSend() { // send already binds to the endpoint
+        DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+        try {
+            socket.receive(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return packet;
     }
 }

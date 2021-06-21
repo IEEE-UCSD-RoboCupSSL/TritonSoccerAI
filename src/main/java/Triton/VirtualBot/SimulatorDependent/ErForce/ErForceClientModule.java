@@ -1,12 +1,17 @@
 package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
+import Proto.SslSimulationRobotFeedback;
 import Triton.Config.Config;
-import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
+import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.VirtualBot.SimClientModule;
 import Triton.VirtualBot.VirtualBotCmds;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.util.ArrayList;
 
 import Proto.SslSimulationRobotControl.RobotCommand;
@@ -17,13 +22,19 @@ import Proto.SslSimulationRobotControl.RobotControl;
 public class ErForceClientModule extends SimClientModule {
 
     private static final float MAX_DRIB_SPEED = 500.0f;
+    private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
 
     public ErForceClientModule(Config config) {
         super(config);
+        for(int id = 0; id < config.numAllyRobots; id++) {
+            isBotContactBallPubs.add(new FieldPublisher<>("From:ErForceClientModule", "BallBotContactList " + id, false));
+        }
     }
 
+
+
     @Override
-    protected void sendCommandsToSim() {
+    protected void exec() {
         ArrayList<RobotCommand> robotCmdArr = new ArrayList<>();
 
         for (int i = 0; i < config.numAllyRobots; i++) {
@@ -61,5 +72,25 @@ public class ErForceClientModule extends SimClientModule {
         byte[] bytes;
         bytes = robotCtrl.toByteArray();
         sendUdpPacket(bytes);
+
+
+//        try {
+//            SslSimulationRobotFeedback.RobotControlResponse feedbacks = receiveResponse();
+//            for(int id = 0; id < config.numAllyRobots; id++) {
+//                isBotContactBallPubs.get(id).publish(feedbacks.getFeedback(id).getDribblerBallContact());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+    }
+
+    private SslSimulationRobotFeedback.RobotControlResponse receiveResponse() throws IOException {
+        DatagramPacket packet = receiveUdpPacketFollowingSend();
+        ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
+                packet.getOffset(), packet.getLength());
+        SslSimulationRobotFeedback.RobotControlResponse robotControlResponse =
+                SslSimulationRobotFeedback.RobotControlResponse.parseFrom(stream);
+        return robotControlResponse;
     }
 }

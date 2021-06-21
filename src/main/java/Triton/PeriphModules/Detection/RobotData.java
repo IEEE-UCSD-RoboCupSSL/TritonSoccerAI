@@ -16,6 +16,7 @@ import java.util.LinkedList;
  * Stores data about robot object
  */
 public class RobotData {
+    public static double MAX_POS_LEN = 8000;
 
     private static class TimePairComparator<T> implements Comparator<Pair<T, Double>> {
         @Override
@@ -76,6 +77,13 @@ public class RobotData {
     public double getAngleVel() {
         return angleVel;
     }
+
+//    public boolean verifyPos() {
+//        Vec2D pos = getPos();
+//        if(pos)
+//    }
+
+
 
     public void update(Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot detection, double time) {
         Vec2D audienceRobotPos = new Vec2D(detection.getX(), detection.getY());
