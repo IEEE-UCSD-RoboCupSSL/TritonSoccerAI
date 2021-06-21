@@ -1,9 +1,42 @@
 package Triton.ManualTests.TestUtil;
 
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
 import java.util.Scanner;
 
 public class TestUtil {
-    public static boolean testDoublesEq(String testName, double expected, double actual, double precision) {
+    public static boolean testVec2dEq(String testName, Vec2D expected, Vec2D actual, double precision) {
+
+        if(actual == null) {
+            System.out.printf("[Test PASSED] test: [%s] with expected = <%f, %f>, precision = %f, and actual = NULL\n",
+                    testName, expected.x, expected.y, precision);
+            return true;
+        }
+
+        boolean res = (actual.x < expected.x + precision) && (actual.x > expected.x - precision) && (actual.y < expected.y + precision) && (actual.y > expected.y - precision);
+        if (res) {
+            System.out.printf("[Test PASSED] test: [%s] with expected = <%f, %f>, precision = %f, and actual = <%f, %f>\n",
+                    testName, expected.x, expected.y, precision, actual.x, actual.y);
+            return true;
+        } else {
+            System.out.printf("[Test FAILED] test: [%s] with expected = <%f, %f>, precision = %f, and actual = <%f, %f>\n",
+                    testName, expected.x, expected.y, precision, actual.x, actual.y);
+            return false;
+        }
+
+    }
+
+    public static boolean testIntEq(String testName, int expected, int actual){
+        if(expected == actual){
+            System.out.printf("[Test PASSED] test: [%s] with expected = %d, and actual = %d\n", testName, expected, actual);
+            return true;
+        } else {
+            System.out.printf("[Test FAILED] test: [%s] with expected = %d, and actual = %d\n", testName, expected, actual);
+            return false;
+        }
+    }
+
+    public static boolean testDoubleEq(String testName, double expected, double actual, double precision) {
         boolean res = (expected < actual + precision) && (expected > actual - precision);
 
         if (res) {
@@ -17,9 +50,9 @@ public class TestUtil {
 
     public static boolean testStringEq(String testName, String expected, String actual) {
         boolean res;
-        try{
-             res = actual.equals(expected);
-        } catch (NullPointerException e){
+        try {
+            res = actual.equals(expected);
+        } catch (NullPointerException e) {
             res = false;
         }
 
@@ -36,10 +69,10 @@ public class TestUtil {
         boolean res = actual == expected;
 
         if (res) {
-            System.out.printf("[Test PASSED] test: [%s] with expected = %s, and actual = %s\n", testName, expected, actual);
+            System.out.printf("[Test PASSED] test: [%s] with expected = [%s], and actual = [%s]\n", testName, expected, actual);
             return true;
         } else {
-            System.out.printf("[Test FAILED] test: [%s] with expected = %s, and actual = %s\n", testName, expected, actual);
+            System.out.printf("[Test FAILED] test: [%s] with expected = [%s], and actual = [%s]\n", testName, expected, actual);
             return false;
         }
     }

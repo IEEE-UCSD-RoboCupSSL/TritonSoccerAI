@@ -2,6 +2,7 @@ package Triton.ManualTests.CoreTests;
 
 import Triton.Config.Config;
 import Triton.ManualTests.CoreTests.CoreTestFactory;
+import Triton.ManualTests.TestUtil.TestUtil;
 import Triton.ManualTests.TritonTestable;
 import Triton.SoccerObjects;
 
@@ -45,6 +46,7 @@ public class CoreTestRunner {
                 TritonTestable test = testFactory.getTest(testName);
                 if(test == null) {
                     System.out.println("Invalid Test Name");
+                    TestUtil.enterKeyToContinue();
                     continue;
                 } else {
                     result = test.test(config);

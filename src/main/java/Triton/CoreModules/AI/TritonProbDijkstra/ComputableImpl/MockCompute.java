@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl;
 
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.Computables.GoalCenterCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -61,6 +62,7 @@ public class MockCompute implements DijkCompute {
     public boolean setProb(PUAG.Node n1, PUAG.Node n2, double prob) {
         try {
             probMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = prob;
+            probMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = prob;
         } catch (IndexOutOfBoundsException e){
             return false;
         }
@@ -77,19 +79,23 @@ public class MockCompute implements DijkCompute {
 
     public void setAngle(PUAG.Node n1, PUAG.Node n2, double angle) {
         angleMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = angle;
+        angleMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = angle;
     }
 
     public void setKickVec(PUAG.Node n1, PUAG.Node n2, Vec2D kickVec) {
         kickVecMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = kickVec;
+        kickVecMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = kickVec;
 
     }
 
     public void setPasspoint(PUAG.Node n1, PUAG.Node n2, Vec2D passpoint) {
         passPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = passpoint;
+        passPointMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = passpoint;
     }
 
     public void setRecepPoint(PUAG.Node n1, PUAG.Node n2, Vec2D recepPoint) {
         recepPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = recepPoint;
+        recepPointMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = recepPoint;
     }
 
     @Override
@@ -124,6 +130,9 @@ public class MockCompute implements DijkCompute {
 
     @Override
     public Vec2D computeGoalCenter(PUAG.Node n) {
+        if(n.getClass() == PUAG.GoalNode.class) {
+            return ((PUAG.GoalNode) n).getGoalCenter();
+        }
         return null;
     }
 

@@ -2,6 +2,7 @@ package Triton.ManualTests.VirtualBotTests;
 
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.ManualTests.TestUtil.TestUtil;
 import Triton.ManualTests.TritonTestable;
 import Triton.ManualTests.VirtualBotTests.VirtualBotTestFactory;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -35,6 +36,7 @@ public class VirtualBotTestRunner {
 
                 if (test1.isEmpty()) {
                     System.out.println("Invalid Test Name");
+                    TestUtil.enterKeyToContinue();
                     continue;
                 } else {
                     result = test1.get().test(config);
