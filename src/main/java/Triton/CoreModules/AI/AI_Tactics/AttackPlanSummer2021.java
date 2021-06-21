@@ -8,6 +8,7 @@ import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.Compute;
+import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
@@ -116,8 +117,11 @@ public class AttackPlanSummer2021 extends Tactics {
                 }
                 case Dijkstra -> {
 //                    System.out.println("[Attack2021] Entering state [Dijkstra]");
-                    Compute compute = new Compute(graph);
-                    compute.setSnapShots(TritonDijkstra.buildFielderSnaps(fielders), TritonDijkstra.buildFoeSnaps(foes), TritonDijkstra.buildBallSnap(ball));
+
+//                    Compute compute = new Compute(graph);
+//                    compute.setSnapShots(TritonDijkstra.buildFielderSnaps(fielders), TritonDijkstra.buildFoeSnaps(foes), TritonDijkstra.buildBallSnap(ball));
+                    MockCompute compute = new MockCompute(graph);
+                    compute.mock(fielders);
 
                     try {
                         tdksOutput = (new TritonDijkstra(graph, compute, fielders, foes, ball).compute());
