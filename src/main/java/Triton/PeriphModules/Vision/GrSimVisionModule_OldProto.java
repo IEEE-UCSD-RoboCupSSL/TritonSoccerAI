@@ -23,7 +23,7 @@ import static Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslGeometry.*
  */
 public class GrSimVisionModule_OldProto extends VisionModule {
 
-    private final static int MAX_BUFFER_SIZE = 671088;
+    private final static int MAX_BUFFER_SIZE = 600000;
     private final Publisher<SSL_DetectionFrame> visionPub;
     private MulticastSocket socket;
     private DatagramPacket packet;

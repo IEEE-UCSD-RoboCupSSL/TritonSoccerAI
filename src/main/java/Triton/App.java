@@ -3,6 +3,7 @@ package Triton;
 import Triton.Config.*;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
+import Triton.CoreModules.AI.AI;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTests.CoreTestRunner;
 import Triton.ManualTests.CoreTests.RobotSkillsTests.PrimitiveMotionTest;
@@ -11,6 +12,7 @@ import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.ERForceVisionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
@@ -49,6 +51,8 @@ public class App {
     public static FieldPubSubPair<Boolean> appCanceller = new FieldPubSubPair<>("From:App", "Canceller", false);
     public static ScheduledExecutorService threadPool;
     public static ArrayList<ScheduledFuture<?>> moduleFutures = new ArrayList<>();
+    public static GameCtrlModule gameCtrlModule = null;
+
     static {
         /* Prepare a Thread Pool*/
         threadPool = new ScheduledThreadPoolExecutor(TotalNumOfThreads);
@@ -80,15 +84,17 @@ public class App {
 
         switch (config.cliConfig.progMode) {
             case Normal -> {
-//                /* Run the actual game program */
-//                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
-//                createAndRunPeriphModules(config, true);
-//                SoccerObjects soccerObjects = new SoccerObjects(config);
-//                moduleFutures.addAll(soccerObjects.runModules());
-////            /* Instantiate & Run the main AI module, which is the core of this software */
-////            threadPool.submit(new AI(config, fielders, goalKeeper, foes, ball, gameCtrlModule));
-//                Util.sleepForever(appCanceller.sub);
-                System.err.println("Error: WorkInProgress");
+                /* Run the actual game program */
+                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                /* Instantiate & Run each independent module in a separate thread from the thread threadPool */
+                createAndRunPeriphModules(config, true);
+                delay(500);
+                SoccerObjects soccerObjects = new SoccerObjects(config);
+                moduleFutures.addAll(soccerObjects.runModules());
+                delay(500);
+//            /* Instantiate & Run the main AI module, which is the core of this software */
+                App.runModule(new AI(config, soccerObjects, gameCtrlModule), GvcModuleFreqs.AI_MODULE_FREQ);
+                Util.sleepForever(appCanceller.sub);
             }
             case Test -> {
                 handleTestMode(config, scanner);
@@ -121,49 +127,11 @@ public class App {
         } else {
             System.err.println("Error: WorkInProgress");
         }
-
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-//
-//        Display display = new Display(config);
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
-//        paintOptions.add(INFO);
-//        paintOptions.add(PROBABILITY);
-//        paintOptions.add(PREDICTION);
-//        paintOptions.add(DRAWABLES);
-//        display.setPaintOptions(paintOptions);
-//
-//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-//                0,
-//                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
-//                TimeUnit.NANOSECONDS);
-
-//        Publisher<ArrayList<Drawable2D>> drawablePub = new FieldPublisher<>("[Pair]DefinedIn:Display", "Drawables", new ArrayList<>());
-//        ArrayList<Drawable2D> drawables = new ArrayList<>();
-//        Circle2D circle = new Circle2D(new Vec2D(0, 0), 100);
-//        drawables.add(circle);
-//        Line2D line = new Line2D(new Vec2D(0, 0), new Vec2D(500, 500));
-//        drawables.add(line);
-//        Rect2D rect = new Rect2D(new Vec2D(100, 100), 200, 200);
-//        drawables.add(rect);
-//        drawablePub.publish(drawables);
-
         if(runGameCtrl) {
-            App.runModule(new SSLGameCtrlModule(config), GvcModuleFreqs.GAME_CTRL_MODULE_FREQ);
-
-//            int port = (config.team == BLUE) ? 6543 : 6544;
-//
-//            GameCtrlModule gameCtrlModule = new PySocketGameCtrlModule(port);
-//            GameCtrlModule gameCtrlModule = new SSLGameCtrlModule();
-//            GameCtrlModule gameCtrlModule = new StdinGameCtrlModule(new Scanner(System.in));
-//            ScheduledFuture<?> gameCtrlModuleFuture = App.threadPool.scheduleAtFixedRate(
-//                    gameCtrlModule,
-//                0, Util.toPeriod(GvcModuleFreqs.GAME_CTRL_MODULE_FREQ, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
-//
-            System.err.println("Error: WorkInProgress");
+            gameCtrlModule = new SSLGameCtrlModule(config);
+            App.runModule(gameCtrlModule, GvcModuleFreqs.GAME_CTRL_MODULE_FREQ);
         }
-
         delay(1000);
     }
 
@@ -309,3 +277,31 @@ public class App {
 
 
 }
+
+
+
+//
+//        Display display = new Display(config);
+//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+//        paintOptions.add(GEOMETRY);
+//        paintOptions.add(OBJECTS);
+//        paintOptions.add(INFO);
+//        paintOptions.add(PROBABILITY);
+//        paintOptions.add(PREDICTION);
+//        paintOptions.add(DRAWABLES);
+//        display.setPaintOptions(paintOptions);
+//
+//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+//                0,
+//                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+//                TimeUnit.NANOSECONDS);
+
+//        Publisher<ArrayList<Drawable2D>> drawablePub = new FieldPublisher<>("[Pair]DefinedIn:Display", "Drawables", new ArrayList<>());
+//        ArrayList<Drawable2D> drawables = new ArrayList<>();
+//        Circle2D circle = new Circle2D(new Vec2D(0, 0), 100);
+//        drawables.add(circle);
+//        Line2D line = new Line2D(new Vec2D(0, 0), new Vec2D(500, 500));
+//        drawables.add(line);
+//        Rect2D rect = new Rect2D(new Vec2D(100, 100), 200, 200);
+//        drawables.add(rect);
+//        drawablePub.publish(drawables);

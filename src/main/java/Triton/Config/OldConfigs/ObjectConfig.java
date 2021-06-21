@@ -8,7 +8,6 @@ import Triton.CoreModules.Robot.Team;
 public final class ObjectConfig {
     public static double ROBOT_RADIUS = 90.0;
     public static double ROBOT_MIN_RADIUS = ROBOT_RADIUS - 15;
-    public static double ROBOT_DRIB_WIDTH = 80.0;
     public static final double BALL_RADIUS = 45.0 / 2.0;
 
     public static final double EXCESSIVE_DRIBBLING_DIST = 1000; // 1 meter
@@ -17,5 +16,5 @@ public final class ObjectConfig {
     public static double MAX_KICK_VEL = 6.5;
 
     public static int MAX_POS_LIST_CAPACITY = 15;
-    public static double DRIBBLER_OFFSET = 105;
+    public static double DRIBBLER_OFFSET = 85; // Competition Ad Hoc, Was 105
 }

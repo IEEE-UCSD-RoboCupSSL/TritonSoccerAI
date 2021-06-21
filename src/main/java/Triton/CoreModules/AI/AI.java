@@ -26,7 +26,7 @@ import static Triton.Util.delay;
 
 public class AI implements Module {
     private static final double KICK_DIST = 100;
-
+    
     private final RobotList<Ally> fielders;
     private final Ally keeper;
     private final RobotList<Foe> foes;
@@ -38,7 +38,7 @@ public class AI implements Module {
     private final AttackSupportMapModule atkSupportMap;
     private final PassProbMapModule passProbMap;
 
-    private GameState prevState;
+    private GameState prevState = new GameState(GameStateName.HALT);
 
     private Config config;
 
@@ -62,12 +62,43 @@ public class AI implements Module {
         try {
             while (true) { // delay added
                 GameState currGameState = gameCtrl.getGameState();
-                // Decision Trees
-                if (currGameState != prevState) {
-                    runNewState(currGameState);
-                    prevState = currGameState;
+
+                if(currGameState.getName() != prevState.getName()) {
+                    System.out.println(">>>>>>" + currGameState + "<<<<<<");
                 }
-                runCurrentState(currGameState);
+                switch (currGameState.getName()) {
+                    case HALT, STOP, TIMEOUT -> {
+                        fielders.stopAll();
+                        keeper.stop();
+                    }
+                    case NORMAL_START -> {
+                        switch (prevState.getName()) {
+                            case PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE, PREPARE_KICKOFF, PREPARE_PENALTY -> {
+                                preparedStart();
+                            }
+                            default -> {
+                                strategyToPlay.play();
+                            }
+                        }
+                    }
+                    case FORCE_START -> {
+                        strategyToPlay.play();
+                    }
+        //            case PREPARE_KICKOFF -> {
+        //                PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) currGameState;
+        //                kickOff(prepareKickoffGameState);
+        //            }
+                    case BALL_PLACEMENT -> {
+                        BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
+                        Team ballPlacementTeam = ballPlacementGameState.getTeam();
+
+                        if (ballPlacementTeam == config.myTeam) {
+                            Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
+                            ballPlacement(teamTargetPos);
+                        }
+                    }
+                }
+                prevState = currGameState;
                 delay(3);
             }
         } catch (Exception e) {
@@ -75,128 +106,70 @@ public class AI implements Module {
         }
     }
 
-    private void runNewState(GameState currGameState) throws InterruptedException {
-        switch (currGameState.getName()) {
-            case HALT -> {
-                System.err.println(">>>NEW: HALT<<<");
-            }
-            case STOP -> {
-                System.err.println(">>>NEW: STOP<<<");
-            }
-            case NORMAL_START -> {
-                System.err.println(">>>NEW: NORMAL_START<<<");
-                NormalStartGameState normalStartGameState = (NormalStartGameState) currGameState;
-                newNormalStart(normalStartGameState);
-            }
-            case FORCE_START -> {
-                System.err.println(">>>NEW: FORCE_START<<<");
-            }
-            case PREPARE_KICKOFF -> {
-                System.err.println(">>>NEW: PREPARE_KICKOFF<<<");
-            }
-            case PREPARE_PENALTY -> {
-                System.err.println(">>>NEW: PREPARE_PENALTY<<<");
-            }
-            case PREPARE_DIRECT_FREE -> {
-                System.err.println(">>>NEW: PREPARE_DIRECT_FREE<<<");
-            }
-            case PREPARE_INDIRECT_FREE -> {
-                System.err.println(">>>NEW: PREPARE_INDIRECT_FREE<<<");
-            }
-            case TIMEOUT -> {
-                System.err.println(">>>NEW: TIMEOUT<<<");
-            }
-            case BALL_PLACEMENT -> {
-                System.err.println(">>>NEW: BALL_PLACEMENT<<<");
-            }
-            default -> {
-                System.err.println(">>>NEW: UNKNOWN<<<");
-            }
-        }
-    }
+//    private void runNewState(GameState currGameState) throws InterruptedException {
+//        switch (currGameState.getName()) {
+//            case HALT -> {
+//                System.out.println(">>>NEW: HALT<<<");
+//            }
+//            case STOP -> {
+//                System.out.println(">>>NEW: STOP<<<");
+//            }
+//            case NORMAL_START -> {
+//                System.out.println(">>>NEW: NORMAL_START<<<");
+//                NormalStartGameState normalStartGameState = (NormalStartGameState) currGameState;
+//                newNormalStart(normalStartGameState);
+//            }
+//            case FORCE_START -> {
+//                System.out.println(">>>NEW: FORCE_START<<<");
+//            }
+//            case PREPARE_KICKOFF -> {
+//                System.out.println(">>>NEW: PREPARE_KICKOFF<<<");
+//            }
+//            case PREPARE_PENALTY -> {
+//                System.out.println(">>>NEW: PREPARE_PENALTY<<<");
+//            }
+//            case PREPARE_DIRECT_FREE -> {
+//                System.out.println(">>>NEW: PREPARE_DIRECT_FREE<<<");
+//            }
+//            case PREPARE_INDIRECT_FREE -> {
+//                System.out.println(">>>NEW: PREPARE_INDIRECT_FREE<<<");
+//            }
+//            case TIMEOUT -> {
+//                System.out.println(">>>NEW: TIMEOUT<<<");
+//            }
+//            case BALL_PLACEMENT -> {
+//                System.out.println(">>>NEW: BALL_PLACEMENT<<<");
+//            }
+//            default -> {
+//                System.out.println(">>>NEW: UNKNOWN<<<");
+//            }
+//        }
+//    }
 
-    private void runCurrentState(GameState currGameState) throws InterruptedException {
-        switch (currGameState.getName()) {
-            case HALT -> {
-                System.err.println(">>>CURRENT: HALT<<<");
-                fielders.stopAll();
-                keeper.stop();
-            }
-            case STOP -> {
-                System.err.println(">>>CURRENT: STOP<<<");
-                fielders.stopAll();
-                keeper.stop();
-            }
-            case NORMAL_START -> {
-                System.err.println(">>>CURRENT: NORMAL_START<<<");
-                strategyToPlay.play();
-            }
-            case FORCE_START -> {
-                System.err.println(">>>CURRENT: FORCE_START<<<");
-                strategyToPlay.play();
-            }
-            case PREPARE_KICKOFF -> {
-                System.err.println(">>>CURRENT: PREPARE_KICKOFF<<<");
-                PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) currGameState;
-                kickOff(prepareKickoffGameState);
-            }
-            case PREPARE_PENALTY -> {
-                System.err.println(">>>CURRENT: PREPARE_PENALTY<<<");
-            }
-            case PREPARE_DIRECT_FREE -> {
-                System.err.println(">>>CURRENT: PREPARE_DIRECT_FREE<<<");
-            }
-            case PREPARE_INDIRECT_FREE -> {
-                System.err.println(">>>CURRENT: PREPARE_INDIRECT_FREE<<<");
-            }
-            case TIMEOUT -> {
-                System.err.println(">>>CURRENT: TIMEOUT<<<");
-                fielders.stopAll();
-                keeper.stop();
-            }
-            case BALL_PLACEMENT -> {
-                System.err.println(">>>CURRENT: BALL_PLACEMENT<<<");
-                BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
-                Team ballPlacementTeam = ballPlacementGameState.getTeam();
-
-                if (ballPlacementTeam == config.myTeam) {
-                    Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
-                    ballPlacement(teamTargetPos);
-                }
-            }
-            default -> {
-                tmpPlaceHolder(">>>CURRENT: UNKNOWN<<<");
-            }
-        }
-    }
-
-    private void tmpPlaceHolder(String s) {
-    }
-
-    private void newNormalStart(NormalStartGameState normalStartGameState) throws InterruptedException {
+    private void preparedStart() throws InterruptedException {
         switch (prevState.getName()) {
             case PREPARE_KICKOFF -> {
                 if (((PrepareKickoffGameState) prevState).getTeam() == config.myTeam) {
-                    System.err.println(">>>SWITCH: START_KICKOFF<<<");
+                    System.out.println(">>>SWITCH: START_KICKOFF<<<");
                     PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) prevState;
                 }
             }
             case PREPARE_PENALTY -> {
                 if (((PreparePenaltyGameState) prevState).getTeam() == config.myTeam) {
-                    System.err.println(">>>SWITCH: START_PENALTY<<<");
+                    System.out.println(">>>SWITCH: START_PENALTY<<<");
                     PreparePenaltyGameState penaltyGameState = (PreparePenaltyGameState) prevState;
                 }
             }
             case PREPARE_DIRECT_FREE -> {
                 if (((PrepareDirectFreeGameState) prevState).getTeam() == config.myTeam) {
-                    System.err.println(">>>SWITCH: START_DIRECT_FREE<<<");
+                    System.out.println(">>>SWITCH: START_DIRECT_FREE<<<");
                     PrepareDirectFreeGameState prepareDirectFreeGameState = (PrepareDirectFreeGameState) prevState;
                     freeKick(prepareDirectFreeGameState);
                 }
             }
             case PREPARE_INDIRECT_FREE -> {
                 if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.myTeam) {
-                    System.err.println(">>>SWITCH: START_INDIRECT_FREE<<<");
+                    System.out.println(">>>SWITCH: START_INDIRECT_FREE<<<");
                     PrepareIndirectFreeGameState prepareIndirectFreeGameState = (PrepareIndirectFreeGameState) prevState;
                 }
             }

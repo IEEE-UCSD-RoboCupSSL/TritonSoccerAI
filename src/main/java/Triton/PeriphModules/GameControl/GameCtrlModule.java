@@ -14,18 +14,17 @@ public abstract class GameCtrlModule implements Module {
     protected GameCtrlModule(String gcName) {
         gsPub = new FieldPublisher<>("From:GameCtrlModule", "GameState " + gcName, new UnknownGameState());
         gsSub = new FieldSubscriber<>("From:GameCtrlModule", "GameState " + gcName);
-    }
-
-
-    public abstract void run();
-
-    protected void subscribe() {
         try {
             gsSub.subscribe(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    public abstract void run();
+
+    protected void subscribe() {}
 
     public GameState getGameState() {
         if (gsSub.isSubscribed()) {

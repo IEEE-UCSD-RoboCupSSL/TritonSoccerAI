@@ -1,6 +1,6 @@
 package Triton.PeriphModules.GameControl.GameStates;
 
-public abstract class GameState {
+public class GameState {
     private GameStateName name;
 
     public GameState (GameStateName name) {

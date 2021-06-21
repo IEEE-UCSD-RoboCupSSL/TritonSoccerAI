@@ -17,7 +17,7 @@ import static Triton.Util.delay;
 
 public class VirtualMcuTopModule implements Module {
 
-    protected final static int MAX_BUFFER_SIZE = 67108864;
+    protected final static int MAX_BUFFER_SIZE = 60000;
     private boolean isFirstRun = true;
     private Socket socket = null;
     private final int id;

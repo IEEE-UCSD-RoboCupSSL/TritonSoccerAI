@@ -24,7 +24,7 @@ import Proto.SslVisionGeometry.*;
  */
 public class ERForceVisionModule extends VisionModule {
 
-    private final static int MAX_BUFFER_SIZE = 67108864;
+    private final static int MAX_BUFFER_SIZE = 60000;
     private final static int RECV_TIMEOUT = 1000;
     private final Publisher<SSL_DetectionFrame> visionPub;
     private MulticastSocket socket;

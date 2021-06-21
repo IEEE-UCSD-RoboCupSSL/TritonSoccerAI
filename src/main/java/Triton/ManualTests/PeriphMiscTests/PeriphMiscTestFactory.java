@@ -28,7 +28,7 @@ public class PeriphMiscTestFactory {
         periphTestMap.put("pubsub", new PubSubTests(App.threadPool));
         periphTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
         periphTestMap.put("erforcevision", new ErForceSimVisionModuleTest());
-        periphTestMap.put("SSL", new SSLGameCtrlModuleTest());
+        periphTestMap.put("gc", new SSLGameCtrlModuleTest());
         periphTestMap.put("vbotmath", new ConstraintMappingMathTests());
         periphTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
         periphTestMap.put("detection", new DetectionTest_OldProto());
