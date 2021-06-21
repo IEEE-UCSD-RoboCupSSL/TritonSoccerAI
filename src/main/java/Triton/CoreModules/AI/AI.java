@@ -65,9 +65,11 @@ public class AI implements Module {
                 GameState currGameState = gameCtrl.getGameState();
                 // Decision Trees
                 if (currGameState != prevState) {
+                    // If we just switched to a new state, run the new state
                     runNewState(currGameState);
                     prevState = currGameState;
                 }
+                // run the current state we're in
                 runCurrentState(currGameState);
                 delay(3);
             }
