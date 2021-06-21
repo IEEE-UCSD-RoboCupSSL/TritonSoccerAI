@@ -68,7 +68,7 @@ public class DEPRECATED_CoordinatedPass extends Skills {
                 if (!passer.isHoldingBall()) {
                     currState = PassState.FAILED;
                 }
-                Vec2D passPos = passInfo.getOptimalPassingPos(passer);
+                Vec2D passPos = passInfo.getOptimalPassingPos();
                 // fix receive pos
                 Vec2D receivePos;
                 if (DEPRECATED_CoordinatedPass.receivePos != null) {
@@ -84,9 +84,9 @@ public class DEPRECATED_CoordinatedPass extends Skills {
                     currState = PassState.RECEIVER_IN_POSITION;
                 } else {
                     receiver.strafeTo(receivePos, receiveAngle);
-                    Pair<Double, Boolean> decision = passInfo.getKickDecision();
+                    Pair<Vec2D, Boolean> decision = passInfo.getKickDecision();
                     if (decision.getValue1() && passer.isDirAimed(passAngle)) {
-                        passer.kick(new Vec2D(decision.getValue0(), 0));
+                        passer.kick(decision.getValue0());
 
                         t1 = System.currentTimeMillis();
                         currState = PassState.PASSED; // set next state directly to the PASSED state
@@ -97,13 +97,13 @@ public class DEPRECATED_CoordinatedPass extends Skills {
                 if (!passer.isHoldingBall()) {
                     currState = PassState.FAILED;
                 }
-                Vec2D passPos = passInfo.getOptimalPassingPos(passer);
+                Vec2D passPos = passInfo.getOptimalPassingPos();
                 Vec2D receivePos = passInfo.getOptimalReceivingPos();
                 double passAngle = receivePos.sub(passPos).toPlayerAngle();
                 double receiveAngle = passPos.sub(receivePos).toPlayerAngle();
                 if (true) { //if (passer.isDirAimed(passAngle)) {
-                    Pair<Double, Boolean> decision = passInfo.getKickDecision();
-                    passer.kick(new Vec2D(decision.getValue0(), 0));
+                    Pair<Vec2D, Boolean> decision = passInfo.getKickDecision();
+                    passer.kick(decision.getValue0());
 
                     t1 = System.currentTimeMillis();
                     currState = PassState.PASSED;

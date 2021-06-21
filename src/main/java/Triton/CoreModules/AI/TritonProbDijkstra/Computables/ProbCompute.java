@@ -1,9 +1,10 @@
 package Triton.CoreModules.AI.TritonProbDijkstra.Computables;
 
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 
 public interface ProbCompute {
-    double computeProb(PUAG.Node n1, PUAG.Node n2);
+    double computeProb(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException;
 
-    double computeGoalProb(PUAG.Node n);
+    double computeGoalProb(PDG.Node n);
 }

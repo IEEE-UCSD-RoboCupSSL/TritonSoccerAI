@@ -5,15 +5,16 @@ import Triton.CoreModules.AI.Estimators.TimeEstimator.RobotMovement;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
+import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import org.checkerframework.checker.units.qual.A;
 import org.javatuples.Pair;
 
-public class PassInfo {
+import java.util.ArrayList;
 
-    private final RobotList<Ally> allies;
-    private final RobotList<Foe> foes;
-    private final Ball ball;
+public class PassInfo {
 
     private static final double DIST_MEAN = 500.0;
     private static final double DIST_RANGE = 500.0;
@@ -22,33 +23,36 @@ public class PassInfo {
 
     private static final double MAX_KICK_VEL = 4.0;
     private static final double MIN_KICK_VEL = 1.0;
+    private static final double GRAVITY = 9.81;
+    private static final double KICK_Z_FACTOR = 1.0;
+    private static final double KICK_Z_THRESHOLD = 100.0;
 
     private Ally passer;
     private Ally receiver;
+    private ArrayList<RobotSnapshot> robotSnaps;
     private Vec2D passingPos;
     private Vec2D receivingPos;
     private double prob;
 
-    public PassInfo(RobotList<Ally> allies, RobotList<Foe> foes, Ball ball) {
-        this.allies = allies;
-        this.foes = foes;
-        this.ball = ball;
-    }
-
-    public void setInfo(int passerID, int receiverID,
+    public void setInfo(Ally passer, Ally receiver,
                         Vec2D passingPos, Vec2D receivingPos, double prob) {
-        this.passer = allies.get(passerID);
-        this.receiver = allies.get(receiverID);
+        this.passer = passer;
+        this.receiver = receiver;
         this.passingPos = passingPos;
         this.receivingPos = receivingPos;
         this.prob = prob;
+    }
+
+    public void setRobots(ArrayList<RobotSnapshot> fielderSnaps, ArrayList<RobotSnapshot> foeSnaps) {
+        this.robotSnaps = new ArrayList<>(fielderSnaps);
+        this.robotSnaps.addAll(foeSnaps);
     }
 
     public double getMaxProb() {
         return prob;
     }
 
-    public Vec2D getOptimalPassingPos(Ally passer) {
+    public Vec2D getOptimalPassingPos() {
         return passingPos;
     }
 
@@ -64,16 +68,36 @@ public class PassInfo {
         return (1 / (1 + Math.exp(-(dist - DIST_MEAN) / DIST_RANGE))) * (WEIGHT_MAX - WEIGHT_MIN) + WEIGHT_MIN;
     }
 
-    public Pair<Double, Boolean> getKickDecision() {
-        double receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
-                receivingPos, receiver.getPos());
+    public Pair<Vec2D, Boolean> getKickDecision() {
+        /* Estimate optimal kick-x */
+        double receiverETA = 0.0;
+        try {
+            receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
+                    receivingPos, receiver.getPos());
+        } catch (NullPointerException e) {
+            System.err.println(receiver);
+            System.err.println(receivingPos);
+        }
         double ballDist = passingPos.sub(receivingPos).mag();
         double s = BallMovement.calcKickVel(ballDist, receiverETA);
         s = Math.max(MIN_KICK_VEL, Math.min(s, MAX_KICK_VEL));
         double ballETA = BallMovement.calcETA(s, ballDist);
-        return new Pair<>(s, receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
+
+        /* Estimate optimal kick-z */
+        double z = 0.0;
+        if (robotSnaps != null) {
+            for (RobotSnapshot robotSnap : robotSnaps) {
+                Vec2D robotPos = robotSnap.getPos();
+                if (robotPos.sub(receivingPos).mag() + robotPos.sub(passingPos).mag()
+                        - receivingPos.sub(passingPos).mag() < KICK_Z_THRESHOLD) {
+                    z = ballETA / 2.0 * GRAVITY * KICK_Z_FACTOR;
+                    break;
+                }
+            }
+        }
+
+        return new Pair<>(new Vec2D(s, z),
+                receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
     }
-
-
 
 }

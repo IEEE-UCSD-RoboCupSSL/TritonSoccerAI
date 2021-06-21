@@ -2,8 +2,11 @@ package Triton.CoreModules.AI.Estimators.Scores;
 
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_WIDTH;
@@ -20,6 +23,13 @@ public class C5 extends Score {
 
     public C5(ProbMapModule finder, Rect2D allyPenaltyRegion, Rect2D foePenaltyRegion) {
         super(finder);
+        this.allyPenaltyRegion = allyPenaltyRegion;
+        this.foePenaltyRegion  = foePenaltyRegion;
+    }
+
+    public C5(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps, Rect2D allyPenaltyRegion, Rect2D foePenaltyRegion) {
+        super(ballPos, fielderSnaps, foeSnaps);
         this.allyPenaltyRegion = allyPenaltyRegion;
         this.foePenaltyRegion  = foePenaltyRegion;
     }

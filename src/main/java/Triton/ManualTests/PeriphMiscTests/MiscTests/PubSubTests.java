@@ -1,12 +1,10 @@
-package Triton.ManualTests.MiscTests;
+package Triton.ManualTests.PeriphMiscTests.MiscTests;
 
 import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.MQPubSubPair;
 import Triton.Util;
-import lombok.Synchronized;
-import lombok.extern.log4j.Log4j;
 
 import java.util.Scanner;
 import java.util.concurrent.*;

@@ -3,9 +3,12 @@ package Triton.ManualTests.PeriphMiscTests;
 import Triton.App;
 
 import Triton.Config.Config;
-import Triton.ManualTests.MiscTests.ConstraintMappingMathTests;
-import Triton.ManualTests.MiscTests.FutureTaskTest;
-import Triton.ManualTests.MiscTests.PubSubTests;
+import Triton.ManualTests.PeriphMiscTests.MiscTests.ConstraintMappingMathTests;
+import Triton.ManualTests.PeriphMiscTests.MiscTests.FutureTaskTest;
+import Triton.ManualTests.PeriphMiscTests.MiscTests.PubSubTests;
+import Triton.ManualTests.PeriphMiscTests.PeriphTests.CustomPriorityQueueTest;
+import Triton.ManualTests.PeriphMiscTests.PeriphTests.GrSimVisionModuleTest_OldProto;
+import Triton.ManualTests.PeriphMiscTests.PeriphTests.SSLGameCtrlModuleTest;
 import Triton.ManualTests.TritonTestable;
 
 import java.util.TreeMap;
@@ -21,32 +24,33 @@ import java.util.TreeMap;
  */
 public class PeriphMiscTestFactory {
 
-    private final TreeMap<String, TritonTestable> periphTestMap = new TreeMap<>();
+    private final TreeMap<String, TritonTestable> periphMiscTestMap = new TreeMap<>();
 
     public PeriphMiscTestFactory(Config config) {
-        periphTestMap.put("futask", new FutureTaskTest(App.threadPool));
-        periphTestMap.put("pubsub", new PubSubTests(App.threadPool));
-        periphTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
-        periphTestMap.put("erforcevision", new ErForceSimVisionModuleTest());
-        periphTestMap.put("gc", new SSLGameCtrlModuleTest());
-        periphTestMap.put("vbotmath", new ConstraintMappingMathTests());
-        periphTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
-        periphTestMap.put("detection", new DetectionTest_OldProto());
+        periphMiscTestMap.put("futask", new FutureTaskTest(App.threadPool));
+        periphMiscTestMap.put("pubsub", new PubSubTests(App.threadPool));
+        periphMiscTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
+        periphMiscTestMap.put("erforcevision", new ErForceSimVisionModuleTest());
+        periphMiscTestMap.put("gc", new SSLGameCtrlModuleTest());
+        periphMiscTestMap.put("vbotmath", new ConstraintMappingMathTests());
+        periphMiscTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
+        periphMiscTestMap.put("detection", new DetectionTest_OldProto());
+
     }
 
     public String[] getAvailableTestNames() {
-        return periphTestMap.keySet().toArray(new String[0]);
+        return periphMiscTestMap.keySet().toArray(new String[0]);
     }
 
     public void printAvailableTestNames() {
         System.out.println("Available Tests:");
-        for (String test : periphTestMap.keySet()) {
+        for (String test : periphMiscTestMap.keySet()) {
             System.out.printf("- %s \n", test);
         }
         System.out.println();
     }
 
     public TritonTestable getTest(String testName) {
-        return periphTestMap.get(testName);
+        return periphMiscTestMap.get(testName);
     }
 }

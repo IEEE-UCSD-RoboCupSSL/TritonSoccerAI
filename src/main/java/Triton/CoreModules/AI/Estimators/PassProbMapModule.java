@@ -22,8 +22,7 @@ public class PassProbMapModule extends ProbMapModule {
     private static final double G2_WEIGHT = 1.5;
     private static final double G3_WEIGHT = 2.0;
 
-    private volatile boolean fixCandidate = false;
-    private volatile Integer candidate = null;
+    private volatile String score = "all";
     private volatile Integer passer = null;
 
     protected RWLockee<double[][]> gWrapper = new RWLockee<>(null);
@@ -38,7 +37,7 @@ public class PassProbMapModule extends ProbMapModule {
     }
 
     public PassProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
-        this(fielders, foes, ball, 400, 20);
+        this(fielders, foes, ball, 100, 20);
     }
 
 
@@ -89,18 +88,18 @@ public class PassProbMapModule extends ProbMapModule {
         }
 
         HashMap<Integer, Score> c1 = new HashMap<>();
-        Score c2 = new C2(this);
+        Score c2 = new C2(this, true);
         Score c3 = new C3(this);
         Score c4 = new C4(this);
         Score c5 = new C5(this, allyPenaltyRegion, foePenaltyRegion);
 
-        Score g1 = new G1(this);
+        Score g1 = new G1(this, true);
         Score g2 = new G2(this);
         HashMap<Integer, Score> g3 = new HashMap<>();
 
         for (int cand = 0; cand < fielders.size(); cand++) {
             if (cand == passer) continue; // skip passer as possible candidate
-            c1.put(cand, new C1(this, cand));
+            c1.put(cand, new C1(this, cand, true));
             g3.put(cand, new G3(this, cand));
         }
 
@@ -124,10 +123,6 @@ public class PassProbMapModule extends ProbMapModule {
                 int receiver = 0;
 
                 for (int cand = 0; cand < fielders.size(); cand++) {
-
-                    /* Fix candidate, run only one iteration */
-                    if (fixCandidate) cand = this.candidate;
-
                     /* Skip passer **/
                     if (cand == passer) continue;
 
@@ -136,9 +131,22 @@ public class PassProbMapModule extends ProbMapModule {
 
                     double c = c1prob * C1_WEIGHT + c2prob * C2_WEIGHT + c3prob * C3_WEIGHT
                             + c4prob * C4_WEIGHT + c5prob * C5_WEIGHT;
-                    double g = g1prob * G1_WEIGHT + g2prob * G2_WEIGHT + g3prob * G3_WEIGHT;
+                    double g = g1prob * G1_WEIGHT + g2prob * G2_WEIGHT; // + g3prob * G3_WEIGHT;
 
-                    double score = c + g;
+                    double score = switch (this.score) {
+                        case "c"   -> c;
+                        case "g"   -> g;
+                        case "c1"  -> c1prob;
+                        case "c2"  -> c2prob;
+                        case "c3"  -> c3prob;
+                        case "c4"  -> c4prob;
+                        case "c5"  -> c5prob;
+                        case "g1"  -> g1prob;
+                        case "g2"  -> g2prob;
+                        case "g3"  -> g3prob;
+                        default    -> c + g;
+                    };
+
                     double prob = (1 / (1 + Math.exp(-score)));
                     double gProb = (1 / (1 + Math.exp(-g)));
 
@@ -150,14 +158,10 @@ public class PassProbMapModule extends ProbMapModule {
                     if (gProb > maxGProb) {
                         maxGProb = gProb;
                     }
-
-                    if (fixCandidate) break;
                 }
 
                 pmf[gridX][gridY] = maxProb;
                 gProbs[gridX][gridY] = maxGProb;
-
-                if (fixCandidate) receiver = candidate;
                 R[gridX][gridY] = receiver;
                 int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
                 if(maxProb > localMax[evalIdx[0]][evalIdx[1]]) {
@@ -175,9 +179,8 @@ public class PassProbMapModule extends ProbMapModule {
         localMaxScoreWrapper.set(localMax);
     }
 
-    public void fixCandidate(int candidate) {
-        this.fixCandidate = true;
-        this.candidate = candidate;
+    public void fixScore(String score) {
+        this.score = score;
     }
 
     /**
@@ -196,11 +199,11 @@ public class PassProbMapModule extends ProbMapModule {
             double maxProb = pmf[idx[0]][idx[1]];
             int bestReceiver = receiver[idx[0]][idx[1]];
 
-            PassInfo info = new PassInfo(fielders, foes, ball);
-            info.setInfo(passer, bestReceiver, fielderSnaps.get(passer).getPos(), topPos, maxProb);
+            PassInfo info = new PassInfo();
+            info.setInfo(fielders.get(passer), fielders.get(bestReceiver),
+                    fielderSnaps.get(passer).getPos(), topPos, maxProb);
             return info;
         } catch (Exception e) {
-            fixCandidate = false;
             return null;
         }
     }

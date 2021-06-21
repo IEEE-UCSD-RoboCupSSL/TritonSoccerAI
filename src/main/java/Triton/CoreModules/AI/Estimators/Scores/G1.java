@@ -3,7 +3,10 @@ package Triton.CoreModules.AI.Estimators.Scores;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.GOAL_LENGTH;
@@ -15,9 +18,17 @@ public class G1 extends Score {
 
     private static final int G1_GOAL_INTERVAL = 3;
     private static final int G1_INTERCEPT_INTERVAL = 3;
+    private final boolean fast;
 
-    public G1(ProbMapModule finder) {
+    public G1(ProbMapModule finder, boolean fast) {
         super(finder);
+        this.fast = fast;
+    }
+
+    public G1(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps, boolean fast) {
+        super(ballPos, fielderSnaps, foeSnaps);
+        this.fast = fast;
     }
 
     @Override
@@ -43,7 +54,7 @@ public class G1 extends Score {
                         foeTime = 0;
                         continue;
                     }
-                    double ETA = calcETA(foeSnap, interceptPos);
+                    double ETA = calcETA(foeSnap, interceptPos, fast);
                     foeTime = Math.min(ETA, foeTime);
                 }
                 g1_ = Math.min(foeTime - ballTime, g1_);

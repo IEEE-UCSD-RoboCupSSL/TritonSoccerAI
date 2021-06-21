@@ -1,6 +1,7 @@
 package Triton.ManualTests.PeriphMiscTests;
 
 import Triton.Config.Config;
+import Triton.ManualTests.TestUtil.TestUtil;
 import Triton.ManualTests.TritonTestable;
 
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class PeriphMiscTestRunner {
                 Optional<TritonTestable> test1 = Optional.ofNullable(test);
 
                 if (test1.isEmpty()) {
+                    TestUtil.enterKeyToContinue();
                     System.out.println("Invalid Test Name");
                     continue;
                 } else {
