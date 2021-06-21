@@ -45,12 +45,17 @@ public class AttackPlan2021Test implements TritonTestable {
         AttackSupportMapModule attackSupportMapModule = new AttackSupportMapModule(fielders, foes, ball);
         PassProbMapModule passProbMapModule = new PassProbMapModule(fielders, foes, ball);
         AttackPlanSummer2021 attackPlanSummer2021 = new AttackPlanSummer2021(fielders, keeper, foes, ball, attackSupportMapModule, passProbMapModule, config);
+        AttackPlanSummer2021.States currState = attackPlanSummer2021.getCurrState();
 
         LocalDateTime twentySecsLater = LocalDateTime.now().plusSeconds(20);
-        while(LocalDateTime.now().isBefore(twentySecsLater)) {
+        while(LocalDateTime.now().isBefore(twentySecsLater) && !currState.equals(AttackPlanSummer2021.States.Exit)) {
+
             attackPlanSummer2021.exec();
+            currState = attackPlanSummer2021.getCurrState();
             delay(3);
         }
+
+        attackPlanSummer2021.setCurrState(AttackPlanSummer2021.States.Start);
 
         TestUtil.enterKeyToContinue();
         return true;

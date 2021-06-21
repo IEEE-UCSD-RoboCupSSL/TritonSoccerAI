@@ -37,17 +37,17 @@ public class PUAG { //Probability Undirected Acyclic Graph
         int index = 0;
 
         nodeToIndexMap.put(startNode, index);
-        System.out.printf("[PUAG1] map %s to index %d\n", startNode, index);
+//        System.out.printf("[PUAG1] map %s to index %d\n", startNode, index);
         index++;
 
         for (Node middleNode : middleNodes) {
             nodeToIndexMap.put(middleNode, index);
-            System.out.printf("[PUAG1] map %s to index %d\n", middleNode, index);
+//            System.out.printf("[PUAG1] map %s to index %d\n", middleNode, index);
             index++;
         }
 
         nodeToIndexMap.put(endNode, index);
-        System.out.printf("[PUAG1] map %s to index %d\n", endNode, index);
+//        System.out.printf("[PUAG1] map %s to index %d\n", endNode, index);
 
         adjMatrix = new Edge[nodeToIndexMap.size()][nodeToIndexMap.size()];
 
@@ -163,22 +163,22 @@ public class PUAG { //Probability Undirected Acyclic Graph
         @Override
         public int hashCode() {
             if(bot == null){
-//                System.out.println("[hashCode] bot is null");
+////                System.out.println("[hashCode] bot is null");
                 return super.hashCode();
             }
-//            System.out.println("[hashCode] bot is not null");
+////            System.out.println("[hashCode] bot is not null");
             return bot.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
             if(bot == null || obj == null){
-//                System.out.println("[equals] either bot or obj is null");
+////                System.out.println("[equals] either bot or obj is null");
                 return super.equals(obj);
             }
 
             if(!(obj instanceof Node)){
-//                System.out.println("[equals] obj is no instanceof Node");
+////                System.out.println("[equals] obj is no instanceof Node");
                 return super.equals(obj);
             }
 
@@ -191,7 +191,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
             int id1 = this.bot.getID();
             int id2 = otherBot.getID();
 
-//            System.out.printf("[equals] comparing if bot %d is equal to bot %d\n", id1, id2);
+////            System.out.printf("[equals] comparing if bot %d is equal to bot %d\n", id1, id2);
             return id1 == id2;
         }
     }
