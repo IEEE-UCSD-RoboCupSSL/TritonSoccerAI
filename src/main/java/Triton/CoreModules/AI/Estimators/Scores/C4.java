@@ -2,7 +2,10 @@ package Triton.CoreModules.AI.Estimators.Scores;
 
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 /**
  * c4: The pass is short enough to be performed accurately
@@ -15,6 +18,11 @@ public class C4 extends Score {
 
     public C4(ProbMapModule finder) {
         super(finder);
+    }
+
+    public C4(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps) {
+        super(ballPos, fielderSnaps, foeSnaps);
     }
 
     @Override

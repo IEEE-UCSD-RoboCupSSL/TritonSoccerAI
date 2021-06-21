@@ -3,7 +3,10 @@ package Triton.CoreModules.AI.Estimators.Scores;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 /**
  * c2 : No opponent intercepts the pass.
@@ -11,9 +14,19 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 public class C2 extends Score {
 
     private static final int C2_INTERVAL = 5;
+    private static final double CHIP_KICK_DIST = 500.0;
+    private static final double CHIP_KICK_DECAY = 500.0;
+    private final boolean fast;
 
-    public C2(ProbMapModule finder) {
+    public C2(ProbMapModule finder, boolean fast) {
         super(finder);
+        this.fast = fast;
+    }
+
+    public C2(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps, boolean fast) {
+        super(ballPos, fielderSnaps, foeSnaps);
+        this.fast = fast;
     }
 
     @Override
@@ -29,13 +42,16 @@ public class C2 extends Score {
             for (Triton.CoreModules.Robot.RobotSnapshot foeSnap : foeSnaps) {
                 Vec2D foePos = foeSnap.getPos();
                 double[] angleRange = angleRange(foePos, ballPos);
+                double ETA = calcETA(foeSnap, interceptPos, fast);
                 if (foePos.sub(ballPos).mag() - FRONT_PADDING < pos.sub(ballPos).mag() &&
                         angleBetween(path.toPlayerAngle(), angleRange)) {
-                    foeTime = 0;
-                    continue;
+                    double chipDist = pos.sub(ballPos).mag() - foePos.sub(ballPos).mag();
+                    chipDist = Math.max(chipDist - CHIP_KICK_DIST, 0);
+                    foeTime = chipDist / CHIP_KICK_DECAY;
+                    foeTime = Math.min(ETA, foeTime);
+                } else {
+                    foeTime = Math.min(ETA, foeTime);
                 }
-                double ETA = calcETA(foeSnap, interceptPos);
-                foeTime = Math.min(ETA, foeTime);
             }
             c2 = Math.min(foeTime - ballTime, c2);
         }

@@ -26,7 +26,7 @@ public class DefendPlanA extends Tactics {
         super(fielders, keeper, foes, ball);
         this.config = config;
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passInfo = new PassInfo(fielders, foes, ball);
+        passInfo = new PassInfo();
         this.foeBlockOffset = foeBlockOffset;
     }
 

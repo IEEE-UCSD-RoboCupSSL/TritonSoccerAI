@@ -2,7 +2,10 @@ package Triton.CoreModules.AI.Estimators.Scores;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+
+import java.util.ArrayList;
 
 /**
  * c3: The pass is long enough for R to react and receive the pass robustly
@@ -15,6 +18,11 @@ public class C3 extends Score {
 
     public C3(ProbMapModule finder) {
         super(finder);
+    }
+
+    public C3(Vec2D ballPos, ArrayList<RobotSnapshot> fielderSnaps,
+              ArrayList<RobotSnapshot> foeSnaps) {
+        super(ballPos, fielderSnaps, foeSnaps);
     }
 
     @Override

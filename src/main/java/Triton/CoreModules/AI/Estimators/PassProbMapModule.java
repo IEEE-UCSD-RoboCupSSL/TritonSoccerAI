@@ -88,18 +88,18 @@ public class PassProbMapModule extends ProbMapModule {
         }
 
         HashMap<Integer, Score> c1 = new HashMap<>();
-        Score c2 = new C2(this);
+        Score c2 = new C2(this, true);
         Score c3 = new C3(this);
         Score c4 = new C4(this);
         Score c5 = new C5(this, allyPenaltyRegion, foePenaltyRegion);
 
-        Score g1 = new G1(this);
+        Score g1 = new G1(this, true);
         Score g2 = new G2(this);
         HashMap<Integer, Score> g3 = new HashMap<>();
 
         for (int cand = 0; cand < fielders.size(); cand++) {
             if (cand == passer) continue; // skip passer as possible candidate
-            c1.put(cand, new C1(this, cand));
+            c1.put(cand, new C1(this, cand, true));
             g3.put(cand, new G3(this, cand));
         }
 
@@ -131,10 +131,11 @@ public class PassProbMapModule extends ProbMapModule {
 
                     double c = c1prob * C1_WEIGHT + c2prob * C2_WEIGHT + c3prob * C3_WEIGHT
                             + c4prob * C4_WEIGHT + c5prob * C5_WEIGHT;
-                    double g = g1prob * G1_WEIGHT + g2prob * G2_WEIGHT + g3prob * G3_WEIGHT;
+                    double g = g1prob * G1_WEIGHT + g2prob * G2_WEIGHT; // + g3prob * G3_WEIGHT;
 
                     double score = switch (this.score) {
-                        case "all" -> c + g;
+                        case "c"   -> c;
+                        case "g"   -> g;
                         case "c1"  -> c1prob;
                         case "c2"  -> c2prob;
                         case "c3"  -> c3prob;
@@ -198,8 +199,9 @@ public class PassProbMapModule extends ProbMapModule {
             double maxProb = pmf[idx[0]][idx[1]];
             int bestReceiver = receiver[idx[0]][idx[1]];
 
-            PassInfo info = new PassInfo(fielders, foes, ball);
-            info.setInfo(passer, bestReceiver, fielderSnaps.get(passer).getPos(), topPos, maxProb);
+            PassInfo info = new PassInfo();
+            info.setInfo(fielders.get(passer), fielders.get(bestReceiver),
+                    fielderSnaps.get(passer).getPos(), topPos, maxProb);
             return info;
         } catch (Exception e) {
             return null;
