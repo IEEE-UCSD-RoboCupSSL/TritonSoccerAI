@@ -9,12 +9,13 @@ import Triton.ManualTests.CoreTests.AI_SkillsTests.CoordinatedPassTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.CoreTests.AI_StrategiesTests.DEPRECATED_BasicPlayTest;
 import Triton.ManualTests.CoreTests.AI_StrategiesTests.Summer2021PlayTest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.GapGetBallTest;
-import Triton.ManualTests.CoreTests.EstimatorTests.GapFinderTest;
-import Triton.ManualTests.CoreTests.EstimatorTests.PassFinderTest;
+import Triton.ManualTests.CoreTests.DijkstraTest.DijkstraTest;
+import Triton.ManualTests.CoreTests.EstimatorTests.AttackSupportMapTest;
+import Triton.ManualTests.CoreTests.EstimatorTests.PassProbMapTest;
+
 
 import Triton.ManualTests.CoreTests.RobotSkillsTests.*;
 import Triton.ManualTests.CoreTests.RobotSkillsTests.AsyncSkillsTests.SimpleProceduralSkillDemo;
@@ -60,8 +61,8 @@ public class CoreTestFactory {
         coreTestMap.put("collect", new DataCollector(fielders, keeper, ball));
         coreTestMap.put("reset", new FormationTest("tester", fielders));
         coreTestMap.put("formation", new FormationTest(fielders, keeper));
-        coreTestMap.put("gap", new GapFinderTest(fielders, foes, ball));
-        coreTestMap.put("pass", new PassFinderTest(fielders, foes, ball));
+        coreTestMap.put("atks-map", new AttackSupportMapTest(fielders, foes, ball));
+        coreTestMap.put("pass-map", new PassProbMapTest(fielders, foes, ball));
         coreTestMap.put("gapgetball", new GapGetBallTest(fielders, keeper, foes, ball));
         coreTestMap.put("shoot", new ShootGoalTest(fielders.get(0), foes, ball));
         coreTestMap.put("keep", new KeeperTest(fielders, keeper, foes, ball));
@@ -75,6 +76,7 @@ public class CoreTestFactory {
         coreTestMap.put("autocap", new AutoCapTest(fielders.get(3), ball));
         coreTestMap.put("rotateAll", new RotateAllRobots(fielders));
         coreTestMap.put("stopAll", new StopAllRobots(fielders));
+        coreTestMap.put("dijkstra-test", new DijkstraTest(soccerObjects));
     }
 
     public String[] getAvailableTestNames() {

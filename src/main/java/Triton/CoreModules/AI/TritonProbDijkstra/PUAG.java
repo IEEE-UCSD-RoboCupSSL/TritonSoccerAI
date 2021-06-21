@@ -1,10 +1,15 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoSuchEdgeException;
 import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.RWLockee;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -14,88 +19,146 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     private final Node startNode;
     private final Node endNode;
-    private final ArrayList<Node> nodeList = new ArrayList<>();
-
-    private final HashMap<Node, HashMap<Node, Edge>> adjList = new HashMap<>();
+    private final HashMap<Node, Integer> nodeToIndexMap = new HashMap<>();
+    private final HashMap<Node, Set<Node>> nodeNeighborSetMap = new HashMap<>();
+    private final Edge[][] adjMatrix;
 
     public PUAG(Node startNode, Node endNode, List<Node> middleNodes) {
         // construct graph
         this.startNode = startNode;
         this.endNode = endNode;
+        int index = 0;
 
-        nodeList.add(startNode);
-        nodeList.addAll(middleNodes);
-        nodeList.add(endNode);
+        nodeToIndexMap.put(startNode, index++);
 
-        for (Node node1 : nodeList) {
-            for (Node node2 : nodeList) {
-                if (node1 == node2) {
-                    continue;
-                }
-                Edge sharedEdge = new Edge();
+        for (Node middleNode : middleNodes) {
+            nodeToIndexMap.put(middleNode, index++);
+        }
 
-                if (!adjList.containsKey(node1)) {
-                    adjList.put(node1, new HashMap<>());
-                } else {
-                    adjList.get(node1).put(node2, sharedEdge);
-                }
+        nodeToIndexMap.put(endNode, index);
 
-                if (!adjList.containsKey(node2)) {
-                    adjList.put(node2, new HashMap<>());
-                } else {
-                    adjList.get(node2).put(node1, sharedEdge);
-                }
+        adjMatrix = new Edge[nodeToIndexMap.size()][nodeToIndexMap.size()];
+
+        for (Node node1 : nodeToIndexMap.keySet()) {
+            HashSet<Node> neighborSet = new HashSet<>();
+            nodeNeighborSetMap.put(node1, neighborSet);
+            neighborSet.addAll(nodeToIndexMap.keySet());
+        }
+
+        for (int i = 0; i < nodeToIndexMap.size(); i++) {
+            for (int j = 0; j < nodeToIndexMap.size(); j++) {
+                adjMatrix[i][j] = new Edge();
             }
         }
     }
 
+    public int getIndexOfNode(Node node){
+        Integer integer = nodeToIndexMap.get(node);
+        if(integer == null){
+            return -1;
+        }
+        return integer;
+    }
+
     public Set<Node> getNodeSet() {
-        return new HashSet<>(nodeList);
+        return nodeToIndexMap.keySet();
     }
 
     public int getNumNodes() {
-        assert nodeList.size() == adjList.size();
-        return nodeList.size();
+        return nodeToIndexMap.size();
     }
 
     public List<Node> getAdjacentNodes(Node node) {
-        HashMap<Node, Edge> neighbors = adjList.get(node);
-        if (neighbors == null) {
+        if(nodeNeighborSetMap.containsKey(node)) {
+            return new ArrayList<>(nodeNeighborSetMap.get(node));
+        } else {
             return null;
         }
-
-        return new ArrayList<>(neighbors.keySet());
     }
 
     public Edge getEdge(Node node1, Node node2) {
-        return adjList.get(node1).get(node2);
-    }
-
-    public boolean setEdgeProb(Node node1, Node node2, double prob) {
-        try {
-            adjList.get(node1).get(node2).setProb(prob);
-        } catch (NullPointerException e) {
-            return false;
+        if (node1.equals(node2)){
+            throw new NoSuchEdgeException(node1, node2);
         }
 
-        return true;
+        boolean isNode2NeighborOfNode1 = getAdjacentNodes(node1).contains(node2);
+        boolean isNode1NeighborOfNode2 = getAdjacentNodes(node2).contains(node1);
+
+        boolean areNeighbors = isNode1NeighborOfNode2 && isNode2NeighborOfNode1;
+
+        assert isNode1NeighborOfNode2 == isNode2NeighborOfNode1;
+
+        int indexOfNode1 = getIndexOfNode(node1);
+        int indexOfNode2 = getIndexOfNode(node2);
+
+        if(indexOfNode1 < indexOfNode2) {
+            if (areNeighbors) {
+                return adjMatrix[indexOfNode1][indexOfNode2];
+            } else {
+                throw new NoSuchEdgeException(node1, node2);
+            }
+        }else{
+            if (areNeighbors) {
+                return adjMatrix[indexOfNode2][indexOfNode1];
+            } else {
+                throw new NoSuchEdgeException(node2, node1);
+            }
+        }
     }
 
-    public abstract static class Node {
+    public void setEdgeProb(Node node1, Node node2, double prob) {
+        getEdge(node1, node2).setProb(prob);
     }
 
     @Getter
-    @Setter
-    public static class AllyNode extends Node {
-        private final Ally bot;
+    public abstract static class Node {
+        @Nullable private final Ally bot;
 
-        public AllyNode(Ally bot) {
+        public Node(@Nullable Ally bot) {
             this.bot = bot;
         }
+
+        public String getNodeBotIdString(){
+            if (bot == null){
+                return "Goal";
+            }
+
+            return Integer.toString(bot.getID());
+        }
+
+        @Override
+        public int hashCode() {
+            if(bot == null){
+                return super.hashCode();
+            }
+
+            return bot.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(bot == null || obj == null){
+                return super.equals(obj);
+            }
+
+            if(!(obj instanceof Ally)){
+                return super.equals(obj);
+            }
+
+            return bot.getID() == ((Ally) obj).getID();
+        }
+    }
+
+    public static class AllyNode extends Node {
+
+        public AllyNode(Ally bot) {
+            super(bot);
+        }
     }
 
     @Getter
     @Setter
+    @ToString
     public static class AllyRecepNode extends AllyNode {
         private Vec2D receptionPoint;
         private double angle;
@@ -107,6 +170,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     @Getter
     @Setter
+    @ToString
     public static class AllyPassNode extends AllyNode {
         private Vec2D passPoint;
         private double angle;
@@ -119,16 +183,19 @@ public class PUAG { //Probability Undirected Acyclic Graph
 
     @Getter
     @Setter
+    @ToString
     public static class GoalNode extends Node {
         private Vec2D goalCenter = GvcGeometry.GOAL_CENTER_FOE;
+
+        public GoalNode() {
+            super(null);
+        }
     }
 
     @Getter
     @Setter
+    @ToString
     public static class Edge {
-        private Vec2D passPoint;
-        private double angle;
-        private Vec2D kickVec;
         private double prob;
     }
 

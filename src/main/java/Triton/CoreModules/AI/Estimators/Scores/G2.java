@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Estimators.Scores;
 
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
@@ -15,7 +15,7 @@ public class G2 extends Score {
     private static final double G2_MEAN = 20.0;
     private static final double G2_DEV = 40.0;
 
-    public G2(ProbFinder finder) {
+    public G2(ProbMapModule finder) {
         super(finder);
     }
 

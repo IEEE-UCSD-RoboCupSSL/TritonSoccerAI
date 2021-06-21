@@ -1,4 +1,4 @@
-package Triton.ManualTests.MiscTests;
+package Triton.ManualTests.PeriphMiscTests.MiscTests;
 
 import Triton.Config.Config;
 import Triton.ManualTests.TritonTestable;

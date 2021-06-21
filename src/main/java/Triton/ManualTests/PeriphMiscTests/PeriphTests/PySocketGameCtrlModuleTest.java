@@ -1,4 +1,4 @@
-package Triton.ManualTests.PeriphMiscTests;
+package Triton.ManualTests.PeriphMiscTests.PeriphTests;
 
 import Triton.App;
 import Triton.Config.Config;

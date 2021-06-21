@@ -1,10 +1,11 @@
-package Triton.ManualTests.PeriphMiscTests;
+package Triton.ManualTests.PeriphMiscTests.PeriphTests;
 
 import Triton.App;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.ManualTests.TestUtil.TestUtil;
 import Triton.ManualTests.TritonTestable;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class CustomPriorityQueueTest implements TritonTestable {
             System.out.println("Test FAILED");
         }
 
-        App.enterKeyToContinue();
+        TestUtil.enterKeyToContinue();
 
         return isSuccess;
     }

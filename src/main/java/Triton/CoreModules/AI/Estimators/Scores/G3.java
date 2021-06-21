@@ -1,6 +1,6 @@
 package Triton.CoreModules.AI.Estimators.Scores;
 
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
@@ -17,7 +17,7 @@ public class G3 extends Score {
 
     private final int candidate;
 
-    public G3(ProbFinder finder, int candidate) {
+    public G3(ProbMapModule finder, int candidate) {
         super(finder);
         this.candidate = candidate;
     }

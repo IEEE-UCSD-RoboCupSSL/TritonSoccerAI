@@ -4,7 +4,7 @@ import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.DEPRECATED_CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.PassState;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -21,7 +21,7 @@ public class DEPRECATED_CPassTest extends RobotSkillsTest {
     Ball ball;
 
     BasicEstimator basicEstimator;
-    PassFinder passFinder;
+    PassProbMapModule passProbMap;
     PassInfo info;
 
     public DEPRECATED_CPassTest(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes, Ball ball) {
@@ -29,8 +29,8 @@ public class DEPRECATED_CPassTest extends RobotSkillsTest {
         this.fielders = fielders;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passFinder = new PassFinder(fielders, foes, ball);
-        passFinder.run();
+        passProbMap = new PassProbMapModule(fielders, foes, ball);
+        passProbMap.run();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class DEPRECATED_CPassTest extends RobotSkillsTest {
                 while (!toQuit) {
                     Thread.sleep(1);
                     if (basicEstimator.isBallUnderOurCtrl()) {
-                        info = passFinder.evalPass();
+                        info = passProbMap.evalPass();
                         if (info == null) {
                             fielders.stopAll();
                             continue;
@@ -68,7 +68,7 @@ public class DEPRECATED_CPassTest extends RobotSkillsTest {
                             passer = (Ally) basicEstimator.getBallHolder();
                             receiver = info.getOptimalReceiver();
                             // System.out.println(receiver);
-                            // passFinder.fixCandidate(receiver.getID()); // lock receiver
+                            // passProbMap.fixCandidate(receiver.getID()); // lock receiver
                         }
 
                         passState = DEPRECATED_CoordinatedPass.basicPass(passer, receiver, ball, basicEstimator, info);

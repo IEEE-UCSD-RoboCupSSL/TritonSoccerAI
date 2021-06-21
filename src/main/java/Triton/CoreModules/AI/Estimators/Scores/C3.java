@@ -1,5 +1,5 @@
 package Triton.CoreModules.AI.Estimators.Scores;
-import Triton.CoreModules.AI.Estimators.ProbFinder;
+import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -13,7 +13,7 @@ public class C3 extends Score {
     private static final double C3_T_MAX = 0.3;
     private static final double C3_DEV = 0.1;
 
-    public C3(ProbFinder finder) {
+    public C3(ProbMapModule finder) {
         super(finder);
     }
 

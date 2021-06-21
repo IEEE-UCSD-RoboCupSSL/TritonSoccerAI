@@ -11,7 +11,7 @@ import Triton.SoccerObjects;
 
 import java.util.HashMap;
 
-public class PassFinder extends GapFinder {
+public class PassProbMapModule extends ProbMapModule {
 
     private static final double C1_WEIGHT = 1.0;
     private static final double C2_WEIGHT = 1.0;
@@ -22,28 +22,27 @@ public class PassFinder extends GapFinder {
     private static final double G2_WEIGHT = 1.5;
     private static final double G3_WEIGHT = 2.0;
 
-    private volatile boolean fixCandidate = false;
-    private volatile Integer candidate = null;
+    private volatile String score = "all";
     private volatile Integer passer = null;
 
     protected RWLockee<double[][]> gWrapper = new RWLockee<>(null);
     protected RWLockee<int[][]> rWrapper = new RWLockee<>(null);
 
-    public PassFinder(SoccerObjects soccerObjects) {
+    public PassProbMapModule(SoccerObjects soccerObjects) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
     }
 
-    public PassFinder(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
+    public PassProbMapModule(SoccerObjects soccerObjects, int resolutionStepSize, int evalWindowSize) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball, resolutionStepSize, evalWindowSize);
     }
 
-    public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
-        this(fielders, foes, ball, 400, 20);
+    public PassProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
+        this(fielders, foes, ball, 100, 20);
     }
 
 
-    public PassFinder(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
-                      int resolutionStepSize, int evalWindowSize) {
+    public PassProbMapModule(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball,
+                             int resolutionStepSize, int evalWindowSize) {
         super(fielders, foes, ball, resolutionStepSize, evalWindowSize);
     }
 
@@ -124,10 +123,6 @@ public class PassFinder extends GapFinder {
                 int receiver = 0;
 
                 for (int cand = 0; cand < fielders.size(); cand++) {
-
-                    /* Fix candidate, run only one iteration */
-                    if (fixCandidate) cand = this.candidate;
-
                     /* Skip passer **/
                     if (cand == passer) continue;
 
@@ -138,7 +133,19 @@ public class PassFinder extends GapFinder {
                             + c4prob * C4_WEIGHT + c5prob * C5_WEIGHT;
                     double g = g1prob * G1_WEIGHT + g2prob * G2_WEIGHT + g3prob * G3_WEIGHT;
 
-                    double score = c + g;
+                    double score = switch (this.score) {
+                        case "all" -> c + g;
+                        case "c1"  -> c1prob;
+                        case "c2"  -> c2prob;
+                        case "c3"  -> c3prob;
+                        case "c4"  -> c4prob;
+                        case "c5"  -> c5prob;
+                        case "g1"  -> g1prob;
+                        case "g2"  -> g2prob;
+                        case "g3"  -> g3prob;
+                        default    -> c + g;
+                    };
+
                     double prob = (1 / (1 + Math.exp(-score)));
                     double gProb = (1 / (1 + Math.exp(-g)));
 
@@ -150,14 +157,10 @@ public class PassFinder extends GapFinder {
                     if (gProb > maxGProb) {
                         maxGProb = gProb;
                     }
-
-                    if (fixCandidate) break;
                 }
 
                 pmf[gridX][gridY] = maxProb;
                 gProbs[gridX][gridY] = maxGProb;
-
-                if (fixCandidate) receiver = candidate;
                 R[gridX][gridY] = receiver;
                 int[] evalIdx = evalGrid.fromPos(new Vec2D(gridX, gridY));
                 if(maxProb > localMax[evalIdx[0]][evalIdx[1]]) {
@@ -175,9 +178,8 @@ public class PassFinder extends GapFinder {
         localMaxScoreWrapper.set(localMax);
     }
 
-    public void fixCandidate(int candidate) {
-        this.fixCandidate = true;
-        this.candidate = candidate;
+    public void fixScore(String score) {
+        this.score = score;
     }
 
     /**
@@ -200,7 +202,6 @@ public class PassFinder extends GapFinder {
             info.setInfo(passer, bestReceiver, fielderSnaps.get(passer).getPos(), topPos, maxProb);
             return info;
         } catch (Exception e) {
-            fixCandidate = false;
             return null;
         }
     }

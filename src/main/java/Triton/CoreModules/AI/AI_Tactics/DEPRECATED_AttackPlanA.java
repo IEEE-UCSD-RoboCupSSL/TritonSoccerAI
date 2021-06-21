@@ -3,9 +3,9 @@ package Triton.CoreModules.AI.AI_Tactics;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.*;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.Estimators.GapFinder;
+import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
-import Triton.CoreModules.AI.Estimators.PassFinder;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -28,33 +28,33 @@ public class DEPRECATED_AttackPlanA extends Tactics {
     protected Robot holder;
     protected final BasicEstimator basicEstimator;
     private PassInfo passInfo;
-    private GapFinder gapFinder;
-    private PassFinder passFinder;
+    private AttackSupportMapModule atkSupportMap;
+    private PassProbMapModule passProbMap;
     private Dodging dodging;
     final private double interAllyClearance = 600; // mm
     private Config config;
 
     public DEPRECATED_AttackPlanA(RobotList<Ally> fielders, Ally keeper, RobotList<Foe> foes,
-                                  Ball ball, GapFinder gapFinder, PassFinder passFinder, Config config) {
+                                  Ball ball, AttackSupportMapModule atkSupportMap, PassProbMapModule passProbMap, Config config) {
         super(fielders, keeper, foes, ball);
         this.config = config;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
         passInfo = new PassInfo(fielders, foes, ball);
 
-        this.gapFinder = gapFinder;
-        this.passFinder = passFinder;
+        this.atkSupportMap = atkSupportMap;
+        this.passProbMap = passProbMap;
         this.dodging = new Dodging(fielders, foes, ball, basicEstimator);
     }
 
 
     private boolean isReadyToShoot() {
         if (holder == null) return false;
-        if (passFinder == null) return false;
-        double[][] gProbs = passFinder.getGProb();
+        if (passProbMap == null) return false;
+        double[][] gProbs = passProbMap.getGProb();
         if (gProbs == null) return false;
 
-        int[] holderIdx = passFinder.getIdxFromPos(holder.getPos());
+        int[] holderIdx = passProbMap.getIdxFromPos(holder.getPos());
         double gProb = gProbs[holderIdx[0]][holderIdx[1]];
         return gProb > SHOOT_THRESHOLD;
     }
@@ -73,7 +73,7 @@ public class DEPRECATED_AttackPlanA extends Tactics {
             shootingProcedure((Ally) holder);
         }
 
-        passInfo = passFinder.evalPass();
+        passInfo = passProbMap.evalPass();
         if(passInfo == null) {
             return false;
         }
@@ -112,7 +112,7 @@ public class DEPRECATED_AttackPlanA extends Tactics {
         if(restFielders == null) {
             return;
         }
-        ArrayList<Vec2D> gapPos = gapFinder.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
+        ArrayList<Vec2D> gapPos = atkSupportMap.getTopNMaxPosWithClearance(restFielders.size(), interAllyClearance);
         if(gapPos != null) {
             ArrayList<Double> gapPosDir = new ArrayList<>();
             for(Vec2D pos : gapPos) {
