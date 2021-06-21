@@ -1,6 +1,7 @@
 package Triton.VirtualBot;
 
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
@@ -54,8 +55,11 @@ public abstract class SimClientModule implements Module {
         }
 
         try {
-            //socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
-            socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
+            } else {
+                socket = new DatagramSocket();
+            }
             address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
         } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();

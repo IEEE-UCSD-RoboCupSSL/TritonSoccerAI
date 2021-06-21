@@ -499,8 +499,10 @@ public class Ally extends Robot implements AllySkills {
             kickVelSub.subscribe(1000);
             holdBallPosSub.subscribe(1000);
 
-            for(int id = 0; id < config.numAllyRobots; id++) {
-                isBotContactBallSubs.get(id).subscribe(1000);
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                for (int id = 0; id < config.numAllyRobots; id++) {
+                    isBotContactBallSubs.get(id).subscribe(1000);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
