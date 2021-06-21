@@ -14,6 +14,8 @@ import java.util.ArrayList;
 public class C2 extends Score {
 
     private static final int C2_INTERVAL = 5;
+    private static final double CHIP_KICK_DIST = 500.0;
+    private static final double CHIP_KICK_DECAY = 500.0;
     private final boolean fast;
 
     public C2(ProbMapModule finder, boolean fast) {
@@ -40,13 +42,16 @@ public class C2 extends Score {
             for (Triton.CoreModules.Robot.RobotSnapshot foeSnap : foeSnaps) {
                 Vec2D foePos = foeSnap.getPos();
                 double[] angleRange = angleRange(foePos, ballPos);
+                double ETA = calcETA(foeSnap, interceptPos, fast);
                 if (foePos.sub(ballPos).mag() - FRONT_PADDING < pos.sub(ballPos).mag() &&
                         angleBetween(path.toPlayerAngle(), angleRange)) {
-                    foeTime = 0;
-                    continue;
+                    double chipDist = pos.sub(ballPos).mag() - foePos.sub(ballPos).mag();
+                    chipDist = Math.max(chipDist - CHIP_KICK_DIST, 0);
+                    foeTime = chipDist / CHIP_KICK_DECAY;
+                    foeTime = Math.min(ETA, foeTime);
+                } else {
+                    foeTime = Math.min(ETA, foeTime);
                 }
-                double ETA = calcETA(foeSnap, interceptPos, fast);
-                foeTime = Math.min(ETA, foeTime);
             }
             c2 = Math.min(foeTime - ballTime, c2);
         }

@@ -24,10 +24,12 @@ import static Triton.PeriphModules.Display.PaintOption.PROBABILITY;
 public class PassProbMapTest implements TritonTestable {
 
     PassProbMapModule passProbMap;
+    RobotList<Ally> fielders;
 
     public PassProbMapTest(RobotList<Ally> fielders, RobotList<Foe> foes, Ball ball) {
-        passProbMap = new PassProbMapModule(fielders, foes, ball);
+        passProbMap = new PassProbMapModule(fielders, foes, ball, 50, 20);
         passProbMap.run();
+        this.fielders = fielders;
     }
 
     public boolean test(Config config) {
@@ -40,10 +42,11 @@ public class PassProbMapTest implements TritonTestable {
         display.setPaintOptions(paintOptions);
         display.setProbFinder(passProbMap);
 
-        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-                0,
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display, 0,
                 Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
                 TimeUnit.NANOSECONDS);
+
+        this.fielders.stopAll();
 
         while(true) {
             Scanner scanner = new Scanner(System.in);

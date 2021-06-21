@@ -36,7 +36,7 @@ public class Compute implements DijkCompute {
     private static final double SAMPLE_PADDING  = 250.0;
     private static final double SAMPLE_INTERVAL = 50.0;
 
-    private ArrayList<RobotSnapshot> allySnaps;
+    private ArrayList<RobotSnapshot> fielderSnaps;
     private ArrayList<RobotSnapshot> foeSnaps;
     private Vec2D ballPos;
     private PassInfo info = null;
@@ -55,11 +55,11 @@ public class Compute implements DijkCompute {
         assert n1.getBot() != null && n2.getBot() != null;
 
         /* Initiate scores */
-        Score c1 = new C1(ballPos, allySnaps, foeSnaps, n2.getBot().getID(), true);
-        Score c2 = new C2(ballPos, allySnaps, foeSnaps, true);
-        Score c3 = new C3(ballPos, allySnaps, foeSnaps);
-        Score c4 = new C4(ballPos, allySnaps, foeSnaps);
-        Score c5 = new C5(ballPos, allySnaps, foeSnaps, allyPenaltyRegion, foePenaltyRegion);
+        Score c1 = new C1(ballPos, fielderSnaps, foeSnaps, n2.getBot().getID(), true);
+        Score c2 = new C2(ballPos, fielderSnaps, foeSnaps, true);
+        Score c3 = new C3(ballPos, fielderSnaps, foeSnaps);
+        Score c4 = new C4(ballPos, fielderSnaps, foeSnaps);
+        Score c5 = new C5(ballPos, fielderSnaps, foeSnaps, allyPenaltyRegion, foePenaltyRegion);
 
         /* Evaluate reception points */
         double[] bnds = getMinMax(n1.getBot().getPos(), n2.getBot().getPos());
@@ -132,7 +132,7 @@ public class Compute implements DijkCompute {
     @Override
     public void setSnapShots(ArrayList<RobotSnapshot> allySnaps, ArrayList<RobotSnapshot> foeSnaps,
                              RWLockee<Vec2D> ballSnap) {
-        this.allySnaps = allySnaps;
+        this.fielderSnaps = allySnaps;
         this.foeSnaps = foeSnaps;
         this.ballPos = ballSnap.get();
         info = null;
@@ -141,6 +141,7 @@ public class Compute implements DijkCompute {
     @Override
     public Vec2D computeKickVec(PUAG.Node n1, PUAG.Node n2) {
         computePass(n1, n2);
+        info.setRobots(fielderSnaps, foeSnaps);
         Pair<Vec2D, Boolean> kick = info.getKickDecision();
         return kick.getValue0();
     }
@@ -163,8 +164,8 @@ public class Compute implements DijkCompute {
         Vec2D pos = n.getBot().getPos();
 
         /* Initiate scores */
-        Score g1 = new G1(ballPos, allySnaps, foeSnaps, true);
-        Score g2 = new G2(ballPos, allySnaps, foeSnaps);
+        Score g1 = new G1(ballPos, fielderSnaps, foeSnaps, true);
+        Score g2 = new G2(ballPos, fielderSnaps, foeSnaps);
 
         /* Evaluate goal probability */
         double g1prob = g1.prob(pos);
