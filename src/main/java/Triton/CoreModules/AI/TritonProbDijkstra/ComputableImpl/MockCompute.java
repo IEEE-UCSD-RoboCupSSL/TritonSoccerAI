@@ -333,10 +333,7 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeGoalCenter(PDG.Node n) {
-        if(n.getClass() == PDG.GoalNode.class) {
-            return ((PDG.GoalNode) n).getGoalCenter();
-        }
+    public Vec2D computeGoalCenter() {
         return null;
     }
 

@@ -5,6 +5,7 @@ import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.Scores.*;
+import Triton.CoreModules.AI.Estimators.TimeEstimator.BallMovement;
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
 import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
@@ -38,6 +39,10 @@ public class Compute implements DijkCompute {
 
     private static final double SAMPLE_PADDING  = 250.0;
     private static final double SAMPLE_INTERVAL = 50.0;
+
+    private static final double GOAL_KICK_TIME = 1.0;
+    private static final double MAX_KICK_VEL = 6.4;
+    private static final double MIN_KICK_VEL = 1.0;
 
     private ArrayList<RobotSnapshot> fielderSnaps;
     private ArrayList<RobotSnapshot> foeSnaps;
@@ -186,7 +191,10 @@ public class Compute implements DijkCompute {
 
     @Override
     public Vec2D computeGoalKickVec(PDG.Node node) {
-        return null;
+        Vec2D goal = computeGoalCenter();
+        double ballDist = goal.sub(node.getPos()).mag();
+        double s = BallMovement.calcKickVel(ballDist, GOAL_KICK_TIME);
+        return new Vec2D(Math.max(MIN_KICK_VEL, Math.min(s, MAX_KICK_VEL)), 0);
     }
 
     @Override
@@ -201,7 +209,7 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeGoalCenter(PDG.Node n) {
+    public Vec2D computeGoalCenter() {
         return foePenaltyRegion.anchor.add(new Vec2D(foePenaltyRegion.width / 2.0, foePenaltyRegion.height));
     }
 
