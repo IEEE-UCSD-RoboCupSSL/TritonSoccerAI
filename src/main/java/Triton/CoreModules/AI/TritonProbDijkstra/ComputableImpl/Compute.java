@@ -5,12 +5,14 @@ import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.Scores.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.RWLockee;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.TOP_TOUCH_LINE;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.BOTTOM_TOUCH_LINE;
@@ -39,18 +41,36 @@ public class Compute implements DijkCompute {
     private ArrayList<RobotSnapshot> fielderSnaps;
     private ArrayList<RobotSnapshot> foeSnaps;
     private Vec2D ballPos;
-    private PassInfo info = null;
+    private PassInfo[][] infoMatrix;
     private Rect2D allyPenaltyRegion, foePenaltyRegion;
 
-    public Compute() {
+    private PUAG graph;
+    private HashMap<PUAG.Node, Integer> nodeToIndexMap;
+
+    public Compute(PUAG graph) {
+        this.graph = graph;
+        nodeToIndexMap = graph.getNodeToIndexMap();
+        assert graph.getNumNodes() == nodeToIndexMap.size();
+
+        int workingSize = nodeToIndexMap.size();
+        infoMatrix = new PassInfo[workingSize][workingSize];
+
         Rect2D[] penaltyRegions = ProbMapModule.getPenaltyRegions();
         allyPenaltyRegion = penaltyRegions[0];
         foePenaltyRegion = penaltyRegions[1];
     }
 
-    public void computePass(PUAG.Node n1, PUAG.Node n2) {
+    public int getIndexOfNode(PUAG.Node n){
+        Integer integer = nodeToIndexMap.get(n);
+        if(integer == null){
+            throw new NonExistentNodeException(n);
+        }
+        return integer;
+    }
+
+    private void computePass(PUAG.Node n1, PUAG.Node n2) {
         /* Return if have computed for current data */
-        if (info != null) return;
+        if (infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] != null) return;
 
         assert n1.getBot() != null && n2.getBot() != null;
 
@@ -93,8 +113,9 @@ public class Compute implements DijkCompute {
             }
         }
 
-        info = new PassInfo();
+        PassInfo info = new PassInfo();
         info.setInfo(n1.getBot(), n2.getBot(), n1.getBot().getPos(), receivingPos, prob);
+        infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = info;
     }
 
     private static double[] getMinMax(Vec2D v1, Vec2D v2) {
@@ -135,12 +156,13 @@ public class Compute implements DijkCompute {
         this.fielderSnaps = allySnaps;
         this.foeSnaps = foeSnaps;
         this.ballPos = ballSnap.get();
-        info = null;
+        infoMatrix = null;
     }
 
     @Override
     public Vec2D computeKickVec(PUAG.Node n1, PUAG.Node n2) {
         computePass(n1, n2);
+        PassInfo info = infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         info.setRobots(fielderSnaps, foeSnaps);
         Pair<Vec2D, Boolean> kick = info.getKickDecision();
         return kick.getValue0();
@@ -155,7 +177,7 @@ public class Compute implements DijkCompute {
     @Override
     public double computeProb(PUAG.Node n1, PUAG.Node n2) {
         computePass(n1, n2);
-        return info.getMaxProb();
+        return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getMaxProb();
     }
 
     @Override
@@ -178,6 +200,6 @@ public class Compute implements DijkCompute {
     @Override
     public Vec2D computeRecepPoint(PUAG.Node n1, PUAG.Node n2) {
         computePass(n1, n2);
-        return info.getOptimalReceivingPos();
+        return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getOptimalReceivingPos();
     }
 }
