@@ -2,7 +2,7 @@ package Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl;
 
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.RobotSnapshot;
@@ -13,12 +13,11 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 @Getter
 @Setter
 public class MockCompute implements DijkCompute {
-    private HashMap<PUAG.Node, Integer> nodeToIndexMap;
+    private HashMap<PDG.Node, Integer> nodeToIndexMap;
     private final double[][] probMatrix;
     private final double[][] angleMatrix;
     private final Vec2D[][] kickVecMatrix;
@@ -26,9 +25,9 @@ public class MockCompute implements DijkCompute {
     private final Vec2D[][] recepPointMatrix;
 
 
-    private PUAG graph;
+    private PDG graph;
 
-    public MockCompute(PUAG graph) {
+    public MockCompute(PDG graph) {
         this.graph = graph;
         nodeToIndexMap = graph.getNodeToIndexMap();
 
@@ -51,7 +50,7 @@ public class MockCompute implements DijkCompute {
         }
     }
 
-    public int getIndexOfNode(PUAG.Node n) throws NonExistentNodeException {
+    public int getIndexOfNode(PDG.Node n) throws NonExistentNodeException {
         Integer integer = nodeToIndexMap.get(n);
         if(integer == null){
             throw new NonExistentNodeException(n);
@@ -59,7 +58,7 @@ public class MockCompute implements DijkCompute {
         return integer;
     }
 
-    public boolean setProb(PUAG.Node n1, PUAG.Node n2, double prob) {
+    public boolean setProb(PDG.Node n1, PDG.Node n2, double prob) {
         try {
             probMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = prob;
             probMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = prob;
@@ -77,7 +76,7 @@ public class MockCompute implements DijkCompute {
         }
     }
 
-    public void setAngle(PUAG.Node n1, PUAG.Node n2, double angle) throws NonExistentNodeException {
+    public void setAngle(PDG.Node n1, PDG.Node n2, double angle) throws NonExistentNodeException {
         int indexOfNode1 = getIndexOfNode(n1);
         int indexOfNode2 = getIndexOfNode(n2);
 
@@ -85,7 +84,7 @@ public class MockCompute implements DijkCompute {
         angleMatrix[indexOfNode2][indexOfNode1] = angle;
     }
 
-    public void setKickVec(PUAG.Node n1, PUAG.Node n2, Vec2D kickVec) {
+    public void setKickVec(PDG.Node n1, PDG.Node n2, Vec2D kickVec) {
         try {
             kickVecMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = kickVec;
             kickVecMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = kickVec;
@@ -95,7 +94,7 @@ public class MockCompute implements DijkCompute {
 
     }
 
-    public void setPasspoint(PUAG.Node n1, PUAG.Node n2, Vec2D passpoint) {
+    public void setPasspoint(PDG.Node n1, PDG.Node n2, Vec2D passpoint) {
         try {
             passPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = passpoint;
             passPointMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = passpoint;
@@ -105,7 +104,7 @@ public class MockCompute implements DijkCompute {
 
     }
 
-    public void setRecepPoint(PUAG.Node n1, PUAG.Node n2, Vec2D recepPoint) {
+    public void setRecepPoint(PDG.Node n1, PDG.Node n2, Vec2D recepPoint) {
         try {
             recepPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] = recepPoint;
             recepPointMatrix[getIndexOfNode(n2)][getIndexOfNode(n1)] = recepPoint;
@@ -118,21 +117,21 @@ public class MockCompute implements DijkCompute {
     public void mock(RobotList<Ally> fielders){
         Ally startAlly = fielders.get(0);
 
-        PUAG.AllyPassNode allyPassNode = new PUAG.AllyPassNode(startAlly);
-        ArrayList<PUAG.Node> allyRecepNodes = new ArrayList<>();
+        PDG.AllyPassNode allyPassNode = new PDG.AllyPassNode(startAlly);
+        ArrayList<PDG.Node> allyRecepNodes = new ArrayList<>();
 
         for (int i = 1; i < fielders.size(); i++) {
-            allyRecepNodes.add(new PUAG.AllyRecepNode(fielders.get(i)));
+            allyRecepNodes.add(new PDG.AllyRecepNode(fielders.get(i)));
         }
 
-        PUAG.GoalNode goalNode = new PUAG.GoalNode();
+        PDG.GoalNode goalNode = new PDG.GoalNode();
 
-        PUAG.Node n0 = allyPassNode;
-        PUAG.Node n1 = allyRecepNodes.get(0);
-        PUAG.Node n2 = allyRecepNodes.get(1);
-        PUAG.Node n3 = allyRecepNodes.get(2);
-        PUAG.Node n4 = allyRecepNodes.get(3);
-        PUAG.GoalNode n5 = goalNode;
+        PDG.Node n0 = allyPassNode;
+        PDG.Node n1 = allyRecepNodes.get(0);
+        PDG.Node n2 = allyRecepNodes.get(1);
+        PDG.Node n3 = allyRecepNodes.get(2);
+        PDG.Node n4 = allyRecepNodes.get(3);
+        PDG.GoalNode n5 = goalNode;
 
 
         this.setProb(n0, n1, 0.95);
@@ -234,7 +233,7 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public double computeProb(PUAG.Node n1, PUAG.Node n2) {
+    public double computeProb(PDG.Node n1, PDG.Node n2) {
         try {
             return probMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         } catch (NonExistentNodeException e) {
@@ -244,12 +243,12 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public double computeGoalProb(PUAG.Node n) {
+    public double computeGoalProb(PDG.Node n) {
         return 1.0;
     }
 
     @Override
-    public double computeAngle(PUAG.Node n1, PUAG.Node n2) {
+    public double computeAngle(PDG.Node n1, PDG.Node n2) {
         try {
             return angleMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         } catch (NonExistentNodeException e) {
@@ -259,7 +258,7 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeKickVec(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computeKickVec(PDG.Node n1, PDG.Node n2) {
 
         try {
             return kickVecMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
@@ -270,7 +269,7 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computePasspoint(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computePasspoint(PDG.Node n1, PDG.Node n2) {
         try {
             return passPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         } catch (NonExistentNodeException e) {
@@ -280,7 +279,7 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeRecepPoint(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computeRecepPoint(PDG.Node n1, PDG.Node n2) {
         try {
             return recepPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         } catch (NonExistentNodeException e) {
@@ -290,9 +289,9 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeGoalCenter(PUAG.Node n) {
-        if(n.getClass() == PUAG.GoalNode.class) {
-            return ((PUAG.GoalNode) n).getGoalCenter();
+    public Vec2D computeGoalCenter(PDG.Node n) {
+        if(n.getClass() == PDG.GoalNode.class) {
+            return ((PDG.GoalNode) n).getGoalCenter();
         }
         return null;
     }

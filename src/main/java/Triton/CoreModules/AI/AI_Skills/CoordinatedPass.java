@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.AI_Skills;
 
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -30,7 +30,7 @@ public class CoordinatedPass {
         Executing
     }
 
-    public CoordinatedPass(PUAG.AllyPassNode passerNode, PUAG.AllyRecepNode receiverNode, 
+    public CoordinatedPass(PDG.AllyPassNode passerNode, PDG.AllyRecepNode receiverNode,
                            Ball ball, BasicEstimator estimator) {
         this.basicEstimator = estimator;
         this.passer = passerNode.getBot();
@@ -95,8 +95,8 @@ public class CoordinatedPass {
 
     private static class PassTask extends ProceduralTask {
         private final Ally passer;
-        private final PUAG.AllyPassNode passNode;
-        public PassTask(PUAG.AllyPassNode passerNode) {
+        private final PDG.AllyPassNode passNode;
+        public PassTask(PDG.AllyPassNode passerNode) {
             this.passer = passerNode.getBot();
             this.passNode = passerNode;
         }
@@ -121,10 +121,10 @@ public class CoordinatedPass {
 
     private static class ReceiveTask extends ProceduralTask {
         private final Ally receiver;
-        private final PUAG.AllyRecepNode recepNode;
+        private final PDG.AllyRecepNode recepNode;
         private final Ball ball;
 
-        public ReceiveTask(PUAG.AllyRecepNode recepNode, Ball ball) {
+        public ReceiveTask(PDG.AllyRecepNode recepNode, Ball ball) {
             this.receiver = recepNode.getBot();
             this.recepNode = recepNode;
             this.ball = ball;

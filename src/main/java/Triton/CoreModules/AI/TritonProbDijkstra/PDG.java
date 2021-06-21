@@ -15,7 +15,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class PUAG { //Probability Undirected Acyclic Graph
+public class PDG { //Probability Undirected Acyclic Graph
 
     private final Node startNode;
     private final Node endNode;
@@ -23,7 +23,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
     private final HashMap<Node, Set<Node>> nodeNeighborSetMap = new HashMap<>();
     private final Edge[][] adjMatrix;
 
-    public PUAG(Node startNode, Node endNode, List<Node> middleNodes) throws NodesNotUniqueException {
+    public PDG(Node startNode, Node endNode, List<Node> middleNodes) throws NodesNotUniqueException {
 
         if(!testNodeUnique(startNode, endNode, middleNodes)){
             throw new NodesNotUniqueException(startNode, endNode, middleNodes);

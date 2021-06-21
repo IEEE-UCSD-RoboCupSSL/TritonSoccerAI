@@ -1,7 +1,7 @@
 package Triton.CoreModules.AI.TritonProbDijkstra.Computables;
 
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 
 public interface AngleCompute {
-    double computeAngle(PUAG.Node n1, PUAG.Node n2);
+    double computeAngle(PDG.Node n1, PDG.Node n2);
 }

@@ -3,7 +3,7 @@ package Triton.ManualTests.CoreTests.AI_SkillsTests;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -52,9 +52,9 @@ public class CoordinatedPassTest extends RobotSkillsTest {
         double receiveDir = passPoint.sub(receptionPoint).toPlayerAngle();
         Vec2D kickVec = new Vec2D(3, 2);
 
-        ArrayList<PUAG.Node> attackerNodes = new ArrayList<>();
-        PUAG.AllyPassNode node1 = new PUAG.AllyPassNode(passer);
-        PUAG.AllyRecepNode node2 = new PUAG.AllyRecepNode(receiver);
+        ArrayList<PDG.Node> attackerNodes = new ArrayList<>();
+        PDG.AllyPassNode node1 = new PDG.AllyPassNode(passer);
+        PDG.AllyRecepNode node2 = new PDG.AllyRecepNode(receiver);
         node1.setPassPoint(passPoint);
         node1.setAngle(passDir);
         node1.setKickVec(kickVec);
@@ -70,14 +70,14 @@ public class CoordinatedPassTest extends RobotSkillsTest {
 
             /* Pass to Next */
             CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
-            CoordinatedPass cp = new CoordinatedPass((PUAG.AllyPassNode) attackerNodes.get(0),
-                    (PUAG.AllyRecepNode) attackerNodes.get(1), ball, basicEstimator);
+            CoordinatedPass cp = new CoordinatedPass((PDG.AllyPassNode) attackerNodes.get(0),
+                    (PDG.AllyRecepNode) attackerNodes.get(1), ball, basicEstimator);
             try {
                 while (passResult == CoordinatedPass.PassShootResult.Executing) {
                     passResult = cp.execute();
                     for (int i = 2; i < attackerNodes.size(); i++) {
-                        if(attackerNodes.get(i) instanceof PUAG.AllyRecepNode) {
-                            PUAG.AllyRecepNode recepNode = ((PUAG.AllyRecepNode) attackerNodes.get(i));
+                        if(attackerNodes.get(i) instanceof PDG.AllyRecepNode) {
+                            PDG.AllyRecepNode recepNode = ((PDG.AllyRecepNode) attackerNodes.get(i));
                             recepNode.getBot().curveTo(recepNode.getReceptionPoint(), recepNode.getAngle());
                         }
                     }

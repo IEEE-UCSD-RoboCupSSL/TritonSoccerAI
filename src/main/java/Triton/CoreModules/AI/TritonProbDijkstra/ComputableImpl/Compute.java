@@ -6,7 +6,7 @@ import Triton.CoreModules.AI.Estimators.Score;
 import Triton.CoreModules.AI.Estimators.Scores.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -44,10 +44,10 @@ public class Compute implements DijkCompute {
     private PassInfo[][] infoMatrix;
     private Rect2D allyPenaltyRegion, foePenaltyRegion;
 
-    private PUAG graph;
-    private HashMap<PUAG.Node, Integer> nodeToIndexMap;
+    private PDG graph;
+    private HashMap<PDG.Node, Integer> nodeToIndexMap;
 
-    public Compute(PUAG graph) {
+    public Compute(PDG graph) {
         this.graph = graph;
         nodeToIndexMap = graph.getNodeToIndexMap();
         assert graph.getNumNodes() == nodeToIndexMap.size();
@@ -60,7 +60,7 @@ public class Compute implements DijkCompute {
         foePenaltyRegion = penaltyRegions[1];
     }
 
-    public int getIndexOfNode(PUAG.Node n){
+    public int getIndexOfNode(PDG.Node n) throws NonExistentNodeException {
         Integer integer = nodeToIndexMap.get(n);
         if(integer == null){
             throw new NonExistentNodeException(n);
@@ -68,7 +68,7 @@ public class Compute implements DijkCompute {
         return integer;
     }
 
-    private void computePass(PUAG.Node n1, PUAG.Node n2) {
+    public void computePass(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
         /* Return if have computed for current data */
         if (infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] != null) return;
 
@@ -138,7 +138,7 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public double computeAngle(PUAG.Node n1, PUAG.Node n2) {
+    public double computeAngle(PDG.Node n1, PDG.Node n2) {
         assert n1.getBot() != null && n2.getBot() != null;
 
         Vec2D path = n2.getBot().getPos().sub(n1.getBot().getPos());
@@ -146,7 +146,7 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeGoalCenter(PUAG.Node n) {
+    public Vec2D computeGoalCenter(PDG.Node n) {
         return foePenaltyRegion.anchor.add(new Vec2D(foePenaltyRegion.width / 2.0, foePenaltyRegion.height));
     }
 
@@ -156,11 +156,12 @@ public class Compute implements DijkCompute {
         this.fielderSnaps = allySnaps;
         this.foeSnaps = foeSnaps;
         this.ballPos = ballSnap.get();
-        infoMatrix = null;
+        int workingSize = nodeToIndexMap.size();
+        infoMatrix = new PassInfo[workingSize][workingSize];
     }
 
     @Override
-    public Vec2D computeKickVec(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computeKickVec(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
         computePass(n1, n2);
         PassInfo info = infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         info.setRobots(fielderSnaps, foeSnaps);
@@ -169,19 +170,19 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computePasspoint(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computePasspoint(PDG.Node n1, PDG.Node n2) {
         assert n1.getBot() != null && n2.getBot() != null;
         return n1.getBot().getPos();
     }
 
     @Override
-    public double computeProb(PUAG.Node n1, PUAG.Node n2) {
+    public double computeProb(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
         computePass(n1, n2);
         return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getMaxProb();
     }
 
     @Override
-    public double computeGoalProb(PUAG.Node n) {
+    public double computeGoalProb(PDG.Node n) {
         assert n.getBot() != null;
         Vec2D pos = n.getBot().getPos();
 
@@ -198,7 +199,7 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computeRecepPoint(PUAG.Node n1, PUAG.Node n2) {
+    public Vec2D computeRecepPoint(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
         computePass(n1, n2);
         return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getOptimalReceivingPos();
     }

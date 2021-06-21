@@ -3,7 +3,7 @@ package Triton.ManualTests.CoreTests.DijkstraTest;
 import Triton.Config.Config;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
-import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
+import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
@@ -12,7 +12,6 @@ import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.SoccerObjects;
 import lombok.Data;
-import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil;
 
 import java.util.ArrayList;
 
@@ -35,25 +34,25 @@ public class DijkstraTest implements TritonTestable {
         Ally startAlly = fielders.get(0);
 
 
-        PUAG.AllyPassNode allyPassNode = new PUAG.AllyPassNode(startAlly);
-        ArrayList<PUAG.Node> allyRecepNodes = new ArrayList<>();
+        PDG.AllyPassNode allyPassNode = new PDG.AllyPassNode(startAlly);
+        ArrayList<PDG.Node> allyRecepNodes = new ArrayList<>();
 
         for (int i = 1; i < fielders.size(); i++) {
-            allyRecepNodes.add(new PUAG.AllyRecepNode(fielders.get(i)));
+            allyRecepNodes.add(new PDG.AllyRecepNode(fielders.get(i)));
         }
 
-        PUAG.GoalNode goalNode = new PUAG.GoalNode();
+        PDG.GoalNode goalNode = new PDG.GoalNode();
 
-        PUAG puag = new PUAG(allyPassNode, goalNode, allyRecepNodes);
+        PDG PDG = new PDG(allyPassNode, goalNode, allyRecepNodes);
 
-        PUAG.Node n0 = allyPassNode;
-        PUAG.Node n1 = allyRecepNodes.get(0);
-        PUAG.Node n2 = allyRecepNodes.get(1);
-        PUAG.Node n3 = allyRecepNodes.get(2);
-        PUAG.Node n4 = allyRecepNodes.get(3);
-        PUAG.Node n5 = goalNode;
+        PDG.Node n0 = allyPassNode;
+        PDG.Node n1 = allyRecepNodes.get(0);
+        PDG.Node n2 = allyRecepNodes.get(1);
+        PDG.Node n3 = allyRecepNodes.get(2);
+        PDG.Node n4 = allyRecepNodes.get(3);
+        PDG.Node n5 = goalNode;
 
-        MockCompute mockCompute = new MockCompute(puag);
+        MockCompute mockCompute = new MockCompute(PDG);
         mockCompute.setProb(n0, n1, 0.95);
         mockCompute.setProb(n0, n2, 0.9);
         mockCompute.setProb(n0, n3, 0.8);
@@ -135,30 +134,30 @@ public class DijkstraTest implements TritonTestable {
         mockCompute.setRecepPoint(n3, n5, new Vec2D(0.3, 0.4));
         mockCompute.setRecepPoint(n4, n5, new Vec2D(0.3, 0.4));
 
-        TritonDijkstra tritonDijkstra = new TritonDijkstra(puag, mockCompute, so);
+        TritonDijkstra tritonDijkstra = new TritonDijkstra(PDG, mockCompute, so);
         TritonDijkstra.AttackPathInfo optimalPath = tritonDijkstra.compute();
         double actual = optimalPath.getTotalProbabilityProduct();
-        ArrayList<PUAG.Node> maxProbPath = optimalPath.getMaxProbPath();
+        ArrayList<PDG.Node> maxProbPath = optimalPath.getMaxProbPath();
         System.out.printf("Return optimal path: [%s]\n", optimalPath.pathString());
 
-        PUAG.Node node = maxProbPath.get(0);
-        PUAG.Node node1 = maxProbPath.get(1);
-        PUAG.Node node2 = maxProbPath.get(2);
-        PUAG.Node node3 = maxProbPath.get(3);
+        PDG.Node node = maxProbPath.get(0);
+        PDG.Node node1 = maxProbPath.get(1);
+        PDG.Node node2 = maxProbPath.get(2);
+        PDG.Node node3 = maxProbPath.get(3);
 
-        boolean b = TestUtil.testReferenceEq("Test if start node is pass node", PUAG.AllyPassNode.class, node.getClass());
-        boolean b1 = TestUtil.testReferenceEq("Test if node1 is recep node", PUAG.AllyRecepNode.class, node1.getClass());
-        boolean b2 = TestUtil.testReferenceEq("Test if node2 is recep node", PUAG.AllyRecepNode.class, node2.getClass());
-        boolean b3 = TestUtil.testReferenceEq("Test if node3 is goal node", PUAG.GoalNode.class, node3.getClass());
+        boolean b = TestUtil.testReferenceEq("Test if start node is pass node", PDG.AllyPassNode.class, node.getClass());
+        boolean b1 = TestUtil.testReferenceEq("Test if node1 is recep node", PDG.AllyRecepNode.class, node1.getClass());
+        boolean b2 = TestUtil.testReferenceEq("Test if node2 is recep node", PDG.AllyRecepNode.class, node2.getClass());
+        boolean b3 = TestUtil.testReferenceEq("Test if node3 is goal node", PDG.GoalNode.class, node3.getClass());
 
         if(!(b && b1 && b2 && b3)){
             return false;
         }
 
-        PUAG.AllyPassNode passNode = (PUAG.AllyPassNode) node;
-        PUAG.AllyRecepNode recepNode1 = (PUAG.AllyRecepNode) node1;
-        PUAG.AllyRecepNode recepNode2 = (PUAG.AllyRecepNode) node2;
-        PUAG.GoalNode endGoalNode = (PUAG.GoalNode) node3;
+        PDG.AllyPassNode passNode = (PDG.AllyPassNode) node;
+        PDG.AllyRecepNode recepNode1 = (PDG.AllyRecepNode) node1;
+        PDG.AllyRecepNode recepNode2 = (PDG.AllyRecepNode) node2;
+        PDG.GoalNode endGoalNode = (PDG.GoalNode) node3;
 
         Vec2D passPoint = passNode.getPassPoint();
         Vec2D receptionPoint1 = recepNode1.getReceptionPoint();
@@ -173,22 +172,22 @@ public class DijkstraTest implements TritonTestable {
 
         mockCompute.setProb(n0, n5, 0.99);
         mockCompute.setPasspoint(n0, n5, new Vec2D(200, 300));
-        TritonDijkstra tritonDijkstra1 = new TritonDijkstra(puag, mockCompute, so);
+        TritonDijkstra tritonDijkstra1 = new TritonDijkstra(PDG, mockCompute, so);
         TritonDijkstra.AttackPathInfo optimalPath1 = tritonDijkstra1.compute();
         double actual1 = optimalPath1.getTotalProbabilityProduct();
-        ArrayList<PUAG.Node> maxProbPath1 = optimalPath1.getMaxProbPath();
-        PUAG.Node node11 = maxProbPath1.get(0);
-        PUAG.Node node12 = maxProbPath1.get(1);
+        ArrayList<PDG.Node> maxProbPath1 = optimalPath1.getMaxProbPath();
+        PDG.Node node11 = maxProbPath1.get(0);
+        PDG.Node node12 = maxProbPath1.get(1);
 
-        boolean b11 = TestUtil.testReferenceEq("Test if node11 is pass node", PUAG.AllyPassNode.class, node11.getClass());
-        boolean b12 = TestUtil.testReferenceEq("Test if Node12 is goal node", PUAG.GoalNode.class, node12.getClass());
+        boolean b11 = TestUtil.testReferenceEq("Test if node11 is pass node", PDG.AllyPassNode.class, node11.getClass());
+        boolean b12 = TestUtil.testReferenceEq("Test if Node12 is goal node", PDG.GoalNode.class, node12.getClass());
 
         if(! (b11 && b12)){
             return false;
         }
 
-        PUAG.AllyPassNode passNode1 = (PUAG.AllyPassNode) node11;
-        PUAG.GoalNode endGoalNode1 = (PUAG.GoalNode) node12;
+        PDG.AllyPassNode passNode1 = (PDG.AllyPassNode) node11;
+        PDG.GoalNode endGoalNode1 = (PDG.GoalNode) node12;
 
         TestUtil.testIntEq("Test if returned path has only 2 nodes", 2, maxProbPath1.size());
         TestUtil.testVec2dEq("Test if start node has correct pass point", new Vec2D(200, 300), passNode1.getPassPoint(), 0.001);
@@ -208,35 +207,35 @@ public class DijkstraTest implements TritonTestable {
         mockCompute.setProb(n3, n5, 0.99);
         mockCompute.setRecepPoint(n3, n5, new Vec2D(300, 500));
 
-        TritonDijkstra tritonDijkstra2 = new TritonDijkstra(puag, mockCompute, so);
+        TritonDijkstra tritonDijkstra2 = new TritonDijkstra(PDG, mockCompute, so);
         TritonDijkstra.AttackPathInfo optimalPath2 = tritonDijkstra2.compute();
-        ArrayList<PUAG.Node> maxProbPath2 = optimalPath2.getMaxProbPath();
+        ArrayList<PDG.Node> maxProbPath2 = optimalPath2.getMaxProbPath();
         TestUtil.testIntEq("Test if returned path has 6 nodes", 6, maxProbPath2.size());
 
-        PUAG.Node node20 = maxProbPath2.get(0);
-        PUAG.Node node21 = maxProbPath2.get(1);
-        PUAG.Node node22 = maxProbPath2.get(2);
-        PUAG.Node node23 = maxProbPath2.get(3);
-        PUAG.Node node24 = maxProbPath2.get(4);
-        PUAG.Node node25 = maxProbPath2.get(5);
+        PDG.Node node20 = maxProbPath2.get(0);
+        PDG.Node node21 = maxProbPath2.get(1);
+        PDG.Node node22 = maxProbPath2.get(2);
+        PDG.Node node23 = maxProbPath2.get(3);
+        PDG.Node node24 = maxProbPath2.get(4);
+        PDG.Node node25 = maxProbPath2.get(5);
 
-        boolean b20 = TestUtil.testReferenceEq("Test if node20 is pass node", PUAG.AllyPassNode.class, node20.getClass());
-        boolean b21 = TestUtil.testReferenceEq("Test if Node21 is recep node", PUAG.AllyRecepNode.class, node21.getClass());
-        boolean b22 = TestUtil.testReferenceEq("Test if Node22 is recep node", PUAG.AllyRecepNode.class, node22.getClass());
-        boolean b23 = TestUtil.testReferenceEq("Test if Node23 is recep node", PUAG.AllyRecepNode.class, node23.getClass());
-        boolean b24 = TestUtil.testReferenceEq("Test if Node24 is recep node", PUAG.AllyRecepNode.class, node24.getClass());
-        boolean b25 = TestUtil.testReferenceEq("Test if Node25 is goal node", PUAG.GoalNode.class, node25.getClass());
+        boolean b20 = TestUtil.testReferenceEq("Test if node20 is pass node", PDG.AllyPassNode.class, node20.getClass());
+        boolean b21 = TestUtil.testReferenceEq("Test if Node21 is recep node", PDG.AllyRecepNode.class, node21.getClass());
+        boolean b22 = TestUtil.testReferenceEq("Test if Node22 is recep node", PDG.AllyRecepNode.class, node22.getClass());
+        boolean b23 = TestUtil.testReferenceEq("Test if Node23 is recep node", PDG.AllyRecepNode.class, node23.getClass());
+        boolean b24 = TestUtil.testReferenceEq("Test if Node24 is recep node", PDG.AllyRecepNode.class, node24.getClass());
+        boolean b25 = TestUtil.testReferenceEq("Test if Node25 is goal node", PDG.GoalNode.class, node25.getClass());
 
         if(!(b20 && b21 && b22 && b23 && b24 && b25)){
             return false;
         }
 
-        PUAG.AllyPassNode passNode20 = (PUAG.AllyPassNode) node20;
-        PUAG.AllyRecepNode recepNode21 = (PUAG.AllyRecepNode) node21;
-        PUAG.AllyRecepNode recepNode22 = (PUAG.AllyRecepNode) node22;
-        PUAG.AllyRecepNode recepNode23 = (PUAG.AllyRecepNode) node23;
-        PUAG.AllyRecepNode recepNode24 = (PUAG.AllyRecepNode) node24;
-        PUAG.GoalNode goalNode25 = (PUAG.GoalNode) node25;
+        PDG.AllyPassNode passNode20 = (PDG.AllyPassNode) node20;
+        PDG.AllyRecepNode recepNode21 = (PDG.AllyRecepNode) node21;
+        PDG.AllyRecepNode recepNode22 = (PDG.AllyRecepNode) node22;
+        PDG.AllyRecepNode recepNode23 = (PDG.AllyRecepNode) node23;
+        PDG.AllyRecepNode recepNode24 = (PDG.AllyRecepNode) node24;
+        PDG.GoalNode goalNode25 = (PDG.GoalNode) node25;
 
         Vec2D passPoint20 = passNode20.getPassPoint();
         Vec2D kickVec20 = passNode20.getKickVec();
