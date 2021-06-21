@@ -120,48 +120,34 @@ public class TritonDijkstra {
         return new RWLockee<Vec2D>(ball.getPos());
     }
 
-    private void updateTailNode(PDG.Node secondTailNode, PDG.Node tailNode) throws GraphIOException {
-        if (tailNode.getClass() == PDG.AllyPassNode.class) {
-            PDG.AllyPassNode tailAllyPassNode = (PDG.AllyPassNode) tailNode;
-
-            graph.setEdgeProb(secondTailNode, tailNode, dijkComp.computeProb(secondTailNode, tailNode));
-            tailAllyPassNode.setPassPoint(dijkComp.computePasspoint(secondTailNode, tailNode));
-            tailAllyPassNode.setAngle(dijkComp.computeAngle(secondTailNode, tailNode));
-            tailAllyPassNode.setKickVec(dijkComp.computeKickVec(secondTailNode, tailNode));
-        } else if (tailNode.getClass() == PDG.AllyRecepNode.class) {
-            PDG.AllyRecepNode tailAllyRecepNode = (PDG.AllyRecepNode) tailNode;
-
-            graph.setEdgeProb(secondTailNode, tailNode, dijkComp.computeProb(secondTailNode, tailNode));
-            tailAllyRecepNode.setAngle(dijkComp.computeAngle(secondTailNode, tailNode));
-            tailAllyRecepNode.setReceptionPoint(dijkComp.computeRecepPoint(secondTailNode, tailNode));
-        } else if (tailNode.getClass() == PDG.GoalNode.class) {
-            PDG.GoalNode tailGoalNode = (PDG.GoalNode) tailNode;
-            tailGoalNode.setGoalCenter(dijkComp.computeGoalCenter(tailGoalNode));
-        } else {
-            throw new UnknownPdgNodeException(tailNode);
-        }
-    }
-
     private void updateNode(PDG.Node node1, PDG.Node node2) throws GraphIOException {
+
+        if (node2.getClass() == PDG.GoalNode.class) {
+            graph.setEdgeProb(node1, node2, dijkComp.computeGoalProb(node1));
+        } else {
+            graph.setEdgeProb(node1, node2, dijkComp.computeProb(node1, node2));
+        }
+
         if (node1.getClass() == PDG.AllyPassNode.class) {
             PDG.AllyPassNode node1PassNode = (PDG.AllyPassNode) node1;
-
-            graph.setEdgeProb(node1, node2, dijkComp.computeProb(node1, node2));
-            node1PassNode.setPassPoint(dijkComp.computePasspoint(node1, node2));
-            node1PassNode.setAngle(dijkComp.computeAngle(node1, node2));
-            node1PassNode.setKickVec(dijkComp.computeKickVec(node1, node2));
-        } else if (node1.getClass() == PDG.AllyRecepNode.class) {
-            PDG.AllyRecepNode node1RecepNode = (PDG.AllyRecepNode) node1;
-
-            graph.setEdgeProb(node1, node2, dijkComp.computeProb(node1, node2));
-            node1RecepNode.setAngle(dijkComp.computeAngle(node1, node2));
-            node1RecepNode.setReceptionPoint(dijkComp.computeRecepPoint(node1, node2));
-        } else if (node1.getClass() == PDG.GoalNode.class) {
-            PDG.GoalNode node1GoalNode = (PDG.GoalNode) node1;
-            node1GoalNode.setGoalCenter(dijkComp.computeGoalCenter(node1GoalNode));
-        } else {
-            throw new UnknownPdgNodeException(node1);
+            if (node2.getClass() == PDG.GoalNode.class){
+                node1PassNode.setPassPoint(dijkComp.computeGoalPassPoint(node1));
+                node1PassNode.setAngle(dijkComp.computeGoalAngle(node1));
+                node1PassNode.setKickVec(dijkComp.computeGoalKickVec(node1));
+            }else {
+                node1PassNode.setPassPoint(dijkComp.computePassPoint(node1, node2));
+                node1PassNode.setAngle(dijkComp.computeAngle(node1, node2));
+                node1PassNode.setKickVec(dijkComp.computeKickVec(node1, node2));
+            }
         }
+
+        if (node2.getClass() == PDG.AllyRecepNode.class) {
+            PDG.AllyRecepNode node2RecepNode = (PDG.AllyRecepNode) node2;
+            node2RecepNode.setReceptionPoint(dijkComp.computeRecepPoint(node1, node2));
+            node2RecepNode.setAngle(dijkComp.computeAngle(node1, node2));
+        }
+
+
     }
 
     /**
@@ -203,7 +189,7 @@ public class TritonDijkstra {
 //                        System.out.println("[compute3 ] Second tail returned null.");
                     }
                     assert secondTailNode != null;
-                    updateTailNode(secondTailNode, tailNode);
+                    updateNode(secondTailNode, tailNode);
 
 //                    System.out.printf("[compute4 ] Updating node %s - tail: %s \n", secondTailNode.getNodeBotIdString(), tailNode.getNodeBotIdString());
 //                    System.out.printf("[compute5 ] Append and update node %s with prob endNode\n", tailNode.getNodeBotIdString());

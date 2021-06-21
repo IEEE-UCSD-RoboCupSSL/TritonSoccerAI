@@ -18,6 +18,7 @@ import java.util.HashMap;
 @Setter
 public class MockCompute implements DijkCompute {
     private HashMap<PDG.Node, Integer> nodeToIndexMap;
+    private PDG.GoalNode goalNode;
     private final double[][] probMatrix;
     private final double[][] angleMatrix;
     private final Vec2D[][] kickVecMatrix;
@@ -30,6 +31,11 @@ public class MockCompute implements DijkCompute {
     public MockCompute(PDG graph) {
         this.graph = graph;
         nodeToIndexMap = graph.getNodeToIndexMap();
+        for (PDG.Node node : graph.getNodeSet()) {
+            if(node.getClass() == PDG.GoalNode.class){
+                this.goalNode = (PDG.GoalNode)node;
+            }
+        }
 
         assert graph.getNumNodes() == nodeToIndexMap.size();
 
@@ -258,6 +264,16 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
+    public double computeGoalAngle(PDG.Node n) {
+        try {
+            return angleMatrix[getIndexOfNode(n)][getIndexOfNode(goalNode)];
+        } catch (NonExistentNodeException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
     public Vec2D computeKickVec(PDG.Node n1, PDG.Node n2) {
 
         try {
@@ -269,13 +285,41 @@ public class MockCompute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computePasspoint(PDG.Node n1, PDG.Node n2) {
+    public Vec2D computeGoalKickVec(PDG.Node node) {
+        try {
+            return passPointMatrix[getIndexOfNode(node)][getIndexOfNode(this.goalNode)];
+        } catch (NonExistentNodeException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Vec2D computePassPoint(PDG.Node n1, PDG.Node n2) {
+
         try {
             return passPointMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)];
         } catch (NonExistentNodeException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public Vec2D computePassPoint(PDG.Node node) {
+        return null;
+    }
+
+    @Override
+    public Vec2D computeGoalPassPoint(PDG.Node node) {
+        try {
+            return passPointMatrix[getIndexOfNode(node)][getIndexOfNode(this.goalNode)];
+        } catch (NonExistentNodeException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override

@@ -6,4 +6,5 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public interface RecepPointCompute {
     Vec2D computeRecepPoint(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException;
+
 }

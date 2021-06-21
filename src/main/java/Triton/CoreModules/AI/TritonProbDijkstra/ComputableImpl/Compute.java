@@ -1,5 +1,6 @@
 package Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl;
 
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.Estimators.ProbMapModule;
 import Triton.CoreModules.AI.Estimators.Score;
@@ -139,16 +140,13 @@ public class Compute implements DijkCompute {
 
     @Override
     public double computeAngle(PDG.Node n1, PDG.Node n2) {
-        assert n1.getBot() != null && n2.getBot() != null;
+        assert n1.getBot() != null;
 
-        Vec2D path = n2.getBot().getPos().sub(n1.getBot().getPos());
+        Vec2D path = n2.getPos().sub(n1.getPos());
         return path.toPlayerAngle();
     }
 
-    @Override
-    public Vec2D computeGoalCenter(PDG.Node n) {
-        return foePenaltyRegion.anchor.add(new Vec2D(foePenaltyRegion.width / 2.0, foePenaltyRegion.height));
-    }
+
 
     @Override
     public void setSnapShots(ArrayList<RobotSnapshot> allySnaps, ArrayList<RobotSnapshot> foeSnaps,
@@ -170,18 +168,6 @@ public class Compute implements DijkCompute {
     }
 
     @Override
-    public Vec2D computePasspoint(PDG.Node n1, PDG.Node n2) {
-        assert n1.getBot() != null && n2.getBot() != null;
-        return n1.getBot().getPos();
-    }
-
-    @Override
-    public double computeProb(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
-        computePass(n1, n2);
-        return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getMaxProb();
-    }
-
-    @Override
     public double computeGoalProb(PDG.Node n) {
         assert n.getBot() != null;
         Vec2D pos = n.getBot().getPos();
@@ -197,6 +183,48 @@ public class Compute implements DijkCompute {
 
         return (1 / (1 + Math.exp(-g)));
     }
+
+    @Override
+    public Vec2D computeGoalKickVec(PDG.Node node) {
+        return null;
+    }
+
+    @Override
+    public Vec2D computeGoalPassPoint(PDG.Node node) {
+        return computePassPoint(node);
+    }
+
+    @Override
+    public double computeGoalAngle(PDG.Node n) {
+        Vec2D path = GvcGeometry.GOAL_CENTER_FOE.sub(n.getPos());
+        return path.toPlayerAngle();
+    }
+
+    @Override
+    public Vec2D computeGoalCenter(PDG.Node n) {
+        return foePenaltyRegion.anchor.add(new Vec2D(foePenaltyRegion.width / 2.0, foePenaltyRegion.height));
+    }
+
+    @Override
+    public Vec2D computePassPoint(PDG.Node n1, PDG.Node n2) {
+        assert n1.getBot() != null;
+        return n1.getBot().getPos();
+    }
+
+    @Override
+    public Vec2D computePassPoint(PDG.Node node) {
+        return node.getPos();
+    }
+
+
+
+    @Override
+    public double computeProb(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {
+        computePass(n1, n2);
+        return infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)].getMaxProb();
+    }
+
+
 
     @Override
     public Vec2D computeRecepPoint(PDG.Node n1, PDG.Node n2) throws NonExistentNodeException {

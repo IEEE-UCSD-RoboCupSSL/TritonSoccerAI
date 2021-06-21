@@ -127,10 +127,18 @@ public class PDG { //Probability Undirected Acyclic Graph
         getEdge(node1, node2).setProb(prob);
     }
 
-    @Getter
+
     public abstract static class Node {
         @Nullable private final Ally bot;
         private final int relatedRobotId;
+
+        public Vec2D getPos(){
+            if(bot == null){
+                return GvcGeometry.GOAL_CENTER_FOE;
+            } else {
+                return bot.getPos();
+            }
+        }
 
         public Node(@Nullable Ally bot) {
             this.bot = bot;
@@ -147,6 +155,14 @@ public class PDG { //Probability Undirected Acyclic Graph
             }
 
             return Integer.toString(bot.getID());
+        }
+
+        public @Nullable Ally getBot() {
+            return bot;
+        }
+
+        public int getRelatedRobotId() {
+            return relatedRobotId;
         }
 
         @Override

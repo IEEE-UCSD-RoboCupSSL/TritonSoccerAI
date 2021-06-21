@@ -242,17 +242,17 @@ public class DijkstraTest implements TritonTestable {
         Vec2D receptionPoint21 = recepNode21.getReceptionPoint();
         Vec2D receptionPoint22 = recepNode22.getReceptionPoint();
         Vec2D receptionPoint23 = recepNode23.getReceptionPoint();
-        double angle23 = recepNode23.getAngle();
+        double angle24 = recepNode24.getAngle();
         Vec2D receptionPoint24 = recepNode24.getReceptionPoint();
         Vec2D goalCenter25 = goalNode25.getGoalCenter();
 
         TestUtil.testVec2dEq("Test if start node pass point is correct", new Vec2D(0.3, 0.4), passPoint20, 0.001);
         TestUtil.testVec2dEq("Test if start node kick vec is correct", new Vec2D(222.22, 333.33), kickVec20, 0.001);
-        TestUtil.testVec2dEq("Test if node21 has correct recep point", new Vec2D(200, 100), receptionPoint21, 0.001);
-        TestUtil.testVec2dEq("Test if node22 has correct recep point", new Vec2D(100, 400), receptionPoint22, 0.001);
-        TestUtil.testVec2dEq("Test if node23 has correct recep point", new Vec2D(400, 300), receptionPoint23, 0.001);
-        TestUtil.testDoubleEq("Test if node23 has correct angle", 42.5, angle23, 0.001);
-        TestUtil.testVec2dEq("Test if node24 has correct recep point", new Vec2D(300, 500), receptionPoint24, 0.001);
+        TestUtil.testVec2dEq("Test if node21 has correct recep point", new Vec2D(0.3, 0.4), receptionPoint21, 0.001);
+        TestUtil.testVec2dEq("Test if node22 has correct recep point", new Vec2D(200, 100), receptionPoint22, 0.001);
+        TestUtil.testVec2dEq("Test if node23 has correct recep point", new Vec2D(100, 400), receptionPoint23, 0.001);
+        TestUtil.testDoubleEq("Test if node24 has correct angle", 42.5, angle24, 0.001);
+        TestUtil.testVec2dEq("Test if node24 has correct recep point", new Vec2D(400, 300), receptionPoint24, 0.001);
         TestUtil.testVec2dEq("Test if end node has correct goal center", new Vec2D(0, 4500), goalCenter25, 0.001);
 
         double totalProbabilityProduct = optimalPath2.getTotalProbabilityProduct();
