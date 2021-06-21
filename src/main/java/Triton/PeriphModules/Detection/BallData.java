@@ -1,7 +1,11 @@
 package Triton.PeriphModules.Detection;
 
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall;
+import Proto.SslVisionDetection;
+import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.CoreModules.Robot.Side;
+import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import org.javatuples.Pair;
@@ -51,7 +55,7 @@ public class BallData {
      * @param detection SSL_Detection of the ball
      * @param time      time of detection
      */
-    public void update(SSL_DetectionBall detection, double time) {
+    public void update(Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionBall detection, double time) {
         Vec2D audienceBallPos = new Vec2D(detection.getX(), detection.getY());
         Vec2D currPos = PerspectiveConverter.audienceToPlayer(audienceBallPos);
         Pair<Vec2D, Double> posTimePair = new Pair<>(currPos, time);
@@ -59,6 +63,24 @@ public class BallData {
         updatePos(posTimePair);
         updateVel();
     }
+
+    public void update(SslVisionDetection.SSL_DetectionBall detection, double time, Config config) {
+        Vec2D ballPos;
+        Vec2D audienceBallPos;
+//        if(config.mySide == Side.GoalToGuardAtLeft) {
+            audienceBallPos = new Vec2D(detection.getX(), detection.getY());
+//        } else {
+//            audienceBallPos = new Vec2D(-detection.getX(), -detection.getY());
+//        }
+        ballPos = PerspectiveConverter.audienceToPlayer(audienceBallPos);
+
+
+        Pair<Vec2D, Double> posTimePair = new Pair<>(ballPos, time);
+
+        updatePos(posTimePair);
+        updateVel();
+    }
+
 
     private void updatePos(Pair<Vec2D, Double> posTimePair) {
         posList.add(posTimePair);

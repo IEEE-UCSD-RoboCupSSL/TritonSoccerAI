@@ -1,7 +1,9 @@
 package Triton.PeriphModules.Detection;
 
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Proto.SslVisionDetection;
+import Triton.Config.Config;
 import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.CoreModules.Robot.Side;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -14,6 +16,7 @@ import java.util.LinkedList;
  * Stores data about robot object
  */
 public class RobotData {
+    public static double MAX_POS_LEN = 8000;
 
     private static class TimePairComparator<T> implements Comparator<Pair<T, Double>> {
         @Override
@@ -75,10 +78,39 @@ public class RobotData {
         return angleVel;
     }
 
-    public void update(SSL_DetectionRobot detection, double time) {
+//    public boolean verifyPos() {
+//        Vec2D pos = getPos();
+//        if(pos)
+//    }
+
+
+
+    public void update(Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot detection, double time) {
         Vec2D audienceRobotPos = new Vec2D(detection.getX(), detection.getY());
         Vec2D currPos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
         Pair<Vec2D, Double> posTimePair = new Pair<>(currPos, time);
+
+        double audienceRobotAngle = Math.toDegrees(detection.getOrientation());
+        double currAngle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);
+        Pair<Double, Double> angleTimePair = new Pair<>(currAngle, time);
+
+        updatePos(posTimePair);
+        updateVel();
+
+        updateAngle(angleTimePair);
+        updateAngleVel();
+    }
+
+    public void update(SslVisionDetection.SSL_DetectionRobot detection, double time, Config config) {
+        Vec2D botPos;
+        Vec2D audienceRobotPos;
+//        if(config.mySide == Side.GoalToGuardAtLeft) {
+            audienceRobotPos = new Vec2D(detection.getX(), detection.getY());
+//        } else {
+//            audienceRobotPos = new Vec2D(-detection.getX(), -detection.getY());
+//        }
+        botPos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
+        Pair<Vec2D, Double> posTimePair = new Pair<>(botPos, time);
 
         double audienceRobotAngle = Math.toDegrees(detection.getOrientation());
         double currAngle = PerspectiveConverter.audienceToPlayer(audienceRobotAngle);

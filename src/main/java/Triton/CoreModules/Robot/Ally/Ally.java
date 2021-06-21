@@ -3,6 +3,7 @@ package Triton.CoreModules.Robot.Ally;
 import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
@@ -57,6 +58,8 @@ public class Ally extends Robot implements AllySkills {
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
+    private final ArrayList<FieldSubscriber<Boolean>> isBotContactBallSubs = new ArrayList<>();
+
     protected ExecutorService threadPool;
     private PathFinder pathFinder;
 
@@ -100,6 +103,12 @@ public class Ally extends Robot implements AllySkills {
         RemoteAPI.CommandData standbyCmd = createStandbyCmd();
 
         commandsPub = new FieldPublisher<>("From:Ally", "Commands " + ID, standbyCmd);
+
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            for(int id = 0; id < config.numAllyRobots; id++) {
+                isBotContactBallSubs.add(new FieldSubscriber<>("From:ErForceClientModule", "BallBotContactList " + id));
+            }
+        }
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
@@ -325,10 +334,16 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isHoldingBall() {
-        if (!isDribbledSub.isSubscribed()) {
-            return false;
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+            if (!isDribbledSub.isSubscribed()) {
+                return false;
+            }
+            return isDribbledSub.getMsg();
         }
-        return isDribbledSub.getMsg();
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            return isBotContactBallSubs.get(getID()).getMsg();
+        }
+        return false;
     }
 
     @Override
@@ -431,7 +446,7 @@ public class Ally extends Robot implements AllySkills {
                         Util.toPeriod(GvcModuleFreqs.UDP_STREAM_SEND_FREQ, TimeUnit.NANOSECONDS),
                         TimeUnit.NANOSECONDS);
 
-
+                delay(500);
                 conn.getTCPConnection().sendInit();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -484,6 +499,12 @@ public class Ally extends Robot implements AllySkills {
             angSub.subscribe(1000);
             kickVelSub.subscribe(1000);
             holdBallPosSub.subscribe(1000);
+
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                for (int id = 0; id < config.numAllyRobots; id++) {
+                    isBotContactBallSubs.get(id).subscribe(1000);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

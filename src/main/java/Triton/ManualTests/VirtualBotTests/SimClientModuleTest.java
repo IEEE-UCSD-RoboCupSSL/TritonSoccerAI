@@ -10,7 +10,7 @@ import Triton.VirtualBot.VirtualBotFactory;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GrSimClientModuleTest implements TritonTestable {
+public class SimClientModuleTest implements TritonTestable {
     private final ArrayList<Publisher<VirtualBotCmds>> virtualBotCmdPubs = new ArrayList<>();
 
     @Override

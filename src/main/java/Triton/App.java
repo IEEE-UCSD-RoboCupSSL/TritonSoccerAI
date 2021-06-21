@@ -6,14 +6,16 @@ import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTests.CoreTestRunner;
 import Triton.ManualTests.CoreTests.RobotSkillsTests.PrimitiveMotionTest;
+import Triton.ManualTests.VirtualBotTests.SimClientModuleTest;
 import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
-import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
+import Triton.PeriphModules.Vision.ERForceVisionModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.*;
+import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 import Triton.VirtualBot.SimulatorDependent.GrSim_OldProto.GrSimClientModule;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral.SimulatorName;
 
@@ -67,9 +69,7 @@ public class App {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(config.cliConfig);
-        System.out.println(config.connConfig);
-        System.out.println(config.botConfig);
+        System.out.println(config);
         // ...
         System.out.println("==============================================================");
 
@@ -107,9 +107,16 @@ public class App {
     public static void createAndRunPeriphModules(Config config, boolean runGameCtrl) {
         if(config.cliConfig.isVirtualSetup) {
             switch (config.cliConfig.simulator) {
-                case GrSim -> moduleFutures.add(App.runModule(
-                        new GrSimVisionModule_OldProto(config), GvcModuleFreqs.VISION_MODULE_FREQ));
-                case ErForceSim -> System.err.println("Error: WorkInProgress");
+                case GrSim -> {
+                    moduleFutures.add(App.runModule(
+                            new GrSimVisionModule_OldProto(config), GvcModuleFreqs.VISION_MODULE_FREQ)
+                    );
+                }
+                case ErForceSim -> {
+                    moduleFutures.add(App.runModule(
+                            new ERForceVisionModule(config), GvcModuleFreqs.VISION_MODULE_FREQ)
+                    );
+                }
             }
         } else {
             System.err.println("Error: WorkInProgress");
@@ -254,6 +261,8 @@ public class App {
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == SimulatorName.GrSim) {
             simClientModule = new GrSimClientModule(config);
+        } else if(config.cliConfig.simulator == SimulatorName.ErForceSim) {
+            simClientModule = new ErForceClientModule(config);
         }
         App.runModule(simClientModule, GvcModuleFreqs.SIM_CLIENT_FREQ);
         /* Note: VirtualBot has nothing to do with Robot(Ally/Foe), despite their naming similar.
@@ -273,7 +282,7 @@ public class App {
 
         /* just taking advantage of this tester's constructor, which constructs the publishers
            matching those subscribers inside simClientModule, preventing subscribe timeout exception */
-        new GrSimClientModuleTest();
+        new SimClientModuleTest();
 
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {

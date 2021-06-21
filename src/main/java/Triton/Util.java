@@ -23,6 +23,7 @@ public final class Util {
             NetworkInterface netIf = null;
             while (netIfs.hasMoreElements()) {
                 netIf = netIfs.nextElement();
+                System.out.println("Discovered network interface: " + netIf.getDisplayName());
                 if (netIf.getDisplayName().startsWith(prefix)) { // use ethernet
                     break;
                 }

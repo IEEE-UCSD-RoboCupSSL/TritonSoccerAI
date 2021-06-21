@@ -26,10 +26,15 @@ public class GetBallTest extends RobotSkillsTest {
 
         while (!ally.isHoldingBall()) {
             ally.getBall(ball);
+            System.out.println(ball.getPos());
             delay(3);
         }
 
         ally.stop();
+        long t0 = System.currentTimeMillis();
+        while(System.currentTimeMillis() - t0 < 1000) {
+            System.out.println(ball.getPos());
+        }
 
         return true;
     }

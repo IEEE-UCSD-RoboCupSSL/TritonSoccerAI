@@ -5,5 +5,5 @@ package Triton.CoreModules.Robot;
  */
 public enum Team {
     BLUE,
-    YELLOW,
+    YELLOW
 }

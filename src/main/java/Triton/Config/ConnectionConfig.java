@@ -63,10 +63,9 @@ public class ConnectionConfig implements IniConfig {
     public String toString() {
         return "ConnectionConfig{" +
                 "botConns=" + botConns +
-                ", sslVisionConn=" + sslVisionConn +
-                ", gcConn=" + gcConn +
-                ", simCmdEndpoint=" + simCmdEndpoint +
-                ", numAllyRobots=" + numAllyRobots +
+                ",\n sslVisionConn=" + sslVisionConn +
+                ",\n gcConn=" + gcConn +
+                ",\n simCmdEndpoint=" + simCmdEndpoint +
                 '}';
     }
 
@@ -86,9 +85,9 @@ public class ConnectionConfig implements IniConfig {
         @Override
         public String toString() {
             return "BotConn{" +
-                    "id=" + id +
-                    ", ipAddr='" + ipAddr + '\'' +
-                    ", tritonBotTcpPort=" + tritonBotTcpPort +
+                    " \n id=" + id +
+                    ",\n ipAddr='" + ipAddr + '\'' +
+                    ",\n tritonBotTcpPort=" + tritonBotTcpPort +
                     ",\n tritonBotUdpPort=" + tritonBotUdpPort +
                     ",\n virtualBotTcpPort=" + virtualBotTcpPort +
                     ",\n virtualBotUdpSendPort=" + virtualBotUdpSendPort +

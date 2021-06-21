@@ -36,7 +36,7 @@ public class GrSimClientModule extends SimClientModule {
     }
 
     @Override
-    protected void sendCommandsToSim() {
+    protected void exec() {
         ArrayList<GrSimCommands.grSim_Robot_Command> robotCommandsArr = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();

@@ -7,6 +7,7 @@ import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.ManualTests.TritonTestable;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.MQSubscriber;
 import Triton.Misc.ModulePubSubSystem.Subscriber;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
@@ -15,6 +16,8 @@ import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_Det
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static Triton.Util.delay;
 
 
 public class GrSimVisionModuleTest_OldProto implements TritonTestable {
@@ -47,6 +50,7 @@ public class GrSimVisionModuleTest_OldProto implements TritonTestable {
 //                time = System.currentTimeMillis();
 //                pos = currPos;
             }
+            delay(3);
         }
     }
 }

@@ -30,6 +30,14 @@ public class PeriphMiscTestFactory {
         periphMiscTestMap.put("futask", new FutureTaskTest(App.threadPool));
         periphMiscTestMap.put("pubsub", new PubSubTests(App.threadPool));
         periphMiscTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
+        periphMiscTestMap.put("erforcevision", new ErForceSimVisionModuleTest());
+        periphMiscTestMap.put("SSL", new SSLGameCtrlModuleTest());
+        periphMiscTestMap.put("vbotmath", new ConstraintMappingMathTests());
+        periphMiscTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
+        periphMiscTestMap.put("detection", new DetectionTest_OldProto());
+        periphMiscTestMap.put("futask", new FutureTaskTest(App.threadPool));
+        periphMiscTestMap.put("pubsub", new PubSubTests(App.threadPool));
+        periphMiscTestMap.put("grsimvision", new GrSimVisionModuleTest_OldProto());
         periphMiscTestMap.put("SSL", new SSLGameCtrlModuleTest());
         periphMiscTestMap.put("vbotmath", new ConstraintMappingMathTests());
         periphMiscTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());

@@ -18,6 +18,13 @@ public class CliConfig {
     @Option(names = {"-y", "--yellow"}, description = "set team color to be yellow")
     public boolean isYellowTeam = false;
 
+    @Option(names = {"-l", "--left"}, description = "set team to guard the goal at left side")
+    public boolean isGoalToGuardAtLeft  = false;
+
+    @Option(names = {"-r", "--right"}, description = "set team to guard the goal at the right side")
+    public boolean isGoalToGuardAtRight = false;
+
+
     @Option(names = {"-v", "--virtual"}, description = "run this program for virtual setup (i.e. with a simulator instead of real robots)")
     public boolean isVirtualSetup = false;
 
@@ -66,24 +73,21 @@ public class CliConfig {
                 throw new RuntimeException();
             }
         }
-
-        if(isBlueTeam && isYellowTeam) {
-            System.err.println("Error: can only select one team color, run with -h or --help for more details");
-            throw new RuntimeException();
-        }
-
-        if(!isBlueTeam && !isYellowTeam) {
-            isBlueTeam = true;
-            System.out.println("Warning: team color set as default: blue");
-        }
+//
+//        if(isBlueTeam && isYellowTeam) {
+//            System.err.println("Error: can only select one team color, run with -h or --help for more details");
+//            throw new RuntimeException();
+//        }
+//
+//        if(!isBlueTeam && !isYellowTeam) {
+//            System.
+//        }
 
     }
 
     @Override
     public String toString() {
         return "CliConfig{" +
-                "\nisBlueTeam=" + isBlueTeam +
-                ", \nisYellowTeam=" + isYellowTeam +
                 ", \nisVirtualMode=" + isVirtualSetup +
                 ", \nprogMode='" + progModeStr + '\'' +
                 ", \niniFiles=" + Arrays.toString(iniFiles) +

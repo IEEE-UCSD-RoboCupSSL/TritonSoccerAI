@@ -1,8 +1,8 @@
 package Triton.PeriphModules.Detection;
 
+import Proto.SslVisionDetection;
 import Triton.Config.Config;
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
@@ -13,13 +13,17 @@ import java.util.ArrayList;
  * Module to process object detection data from VisionModule
  */
 public class DetectionModule implements Module {
+
+    private final Config config;
+
     // Data objects
     private final ArrayList<RobotData> yellowRobotsData;
     private final ArrayList<RobotData> blueRobotsData;
     private final BallData ballData;
 
     // Subscribers
-    private final Subscriber<SSL_DetectionFrame> visionSub;
+    private final Subscriber<Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame> visionSub_OldProto;
+    private final Subscriber<SslVisionDetection.SSL_DetectionFrame> visionSub;
 
     // Publishers
     private final ArrayList<Publisher<RobotData>> yellowRobotPubs;
@@ -32,8 +36,17 @@ public class DetectionModule implements Module {
      * Constructs a DetectionModule
      */
     public DetectionModule(Config config) {
-        visionSub = new MQSubscriber<>("From:GrSimVisionModule_OldProto", "Detection");
-
+        this.config = config;
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            visionSub = new MQSubscriber<>("From:ERForceVisionModule", "Detection");
+            visionSub_OldProto = null;
+        } else if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+            visionSub_OldProto = new MQSubscriber<>("From:GrSimVisionModule_OldProto", "Detection");
+            visionSub = null;
+        } else {
+            visionSub_OldProto = null;
+            visionSub = null;
+        }
         yellowRobotsData = new ArrayList<>();
         blueRobotsData = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
@@ -62,11 +75,14 @@ public class DetectionModule implements Module {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             isFirstRun = false;
         }
-
-        update(visionSub.getMsg());
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+            update(visionSub_OldProto.getMsg());
+        }
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            update(visionSub.getMsg());
+        }
     }
 
     /**
@@ -74,7 +90,13 @@ public class DetectionModule implements Module {
      */
     private void subscribe() {
         try {
-            visionSub.subscribe(1000);
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+                visionSub_OldProto.subscribe(1000);
+            }
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                visionSub.subscribe(1000);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -85,16 +107,17 @@ public class DetectionModule implements Module {
      *
      * @param frame SSL_Detection frame, sent from VisionModule
      */
-    public void update(SSL_DetectionFrame frame) {
+    public void update(Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame frame) {
+        if (frame == null) return;
         double time = frame.getTCapture();
 
-        for (SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
+        for (Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
             int id = robotFrame.getRobotId();
             blueRobotsData.get(id).update(robotFrame, time);
             blueRobotPubs.get(id).publish(blueRobotsData.get(id));
         }
 
-        for (SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
+        for (Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
             int id = robotFrame.getRobotId();
             yellowRobotsData.get(id).update(robotFrame, time);
             yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
@@ -102,6 +125,33 @@ public class DetectionModule implements Module {
 
         if (frame.getBallsCount() > 0)
             ballData.update(frame.getBalls(0), time);
+        ballPub.publish(ballData);
+    }
+
+
+    /**
+     * Updates data and publish to subscribers
+     *
+     * @param frame SSL_Detection frame, sent from VisionModule
+     */
+    public void update(SslVisionDetection.SSL_DetectionFrame frame) {
+        if (frame == null) return;
+        double time = frame.getTCapture();
+
+        for (SslVisionDetection.SSL_DetectionRobot robotFrame : frame.getRobotsBlueList()) {
+            int id = robotFrame.getRobotId();
+            blueRobotsData.get(id).update(robotFrame, time, config);
+            blueRobotPubs.get(id).publish(blueRobotsData.get(id));
+        }
+
+        for (SslVisionDetection.SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
+            int id = robotFrame.getRobotId();
+            yellowRobotsData.get(id).update(robotFrame, time, config);
+            yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
+        }
+
+        if (frame.getBallsCount() > 0)
+            ballData.update(frame.getBalls(0), time, config);
         ballPub.publish(ballData);
     }
 }

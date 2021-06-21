@@ -23,7 +23,7 @@ public class VirtualMcuTopModule implements Module {
     private final int id;
     private int port;
     //private PrintWriter socketOut;
-    //private BufferedReader socketIn;
+    private BufferedReader socketIn;
     private final FieldPublisher<FirmwareAPI.FirmwareCommand> cmdPub;
     private final FieldSubscriber<FirmwareAPI.FirmwareData> dataSub;
     private final FieldPubSubPair<Boolean> isConnectedToTritonBotPubSub;
@@ -66,7 +66,7 @@ public class VirtualMcuTopModule implements Module {
             ServerSocket severSocket = new ServerSocket(port);
             socket = severSocket.accept();
             //socketOut = new PrintWriter(socket.getOutputStream(), true);
-            //socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.ISO_8859_1));
+            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("\033[0;32m VirtualBot " + id + " successfully accepted " +
                     "TritonBot(cpp)'s tcp connection request \033[0m");
             isConnectedToTritonBotPubSub.pub.publish(true);
@@ -90,8 +90,17 @@ public class VirtualMcuTopModule implements Module {
             System.out.println("Something went wrong in VirtualMcuTopModule.java");
             return;
         }
+        String line = "";
+        try {
+            line = socketIn.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        delay(5000);
+        if(line.equals("init")) {
+            System.out.println("V-McuTop: Init command received");
+        }
+
     }
 
 

@@ -2,8 +2,6 @@ package Triton.PeriphModules.Vision;
 
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslDetection.SSL_DetectionFrame;
-import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslWrapper.SSL_WrapperPacket;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -16,14 +14,18 @@ import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
 
-import static Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslGeometry.*;
+import Proto.SslVisionDetection.SSL_DetectionFrame;
+import Proto.SslVisionWrapper.SSL_WrapperPacket;
+import Proto.SslVisionGeometry.*; 
+
 
 /**
  * Module to receive data from grSim and send to GeometryModule and Detection Module
  */
-public class GrSimVisionModule_OldProto extends VisionModule {
+public class ERForceVisionModule extends VisionModule {
 
     private final static int MAX_BUFFER_SIZE = 67108864;
+    private final static int RECV_TIMEOUT = 1000;
     private final Publisher<SSL_DetectionFrame> visionPub;
     private MulticastSocket socket;
     private DatagramPacket packet;
@@ -31,8 +33,10 @@ public class GrSimVisionModule_OldProto extends VisionModule {
     /**
      * Constructs a VisionModule listening on default ip and port inside ConnectionjsonConfig
      */
-    public GrSimVisionModule_OldProto(Config config) {
+    public ERForceVisionModule(Config config) {
         this(config.connConfig.sslVisionConn.ipAddr, config.connConfig.sslVisionConn.port);
+        System.out.println("Vision: " + config.connConfig.sslVisionConn.ipAddr + ":" +
+                config.connConfig.sslVisionConn.port);
     }
 
     /**
@@ -41,20 +45,16 @@ public class GrSimVisionModule_OldProto extends VisionModule {
      * @param ip   ip to receive from
      * @param port port to receive from
      */
-    public GrSimVisionModule_OldProto(String ip, int port) {
-        visionPub = new MQPublisher<>("From:GrSimVisionModule_OldProto", "Detection");
-
+    public ERForceVisionModule(String ip, int port) {
+        visionPub = new MQPublisher("From:ERForceVisionModule", "Detection");
         byte[] buffer = new byte[MAX_BUFFER_SIZE];
 
         try {
-//            socket = Util.mcSocket(jsonConfig.conn().getGrsimMcAddr(),
-//                    jsonConfig.conn().getGrsimMcPort());
+            socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
+            socket.joinGroup(new InetSocketAddress(ip, port), Triton.Util.getNetIf("eth1"));
+            socket.setSoTimeout(RECV_TIMEOUT);
 
-              socket = new MulticastSocket(port); // this constructor will automatically enable reuse_addr
-              socket.joinGroup(new InetSocketAddress(ip, port),
-                        NetworkInterface.getByInetAddress(InetAddress.getByName(ip)));
-
-              packet = new DatagramPacket(buffer, buffer.length);
+            packet = new DatagramPacket(buffer, buffer.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,15 +69,17 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         socket.receive(packet);
         ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
                 packet.getOffset(), packet.getLength());
-        SSL_WrapperPacket SSLPacket =
-                SSL_WrapperPacket.parseFrom(stream);
+        SSL_WrapperPacket SSLPacket = SSL_WrapperPacket.parseFrom(stream);
 
         if (!GvcGeometry.IS_GEO_INIT && SSLPacket.hasGeometry()) {
             processGeometry(SSLPacket.getGeometry());
         }
 
         if (SSLPacket.hasDetection()) {
-            visionPub.publish(SSLPacket.getDetection());
+//            String s = SSLPacket.getDetection().toString();
+//            System.out.println("publish: " + s.substring(0, s.indexOf('\n')));
+            SSL_DetectionFrame detectionFrame = SSLPacket.getDetection();
+            visionPub.publish(detectionFrame);
         }
     }
 
@@ -115,7 +117,7 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         }
 
         // Field Circle
-        SSL_FieldCicularArc arc = field.getFieldArcs(0);
+        SSL_FieldCircularArc arc = field.getFieldArcs(0);
         GvcGeometry.FIELD_CIRCLE_CENTER = new Vec2D(arc.getCenter().getX(), arc.getCenter().getY());
         GvcGeometry.FIELD_CIRCLE_RADIUS = arc.getRadius();
         GvcGeometry.FIELD_CIRCLE = new Circle2D(GvcGeometry.FIELD_CIRCLE_CENTER, GvcGeometry.FIELD_CIRCLE_RADIUS);
@@ -133,13 +135,6 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         // Other
         GvcGeometry.GOAL_CENTER_TEAM = new Vec2D(0, -GvcGeometry.FIELD_LENGTH / 2);
         GvcGeometry.GOAL_CENTER_FOE = new Vec2D(0, GvcGeometry.FIELD_LENGTH / 2);
-        GvcGeometry.PENALTY_STRETCH_WIDTH =
-                GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.y - GvcGeometry.LEFT_FIELD_RIGHT_PENALTY_STRETCH.p1.y;
-        GvcGeometry.PENALTY_STRETCH_LEFT = -GvcGeometry.PENALTY_STRETCH_WIDTH / 2;
-        GvcGeometry.PENALTY_STRETCH_RIGHT = GvcGeometry.PENALTY_STRETCH_WIDTH / 2;
-        GvcGeometry.PENALTY_STRETCH_DEPTH =
-                GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p2.x - GvcGeometry.LEFT_FIELD_LEFT_PENALTY_STRETCH.p1.x;
-        GvcGeometry.PENALTY_STRETCH_Y = -GvcGeometry.FIELD_LENGTH / 2 + GvcGeometry.PENALTY_STRETCH_DEPTH;
 
         GvcGeometry.IS_GEO_INIT = true;
 
