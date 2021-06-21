@@ -40,7 +40,7 @@ public class DEPRECATED_AttackPlanA extends Tactics {
         this.config = config;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passInfo = new PassInfo(fielders, foes, ball);
+        passInfo = new PassInfo();
 
         this.atkSupportMap = atkSupportMap;
         this.passProbMap = passProbMap;

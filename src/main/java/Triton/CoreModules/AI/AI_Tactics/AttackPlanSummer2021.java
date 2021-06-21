@@ -59,7 +59,7 @@ public class AttackPlanSummer2021 extends Tactics {
         this.config = config;
 
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
-        passInfo = new PassInfo(fielders, foes, ball);
+        passInfo = new PassInfo();
 
         this.atkSupportMap = atkSupportMap;
         this.passProbMap = passProbMap;

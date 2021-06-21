@@ -199,8 +199,9 @@ public class PassProbMapModule extends ProbMapModule {
             double maxProb = pmf[idx[0]][idx[1]];
             int bestReceiver = receiver[idx[0]][idx[1]];
 
-            PassInfo info = new PassInfo(fielders, foes, ball);
-            info.setInfo(passer, bestReceiver, fielderSnaps.get(passer).getPos(), topPos, maxProb);
+            PassInfo info = new PassInfo();
+            info.setInfo(fielders.get(passer), fielders.get(bestReceiver),
+                    fielderSnaps.get(passer).getPos(), topPos, maxProb);
             return info;
         } catch (Exception e) {
             return null;

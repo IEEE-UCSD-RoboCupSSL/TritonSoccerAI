@@ -11,10 +11,6 @@ import org.javatuples.Pair;
 
 public class PassInfo {
 
-    private final RobotList<Ally> allies;
-    private final RobotList<Foe> foes;
-    private final Ball ball;
-
     private static final double DIST_MEAN = 500.0;
     private static final double DIST_RANGE = 500.0;
     private static final double WEIGHT_MIN = 1.0;
@@ -29,16 +25,10 @@ public class PassInfo {
     private Vec2D receivingPos;
     private double prob;
 
-    public PassInfo(RobotList<Ally> allies, RobotList<Foe> foes, Ball ball) {
-        this.allies = allies;
-        this.foes = foes;
-        this.ball = ball;
-    }
-
-    public void setInfo(int passerID, int receiverID,
+    public void setInfo(Ally passer, Ally receiver,
                         Vec2D passingPos, Vec2D receivingPos, double prob) {
-        this.passer = allies.get(passerID);
-        this.receiver = allies.get(receiverID);
+        this.passer = passer;
+        this.receiver = receiver;
         this.passingPos = passingPos;
         this.receivingPos = receivingPos;
         this.prob = prob;
@@ -48,7 +38,7 @@ public class PassInfo {
         return prob;
     }
 
-    public Vec2D getOptimalPassingPos(Ally passer) {
+    public Vec2D getOptimalPassingPos() {
         return passingPos;
     }
 
@@ -64,16 +54,15 @@ public class PassInfo {
         return (1 / (1 + Math.exp(-(dist - DIST_MEAN) / DIST_RANGE))) * (WEIGHT_MAX - WEIGHT_MIN) + WEIGHT_MIN;
     }
 
-    public Pair<Double, Boolean> getKickDecision() {
+    public Pair<Vec2D, Boolean> getKickDecision() {
         double receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
                 receivingPos, receiver.getPos());
         double ballDist = passingPos.sub(receivingPos).mag();
         double s = BallMovement.calcKickVel(ballDist, receiverETA);
         s = Math.max(MIN_KICK_VEL, Math.min(s, MAX_KICK_VEL));
         double ballETA = BallMovement.calcETA(s, ballDist);
-        return new Pair<>(s, receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
+        return new Pair<>(new Vec2D(s, 0.0),
+                receiverETA * timeWeight(receiver.getPos().sub(receivingPos).mag()) < ballETA);
     }
-
-
 
 }

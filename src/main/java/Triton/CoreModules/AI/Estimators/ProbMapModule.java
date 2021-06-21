@@ -48,6 +48,40 @@ public abstract class ProbMapModule {
     protected RWLockee<double[][]> localMaxScoreWrapper = new RWLockee<>(null);
 
 
+    public static Rect2D[] getPenaltyRegions() {
+        Vec2D lpA = audienceToPlayer(LEFT_PENALTY_STRETCH.p1);
+        Vec2D lpB = audienceToPlayer(LEFT_PENALTY_STRETCH.p2);
+        Vec2D rpA = audienceToPlayer(RIGHT_PENALTY_STRETCH.p1);
+        Vec2D rpB = audienceToPlayer(RIGHT_PENALTY_STRETCH.p2);
+
+        if (lpA.x > lpB.x) {
+            Vec2D tmp = lpA;
+            lpA = lpB;
+            lpB = tmp;
+        }
+        if (rpA.x > rpB.x) {
+            Vec2D tmp = rpA;
+            rpA = rpB;
+            rpB = tmp;
+        }
+        double penaltyWidth = lpA.sub(lpB).mag();
+        double penaltyHeight;
+        if (lpA.y < 0) {
+            penaltyHeight = (new Vec2D(lpA.x, -FIELD_LENGTH / 2)).sub(lpA).mag();
+        } else {
+            penaltyHeight = (new Vec2D(lpA.x, FIELD_LENGTH / 2)).sub(lpA).mag();
+        }
+        if (lpA.y < rpA.y) {
+            Vec2D lpC = new Vec2D(lpA.x, -FIELD_LENGTH / 2);
+            return new Rect2D[]{new Rect2D(lpC, penaltyWidth, penaltyHeight),
+                    new Rect2D(rpA, penaltyWidth, penaltyHeight)};
+        } else {
+            Vec2D rpC = new Vec2D(rpA.x, -FIELD_LENGTH / 2);
+            return new Rect2D[]{new Rect2D(rpC, penaltyWidth, penaltyHeight),
+                    new Rect2D(lpA, penaltyWidth, penaltyHeight)};
+        }
+    }
+
 
     public ProbMapModule(SoccerObjects soccerObjects) {
         this(soccerObjects.fielders, soccerObjects.foes, soccerObjects.ball);
@@ -92,37 +126,10 @@ public abstract class ProbMapModule {
         evalWidth = evalGrid.numCols(width) + 1;
         evalHeight = evalGrid.numRows(height) + 1;
 
-        Vec2D lpA = audienceToPlayer(LEFT_PENALTY_STRETCH.p1);
-        Vec2D lpB = audienceToPlayer(LEFT_PENALTY_STRETCH.p2);
-        Vec2D rpA = audienceToPlayer(RIGHT_PENALTY_STRETCH.p1);
-        Vec2D rpB = audienceToPlayer(RIGHT_PENALTY_STRETCH.p2);
-
-        if (lpA.x > lpB.x) {
-            Vec2D tmp = lpA;
-            lpA = lpB;
-            lpB = tmp;
-        }
-        if (rpA.x > rpB.x) {
-            Vec2D tmp = rpA;
-            rpA = rpB;
-            rpB = tmp;
-        }
-        double penaltyWidth = lpA.sub(lpB).mag();
-        double penaltyHeight;
-        if (lpA.y < 0) {
-            penaltyHeight = (new Vec2D(lpA.x, -FIELD_LENGTH / 2)).sub(lpA).mag();
-        } else {
-            penaltyHeight = (new Vec2D(lpA.x, FIELD_LENGTH / 2)).sub(lpA).mag();
-        }
-        if (lpA.y < rpA.y) {
-            Vec2D lpC = new Vec2D(lpA.x, -FIELD_LENGTH / 2);
-            allyPenaltyRegion = new Rect2D(lpC, penaltyWidth, penaltyHeight);
-            foePenaltyRegion = new Rect2D(rpA, penaltyWidth, penaltyHeight);
-        } else {
-            Vec2D rpC = new Vec2D(rpA.x, -FIELD_LENGTH / 2);
-            allyPenaltyRegion = new Rect2D(rpC, penaltyWidth, penaltyHeight);
-            foePenaltyRegion = new Rect2D(lpA, penaltyWidth, penaltyHeight);
-        }
+        /* Add penalty region */
+        Rect2D[] penaltyRegions = getPenaltyRegions();
+        allyPenaltyRegion = penaltyRegions[0];
+        foePenaltyRegion = penaltyRegions[1];
     }
 
 
