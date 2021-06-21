@@ -2,12 +2,15 @@ package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
 import Proto.SslSimulationRobotFeedback;
+import Triton.App;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Side;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
+import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.VirtualBot.SimClientModule;
 import Triton.VirtualBot.VirtualBotCmds;
 
@@ -20,17 +23,16 @@ import Proto.SslSimulationRobotControl.RobotCommand;
 import Proto.SslSimulationRobotControl.RobotMoveCommand;
 import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
+import lombok.Data;
 
 public class ErForceClientModule extends SimClientModule {
 
     private static final float MAX_DRIB_SPEED = 1000.0f;
-    private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
+
 
     public ErForceClientModule(Config config) {
         super(config);
-        for(int id = 0; id < config.numAllyRobots; id++) {
-            isBotContactBallPubs.add(new FieldPublisher<>("From:ErForceClientModule", "BallBotContactList " + id, false));
-        }
+        App.runModule(new FeedBackReceptionModule(config, this), GvcModuleFreqs.VISION_MODULE_FREQ);
     }
 
 
@@ -41,14 +43,6 @@ public class ErForceClientModule extends SimClientModule {
 
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
-//
-//            if(config.mySide == Side.GoalToGuardAtRight) {
-//                cmd.setVelX(-cmd.getVelX());
-//                cmd.setVelY(-cmd.getVelY());
-//                cmd.setVelAng(cmd.getVelAng());
-//            }
-
-
             Vec2D kickXZ = new Vec2D(cmd.getKickX(), cmd.getKickZ());
             float kickSpeed = (float) kickXZ.mag();
             float kickAngle = (float) Math.toDegrees(Math.atan2(kickXZ.y, kickXZ.x));
@@ -77,18 +71,39 @@ public class ErForceClientModule extends SimClientModule {
         sendUdpPacket(bytes);
 
 
-//        try {
-//            SslSimulationRobotFeedback.RobotControlResponse feedbacks = receiveResponse();
-//            for(int id = 0; id < config.numAllyRobots; id++) {
-//                isBotContactBallPubs.get(id).publish(feedbacks.getFeedback(id).getDribblerBallContact());
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
 
     }
 
-    private SslSimulationRobotFeedback.RobotControlResponse receiveResponse() throws IOException {
+    private static class FeedBackReceptionModule implements Module {
+        private final ErForceClientModule efcm;
+        private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
+        private final Config config;
+
+        public FeedBackReceptionModule(Config config, ErForceClientModule efcm) {
+            this.config = config;
+            this.efcm = efcm;
+            for(int id = 0; id < config.numAllyRobots; id++) {
+                isBotContactBallPubs.add(new FieldPublisher<>("From:ErForceClientModule", "BallBotContactList " + id, false));
+            }
+        }
+
+
+        @Override
+        public void run() {
+            try {
+                SslSimulationRobotFeedback.RobotControlResponse feedbacks = efcm.receiveResponse();
+                for(int id = 0; id < config.numAllyRobots; id++) {
+                    isBotContactBallPubs.get(id).publish(feedbacks.getFeedback(id).getDribblerBallContact());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public SslSimulationRobotFeedback.RobotControlResponse receiveResponse() throws IOException {
         DatagramPacket packet = receiveUdpPacketFollowingSend();
         ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
                 packet.getOffset(), packet.getLength());

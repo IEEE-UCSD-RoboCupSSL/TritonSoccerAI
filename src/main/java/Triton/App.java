@@ -6,7 +6,7 @@ import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.ManualTests.CoreTests.CoreTestRunner;
 import Triton.ManualTests.CoreTests.RobotSkillsTests.PrimitiveMotionTest;
-import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
+import Triton.ManualTests.VirtualBotTests.SimClientModuleTest;
 import Triton.ManualTests.VirtualBotTests.VirtualBotTestRunner;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -282,7 +282,7 @@ public class App {
 
         /* just taking advantage of this tester's constructor, which constructs the publishers
            matching those subscribers inside simClientModule, preventing subscribe timeout exception */
-        new GrSimClientModuleTest();
+        new SimClientModuleTest();
 
         SimClientModule simClientModule = null;
         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {

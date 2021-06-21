@@ -55,11 +55,11 @@ public abstract class SimClientModule implements Module {
         }
 
         try {
-            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
-            } else {
+//            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//                socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
+//            } else {
                 socket = new DatagramSocket();
-            }
+//            }
             address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
         } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
