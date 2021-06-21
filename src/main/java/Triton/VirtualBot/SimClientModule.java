@@ -19,7 +19,8 @@ public abstract class SimClientModule implements Module {
     protected DatagramSocket socket;
     protected int port;
 
-    protected byte[] receiveBuffer = new byte[1024];
+
+
 
     protected final ArrayList<Subscriber<VirtualBotCmds>> virtualBotCmdSubs = new ArrayList<>();
 
@@ -55,11 +56,7 @@ public abstract class SimClientModule implements Module {
         }
 
         try {
-//            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-//                socket = new DatagramSocket(config.connConfig.simCmdEndpoint.port);
-//            } else {
-                socket = new DatagramSocket();
-//            }
+            socket = new DatagramSocket();
             address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
         } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
@@ -86,14 +83,4 @@ public abstract class SimClientModule implements Module {
         }
     }
 
-
-    protected DatagramPacket receiveUdpPacketFollowingSend() { // send already binds to the endpoint
-        DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-        try {
-            socket.receive(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return packet;
-    }
 }

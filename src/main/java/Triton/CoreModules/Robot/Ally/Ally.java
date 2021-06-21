@@ -58,7 +58,7 @@ public class Ally extends Robot implements AllySkills {
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
-    private final ArrayList<FieldSubscriber<Boolean>> isBotContactBallSubs = new ArrayList<>();
+//    private final ArrayList<FieldSubscriber<Boolean>> isBotContactBallSubs = new ArrayList<>();
 
     protected ExecutorService threadPool;
     private PathFinder pathFinder;
@@ -104,11 +104,11 @@ public class Ally extends Robot implements AllySkills {
 
         commandsPub = new FieldPublisher<>("From:Ally", "Commands " + ID, standbyCmd);
 
-        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-            for(int id = 0; id < config.numAllyRobots; id++) {
-                isBotContactBallSubs.add(new FieldSubscriber<>("From:ErForceClientModule", "BallBotContactList " + id));
-            }
-        }
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//            for(int id = 0; id < config.numAllyRobots; id++) {
+//                isBotContactBallSubs.add(new FieldSubscriber<>("From:ErForceClientModule", "BallBotContactList " + id));
+//            }
+//        }
 
         conn.buildTcpConnection();
         conn.buildUDPStream();
@@ -334,16 +334,16 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isHoldingBall() {
-        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
             if (!isDribbledSub.isSubscribed()) {
                 return false;
             }
             return isDribbledSub.getMsg();
-        }
-        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-            return isBotContactBallSubs.get(getID()).getMsg();
-        }
-        return false;
+//        }
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//            return isBotContactBallSubs.get(getID()).getMsg();
+//        }
+//        return false;
     }
 
     @Override
@@ -499,11 +499,11 @@ public class Ally extends Robot implements AllySkills {
             kickVelSub.subscribe(1000);
             holdBallPosSub.subscribe(1000);
 
-            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                for (int id = 0; id < config.numAllyRobots; id++) {
-                    isBotContactBallSubs.get(id).subscribe(1000);
-                }
-            }
+//            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//                for (int id = 0; id < config.numAllyRobots; id++) {
+//                    isBotContactBallSubs.get(id).subscribe(1000);
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

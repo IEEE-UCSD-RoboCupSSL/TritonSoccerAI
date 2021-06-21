@@ -2,13 +2,11 @@ package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
 import Proto.SslSimulationRobotFeedback;
+import Proto.SslSimulationSynchronous;
 import Triton.App;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
-import Triton.CoreModules.Robot.Side;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.VirtualBot.SimClientModule;
@@ -16,14 +14,13 @@ import Triton.VirtualBot.VirtualBotCmds;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
+import java.net.*;
 import java.util.ArrayList;
 
 import Proto.SslSimulationRobotControl.RobotCommand;
 import Proto.SslSimulationRobotControl.RobotMoveCommand;
 import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
-import lombok.Data;
 
 public class ErForceClientModule extends SimClientModule {
 
@@ -32,7 +29,7 @@ public class ErForceClientModule extends SimClientModule {
 
     public ErForceClientModule(Config config) {
         super(config);
-        App.runModule(new FeedBackReceptionModule(config, this), GvcModuleFreqs.VISION_MODULE_FREQ);
+        //App.runModule(new FeedBackReceptionModule(config), GvcModuleFreqs.VISION_MODULE_FREQ);
     }
 
 
@@ -66,8 +63,12 @@ public class ErForceClientModule extends SimClientModule {
         RobotControl robotCtrl = RobotControl.newBuilder()
                 .addAllRobotCommands(robotCmdArr).build();
 
+
         byte[] bytes;
         bytes = robotCtrl.toByteArray();
+
+
+
         sendUdpPacket(bytes);
 
 
@@ -75,40 +76,61 @@ public class ErForceClientModule extends SimClientModule {
 
     }
 
-    private static class FeedBackReceptionModule implements Module {
-        private final ErForceClientModule efcm;
-        private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
-        private final Config config;
+//    private static class FeedBackReceptionModule implements Module {
+//        private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
+//        private final Config config;
+//        protected byte[] receiveBuffer = new byte[600000];
+//        protected InetAddress address;
+//        protected DatagramSocket socket;
+//        protected int port;
+//
+//        public FeedBackReceptionModule(Config config) {
+//            this.config = config;
+//            for(int id = 0; id < config.numAllyRobots; id++) {
+//                isBotContactBallPubs.add(new FieldPublisher<>("From:ErForceClientModule", "BallBotContactList " + id, false));
+//            }
+//            try {
+//                socket = new DatagramSocket();
+//                address = InetAddress.getByName(config.connConfig.sslVisionConn.ipAddr);
+//            } catch (SocketException | UnknownHostException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//
+//        @Override
+//        public void run() {
+//            try {
+//                SslSimulationRobotFeedback.RobotControlResponse feedbacks = efcm.receiveResponse();
+//                for(int id = 0; id < config.numAllyRobots; id++) {
+//                    isBotContactBallPubs.get(id).publish(feedbacks.getFeedback(id).getDribblerBallContact());
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        protected DatagramPacket receiveUdpPacket() { // send already binds to the endpoint
+//            DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+//            try {
+//                socket.receive(packet);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return packet;
+//        }
+//
+//        public SslSimulationRobotFeedback.RobotControlResponse receiveResponse() throws IOException {
+//            DatagramPacket packet = receiveUdpPacket();
+//            ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
+//                    packet.getOffset(), packet.getLength());
+//            SslSimulationSynchronous.SimulationSyncResponse ssr = SslSimulationSynchronous.SimulationSyncResponse.parseFrom(stream);
+//            SslSimulationRobotFeedback.RobotControlResponse robotControlResponse = ssr.getRobotControlResponse();
+//            return robotControlResponse;
+//        }
+//
+//    }
 
-        public FeedBackReceptionModule(Config config, ErForceClientModule efcm) {
-            this.config = config;
-            this.efcm = efcm;
-            for(int id = 0; id < config.numAllyRobots; id++) {
-                isBotContactBallPubs.add(new FieldPublisher<>("From:ErForceClientModule", "BallBotContactList " + id, false));
-            }
-        }
 
 
-        @Override
-        public void run() {
-            try {
-                SslSimulationRobotFeedback.RobotControlResponse feedbacks = efcm.receiveResponse();
-                for(int id = 0; id < config.numAllyRobots; id++) {
-                    isBotContactBallPubs.get(id).publish(feedbacks.getFeedback(id).getDribblerBallContact());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    public SslSimulationRobotFeedback.RobotControlResponse receiveResponse() throws IOException {
-        DatagramPacket packet = receiveUdpPacketFollowingSend();
-        ByteArrayInputStream stream = new ByteArrayInputStream(packet.getData(),
-                packet.getOffset(), packet.getLength());
-        SslSimulationRobotFeedback.RobotControlResponse robotControlResponse =
-                SslSimulationRobotFeedback.RobotControlResponse.parseFrom(stream);
-        return robotControlResponse;
-    }
 }

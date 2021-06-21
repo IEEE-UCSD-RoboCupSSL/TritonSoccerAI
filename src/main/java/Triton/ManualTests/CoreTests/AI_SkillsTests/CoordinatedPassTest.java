@@ -50,7 +50,7 @@ public class CoordinatedPassTest extends RobotSkillsTest {
         Vec2D receptionPoint = new Vec2D(-2000, 3000);
         double passDir = receptionPoint.sub(passPoint).toPlayerAngle();
         double receiveDir = passPoint.sub(receptionPoint).toPlayerAngle();
-        Vec2D kickVec = new Vec2D(3, 2);
+        Vec2D kickVec = new Vec2D(2, 1);
 
         ArrayList<PUAG.Node> attackerNodes = new ArrayList<>();
         PUAG.AllyPassNode node1 = new PUAG.AllyPassNode(passer);
