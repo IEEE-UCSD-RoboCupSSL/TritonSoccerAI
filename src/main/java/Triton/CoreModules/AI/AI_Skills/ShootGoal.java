@@ -31,10 +31,10 @@ public class ShootGoal extends Skills {
 
     public ArrayList<Vec2D> findOptimalShootPos(Vec2D ballCapPos) {
         Rect2D field = new Rect2D(FIELD_BOTTOM_LEFT, FIELD_WIDTH, FIELD_LENGTH);
-        double shooterStepSize = 150;
+        double shooterStepSize = 400;
         ArrayList<Vec2D> shootPosList = new ArrayList<>();
-        for (double x = ballCapPos.x - EXCESSIVE_DRIBBLING_DIST; x < ballCapPos.x + EXCESSIVE_DRIBBLING_DIST; x += shooterStepSize) {
-            for (double y = ballCapPos.y - EXCESSIVE_DRIBBLING_DIST; y < ballCapPos.y + EXCESSIVE_DRIBBLING_DIST; y += shooterStepSize) {
+        for (double x = ballCapPos.x - EXCESSIVE_DRIBBLING_DIST / 2; x < ballCapPos.x + EXCESSIVE_DRIBBLING_DIST / 2; x += shooterStepSize) {
+            for (double y = ballCapPos.y - EXCESSIVE_DRIBBLING_DIST / 2; y < ballCapPos.y + EXCESSIVE_DRIBBLING_DIST / 2; y += shooterStepSize) {
                 Vec2D potentialShootPos = new Vec2D(x, y);
                 if (field.isInside(potentialShootPos)) {
                     shootPosList.add(potentialShootPos);
@@ -42,22 +42,18 @@ public class ShootGoal extends Skills {
             }
         }
 
-        ArrayList<Vec2D> foePosList = new ArrayList<>();
-        for (Foe foe : foes) {
-            foePosList.add(foe.getPos());
-        }
-
         Vec2D shootPos = null;
         Vec2D target = null;
         double maxScore = Double.MIN_VALUE;
-        double goalStepSize = 150;
+        double goalStepSize = 200;
         for (Vec2D potentialShootPos : shootPosList) {
             for (double x = GOAL_LEFT; x < GOAL_RIGHT; x += goalStepSize) {
                 Vec2D potentialTarget = new Vec2D(x, FIELD_LENGTH / 2);
                 Line2D lineToTarget = new Line2D(potentialShootPos, potentialTarget);
 
                 double lineScore = Double.MAX_VALUE;
-                for (Vec2D foePos : foePosList) {
+                for (Foe foe : foes) {
+                    Vec2D foePos = foe.getPos();
                     double newLineScore = foePos.distToLine(lineToTarget);
                     if (newLineScore < lineScore) {
                         lineScore = newLineScore;
@@ -93,11 +89,13 @@ public class ShootGoal extends Skills {
 //            shooter.curveTo(shootPos); // don't rotate yet
 //        }
 
-        if (shooter.isPosArrived(shootPos, 200) && shooter.isDirAimed(shootAngle, 20)) {
+        System.out.println("Target" + shootPos + " : " + shootAngle);
+        System.out.println("Shooter" + shooter.getPos() + " : " + shooter.getDir());
+
+        shooter.curveTo(shootPos, shootAngle);
+        if (shooter.isPosArrived(shootPos, 100) && shooter.isDirAimed(shootAngle, 5)) {
             shooter.kick(new Vec2D(MAX_KICK_VEL, 0));
             hasKicked = true;
-        } else {
-            shooter.curveTo(shootPos, shootAngle);
         }
 
         return hasKicked;

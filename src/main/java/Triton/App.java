@@ -11,6 +11,8 @@ import Triton.ManualTests.VirtualBotTests.GrSimClientModuleTest;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.DetectionModule;
+import Triton.PeriphModules.Display.Display;
+import Triton.PeriphModules.Display.PaintOption;
 import Triton.PeriphModules.GameControl.SSLGameCtrlModule;
 import Triton.PeriphModules.Vision.GrSimVisionModule_OldProto;
 import Triton.VirtualBot.*;
@@ -23,6 +25,7 @@ import java.util.concurrent.*;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.TotalNumOfThreads;
 import static Triton.ManualTests.PeriphMiscTests.PeriphMiscTestRunner.runPeriphMiscTest;
+import static Triton.PeriphModules.Display.PaintOption.*;
 import static Triton.Util.delay;
 
 
@@ -116,21 +119,21 @@ public class App {
         }
 
         moduleFutures.add(App.runModule(new DetectionModule(config), GvcModuleFreqs.DETECTION_MODULE_FREQ));
-//
-//        Display display = new Display(config);
-//        ArrayList<PaintOption> paintOptions = new ArrayList<>();
-//        paintOptions.add(GEOMETRY);
-//        paintOptions.add(OBJECTS);
-//        paintOptions.add(INFO);
-//        paintOptions.add(PROBABILITY);
-//        paintOptions.add(PREDICTION);
-//        paintOptions.add(DRAWABLES);
-//        display.setPaintOptions(paintOptions);
-//
-//        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
-//                0,
-//                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
-//                TimeUnit.NANOSECONDS);
+
+        Display display = new Display(config);
+        ArrayList<PaintOption> paintOptions = new ArrayList<>();
+        paintOptions.add(GEOMETRY);
+        paintOptions.add(OBJECTS);
+        paintOptions.add(INFO);
+        paintOptions.add(PROBABILITY);
+        paintOptions.add(PREDICTION);
+        paintOptions.add(DRAWABLES);
+        display.setPaintOptions(paintOptions);
+
+        ScheduledFuture<?> displayFuture = App.threadPool.scheduleAtFixedRate(display,
+                0,
+                Util.toPeriod(GvcModuleFreqs.DISPLAY_MODULE_FREQ, TimeUnit.NANOSECONDS),
+                TimeUnit.NANOSECONDS);
 
 //        Publisher<ArrayList<Drawable2D>> drawablePub = new FieldPublisher<>("[Pair]DefinedIn:Display", "Drawables", new ArrayList<>());
 //        ArrayList<Drawable2D> drawables = new ArrayList<>();

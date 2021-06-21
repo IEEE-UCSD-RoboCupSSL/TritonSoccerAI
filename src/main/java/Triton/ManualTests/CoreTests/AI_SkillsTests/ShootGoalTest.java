@@ -12,6 +12,8 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static Triton.Config.OldConfigs.ObjectConfig.MAX_KICK_VEL;
+
 public class ShootGoalTest extends RobotSkillsTest {
     Ally shooter;
     RobotList<Foe> foes;
@@ -38,10 +40,9 @@ public class ShootGoalTest extends RobotSkillsTest {
                 else {
                     Vec2D startPos = shooter.getPos();
                     ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
-                    if (!shooter.isPosArrived(startPos)) {
-                        shooter.curveTo(startPos);
-                    }
-                    shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
+
+                    while (shooter.isHoldingBall())
+                        shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
                 }
             }
         } catch (Exception e) {

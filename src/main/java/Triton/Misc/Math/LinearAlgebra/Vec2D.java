@@ -142,11 +142,10 @@ public class Vec2D {
     }
 
     public double distToLine(Line2D line) {
-        Vec2D vecA = line.p2.sub(line.p1).normalized();
-        Vec2D vecB = this.sub(line.p1);
-        Vec2D perpenPoint = line.p1.add(vecA.scale(vecB.dot(vecA)));
-        Vec2D vecC = this.sub(perpenPoint).normalized();
-        return Math.abs(vecB.dot(vecC));
+        double diffX2X1 = line.p2.x - line.p1.x;
+        double diffY2Y1 = line.p2.y - line.p1.y;
+        double abs = Math.abs(diffX2X1 * (line.p1.y - y) - (line.p1.x - x) * diffY2Y1);
+        return abs / Math.sqrt(diffX2X1 * diffX2X1 + diffY2Y1 * diffY2Y1);
     }
 
     /**
