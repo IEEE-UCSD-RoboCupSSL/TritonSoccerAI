@@ -334,16 +334,16 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isHoldingBall() {
-        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
             if (!isDribbledSub.isSubscribed()) {
                 return false;
             }
             return isDribbledSub.getMsg();
-        }
-        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-            return isBotContactBallSubs.get(getID()).getMsg();
-        }
-        return false;
+//        }
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//            return isBotContactBallSubs.get(getID()).getMsg();
+//        }
+//        return false;
     }
 
     @Override

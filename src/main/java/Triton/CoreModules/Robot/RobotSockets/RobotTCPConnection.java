@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static Triton.Util.delay;
+
 /**
  * TCP connection to robot
  */
@@ -62,6 +64,7 @@ public class RobotTCPConnection {
                 isTcpConnected = true;
             } catch (IOException e) {
                 System.out.println("Failed at connecting TritonBot(cpp)'s tcp port, will retry connection");
+                delay(1000);
             }
         } while(!isTcpConnected);
 

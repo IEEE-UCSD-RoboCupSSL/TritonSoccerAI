@@ -3,6 +3,8 @@ package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 import Proto.SslSimulationRobotFeedback;
 import Triton.Config.Config;
+import Triton.CoreModules.Robot.Side;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.Misc.ModulePubSubSystem.FieldPublisher;
@@ -21,7 +23,7 @@ import Proto.SslSimulationRobotControl.RobotControl;
 
 public class ErForceClientModule extends SimClientModule {
 
-    private static final float MAX_DRIB_SPEED = 500.0f;
+    private static final float MAX_DRIB_SPEED = 1000.0f;
     private final ArrayList<FieldPublisher<Boolean>> isBotContactBallPubs = new ArrayList<>();
 
     public ErForceClientModule(Config config) {
@@ -39,16 +41,17 @@ public class ErForceClientModule extends SimClientModule {
 
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
-
-//            Vec2D audienceVel = PerspectiveConverter.playerToAudience(new Vec2D(cmd.getVelX(), cmd.getVelY()));
-//            if (config.myTeam == Team.BLUE) {
-//                audienceVel.x = -audienceVel.x;
-//                audienceVel.y = -audienceVel.y;
+//
+//            if(config.mySide == Side.GoalToGuardAtRight) {
+//                cmd.setVelX(-cmd.getVelX());
+//                cmd.setVelY(-cmd.getVelY());
+//                cmd.setVelAng(cmd.getVelAng());
 //            }
+
 
             Vec2D kickXZ = new Vec2D(cmd.getKickX(), cmd.getKickZ());
             float kickSpeed = (float) kickXZ.mag();
-            float kickAngle = (float) Math.atan2(kickXZ.y, kickXZ.x);
+            float kickAngle = (float) Math.toDegrees(Math.atan2(kickXZ.y, kickXZ.x));
             RobotCommand robotCmd = RobotCommand.newBuilder()
                     .setId(i)
                     .setMoveCommand(RobotMoveCommand.newBuilder()
