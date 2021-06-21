@@ -4,5 +4,5 @@ import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public interface GoalCenterCompute {
-    Vec2D computeGoalCenter(PDG.Node n);
+    Vec2D computeGoalCenter();
 }
