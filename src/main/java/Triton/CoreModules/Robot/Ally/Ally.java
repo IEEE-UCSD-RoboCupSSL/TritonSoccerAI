@@ -413,7 +413,8 @@ public class Ally extends Robot implements AllySkills {
             try {
                 subscribe();
                 super.run();
-                pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH, config);
+                pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH, config,
+                        this.ID == config.numAllyRobots - 1);
 
                 ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getSendTCP(),
                         0,

@@ -14,21 +14,24 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.RIGHT_FIELD_RIGHT_PENALTY_STRETCH;
+
 public class JPSPathFinder extends PathFinder {
 
+    private final boolean keeper;
     private final JPS<Node> jps;
     private final List<List<Node>> nodeList = new ArrayList<>();
     private final Gridify convert;
     private final int numRows, numCols;
     private final double worldSizeX, worldSizeY;
     private final List<Node> lastObstacles = new ArrayList<>();
-    private final int[] ul;
-    private final int[] br;
     private ArrayList<Vec2D> path = new ArrayList<>();
     private final Config config;
+    private final int[] leftPenaltyUL, leftPenaltyBR, rightPenaltyUL, rightPenaltyBR;
 
-    public JPSPathFinder(double worldSizeX, double worldSizeY, Config config) {
+    public JPSPathFinder(double worldSizeX, double worldSizeY, Config config, boolean keeper) {
         super("JPS");
+        this.keeper = keeper;
         this.config = config;
         this.worldSizeX = worldSizeX + GvcPathfinder.BOUNDARY_EXTENSION * 2;
         this.worldSizeY = worldSizeY + GvcPathfinder.BOUNDARY_EXTENSION * 2;
@@ -39,9 +42,15 @@ public class JPSPathFinder extends PathFinder {
                         GvcPathfinder.NODE_RADIUS - this.worldSizeY / 2),
                 false, true);
 
-        // Upper-left and Bottom-right corners
-        ul = convert.fromPos(new Vec2D(-worldSizeX / 2, worldSizeY / 2));
-        br = convert.fromPos(new Vec2D(worldSizeX / 2, -worldSizeY / 2));
+        // Two penalty regions
+        double y = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.x;
+        double x = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.y;
+        double wy = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p1.x;
+
+        leftPenaltyUL = convert.fromPos(new Vec2D(-x, -y));
+        leftPenaltyBR = convert.fromPos(new Vec2D(x, -wy));
+        rightPenaltyUL = convert.fromPos(new Vec2D(-x, wy));
+        rightPenaltyBR = convert.fromPos(new Vec2D(x, y));
 
         numCols = convert.numCols(this.worldSizeX);
         numRows = convert.numRows(this.worldSizeY);
@@ -93,20 +102,16 @@ public class JPSPathFinder extends PathFinder {
 
     /* Set area outside the boundaries as not walkable */
     public void setBound() {
-        for (int col = 0; col < nodeList.get(0).size(); col++) {
-            for (int row = 0; row <= ul[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-            for (int row = br[1]; row < nodeList.size(); row++) {
+        if (keeper) return;
+
+        for (int col = leftPenaltyUL[0]; col < leftPenaltyBR[0]; col++) {
+            for (int row = leftPenaltyUL[1]; row <= leftPenaltyBR[1]; row++) {
                 nodeList.get(row).get(col).setWalkable(false);
             }
         }
 
-        for (int row = ul[1]; row <= br[1]; row++) {
-            for (int col = 0; col <= ul[0]; col++) {
-                nodeList.get(row).get(col).setWalkable(false);
-            }
-            for (int col = br[0]; col < nodeList.get(0).size(); col++) {
+        for (int col = rightPenaltyUL[0]; col < rightPenaltyBR[0]; col++) {
+            for (int row = rightPenaltyUL[1]; row <= rightPenaltyBR[1]; row++) {
                 nodeList.get(row).get(col).setWalkable(false);
             }
         }
@@ -126,10 +131,12 @@ public class JPSPathFinder extends PathFinder {
 
         // find ways out
         if (!start.isWalkable()) {
-            wayOut(startIdx[1], startIdx[0]);
+            if (!inPenalty(startIdx[1], startIdx[0])) {
+                wayOut(startIdx[1], startIdx[0]);
+            }
         }
         if (!target.isWalkable()) {
-            if (!isOutOfBound(targetIdx[1], targetIdx[0])) { // Do nothing if ball is outside the field
+            if (!inPenalty(targetIdx[1], targetIdx[0])) {
                 wayOut(targetIdx[1], targetIdx[0]);
             }
         }
@@ -200,9 +207,10 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
-    /* Check if a point is in area outside the boundary */
-    public boolean isOutOfBound(int row, int col) {
-        return row <= ul[1] || row >= br[1] || col <= ul[0] || col >= br[0];
+    /* Check if a point is in penalty area */
+    public boolean inPenalty(int row, int col) {
+        return (row >= leftPenaltyUL[1] && row <= leftPenaltyBR[1] && col >= leftPenaltyUL[0] && col <= leftPenaltyBR[0])
+        || (row >= rightPenaltyUL[1] && row <= rightPenaltyBR[1] && col >= rightPenaltyUL[0] && col <= rightPenaltyBR[0]);
     }
 
     private ArrayList<Vec2D> toVec2DPath(Queue<Node> path) {

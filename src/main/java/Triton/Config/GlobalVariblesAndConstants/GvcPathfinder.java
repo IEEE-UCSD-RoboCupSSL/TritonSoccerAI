@@ -23,8 +23,6 @@ public class GvcPathfinder {
     public static final double AUTOCAP_DIST_THRESH = 1000; // For getBall, Turn on autocap if ball is within threshold
 
     public static final double INTERCEPT_CIRCLE_RADIUS = 100;
-    public static final double INTERCEPT_COEF_MAX_AWAY_CENTER = 2000;
-    public static final double INTERCEPT_COEF_MAX_TANGENT_CIRC = 2000;
 
     public static final double DRIB_ROTATE_BALL_PUSH = 5000;
     public static final double DRIB_ROTATE_DIST = ROBOT_MIN_RADIUS + BALL_RADIUS;
