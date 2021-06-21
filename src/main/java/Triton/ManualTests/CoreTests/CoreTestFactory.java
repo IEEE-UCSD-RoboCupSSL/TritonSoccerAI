@@ -9,7 +9,7 @@ import Triton.ManualTests.CoreTests.AI_SkillsTests.CoordinatedPassTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.GroupToTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.ShootGoalTest;
-import Triton.ManualTests.CoreTests.AI_StrategiesTests.AttackPlan2021Test;
+import Triton.ManualTests.CoreTests.AI_TacticsTests.AttackPlan2021Test;
 import Triton.ManualTests.CoreTests.AI_StrategiesTests.Summer2021PlayTest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.DefendPlanATest;
 import Triton.ManualTests.CoreTests.AI_TacticsTests.GapGetBallTest;

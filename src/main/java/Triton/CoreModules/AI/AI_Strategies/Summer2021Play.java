@@ -91,18 +91,15 @@ public class Summer2021Play extends Strategies {
             }
             case GETBALL -> {
                 getBall.exec();
-                if(!basicEstimator.isAllyHavingTheBall()) {
-                    currState = States.START;
+                if(basicEstimator.isAllyHavingTheBall()) {
+                    currState = States.ATTACK;
                 }
             }
             case ATTACK -> {
-                fielders.stopAll();
-                currState = States.START;
 
-//
-//                if(!attack.exec()) {
-//                    currState = States.START;
-//                }
+                ((AttackPlanSummer2021)attack).setCurrState(AttackPlanSummer2021.States.Start);
+                attack.exec();
+                currState = States.START;
             }
         }
 

@@ -70,8 +70,14 @@ public class PassInfo {
 
     public Pair<Vec2D, Boolean> getKickDecision() {
         /* Estimate optimal kick-x */
-        double receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
-                receivingPos, receiver.getPos());
+        double receiverETA = 0.0;
+        try {
+            receiverETA = RobotMovement.calcETA(receiver.getDir(), receiver.getVel(),
+                    receivingPos, receiver.getPos());
+        } catch (NullPointerException e) {
+            System.err.println(receiver);
+            System.err.println(receivingPos);
+        }
         double ballDist = passingPos.sub(receivingPos).mag();
         double s = BallMovement.calcKickVel(ballDist, receiverETA);
         s = Math.max(MIN_KICK_VEL, Math.min(s, MAX_KICK_VEL));
