@@ -2,6 +2,7 @@ package Triton.ManualTests.CoreTests.DijkstraTest;
 
 import Triton.Config.Config;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -29,7 +30,7 @@ public class DijkstraTest implements TritonTestable {
     }
 
     @Override
-    public boolean test(Config config) {
+    public boolean test(Config config) throws GraphIOException, NoDijkComputeInjectionException {
         RobotList<Ally> fielders = so.fielders;
         Ally startAlly = fielders.get(0);
 

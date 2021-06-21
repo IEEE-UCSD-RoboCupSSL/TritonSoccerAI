@@ -1,10 +1,7 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidNodeIndexException;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoSuchEdgeException;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NodesNotUniqueException;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NonExistentNodeException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotSnapshot;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -26,7 +23,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
     private final HashMap<Node, Set<Node>> nodeNeighborSetMap = new HashMap<>();
     private final Edge[][] adjMatrix;
 
-    public PUAG(Node startNode, Node endNode, List<Node> middleNodes) {
+    public PUAG(Node startNode, Node endNode, List<Node> middleNodes) throws NodesNotUniqueException {
 
         if(!testNodeUnique(startNode, endNode, middleNodes)){
             throw new NodesNotUniqueException(startNode, endNode, middleNodes);
@@ -64,7 +61,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
         }
     }
 
-    public int getIndexOfNode(Node node){
+    public int getIndexOfNode(Node node) throws GraphIOException {
         Integer integer = nodeToIndexMap.get(node);
         if(integer == null){
             throw new NonExistentNodeException(node);
@@ -103,7 +100,7 @@ public class PUAG { //Probability Undirected Acyclic Graph
         }
     }
 
-    public Edge getEdge(Node node1, Node node2) {
+    public Edge getEdge(Node node1, Node node2) throws GraphIOException {
         if (node1.equals(node2)){
             throw new NoSuchEdgeException(node1, node2);
         }
@@ -118,23 +115,15 @@ public class PUAG { //Probability Undirected Acyclic Graph
         int indexOfNode1 = getIndexOfNode(node1);
         int indexOfNode2 = getIndexOfNode(node2);
 
-        if(indexOfNode1 < indexOfNode2) {
-            if (areNeighbors) {
-                return adjMatrix[indexOfNode1][indexOfNode2];
-            } else {
-                throw new NoSuchEdgeException(node1, node2);
-            }
-
-        }else{
-            if (areNeighbors) {
-                return adjMatrix[indexOfNode2][indexOfNode1];
-            } else {
-                throw new NoSuchEdgeException(node2, node1);
-            }
+        if (areNeighbors) {
+            return adjMatrix[indexOfNode1][indexOfNode2];
+        } else {
+            throw new NoSuchEdgeException(node1, node2);
         }
+
     }
 
-    public void setEdgeProb(Node node1, Node node2, double prob) {
+    public void setEdgeProb(Node node1, Node node2, double prob) throws GraphIOException {
         getEdge(node1, node2).setProb(prob);
     }
 

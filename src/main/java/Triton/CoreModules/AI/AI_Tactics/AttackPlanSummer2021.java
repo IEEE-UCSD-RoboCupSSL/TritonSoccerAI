@@ -9,9 +9,7 @@ import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
-import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Ball.Ball;
@@ -110,7 +108,11 @@ public class AttackPlanSummer2021 extends Tactics {
                             middleNodes.add(recepNode);
 ////                            System.out.println("Adding " + recepNode.getNodeBotIdString());
                         }
-                        graph = new PUAG(new PUAG.AllyPassNode((Ally) ballHolder), new PUAG.GoalNode(), middleNodes);
+                        try {
+                            graph = new PUAG(new PUAG.AllyPassNode((Ally) ballHolder), new PUAG.GoalNode(), middleNodes);
+                        } catch (NodesNotUniqueException e) {
+                            e.printStackTrace();
+                        }
                         currState = States.Dijkstra;
                     }
                 }
@@ -118,7 +120,11 @@ public class AttackPlanSummer2021 extends Tactics {
 //                    System.out.println("[Attack2021] Entering state [Dijkstra]");
                     MockCompute mockCompute = new MockCompute(graph);
                     mockCompute.mock(fielders);
-                    tdksOutput = (new TritonDijkstra(graph, mockCompute, fielders, foes, ball).compute());
+                    try {
+                        tdksOutput = (new TritonDijkstra(graph, mockCompute, fielders, foes, ball).compute());
+                    } catch (GraphIOException | NoDijkComputeInjectionException e) {
+                        e.printStackTrace();
+                    }
                     currState = States.Preparation;
                 }
                 case Preparation -> {

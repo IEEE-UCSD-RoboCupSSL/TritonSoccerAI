@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.TritonProbDijkstra;
 
 import Triton.CoreModules.AI.TritonProbDijkstra.Computables.DijkCompute;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.GraphIOException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.InvalidDijkstraGraphException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.NoDijkComputeInjectionException;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
@@ -121,7 +122,7 @@ public class TritonDijkstra {
         return new RWLockee<Vec2D>(so.ball.getPos());
     }
 
-    private void updateTailNode(PUAG.Node secondTailNode, PUAG.Node tailNode) {
+    private void updateTailNode(PUAG.Node secondTailNode, PUAG.Node tailNode) throws GraphIOException {
         if (tailNode.getClass() == PUAG.AllyPassNode.class) {
             PUAG.AllyPassNode tailAllyPassNode = (PUAG.AllyPassNode) tailNode;
 
@@ -143,7 +144,7 @@ public class TritonDijkstra {
         }
     }
 
-    private void updateNode(PUAG.Node node1, PUAG.Node node2) {
+    private void updateNode(PUAG.Node node1, PUAG.Node node2) throws GraphIOException {
         if (node1.getClass() == PUAG.AllyPassNode.class) {
             PUAG.AllyPassNode node1PassNode = (PUAG.AllyPassNode) node1;
 
@@ -172,7 +173,7 @@ public class TritonDijkstra {
      * @throws UnknownPuagNodeException        Exception thrown if any node in the graph is not an known Node type.
      * @throws NoDijkComputeInjectionException Exception thrown if no `DijkComp` object is injected ever.
      */
-    public AttackPathInfo compute() throws UnknownPuagNodeException, NoDijkComputeInjectionException {
+    public AttackPathInfo compute() throws GraphIOException, NoDijkComputeInjectionException {
         if (dijkComp == null) {
             throw new NoDijkComputeInjectionException();
         }
@@ -323,7 +324,7 @@ public class TritonDijkstra {
             return consideredNodes.contains(n);
         }
 
-        public AttackPathInfo replicatePath() {
+        public AttackPathInfo replicatePath() throws UnknownPuagNodeException {
             AttackPathInfo attackPathInfo = new AttackPathInfo();
 
             for (PUAG.Node node : this.maxProbPath) {

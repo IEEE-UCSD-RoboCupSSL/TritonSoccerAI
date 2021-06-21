@@ -2,6 +2,7 @@ package Triton.ManualTests.PeriphMiscTests.PeriphTests;
 
 import Triton.App;
 import Triton.Config.Config;
+import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.UnknownPuagNodeException;
 import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
 import Triton.CoreModules.Robot.Ally.Ally;
@@ -26,7 +27,12 @@ public class CustomPriorityQueueTest implements TritonTestable {
         attackPathInfo.setMaxProbPath(path);
         attackPathInfo.setTotalProbabilityProduct(0.5);
 
-        TritonDijkstra.AttackPathInfo attackPathInfo1 = attackPathInfo.replicatePath();
+        TritonDijkstra.AttackPathInfo attackPathInfo1 = null;
+        try {
+            attackPathInfo1 = attackPathInfo.replicatePath();
+        } catch (UnknownPuagNodeException e) {
+            e.printStackTrace();
+        }
         attackPathInfo1.appendAndUpdate(new PUAG.AllyRecepNode(new Ally(config, 3)), 0.2);
 
         TritonDijkstra.AttackPathInfo attackPathInfo3 = new TritonDijkstra.AttackPathInfo();
@@ -39,7 +45,12 @@ public class CustomPriorityQueueTest implements TritonTestable {
         attackPathInfo.setTotalProbabilityProduct(0.095);
 
 
-        TritonDijkstra.AttackPathInfo attackPathInfo2 = attackPathInfo.replicatePath();
+        TritonDijkstra.AttackPathInfo attackPathInfo2 = null;
+        try {
+            attackPathInfo2 = attackPathInfo.replicatePath();
+        } catch (UnknownPuagNodeException e) {
+            e.printStackTrace();
+        }
         attackPathInfo2.appendAndUpdate(new PUAG.AllyRecepNode(new Ally(config, 4)), 0.9);
 
 

@@ -4,7 +4,7 @@ import Triton.CoreModules.AI.TritonProbDijkstra.PUAG;
 
 import java.util.List;
 
-public class NodesNotUniqueException extends RuntimeException{
+public class NodesNotUniqueException extends GraphIOException{
     public NodesNotUniqueException() {
         super("Received Nodes that are not unique");
     }
