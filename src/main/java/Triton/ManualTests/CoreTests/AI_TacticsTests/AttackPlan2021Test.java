@@ -1,4 +1,4 @@
-package Triton.ManualTests.CoreTests.AI_StrategiesTests;
+package Triton.ManualTests.CoreTests.AI_TacticsTests;
 
 import Triton.Config.Config;
 import Triton.CoreModules.AI.AI_Tactics.AttackPlanSummer2021;

@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.AI_Tactics;
 
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.Dodging;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
@@ -8,6 +9,7 @@ import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.Compute;
+import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
@@ -16,6 +18,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
+import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -43,7 +46,8 @@ public class AttackPlanSummer2021 extends Tactics {
     private RobotList<Ally> decoys;
     private TritonDijkstra.AttackPathInfo tdksOutput;
     private PDG graph;
-    private final double toPassThreshold = 0.5;
+    private final double toPassThreshold = 0.00;
+    private Compute compute;
 
     private long SDB_t0;
     private long SDB_delay = 1000; // ms
@@ -87,7 +91,7 @@ public class AttackPlanSummer2021 extends Tactics {
             delay(2);
             switch (currState) {
                 case Start -> {
-//                    System.out.println("[Attack2021] Entering state [Start]");
+                    System.out.println("[Attack2021] Entering state [Start]");
                     ballHolder = basicEstimator.getBallHolder();
                     if (!(ballHolder instanceof Ally)) {
                         currState = States.Exit;
@@ -115,9 +119,12 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case Dijkstra -> {
-//                    System.out.println("[Attack2021] Entering state [Dijkstra]");
-                    Compute compute = new Compute(graph);
+                    System.out.println("[Attack2021] Entering state [Dijkstra]");
+
+                    compute = new Compute(graph);
                     compute.setSnapShots(TritonDijkstra.buildFielderSnaps(fielders), TritonDijkstra.buildFoeSnaps(foes), TritonDijkstra.buildBallSnap(ball));
+//                    MockCompute compute = new MockCompute(graph);
+//                    compute.mock(fielders);
 
                     try {
                         tdksOutput = (new TritonDijkstra(graph, compute, fielders, foes, ball).compute());
@@ -127,14 +134,14 @@ public class AttackPlanSummer2021 extends Tactics {
                     currState = States.Preparation;
                 }
                 case Preparation -> {
-//                    System.out.println("[Attack2021] Entering state [Preparation]");
+                    System.out.println("[Attack2021] Entering state [Preparation]");
                     if(!basicEstimator.isAllyHavingTheBall()) {
                         currState = States.Exit;
                         return false;
                     } else {
                         decoys = new RobotList<>();
                         attackerNodes = tdksOutput.getMaxProbPath();
-//                        System.out.println("[Attack2021] returned optimal path: [" + tdksOutput.pathString() + "]");
+                        System.out.println("[Attack2021] returned optimal path: [" + tdksOutput.pathString() + "]");
                         decoys = fielders.copy();
                         for (PDG.Node attackerNode : attackerNodes) {
                             if(attackerNode instanceof PDG.AllyNode) {
@@ -151,7 +158,7 @@ public class AttackPlanSummer2021 extends Tactics {
                     }
                 }
                 case SDB -> { // SDB: Standby/Dodging/BackPass
-//                    System.out.println("[Attack2021] Entering state [SDB]");
+                    System.out.println("[Attack2021] Entering state [SDB]");
                     if (System.currentTimeMillis() > SDB_delay) {
                         currState = States.Start;
                     }
@@ -159,18 +166,30 @@ public class AttackPlanSummer2021 extends Tactics {
                     fielders.stopAll();
                 }
                 case ExecutePassPath -> {
-//                    System.out.println("[Attack2021] Entering state [ExecutePassPath]");
-//                    System.out.println("\t[ExecutePassPath] Opt path: [" + attackerNodes + "] with P = " + tdksOutput.getTotalProbabilityProduct());
+                    System.out.println("[Attack2021] Entering state [ExecutePassPath]");
+                    System.out.println("\t[ExecutePassPath] Opt path: [" + attackerNodes + "] with P = " + tdksOutput.getTotalProbabilityProduct());
                     if(attackerNodes.get(1) instanceof PDG.GoalNode) {
                         /* Shoot Goal */
-//                        System.out.println("\t[ExecutePassPath] shooooooooot");
+                        System.out.println("\t[ExecutePassPath] shooooooooot");
+
+                        Vec2D vec2D = compute.computeGoalKickVec(attackerNodes.get(1));
+                        double v = compute.computeGoalAngle(attackerNodes.get(0));
+                        Ally bot = attackerNodes.get(0).getBot();
+                        assert bot != null;
+
+                        while(!bot.isDirAimed(v)) {
+                            bot.rotateTo(v);
+                        }
+
+                        bot.kick(vec2D);
+
                         currState = States.Exit;
                         return false;
                     } else {
                         if(attackerNodes.get(0) instanceof PDG.AllyPassNode
                                 && attackerNodes.get(1) instanceof PDG.AllyRecepNode) {
 
-//                            System.out.println("\t[ExecutePassPath] Initiating coordinated pass");
+                            System.out.println("\t[ExecutePassPath] Initiating coordinated pass");
 
                             /* Pass to Next */
                             CoordinatedPass.PassShootResult passResult = CoordinatedPass.PassShootResult.Executing;
@@ -195,7 +214,7 @@ public class AttackPlanSummer2021 extends Tactics {
 
                                         if(attackerNodes.get(i) instanceof PDG.AllyRecepNode) {
                                             PDG.AllyRecepNode recepNode = ((PDG.AllyRecepNode) attackerNodes.get(i));
-//                                            System.out.println("\t[ExecutePassPath] Curving to reception point");
+                                            System.out.println("\t[ExecutePassPath] Curving to reception point");
                                             recepNode.getBot().curveTo(recepNode.getReceptionPoint(), recepNode.getAngle());
                                         }
                                     }
@@ -216,7 +235,7 @@ public class AttackPlanSummer2021 extends Tactics {
             }
         }
 
-//        System.out.println("[Attack2021] Exiting...");
+        System.out.println("[Attack2021] Exiting...");
         /* Exit State */
         currState = States.Start;
         return false;

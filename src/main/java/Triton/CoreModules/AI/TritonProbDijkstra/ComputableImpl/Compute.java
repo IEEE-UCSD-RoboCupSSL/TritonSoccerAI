@@ -16,8 +16,8 @@ import Triton.Misc.RWLockee;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.TOP_TOUCH_LINE;
-import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.BOTTOM_TOUCH_LINE;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_WIDTH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class Compute implements DijkCompute {
     private static final double G2_WEIGHT = 1.0;
 
     private static final double SAMPLE_PADDING  = 250.0;
-    private static final double SAMPLE_INTERVAL = 50.0;
+    private static final double SAMPLE_INTERVAL = 100.0;
 
     private static final double GOAL_KICK_TIME = 1.0;
     private static final double MAX_KICK_VEL = 6.4;
@@ -79,6 +79,7 @@ public class Compute implements DijkCompute {
         if (infoMatrix[getIndexOfNode(n1)][getIndexOfNode(n2)] != null) return;
 
         assert n1.getBot() != null && n2.getBot() != null;
+        assert ballPos != null && fielderSnaps != null && foeSnaps != null;
 
         /* Initiate scores */
         Score c1 = new C1(ballPos, fielderSnaps, foeSnaps, n2.getBot().getID(), true);
@@ -89,19 +90,20 @@ public class Compute implements DijkCompute {
 
         /* Evaluate reception points */
         double[] bnds = getMinMax(n1.getBot().getPos(), n2.getBot().getPos());
-        Vec2D corner1 = audienceToPlayer(TOP_TOUCH_LINE.p2);
-        Vec2D corner2 = audienceToPlayer(BOTTOM_TOUCH_LINE.p1);
-        double[] fields = getMinMax(corner1, corner2);
+        Rect2D field = new Rect2D(new Vec2D(-FIELD_WIDTH / 2.0, -FIELD_LENGTH / 2.0), FIELD_WIDTH, FIELD_LENGTH);
 
         Vec2D receivingPos = null;
         double prob = -Double.MAX_VALUE;
 
+//        System.err.printf("bnds[0] - sp: %f, bnds[1] - sp: %f, bnds[2] - sp: %f, bnds[3] - sp: %f \n",
+//                bnds[0] - SAMPLE_PADDING, bnds[1] + SAMPLE_PADDING, bnds[2] - SAMPLE_PADDING, bnds[3] + SAMPLE_PADDING);
+
         for (double x = bnds[0] - SAMPLE_PADDING; x < bnds[1] + SAMPLE_PADDING; x += SAMPLE_INTERVAL) {
             for (double y = bnds[2] - SAMPLE_PADDING; y < bnds[3] + SAMPLE_PADDING; y += SAMPLE_INTERVAL) {
-                if (x < fields[0] || x > fields[1] || y < fields[2] || y > fields[3]) {
-                    continue; // out of field
-                }
                 Vec2D pos = new Vec2D(x, y);
+                if (allyPenaltyRegion.isInside(pos) || foePenaltyRegion.isInside(pos) || !field.isInside(pos)) {
+                    continue;
+                }
 
                 double c1prob = c1.prob(pos);
                 double c2prob = c2.prob(pos);
@@ -112,12 +114,15 @@ public class Compute implements DijkCompute {
                 double c = c1prob * C1_WEIGHT + c2prob * C2_WEIGHT + c3prob * C3_WEIGHT
                         + c4prob * C4_WEIGHT + c5prob * C5_WEIGHT;
                 double cprob = (1 / (1 + Math.exp(-c)));
+
                 if (cprob > prob) {
                     prob = cprob;
                     receivingPos = pos;
                 }
             }
         }
+//        System.err.printf("prob: %f \n", prob);
+//        System.err.printf("receiving pos: %s \n", receivingPos);
 
         PassInfo info = new PassInfo();
         info.setInfo(n1.getBot(), n2.getBot(), n1.getBot().getPos(), receivingPos, prob);
@@ -137,7 +142,7 @@ public class Compute implements DijkCompute {
         ymax = v2.y;
         if (ymax < ymin) {
             double temp = ymin;
-            ymin = xmax;
+            ymin = ymax;
             ymax = temp;
         }
         return new double[]{xmin, xmax, ymin, ymax};
