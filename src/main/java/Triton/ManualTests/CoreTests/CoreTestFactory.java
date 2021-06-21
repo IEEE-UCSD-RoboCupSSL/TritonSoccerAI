@@ -6,7 +6,6 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.*;
-import Triton.ManualTests.CoreTests.AI_StrategiesTests.AttackPlan2021Test;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.CoordinatedPassTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.DodgingTest;
 import Triton.ManualTests.CoreTests.AI_SkillsTests.GroupToTest;
