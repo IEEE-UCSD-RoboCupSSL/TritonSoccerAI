@@ -77,6 +77,18 @@ public class Formation {
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
                     new Vec2D(4450.00, -3500.00),
                     0.0
+            ),
+            "ballplacement-defense", new FormationType(
+                    new ArrayList<>(Arrays.asList(
+                            new Vec2D(0.00, -2500.00),
+                            new Vec2D(1000.00, -2500.00),
+                            new Vec2D(-1000.00, -2500.00),
+                            new Vec2D(2000.00, -3500.00),
+                            new Vec2D(-2000.00, -3500.00)
+                    )),
+                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new Vec2D(4450.00, -3500.00),
+                    0.0
             )
     );
     private static Formation formation = null;

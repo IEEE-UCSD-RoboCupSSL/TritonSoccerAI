@@ -240,6 +240,18 @@ public class Ally extends Robot implements AllySkills {
     /*** advanced control methods with path avoiding obstacles ***/
 
     // Note: (moveTo/At & spinTo/At] are mutually exclusive to advanced control methods
+
+    public void slowTo(Vec2D endPoint) {
+        double targetAngle = normAng(getDir());
+        Vec2D currPos = getPos();
+        spinTo(targetAngle);
+        if (!isPosArrived(endPoint)) {
+            moveAt(endPoint.sub(currPos).normalized().scale((1.45 / config.botConfig.robotMaxAbsoluteLinearSpeed) * 100.00));
+        } else {
+            moveAt(new Vec2D(0, 0));
+        }
+    }
+
     @Override
     public void rotateTo(double angle) {
         RotateTo.exec(this, angle);

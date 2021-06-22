@@ -16,5 +16,5 @@ public final class ObjectConfig {
     public static double MAX_KICK_VEL = 6.5;
 
     public static int MAX_POS_LIST_CAPACITY = 15;
-    public static double DRIBBLER_OFFSET = 85; // Competition Ad Hoc, Was 105
+    public static double DRIBBLER_OFFSET = 105; // Competition Ad Hoc, Was 105
 }

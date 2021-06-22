@@ -36,7 +36,7 @@ public class CoordinatedPass {
         this.passer = passerNode.getBot();
         this.receiver = receiverNode.getBot();
         this.ball = ball;
-        passTask = new PassTask(passerNode);
+        passTask = new PassTask(passerNode, ball);
         receiveTask = new ReceiveTask(receiverNode, ball);
     }
 
@@ -96,16 +96,23 @@ public class CoordinatedPass {
     private static class PassTask extends ProceduralTask {
         private final Ally passer;
         private final PDG.AllyPassNode passNode;
-        public PassTask(PDG.AllyPassNode passerNode) {
+        public final Ball ball;
+        public PassTask(PDG.AllyPassNode passerNode, Ball ball) {
             this.passer = passerNode.getBot();
             this.passNode = passerNode;
+            this.ball = ball;
         }
 
         @Override
         public Boolean call() throws Exception {
             Vec2D targetPoint = passNode.getPassPoint();
             double targetDir = passNode.getAngle();
-            
+
+            while(!passer.isHoldingBall()) {
+                if(isCancelled()) return false;
+                passer.getBall(ball);
+            }
+
             while(!passer.isPosArrived(targetPoint) || !passer.isDirAimed(targetDir)) {
                 if(isCancelled()) return false;
                 if(!passer.isHoldingBall()) return false;
@@ -140,6 +147,13 @@ public class CoordinatedPass {
                 receiver.curveTo(targetPoint, targetDir);
                 delay(3);
             }
+
+//            long t0 = System.currentTimeMillis();
+//            while(System.currentTimeMillis() - t0 < 1000) {
+//                if(isCancelled()) return false;
+//                receiver.stop();
+//                if(receiver.isHoldingBall()) break;
+//            }
 
             while(!receiver.isHoldingBall()) {
                 if(isCancelled()) return false;

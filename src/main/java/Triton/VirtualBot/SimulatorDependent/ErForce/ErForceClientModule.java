@@ -1,20 +1,12 @@
 package Triton.VirtualBot.SimulatorDependent.ErForce;
 
 
-import Proto.SslSimulationRobotFeedback;
-import Proto.SslSimulationSynchronous;
-import Triton.App;
 import Triton.Config.Config;
-import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
-import Triton.Misc.ModulePubSubSystem.Module;
+import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 import Triton.VirtualBot.SimClientModule;
 import Triton.VirtualBot.VirtualBotCmds;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.*;
 import java.util.ArrayList;
 
 import Proto.SslSimulationRobotControl.RobotCommand;
@@ -23,8 +15,10 @@ import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
 
 public class ErForceClientModule extends SimClientModule {
-
     private static final float MAX_DRIB_SPEED = 1000.0f;
+    private static float dribSpeed = 1000.0f;
+    private static final FieldPubSubPair<Boolean> allDribOffPubSub =
+            new FieldPubSubPair<>("[Pair]DefinedIn:ErForceClientModule", "AllDribOff", false);
 
 
     public ErForceClientModule(Config config) {
@@ -32,11 +26,24 @@ public class ErForceClientModule extends SimClientModule {
         //App.runModule(new FeedBackReceptionModule(config), GvcModuleFreqs.VISION_MODULE_FREQ);
     }
 
+    public static void turnAllDribOff() {
+        allDribOffPubSub.pub.publish(true);
+    }
+
+    public static void resetTurnAllDribOff() {
+        allDribOffPubSub.pub.publish(false);
+    }
 
 
     @Override
     protected void exec() {
         ArrayList<RobotCommand> robotCmdArr = new ArrayList<>();
+
+        if(allDribOffPubSub.getSub().getMsg()) {
+            dribSpeed = 0.0f;
+        } else {
+            dribSpeed = MAX_DRIB_SPEED;
+        }
 
         for (int i = 0; i < config.numAllyRobots; i++) {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
@@ -54,7 +61,7 @@ public class ErForceClientModule extends SimClientModule {
                             .build())
                     .setKickSpeed(kickSpeed)
                     .setKickAngle(kickAngle)
-                    .setDribblerSpeed(cmd.getSpinner() ? MAX_DRIB_SPEED : 0.0f)
+                    .setDribblerSpeed(cmd.getSpinner() ? dribSpeed : 0.0f)
                     .build();
 
             robotCmdArr.add(robotCmd);
