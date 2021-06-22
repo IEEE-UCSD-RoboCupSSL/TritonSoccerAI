@@ -161,6 +161,12 @@ public class Ally extends Robot implements AllySkills {
     @Override
     public void autoCap() {
         statePub.publish(AUTO_CAPTURE);
+        //System.err.println("Don't use this for erforcesim");
+
+    }
+
+    public void vAutoCap(Ball ball) {
+        VirtualAutoCap.exec(this, ball);
     }
 
     @Override
@@ -346,16 +352,10 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isHoldingBall() {
-//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.GrSim) {
-            if (!isDribbledSub.isSubscribed()) {
-                return false;
-            }
-            return isDribbledSub.getMsg();
-//        }
-//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-//            return isBotContactBallSubs.get(getID()).getMsg();
-//        }
-//        return false;
+        if (!isDribbledSub.isSubscribed()) {
+            return false;
+        }
+        return isDribbledSub.getMsg();
     }
 
     @Override

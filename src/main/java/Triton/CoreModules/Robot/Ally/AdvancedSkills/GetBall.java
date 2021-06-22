@@ -20,7 +20,7 @@ public class GetBall {
             ally.autoCap();
         } else {
             ally.curveTo(ballLoc, currPosToBall.toPlayerAngle());
-            //dynamicIntercept(ball, 0);
         }
+        //DynamicIntercept.exec(ally, ball);
     }
 }

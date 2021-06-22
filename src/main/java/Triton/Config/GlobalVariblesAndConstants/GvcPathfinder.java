@@ -22,7 +22,7 @@ public class GvcPathfinder {
     public static final double MOVE_ANGLE_THRESH = 40; // Don't move if outside angle threshold
     public static final double AUTOCAP_DIST_THRESH = 1000; // For getBall, Turn on autocap if ball is within threshold
 
-    public static final double INTERCEPT_CIRCLE_RADIUS = 100;
+
 
     public static final double DRIB_ROTATE_BALL_PUSH = 5000;
     public static final double DRIB_ROTATE_DIST = ROBOT_MIN_RADIUS + BALL_RADIUS;

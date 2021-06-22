@@ -9,16 +9,62 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import java.util.ArrayList;
 
 import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
-import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.INTERCEPT_CIRCLE_RADIUS;
 
 public class DynamicIntercept {
+    private static final double interpolationRate = 0.5;
+    public static final double INTERCEPT_CIRCLE_RADIUS = 110;
+
+    public static void exec(Ally ally, Ball ball) {
+        Vec2D ballPos = ball.getPos();
+        Vec2D ballVel = ball.getVel();
+        if(ballVel.mag() > 2000) {
+            ballVel = ballVel.normalized().scale(2000);
+        }
+        ballVel = ballVel.scale(interpolationRate);
+        Vec2D estBallPos = ballPos.add(ballVel);
+
+        if(ballVel.mag() < 500) {
+            exec(ally, ball, ballPos, ally.getDir());
+        } else {
+            exec(ally, ball, estBallPos, ballVel.scale(-1).toPlayerAngle());
+        }
+    }
+
+    public static void exec(Ally ally, Ball ball, Vec2D estBallPos, double faceDir) {
+
+
+        Vec2D currPos = ally.getPos();
+
+
+
+        if (currPos.sub(estBallPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
+            ally.autoCap();
+        } else {
+            Vec2D faceVec = new Vec2D(faceDir).normalized();
+            Vec2D offset = faceVec.scale(DRIBBLER_OFFSET);
+            Vec2D targetPos = estBallPos.sub(offset);
+            ArrayList<Vec2D> circCenters = getCircleCenters(estBallPos, targetPos,
+                    faceVec, offset.mag(), INTERCEPT_CIRCLE_RADIUS);
+
+            // System.out.println(circCenters);
+
+            Vec2D interceptPoint = getInterceptPoint(ally.getPos(), targetPos, faceVec, INTERCEPT_CIRCLE_RADIUS, circCenters);
+
+            //System.out.println(interceptPoint);
+            ally.curveTo(interceptPoint, estBallPos.sub(ally.getPos()).toPlayerAngle());
+        }
+    }
 
     public static void exec(Ally ally, Ball ball, double faceDir) {
-        Vec2D currPos = ally.getPos();
-        Vec2D ballPos = ball.getPos();
 
-        if (currPos.sub(ballPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
-            ally.getBall(ball);
+
+        Vec2D currPos = ally.getPos();
+
+        Vec2D estBallPos = ball.getPos();
+
+
+        if (currPos.sub(estBallPos).mag() < GvcPathfinder.AUTOCAP_DIST_THRESH) {
+            ally.autoCap();
         } else {
             Vec2D faceVec = new Vec2D(faceDir).normalized();
             Vec2D offset = faceVec.scale(DRIBBLER_OFFSET);
