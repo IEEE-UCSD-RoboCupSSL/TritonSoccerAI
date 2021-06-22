@@ -77,6 +77,18 @@ public class TestUtil {
         }
     }
 
+    public static boolean testObjectEq(String testName, Object expected, Object actual) {
+        boolean res = actual.equals(expected);
+
+        if (res) {
+            System.out.printf("[Test PASSED] test: [%s] with expected = [%s], and actual = [%s]\n", testName, expected, actual);
+            return true;
+        } else {
+            System.out.printf("[Test FAILED] test: [%s] with expected = [%s], and actual = [%s]\n", testName, expected, actual);
+            return false;
+        }
+    }
+
     public static void enterKeyToContinue() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter any key to continue: ");

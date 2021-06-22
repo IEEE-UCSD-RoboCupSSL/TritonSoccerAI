@@ -35,7 +35,6 @@ public class PeriphMiscTestFactory {
         periphMiscTestMap.put("vbotmath", new ConstraintMappingMathTests());
         periphMiscTestMap.put("custom-P-queue-test", new CustomPriorityQueueTest());
         periphMiscTestMap.put("detection", new DetectionTest_OldProto());
-
     }
 
     public String[] getAvailableTestNames() {
