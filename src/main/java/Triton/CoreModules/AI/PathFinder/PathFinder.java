@@ -15,6 +15,8 @@ public abstract class PathFinder {
 
     public abstract void setObstacles(ArrayList<Circle2D> obstacles);
 
+    public abstract ArrayList setPointObstacle(Vec2D point, double radius, boolean walkable);
+
     public abstract ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos);
 
     public String getName() {

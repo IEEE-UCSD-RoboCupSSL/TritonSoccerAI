@@ -19,6 +19,12 @@ public class ThetaStarPathFinder extends PathFinder {
         grid.updateGrid(obstacles);
     }
 
+    @Override
+    public ArrayList<Node> setPointObstacle(Vec2D point, double radius, boolean walkable) {
+        System.err.println("TO BE IMPLEMENTED.");
+        return null;
+    }
+
     public ArrayList<Vec2D> findPath(Vec2D startPos, Vec2D targetPos) {
         Node startNode = grid.nodeFromWorldPos(startPos);
         Node targetNode = grid.nodeFromWorldPos(targetPos);
