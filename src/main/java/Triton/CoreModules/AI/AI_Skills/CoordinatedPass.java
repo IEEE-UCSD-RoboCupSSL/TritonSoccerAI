@@ -9,6 +9,7 @@ import Triton.CoreModules.Robot.ProceduralSkills.Dependency.ProceduralTask;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldPubSubPair;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
 
 import static Triton.Util.delay;
@@ -23,6 +24,7 @@ public class CoordinatedPass {
     private FieldPubSubPair<Boolean> receiveTaskCanceller;
     private PassTask passTask;
     private ReceiveTask receiveTask;
+    private LocalDateTime failTimer;
 
     public static enum PassShootResult {
         success,
@@ -38,11 +40,13 @@ public class CoordinatedPass {
         this.ball = ball;
         passTask = new PassTask(passerNode);
         receiveTask = new ReceiveTask(receiverNode, ball);
+        this.failTimer = LocalDateTime.now().plusSeconds(5);
     }
 
     /* return null if it's in the middle of execution; return true if successfully compl*/
     public PassShootResult execute() throws ExecutionException, InterruptedException {
-        if(basicEstimator.getBallHolder() instanceof Foe) {
+        if(basicEstimator.getBallHolder() instanceof Foe || LocalDateTime.now().isAfter(failTimer)) {
+            System.out.println("[Coordinated Pass] Cancelling...");
             passer.cancelProceduralTask();
             receiver.cancelProceduralTask();
         }

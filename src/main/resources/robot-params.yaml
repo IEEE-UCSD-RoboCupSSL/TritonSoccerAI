@@ -1,0 +1,5 @@
+AI:
+  AI_Tactics:
+    AttackPlanSummer2021:
+      penetrate:
+        disToFoe: 500

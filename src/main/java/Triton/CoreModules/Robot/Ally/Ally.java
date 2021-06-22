@@ -216,6 +216,12 @@ public class Ally extends Robot implements AllySkills {
             kickVel = kickVel.normalized().scale(MAX_KICK_VEL);
         }
 
+
+        while(kickVel.y > kickVel.x){
+            kickVel.y /= 1.75;
+            kickVel.x *= 1.25;
+        }
+
         kickVelPub.publish(kickVel);
 
         threadPool.submit(() -> {
