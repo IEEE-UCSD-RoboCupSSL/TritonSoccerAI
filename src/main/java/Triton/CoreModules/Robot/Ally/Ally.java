@@ -24,6 +24,7 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.*;
 import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
+import Triton.PeriphModules.Display.Display;
 import Triton.Util;
 
 import java.io.IOException;
@@ -610,9 +611,11 @@ public class Ally extends Robot implements AllySkills {
         return command.build();
     }
 
-    public void displayPathFinder() {
+    public Display displayPathFinder() {
         if (pathFinder instanceof JPSPathFinder) {
-            ((JPSPathFinder) pathFinder).display();
+            return ((JPSPathFinder) pathFinder).display();
+        } else {
+            return null;
         }
     }
 }

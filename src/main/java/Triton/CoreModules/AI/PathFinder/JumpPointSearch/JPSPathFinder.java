@@ -2,19 +2,21 @@ package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
+import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
+import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import Triton.PeriphModules.Display.Display;
 import Triton.PeriphModules.Display.JPSPathfinderDisplay;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.RIGHT_FIELD_RIGHT_PENALTY_STRETCH;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SAFE_DIST;
 
 public class JPSPathFinder extends PathFinder {
 
@@ -28,6 +30,7 @@ public class JPSPathFinder extends PathFinder {
     private ArrayList<Vec2D> path = new ArrayList<>();
     private final Config config;
     private final int[] leftPenaltyUL, leftPenaltyBR, rightPenaltyUL, rightPenaltyBR;
+    private final Rect2D leftPenaltyRegion, rightPenaltyRegion;
 
     public JPSPathFinder(double worldSizeX, double worldSizeY, Config config, boolean keeper) {
         super("JPS");
@@ -47,10 +50,16 @@ public class JPSPathFinder extends PathFinder {
         double x = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.y;
         double wy = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p1.x;
 
-        leftPenaltyUL = convert.fromPos(new Vec2D(-x, -y));
-        leftPenaltyBR = convert.fromPos(new Vec2D(x, -wy));
-        rightPenaltyUL = convert.fromPos(new Vec2D(-x, wy));
-        rightPenaltyBR = convert.fromPos(new Vec2D(x, y));
+        leftPenaltyUL = convert.fromPos(new Vec2D(-x - SAFE_DIST, -y + SAFE_DIST));
+        leftPenaltyBR = convert.fromPos(new Vec2D(x + SAFE_DIST, -wy - SAFE_DIST));
+        rightPenaltyUL = convert.fromPos(new Vec2D(-x - SAFE_DIST, wy + SAFE_DIST));
+        rightPenaltyBR = convert.fromPos(new Vec2D(x + SAFE_DIST, y - SAFE_DIST));
+
+        Rect2D[] penaltyRegions = PassProbMapModule.getPenaltyRegions();
+        leftPenaltyRegion = new Rect2D(penaltyRegions[0].anchor.sub(new Vec2D(SAFE_DIST, SAFE_DIST)),
+                penaltyRegions[0].width + 2 * SAFE_DIST, penaltyRegions[0].height  + 2 * SAFE_DIST);
+        rightPenaltyRegion = new Rect2D(penaltyRegions[1].anchor.sub(new Vec2D(SAFE_DIST, SAFE_DIST)),
+                penaltyRegions[1].width + 2 * SAFE_DIST, penaltyRegions[1].height  + 2 * SAFE_DIST);
 
         numCols = convert.numCols(this.worldSizeX);
         numRows = convert.numRows(this.worldSizeY);
@@ -68,7 +77,6 @@ public class JPSPathFinder extends PathFinder {
 
     /* Set the robot surroundings as not walkable */
     public void setObstacles(ArrayList<Circle2D> obstacles) {
-        setBound();
 
         // Free last obstacles
         for (Node node : lastObstacles) {
@@ -92,7 +100,11 @@ public class JPSPathFinder extends PathFinder {
                 for (int row = ul[1]; row <= br[1]; row++) {
                     double dist = Math.sqrt(Math.pow((col - ce[0]), 2) + Math.pow((row - ce[1]), 2));
                     if (dist * GvcPathfinder.NODE_DIAMETER < r) {
-                        nodeList.get(row).get(col).setWalkable(false);
+                        try {
+                            nodeList.get(row).get(col).setWalkable(false);
+                        } catch (IndexOutOfBoundsException e) {
+                            continue;
+                        }
                         lastObstacles.add(nodeList.get(row).get(col));
                     }
                 }
@@ -100,19 +112,17 @@ public class JPSPathFinder extends PathFinder {
         }
     }
 
-    /* Set area outside the boundaries as not walkable */
-    public void setBound() {
-        if (keeper) return;
-
+    /* Set area in penalty as (not) walkable */
+    public void setPenalty(boolean walkable) {
         for (int col = leftPenaltyUL[0]; col < leftPenaltyBR[0]; col++) {
             for (int row = leftPenaltyUL[1]; row <= leftPenaltyBR[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(false);
+                nodeList.get(row).get(col).setWalkable(walkable);
             }
         }
 
         for (int col = rightPenaltyUL[0]; col < rightPenaltyBR[0]; col++) {
             for (int row = rightPenaltyUL[1]; row <= rightPenaltyBR[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(false);
+                nodeList.get(row).get(col).setWalkable(walkable);
             }
         }
     }
@@ -121,15 +131,20 @@ public class JPSPathFinder extends PathFinder {
         int[] startIdx = constrain(convert.fromPos(startPos));
         int[] targetIdx = constrain(convert.fromPos(targetPos));
 
+        boolean circumventPenalty = !inPenalty(startPos) && !inPenalty(targetPos);
+        if (!keeper && circumventPenalty) setPenalty(false);
+
         Node start, target;
         try {
             start = nodeList.get(startIdx[1]).get(startIdx[0]);
             target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
         } catch (IndexOutOfBoundsException e) {
+            System.err.println(startPos + ", " + targetPos);
+            System.err.println("position out of bound; empty path returned");
             return nullPath(startPos);
         }
 
-        // find ways out
+        // find ways out if start of target in robot
         if (!start.isWalkable()) {
             if (!inPenalty(startIdx[1], startIdx[0])) {
                 wayOut(startIdx[1], startIdx[0]);
@@ -144,10 +159,15 @@ public class JPSPathFinder extends PathFinder {
         Future<Queue<Node>> futurePath = jps.findPath(start, target);
         try {
             Queue<Node> path = futurePath.get();
-            this.path = toVec2DPath(path);
+            this.path = toVec2DPath(path, !keeper);
             return this.path;
         } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(startPos + ", " + targetPos);
+            System.err.println("blocked by obstacle; empty path returned");
             return nullPath(startPos);
+        } finally {
+            if (!keeper && circumventPenalty) setPenalty(true);
         }
     }
 
@@ -162,7 +182,6 @@ public class JPSPathFinder extends PathFinder {
         empty.add(startPos);
         empty.add(startPos);
         if (path != null) {
-            System.out.println("No valid path found; empty path returned");
             path = null;
         }
         return empty;
@@ -176,7 +195,7 @@ public class JPSPathFinder extends PathFinder {
         for (int i = 0; i < 8; i++) {
             paths[i] = new ArrayList<>();
         }
-        int searchBound = (int) Math.max(GvcPathfinder.SAFE_DIST, GvcPathfinder.BOUNDARY_EXTENSION)
+        int searchBound = (int) Math.max(SAFE_DIST, GvcPathfinder.BOUNDARY_EXTENSION)
                 / GvcPathfinder.NODE_RADIUS;
 
         for (int i = 0; i <= searchBound; i++) {
@@ -194,8 +213,9 @@ public class JPSPathFinder extends PathFinder {
                         } else {
                             paths[arrInd].add(node);
                             if (d_row * d_col != 0) { // diagonal entry
-                                // also unblock the node above
+                                // also unblock the node above and below
                                 paths[arrInd].add(nodeList.get(d_row * i + row + 1).get(d_col * i + col));
+                                paths[arrInd].add(nodeList.get(d_row * i + row - 1).get(d_col * i + col));
                             }
                         }
                     } catch (IndexOutOfBoundsException e) {
@@ -213,7 +233,15 @@ public class JPSPathFinder extends PathFinder {
         || (row >= rightPenaltyUL[1] && row <= rightPenaltyBR[1] && col >= rightPenaltyUL[0] && col <= rightPenaltyBR[0]);
     }
 
-    private ArrayList<Vec2D> toVec2DPath(Queue<Node> path) {
+    public boolean inPenalty(Node node) {
+        return inPenalty(node.getY(), node.getX());
+    }
+
+    public boolean inPenalty(Vec2D pos) {
+        return leftPenaltyRegion.isInside(pos) || rightPenaltyRegion.isInside(pos);
+    }
+
+    private ArrayList<Vec2D> toVec2DPath(Queue<Node> path, boolean trunc) {
         if (path == null || path.isEmpty()) return null;
 
         ArrayList<Vec2D> vec_path = new ArrayList<>();
@@ -221,10 +249,22 @@ public class JPSPathFinder extends PathFinder {
         Node end = path.peek();   // end of the any-angle segment
         Node node; // current node
         vec_path.add(convert.fromInd(start.getX(), start.getY()));
+        if(trunc) trunc = !inPenalty(start);
 
         do {
             node = path.poll();
-            if (!checkLineOfSight(start, node)) {
+            if (trunc && inPenalty(node)) {
+                vec_path.add(convert.fromInd(end.getX(), end.getY()));
+                vec_path.add(convert.fromInd(node.getX(), node.getY()));
+                return vec_path;
+            }
+            boolean sight;
+            try {
+                sight = checkLineOfSight(start, node);
+            } catch (Exception e) {
+                sight = false;
+            }
+            if (!sight) {
                 vec_path.add(convert.fromInd(end.getX(), end.getY()));
                 start = end;
             }
@@ -257,8 +297,8 @@ public class JPSPathFinder extends PathFinder {
         return true;
     }
 
-    public void display() {
-        new JPSPathfinderDisplay(this, config);
+    public Display display() {
+        return new JPSPathfinderDisplay(this, config);
     }
 
     public int getNumRows() {
