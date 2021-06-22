@@ -15,7 +15,7 @@ public class GvcPathfinder {
     public static final double ADD_DIST = 5;
     public static final double SAFE_DIST = GvcPathfinder.NODE_RADIUS + ObjectConfig.ROBOT_RADIUS
             + GvcPathfinder.ADD_DIST;
-    public static final double BOUNDARY_EXTENSION = 800;
+    public static final double BOUNDARY_EXTENSION = 185;
 
     public static final double SPRINT_TO_ROTATE_DIST_THRESH = 500; // When sprinting, face closest node outside of this threshold
     public static final double RD_ANGLE_THRESH = 90; // Outside angle threshold, use RV, inside angle, use RD

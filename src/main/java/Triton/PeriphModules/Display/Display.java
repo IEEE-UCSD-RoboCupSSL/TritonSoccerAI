@@ -28,18 +28,18 @@ import static Triton.PeriphModules.Display.PaintOption.*;
  * Display to convey information in separate window
  */
 public class Display extends JPanel implements Runnable {
-    private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
-    private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
-    private final Subscriber<BallData> ballSub;
+    protected final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
+    protected final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    protected final Subscriber<BallData> ballSub;
     private final FieldPubSubPair<ArrayList<Drawable2D>> drawablesPubSub;
     private final JFrame frame;
     protected Gridify convert;
     ProbMapModule probMapModule;
-    private ArrayList<PaintOption> paintOptions;
+    protected ArrayList<PaintOption> paintOptions;
     private int windowWidth;
     private int windowHeight;
     private long lastPaint;
-    private Config config;
+    protected Config config;
 
     /* Construct a display with robot, ball, and field */
     public Display(Config config) {
