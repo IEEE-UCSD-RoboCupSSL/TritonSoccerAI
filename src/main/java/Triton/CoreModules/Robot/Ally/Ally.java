@@ -116,6 +116,10 @@ public class Ally extends Robot implements AllySkills {
         conn.buildUDPStream();
     }
 
+    public PathFinder getPathFinder() {
+        return pathFinder;
+    }
+
     public boolean connect() {
         boolean rtn = false;
         try {

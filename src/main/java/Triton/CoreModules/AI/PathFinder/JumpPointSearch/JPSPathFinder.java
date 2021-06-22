@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.RIGHT_FIELD_RIGHT_PENALTY_STRETCH;
 import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SAFE_DIST;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.PENALTY_SAFE_DIST;
 
 public class JPSPathFinder extends PathFinder {
 
@@ -50,16 +51,16 @@ public class JPSPathFinder extends PathFinder {
         double x = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.y;
         double wy = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p1.x;
 
-        leftPenaltyUL = convert.fromPos(new Vec2D(-x - SAFE_DIST, -y + SAFE_DIST));
-        leftPenaltyBR = convert.fromPos(new Vec2D(x + SAFE_DIST, -wy - SAFE_DIST));
-        rightPenaltyUL = convert.fromPos(new Vec2D(-x - SAFE_DIST, wy + SAFE_DIST));
-        rightPenaltyBR = convert.fromPos(new Vec2D(x + SAFE_DIST, y - SAFE_DIST));
+        leftPenaltyUL = convert.fromPos(new Vec2D(-x - PENALTY_SAFE_DIST, -y + PENALTY_SAFE_DIST));
+        leftPenaltyBR = convert.fromPos(new Vec2D(x + PENALTY_SAFE_DIST, -wy - PENALTY_SAFE_DIST));
+        rightPenaltyUL = convert.fromPos(new Vec2D(-x - PENALTY_SAFE_DIST, wy + PENALTY_SAFE_DIST));
+        rightPenaltyBR = convert.fromPos(new Vec2D(x + PENALTY_SAFE_DIST, y - PENALTY_SAFE_DIST));
 
         Rect2D[] penaltyRegions = PassProbMapModule.getPenaltyRegions();
-        leftPenaltyRegion = new Rect2D(penaltyRegions[0].anchor.sub(new Vec2D(SAFE_DIST, SAFE_DIST)),
-                penaltyRegions[0].width + 2 * SAFE_DIST, penaltyRegions[0].height  + 2 * SAFE_DIST);
-        rightPenaltyRegion = new Rect2D(penaltyRegions[1].anchor.sub(new Vec2D(SAFE_DIST, SAFE_DIST)),
-                penaltyRegions[1].width + 2 * SAFE_DIST, penaltyRegions[1].height  + 2 * SAFE_DIST);
+        leftPenaltyRegion = new Rect2D(penaltyRegions[0].anchor.sub(new Vec2D(PENALTY_SAFE_DIST, PENALTY_SAFE_DIST)),
+                penaltyRegions[0].width + 2 * PENALTY_SAFE_DIST, penaltyRegions[0].height  + 2 * PENALTY_SAFE_DIST);
+        rightPenaltyRegion = new Rect2D(penaltyRegions[1].anchor.sub(new Vec2D(PENALTY_SAFE_DIST, PENALTY_SAFE_DIST)),
+                penaltyRegions[1].width + 2 * PENALTY_SAFE_DIST, penaltyRegions[1].height  + 2 * PENALTY_SAFE_DIST);
 
         numCols = convert.numCols(this.worldSizeX);
         numRows = convert.numRows(this.worldSizeY);

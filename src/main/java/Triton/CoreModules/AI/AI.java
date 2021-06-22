@@ -13,6 +13,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.Team;
+import Triton.ManualTests.CoreTests.RobotSkillsTests.BallLogger;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -30,6 +31,7 @@ import static Triton.Util.delay;
 public class AI implements Module {
     private static final double KICK_DIST = 100;
     private static final double STOP_DIST = 500;
+    private static final double BALL_DIST = 500;
     
     private final RobotList<Ally> fielders;
     private final Ally keeper;
@@ -138,7 +140,17 @@ public class AI implements Module {
 //                        } else {
 //
 //                        }
+
+                        for (Ally fielder : fielders) {
+                            fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+                        }
+                        keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
                         Formation.getInstance().moveToFormation("ballplacement-defense", fielders, keeper);
+                        for (Ally fielder : fielders) {
+                            fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+                        }
+                        keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+
                     }
                 }
                 prevState = currGameState;
@@ -154,11 +166,23 @@ public class AI implements Module {
         switch (prevState.getName()) {
             case PREPARE_KICKOFF, PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE  -> { // Ad Hoc
                 if (prevState.getTeam() == config.myTeam) {
+                    for (Ally fielder : fielders) {
+                        fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+                    }
+                    keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+
                     long t0 = System.currentTimeMillis();
                     while (!Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)
                                 && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
                         delay(3);
                     }
+
+                    for (Ally fielder : fielders) {
+                        fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+                    }
+                    keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+
+
                     AD_HOC_handleStart();
                     while(gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) delay(3);
                 } else {
