@@ -4,8 +4,6 @@ import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.AI.AI_Strategies.DEPRECATED_BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
-import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
-import Triton.CoreModules.AI.AI_Tactics.Tactics;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
@@ -15,7 +13,6 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.Team;
-import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -24,11 +21,8 @@ import Triton.PeriphModules.GameControl.GameStates.*;
 import Triton.SoccerObjects;
 import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 
-import java.text.Normalizer;
-
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.*;
 import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.FIELD_LENGTH;
-import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Util.delay;
 
@@ -51,6 +45,7 @@ public class AI implements Module {
     private GameState prevState = new GameState(GameStateName.HALT);
 
     private Config config;
+    private BasicEstimator basicEstimator;
 
     public AI(Config config, SoccerObjects soccerObjects, GameCtrlModule gameCtrl) {
         this.fielders = soccerObjects.fielders;
@@ -65,6 +60,7 @@ public class AI implements Module {
         atkSupportMap = new AttackSupportMapModule(soccerObjects);
         passProbMap = new PassProbMapModule(soccerObjects);
         strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, atkSupportMap, passProbMap);
+        basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
     }
 
 
@@ -90,7 +86,7 @@ public class AI implements Module {
                         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
                             ErForceClientModule.turnAllDribOff();
                         }
-                        while(System.currentTimeMillis() - t0 < 2000
+                        while(System.currentTimeMillis() - t0 < 1900
                                 && gameCtrl.getGameState().getName() == GameStateName.STOP) {
                             delay(3);
                             Vec2D bpos = ball.getPos();
@@ -99,7 +95,7 @@ public class AI implements Module {
                                 if (fpos.sub(bpos).mag() < STOP_DIST) {
                                     fielder.slowTo(bpos.sub(fpos).scale(-1000));
                                 } else {
-                                    Rect2D[] pas = getBiggerPenalityRegions(800);
+                                    Rect2D[] pas = getBiggerPenalityRegions(1200);
                                     if(pas[0].isInside(fpos) || pas[1].isInside(fpos)) {
                                         fielder.slowTo(new Vec2D(0, 0));
                                     } else {
@@ -114,22 +110,21 @@ public class AI implements Module {
                                 keeper.stop();
                             }
                         }
-                        ErForceClientModule.resetTurnAllDribOff();
-                    }
-                    case NORMAL_START -> {
-                        switch (prevState.getName()) {
-                            case PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE, PREPARE_KICKOFF, PREPARE_PENALTY -> {
-                                preparedStart();
-                            }
-                            default -> {
-                                strategyToPlay.play();
-                            }
+                        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                            ErForceClientModule.resetTurnAllDribOff();
+                        }
+                        while(gameCtrl.getGameState().getName() == GameStateName.STOP) {
+                            fielders.stopAll();
+                            delay(3);
                         }
                     }
-                    case FORCE_START -> {
+                    case PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE, PREPARE_KICKOFF, PREPARE_PENALTY -> {
+                        preparedStart();
+                    }
+                    case NORMAL_START, FORCE_START -> {
                         strategyToPlay.play();
                     }
-        //            case PREPARE_KICKOFF -> {
+                    //            case PREPARE_KICKOFF -> {
         //                PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) currGameState;
         //                kickOff(prepareKickoffGameState);
         //            }
@@ -143,7 +138,7 @@ public class AI implements Module {
 //                        } else {
 //
 //                        }
-                        Formation.getInstance().moveToFormation("ballplacement-defense", fielders);
+                        Formation.getInstance().moveToFormation("ballplacement-defense", fielders, keeper);
                     }
                 }
                 prevState = currGameState;
@@ -154,76 +149,76 @@ public class AI implements Module {
         }
     }
 
-//    private void runNewState(GameState currGameState) throws InterruptedException {
-//        switch (currGameState.getName()) {
-//            case HALT -> {
-//                System.out.println(">>>NEW: HALT<<<");
-//            }
-//            case STOP -> {
-//                System.out.println(">>>NEW: STOP<<<");
-//            }
-//            case NORMAL_START -> {
-//                System.out.println(">>>NEW: NORMAL_START<<<");
-//                NormalStartGameState normalStartGameState = (NormalStartGameState) currGameState;
-//                newNormalStart(normalStartGameState);
-//            }
-//            case FORCE_START -> {
-//                System.out.println(">>>NEW: FORCE_START<<<");
-//            }
-//            case PREPARE_KICKOFF -> {
-//                System.out.println(">>>NEW: PREPARE_KICKOFF<<<");
-//            }
-//            case PREPARE_PENALTY -> {
-//                System.out.println(">>>NEW: PREPARE_PENALTY<<<");
-//            }
-//            case PREPARE_DIRECT_FREE -> {
-//                System.out.println(">>>NEW: PREPARE_DIRECT_FREE<<<");
-//            }
-//            case PREPARE_INDIRECT_FREE -> {
-//                System.out.println(">>>NEW: PREPARE_INDIRECT_FREE<<<");
-//            }
-//            case TIMEOUT -> {
-//                System.out.println(">>>NEW: TIMEOUT<<<");
-//            }
-//            case BALL_PLACEMENT -> {
-//                System.out.println(">>>NEW: BALL_PLACEMENT<<<");
-//            }
-//            default -> {
-//                System.out.println(">>>NEW: UNKNOWN<<<");
-//            }
-//        }
-//    }
 
     private void preparedStart() throws InterruptedException {
         switch (prevState.getName()) {
-            case PREPARE_KICKOFF -> {
-                if (((PrepareKickoffGameState) prevState).getTeam() == config.myTeam) {
-                    System.out.println(">>>SWITCH: START_KICKOFF<<<");
-                    PrepareKickoffGameState prepareKickoffGameState = (PrepareKickoffGameState) prevState;
+            case PREPARE_KICKOFF, PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE  -> { // Ad Hoc
+                if (prevState.getTeam() == config.myTeam) {
+                    long t0 = System.currentTimeMillis();
+                    while (!Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)
+                                && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+                        delay(3);
+                    }
+                    AD_HOC_handleStart();
+                    while(gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) delay(3);
+                } else {
+                    Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
                 }
             }
             case PREPARE_PENALTY -> {
-                if (((PreparePenaltyGameState) prevState).getTeam() == config.myTeam) {
-                    System.out.println(">>>SWITCH: START_PENALTY<<<");
-                    PreparePenaltyGameState penaltyGameState = (PreparePenaltyGameState) prevState;
+                if (prevState.getTeam() == config.myTeam) {
+                    long t0 = System.currentTimeMillis();
+                    while (!Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)
+                            && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+                        delay(3);
+                    }
+                    AD_HOC_handleStart();
+                    while(gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) delay(3);
+                } else {
+//                    Vec2D ballPos = ball.getPos();
+//                    Vec2D ourGoalPos = new Vec2D(0, -4500); //Ad Hoc
+//
+//                    Vec2D aimDir = ourGoalPos.sub(ballPos).normalized();
+//                    Mat2D perpenAimDir1 = Mat2D.rotation(90).mult(new Mat2D(aimDir.toEJML()));
+
+                    Formation.getInstance().moveToFormation("penalty-defense", fielders, keeper);
+
                 }
             }
-            case PREPARE_DIRECT_FREE -> {
-                if (((PrepareDirectFreeGameState) prevState).getTeam() == config.myTeam) {
-                    System.out.println(">>>SWITCH: START_DIRECT_FREE<<<");
-                    PrepareDirectFreeGameState prepareDirectFreeGameState = (PrepareDirectFreeGameState) prevState;
-                    freeKick(prepareDirectFreeGameState);
-                }
-            }
-            case PREPARE_INDIRECT_FREE -> {
-                if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.myTeam) {
-                    System.out.println(">>>SWITCH: START_INDIRECT_FREE<<<");
-                    PrepareIndirectFreeGameState prepareIndirectFreeGameState = (PrepareIndirectFreeGameState) prevState;
-                }
-            }
+//            case PREPARE_DIRECT_FREE -> {
+//                if (((PrepareDirectFreeGameState) prevState).getTeam() == config.myTeam) {
+//                    AD_HOC_handleStart();
+//                } else {
+//                    Formation.getInstance().moveToFormation("tester", fielders, keeper);
+//                }
+//            }
+//            case PREPARE_INDIRECT_FREE -> {
+//                if (((PrepareIndirectFreeGameState) prevState).getTeam() == config.myTeam) {
+//                    AD_HOC_handleStart();
+//                } else {
+//                    Formation.getInstance().moveToFormation("tester", fielders, keeper);
+//                }
+//            }
             default -> {}
         }
+
+
     }
+
+    private void AD_HOC_handleStart() {
+        Ally starter = basicEstimator.getNearestFielderToBall();
+        while(!starter.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.NORMAL_START) {
+            starter.getBall(ball);
+            delay(3);
+        }
+
+//        starter.moveAt(new Vec2D(0, 50));
+//        starter.spinTo(starter.getDir());
+//        delay(300);
+//        starter.stop();
+
+    }
+
 
     private void kickOff(PrepareKickoffGameState prepareKickoffGameState) {
         if (prepareKickoffGameState.getTeam() == config.myTeam) {
@@ -233,32 +228,33 @@ public class AI implements Module {
         }
     }
 
-    private boolean freeKick(PrepareDirectFreeGameState prepareDirectFreeGameState) throws InterruptedException {
-        if (prepareDirectFreeGameState.getTeam() == config.myTeam) {
-            Tactics getball = strategyToPlay.getGetBallTactics();
-            while (!getball.exec()) {
-                Thread.sleep(1);
-            }
-            fielders.stopAll();
-
-            long t0 = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t0 < 10000) {
-                getball.exec();
-            }
-            fielders.stopAll();
-        } else {
-            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 1000, config);
-            fielders.stopAll();
-
-            long t0 = System.currentTimeMillis();
-            while (System.currentTimeMillis() - t0 < 10000) {
-                tactic.exec();
-            }
-            fielders.stopAll();
-        }
-
-        return true;
-    }
+//    private boolean freeKick(PrepareDirectFreeGameState prepareDirectFreeGameState) throws InterruptedException {
+//        if (prepareDirectFreeGameState.getTeam() == config.myTeam) {
+//            Tactics getball = strategyToPlay.getGetBallTactics();
+//            while (!getball.exec()) {
+//                Thread.sleep(1);
+//            }
+//            fielders.stopAll();
+//
+//            long t0 = System.currentTimeMillis();
+//            while (System.currentTimeMillis() - t0 < 10000) {
+//                getball.exec();
+//            }
+//            fielders.stopAll();
+//        } else {
+////            DefendPlanA tactic = new DefendPlanA(fielders, keeper, foes, ball, 1000, config);
+////            fielders.stopAll();
+////
+////            long t0 = System.currentTimeMillis();
+////            while (System.currentTimeMillis() - t0 < 10000) {
+////                tactic.exec();
+////            }
+////            fielders.stopAll();
+//
+//        }
+//
+//        return true;
+//    }
 
 //    private void ballPlacement(Vec2D targetPos) {
 //        BasicEstimator basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);

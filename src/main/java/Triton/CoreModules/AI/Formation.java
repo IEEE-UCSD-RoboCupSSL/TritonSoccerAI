@@ -1,6 +1,9 @@
 package Triton.CoreModules.AI;
 
+import Triton.Config.GlobalVariblesAndConstants.GvcAI;
+import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 import java.util.ArrayList;
@@ -55,14 +58,14 @@ public class Formation {
 
             "kickoff-offense", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -150.00),
-                            new Vec2D(600.00, -500.00),
-                            new Vec2D(1200.00, -100.00),
-                            new Vec2D(-600.00, -500.00),
-                            new Vec2D(-1200.00, -100.00)
+                            new Vec2D(0.00, -250.00),
+                            new Vec2D(600.00, -600.00),
+                            new Vec2D(1200.00, -200.00),
+                            new Vec2D(-600.00, -600.00),
+                            new Vec2D(-1200.00, -200.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
-                    new Vec2D(4450.00, -3500.00),
+                    new Vec2D(0.00, -4200.00),
                     0.0
             ),
 
@@ -75,7 +78,7 @@ public class Formation {
                             new Vec2D(-1200.00, -900.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
-                    new Vec2D(4450.00, -3500.00),
+                    new Vec2D(0.00, -4200.00),
                     0.0
             ),
             "ballplacement-defense", new FormationType(
@@ -87,9 +90,45 @@ public class Formation {
                             new Vec2D(-2000.00, -3500.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
-                    new Vec2D(4450.00, -3500.00),
+                    new Vec2D(0.00, -4200.00),
+                    0.0
+            ),
+            "goal-defense", new FormationType(
+                    new ArrayList<>(Arrays.asList(
+                            new Vec2D(0.00, -2500.00),
+                            new Vec2D(1000.00, -2500.00),
+                            new Vec2D(-1000.00, -2500.00),
+                            new Vec2D(2000.00, -3500.00),
+                            new Vec2D(-2000.00, -3500.00)
+                    )),
+                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new Vec2D(0.00, -4200.00),
+                    0.0
+            ),
+            "penalty-defense", new FormationType(
+                    new ArrayList<>(Arrays.asList(
+                            new Vec2D(0.00, -600.00),
+                            new Vec2D(600.00, -600.00),
+                            new Vec2D(1200.00, -900.00),
+                            new Vec2D(-600.00, -600.00),
+                            new Vec2D(-1200.00, -900.00)
+                    )),
+                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new Vec2D(0.00, -3500.00),
                     0.0
             )
+//            "free-kick", new FormationType(
+//                    new ArrayList<>(Arrays.asList(
+//                            new Vec2D(0.00, -2500.00),
+//                            new Vec2D(1000.00, -2500.00),
+//                            new Vec2D(-1000.00, -2500.00),
+//                            new Vec2D(2000.00, -3500.00),
+//                            new Vec2D(-2000.00, -3500.00)
+//                    )),
+//                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+//                    new Vec2D(4450.00, -3500.00),
+//                    0.0
+//            )
     );
     private static Formation formation = null;
 
@@ -105,11 +144,11 @@ public class Formation {
     }
 
 
-    public boolean moveToFormation(String str, ArrayList<Ally> bots) {
+    public boolean moveToFormation(String str, RobotList<Ally> bots) {
         return moveToFormation(preset.get(str), bots);
     }
 
-    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots) {
+    public boolean moveToFormation(FormationType formation, RobotList<Ally> bots) {
         if (formation.keeper) {
             System.out.println("The preset formation requires a keeper.");
             return false;
@@ -117,32 +156,33 @@ public class Formation {
         return moveToFormation(formation.points, formation.angles, bots);
     }
 
-    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots) {
-        for (Ally ally : bots) {
-            int botID = ally.getID();
-            Vec2D targetPos = formationPoints.get(botID);
-            double targetAngle = formationAngle.get(botID);
-            ally.curveTo(targetPos, targetAngle);
-        }
-
-        // return false when any robot is outside of their designated formation point
-        for (Ally ally : bots) {
-            int botID = ally.getID();
-            Vec2D targetPos = formationPoints.get(botID);
-            double targetAngle = formationAngle.get(botID);
-            if (!ally.isPosArrived(targetPos) || !ally.isDirAimed(targetAngle))
-                return false;
-        }
+    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, RobotList<Ally> bots) {
+//        for (Ally ally : bots) {
+//            int botID = ally.getID();
+//            Vec2D targetPos = formationPoints.get(botID);
+//            double targetAngle = formationAngle.get(botID);
+//            ally.curveTo(targetPos, targetAngle);
+//        }
+//
+//        // return false when any robot is outside of their designated formation point
+//        for (Ally ally : bots) {
+//            int botID = ally.getID();
+//            Vec2D targetPos = formationPoints.get(botID);
+//            double targetAngle = formationAngle.get(botID);
+//            if (!ally.isPosArrived(targetPos) || !ally.isDirAimed(targetAngle))
+//                return false;
+//        }
+        new Swarm(bots, GvcAI.globalConfig_AdHoc).groupTo(formationPoints, formationAngle);
 
         // return true when all our robots have arrived at their designated formation points
         return true;
     }
 
-    public boolean moveToFormation(String str, ArrayList<Ally> bots, Ally keeper) throws NullPointerException{
+    public boolean moveToFormation(String str, RobotList<Ally> bots, Ally keeper) throws NullPointerException{
         return moveToFormation(preset.get(str), bots, keeper);
     }
 
-    public boolean moveToFormation(FormationType formation, ArrayList<Ally> bots, Ally keeper) throws NullPointerException{
+    public boolean moveToFormation(FormationType formation, RobotList<Ally> bots, Ally keeper) throws NullPointerException{
         if (!formation.keeper || keeper == null) {
             return moveToFormation(formation.points, formation.angles, bots);
         }
@@ -150,12 +190,14 @@ public class Formation {
                 formation.keeperPoint, formation.keeperAngle, keeper);
     }
 
-    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, ArrayList<Ally> bots,
+    public boolean moveToFormation(ArrayList<Vec2D> formationPoints, ArrayList<Double> formationAngle, RobotList<Ally> bots,
                                    Vec2D keeperPoint, Double keeperAngle, Ally keeper) throws NullPointerException {
+
+        keeper.curveTo(keeperPoint, keeperAngle);
         if (!moveToFormation(formationPoints, formationAngle, bots)) {
             return false;
         }
-        keeper.curveTo(keeperPoint, keeperAngle);
+        //System.out.println("Keeper is moving...");
         return keeper.isPosArrived(keeperPoint) && keeper.isDirAimed(keeperAngle);
     }
 

@@ -6,6 +6,7 @@ import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
+import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.PathFinder.JumpPointSearch.JPSPathFinder;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.CoreModules.Ball.Ball;
@@ -241,6 +242,7 @@ public class Ally extends Robot implements AllySkills {
             }
             kickVelPub.publish(new Vec2D(0, 0));
         });
+        BasicEstimator.setPrevKickLauncher(this);
     }
 
     /*** advanced control methods with path avoiding obstacles ***/

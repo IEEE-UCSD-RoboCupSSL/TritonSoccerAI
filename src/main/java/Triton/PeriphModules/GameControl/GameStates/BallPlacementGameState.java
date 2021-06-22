@@ -4,7 +4,7 @@ import Triton.CoreModules.Robot.Team;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public class BallPlacementGameState extends GameState {
-    private Team team;
+
     private Vec2D targetPos;
 
     public BallPlacementGameState(Team team, Vec2D targetPos) {
@@ -21,9 +21,6 @@ public class BallPlacementGameState extends GameState {
         this(team, new Vec2D(0, 0));
     }
 
-    public Team getTeam() {
-        return team;
-    }
 
     public Vec2D getTargetPos() {
         return targetPos;

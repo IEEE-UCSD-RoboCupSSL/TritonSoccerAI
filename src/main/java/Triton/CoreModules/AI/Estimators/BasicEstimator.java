@@ -12,6 +12,7 @@ import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import org.ejml.All;
 
 
 /* provide misc estimations methods to give AI
@@ -132,9 +133,17 @@ public class BasicEstimator {
     }
 
 
+    public static Ally prevKickLauncher = null;
+    public static void setPrevKickLauncher(Ally prevKickLauncher) {
+        BasicEstimator.prevKickLauncher = prevKickLauncher;
+    }
+
+
     public Ally getNearestFielderToBall() {
+        RobotList<Ally> allowedFielders = (RobotList<Ally>) fielders.clone();
+        if(prevKickLauncher != null) allowedFielders.remove(prevKickLauncher);
         Ally nearestFielder = null;
-        for (Ally fielder : fielders) {
+        for (Ally fielder : allowedFielders) {
             if (nearestFielder == null ||
                     fielder.getPos().sub(ball.getPos()).mag() < nearestFielder.getPos().sub(ball.getPos()).mag()) {
                 nearestFielder = fielder;

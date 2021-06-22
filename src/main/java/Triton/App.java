@@ -1,6 +1,7 @@
 package Triton;
 
 import Triton.Config.*;
+import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.AI.AI;
@@ -70,6 +71,7 @@ public class App {
         Config config = new Config(args);
         try {
             config.processAllConfigs();
+            GvcAI.globalConfig_AdHoc = config;
         } catch (IOException e) {
             e.printStackTrace();
         }
