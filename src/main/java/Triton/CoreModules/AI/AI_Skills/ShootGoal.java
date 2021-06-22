@@ -30,9 +30,13 @@ public class ShootGoal extends Skills {
     }
 
     public ArrayList<Vec2D> findOptimalShootPos(Vec2D ballCapPos) {
-        Rect2D field = new Rect2D(FIELD_BOTTOM_LEFT, FIELD_WIDTH, FIELD_LENGTH);
-        double shooterStepSize = 400;
+        Rect2D field = new Rect2D(new Vec2D(-FIELD_WIDTH / 2, -FIELD_LENGTH / 2), FIELD_WIDTH, FIELD_LENGTH);
+        double shooterStepSize = 250;
         ArrayList<Vec2D> shootPosList = new ArrayList<>();
+
+        if (field.isInside(ballCapPos))
+            shootPosList.add(ballCapPos);
+
         for (double x = ballCapPos.x - EXCESSIVE_DRIBBLING_DIST / 2; x < ballCapPos.x + EXCESSIVE_DRIBBLING_DIST / 2; x += shooterStepSize) {
             for (double y = ballCapPos.y - EXCESSIVE_DRIBBLING_DIST / 2; y < ballCapPos.y + EXCESSIVE_DRIBBLING_DIST / 2; y += shooterStepSize) {
                 Vec2D potentialShootPos = new Vec2D(x, y);
@@ -45,9 +49,9 @@ public class ShootGoal extends Skills {
         Vec2D shootPos = null;
         Vec2D target = null;
         double maxScore = Double.MIN_VALUE;
-        double goalStepSize = 200;
+        double goalStepSize = 250;
         for (Vec2D potentialShootPos : shootPosList) {
-            for (double x = GOAL_LEFT; x < GOAL_RIGHT; x += goalStepSize) {
+            for (double x = GOAL_LEFT + 150; x < GOAL_RIGHT - 150; x += goalStepSize) {
                 Vec2D potentialTarget = new Vec2D(x, FIELD_LENGTH / 2);
                 Line2D lineToTarget = new Line2D(potentialShootPos, potentialTarget);
 

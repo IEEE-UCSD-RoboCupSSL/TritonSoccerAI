@@ -39,10 +39,11 @@ public class ShootGoalTest extends RobotSkillsTest {
                 }
                 else {
                     Vec2D startPos = shooter.getPos();
-                    ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
-
-                    while (shooter.isHoldingBall())
-                        shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
+                    while (shooter.isHoldingBall()) {
+                        ArrayList<Vec2D> shootPosAndTarget = shootGoal.findOptimalShootPos(startPos);
+                        if (shootPosAndTarget.get(0) != null && shootPosAndTarget.get(1) != null)
+                            shootGoal.shoot(shootPosAndTarget.get(0), shootPosAndTarget.get(1));
+                    }
                 }
             }
         } catch (Exception e) {
