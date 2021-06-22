@@ -164,7 +164,7 @@ public class AI implements Module {
 
     private void preparedStart() throws InterruptedException {
         switch (prevState.getName()) {
-            case PREPARE_KICKOFF, PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE  -> { // Ad Hoc
+            case PREPARE_KICKOFF  -> { // Ad Hoc
                 if (prevState.getTeam() == config.myTeam) {
                     for (Ally fielder : fielders) {
                         fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
@@ -188,6 +188,9 @@ public class AI implements Module {
                 } else {
                     Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
                 }
+            }
+            case PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE ->{
+                AD_HOC_handleStart();
             }
             case PREPARE_PENALTY -> {
                 if (prevState.getTeam() == config.myTeam) {
