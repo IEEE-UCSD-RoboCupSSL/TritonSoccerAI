@@ -4,12 +4,12 @@ import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.AI.AI_Skills.CoordinatedPass;
 import Triton.CoreModules.AI.AI_Skills.Dodging;
+import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
 import Triton.CoreModules.AI.Estimators.AttackSupportMapModule;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.Estimators.PassInfo;
 import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.Compute;
-import Triton.CoreModules.AI.TritonProbDijkstra.ComputableImpl.MockCompute;
 import Triton.CoreModules.AI.TritonProbDijkstra.Exceptions.*;
 import Triton.CoreModules.AI.TritonProbDijkstra.PDG;
 import Triton.CoreModules.AI.TritonProbDijkstra.TritonDijkstra;
@@ -20,7 +20,10 @@ import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import static Triton.Util.delay;
@@ -148,7 +151,13 @@ public class AttackPlanSummer2021 extends Tactics {
                                 decoys.remove(((PDG.AllyNode) attackerNode).getBot());
                             }
                         }
-                        runDecoyBackGndTasks();
+
+                        ArrayList<Ally> decoysCopy = new ArrayList<>(decoys);
+                        System.out.println("[Attack2021] decoy list: " + getDecoyListString(decoysCopy));
+//                        runDecoyBackGndTasks(ball.getPos());
+
+                        //
+                        penetrate(decoys, 0);
                         if (tdksOutput.getTotalProbabilityProduct() > toPassThreshold) {
                             currState = States.ExecutePassPath;
                         } else {
@@ -206,18 +215,19 @@ public class AttackPlanSummer2021 extends Tactics {
                                     (PDG.AllyRecepNode) attackerNodes.get(1), ball, basicEstimator);
 
                             try {
+
                                 while (passResult == CoordinatedPass.PassShootResult.Executing) {
 //                                    System.out.println("\t[ExecutePassPath] Kick vec: " + ((PDG.AllyPassNode) attackerNodes.get(0)).getKickVec());
-                                    passResult = cp.execute();
 //                                    System.out.println("\t[ExecutePassPath] All nodes in attacker nodes: [" + attackerNodes + "]");
                                     for (int i = 2; i < attackerNodes.size(); i++) {
-
                                         if(attackerNodes.get(i) instanceof PDG.AllyRecepNode) {
                                             PDG.AllyRecepNode recepNode = ((PDG.AllyRecepNode) attackerNodes.get(i));
-                                            System.out.println("\t[ExecutePassPath] Curving to reception point");
+                                            System.out.printf("\t[ExecutePassPath] bot %d Curving to reception point \n", recepNode.getBot().getID());
                                             recepNode.getBot().curveTo(recepNode.getReceptionPoint(), recepNode.getAngle());
                                         }
                                     }
+                                    passResult = cp.execute();
+
                                     delay(3);
                                 }
                             } catch (ExecutionException | InterruptedException e) {
@@ -241,7 +251,70 @@ public class AttackPlanSummer2021 extends Tactics {
         return false;
     }
 
-    private void runDecoyBackGndTasks() {
+    private void penetrate(ArrayList<Ally> decoys, double disToFoe){
+        ArrayList<Vec2D> topNPos = new ArrayList<>();
+        topNPos.add(new Vec2D(-2000, 3000));
+        topNPos.add(new Vec2D(2000, 3000));
+        topNPos.add(new Vec2D(-2000, 2000));
+        topNPos.add(new Vec2D(2000, 2000));
+        topNPos.add(new Vec2D(-2000, 1000));
+        topNPos.add(new Vec2D(2000, 1000));
 
+        HashSet<Integer> occupied = new HashSet<>();
+        Random random = new Random();
+
+        for (Ally ally : decoys) {
+
+            int index = random.nextInt(topNPos.size());
+
+            while(occupied.contains(index)){
+                index = random.nextInt(topNPos.size());
+            }
+            Vec2D loc = topNPos.get(index);
+            occupied.add(index);
+            ally.curveTo(loc);
+
+        }
+    }
+
+    private void runDecoyBackGndTasks(Vec2D priorityAnchor) {
+        if(decoys == null || decoys.size() == 0) {
+            System.out.println("\t[Decoy] decoy list is null or empty");
+            return;
+        }
+
+        ArrayList<Vec2D> gapPos = atkSupportMap.getTopNMaxPosWithClearance(decoys.size(), interAllyClearance);
+
+        if(gapPos == null){
+            System.out.println("\t[Decoy] gapPos is null");
+            return;
+        }
+
+        ArrayList<Double> gapPosDir = new ArrayList<>();
+
+        for (Vec2D pos : gapPos) {
+            gapPosDir.add(ball.getPos().sub(pos).toPlayerAngle());
+        }
+
+        System.out.println("\t[Decoy] Decoy running...");
+        boolean b = new Swarm(restFielders, config).groupTo(gapPos, gapPosDir, priorityAnchor);
+    }
+
+
+
+    public static String getDecoyListString(ArrayList<Ally> decoys){
+        if (decoys == null || decoys.size() == 0){
+            return "";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(decoys.get(0).getID());
+
+        for (int i = 1; i < decoys.size(); i++) {
+            stringBuilder.append(" - ");
+            stringBuilder.append(decoys.get(i).getID());
+        }
+
+        return stringBuilder.toString();
     }
 }
