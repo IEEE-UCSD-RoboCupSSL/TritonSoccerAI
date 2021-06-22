@@ -77,43 +77,54 @@ public class JPSPathFinder extends PathFinder {
 
     /* Set the robot surroundings as not walkable */
     public void setObstacles(ArrayList<Circle2D> obstacles) {
-
         // Free last obstacles
         for (Node node : lastObstacles) {
-            node.setWalkable(true);
+            try {
+                node.setWalkable(true);
+            } catch (NullPointerException e) {
+                // Do nothing
+            }
         }
         lastObstacles.clear();
 
         for (Circle2D obstacle : obstacles) {
-            double x = obstacle.center.x;
-            double y = obstacle.center.y;
-            double r = obstacle.radius + GvcPathfinder.SAFE_DIST;
-
-            // Upper-left and Bottom-right corners
-            int[] ul = convert.fromPos(new Vec2D(x - r, y + r));
-            int[] br = convert.fromPos(new Vec2D(x + r, y - r));
-            // Center
-            int[] ce = convert.fromPos(new Vec2D(x, y));
-
-            // Set the surroundings as not walkable
-            for (int col = ul[0]; col <= br[0]; col++) {
-                for (int row = ul[1]; row <= br[1]; row++) {
-                    double dist = Math.sqrt(Math.pow((col - ce[0]), 2) + Math.pow((row - ce[1]), 2));
-                    if (dist * GvcPathfinder.NODE_DIAMETER < r) {
-                        try {
-                            nodeList.get(row).get(col).setWalkable(false);
-                        } catch (IndexOutOfBoundsException e) {
-                            continue;
-                        }
-                        lastObstacles.add(nodeList.get(row).get(col));
-                    }
-                }
-            }
+            ArrayList<Node> nodes = setPointObstacle(obstacle.center,
+                    obstacle.radius + GvcPathfinder.SAFE_DIST, false);
+            lastObstacles.addAll(nodes);
         }
     }
 
+    /* Set area surrounding ball as (not) walkable */
+    public ArrayList<Node> setPointObstacle(Vec2D point, double radius, boolean walkable) {
+        double x = point.x;
+        double y = point.y;
+        ArrayList<Node> affectedNodes = new ArrayList<>();
+
+        // Upper-left and Bottom-right corners
+        int[] ul = convert.fromPos(new Vec2D(x - radius, y + radius));
+        int[] br = convert.fromPos(new Vec2D(x + radius, y - radius));
+        // Center
+        int[] ce = convert.fromPos(new Vec2D(x, y));
+
+        // Set the surroundings as not walkable
+        for (int col = ul[0]; col <= br[0]; col++) {
+            for (int row = ul[1]; row <= br[1]; row++) {
+                double dist = Math.sqrt(Math.pow((col - ce[0]), 2) + Math.pow((row - ce[1]), 2));
+                if (dist * GvcPathfinder.NODE_DIAMETER < radius) {
+                    try {
+                        nodeList.get(row).get(col).setWalkable(false);
+                    } catch (IndexOutOfBoundsException e) {
+                        continue;
+                    }
+                    affectedNodes.add(nodeList.get(row).get(col));
+                }
+            }
+        }
+        return affectedNodes;
+    }
+
     /* Set area in penalty as (not) walkable */
-    public void setPenalty(boolean walkable) {
+    public void setPenaltyObstacle(boolean walkable) {
         for (int col = leftPenaltyUL[0]; col < leftPenaltyBR[0]; col++) {
             for (int row = leftPenaltyUL[1]; row <= leftPenaltyBR[1]; row++) {
                 nodeList.get(row).get(col).setWalkable(walkable);
@@ -132,7 +143,7 @@ public class JPSPathFinder extends PathFinder {
         int[] targetIdx = constrain(convert.fromPos(targetPos));
 
         boolean circumventPenalty = !inPenalty(startPos) && !inPenalty(targetPos);
-        if (!keeper && circumventPenalty) setPenalty(false);
+        if (!keeper && circumventPenalty) setPenaltyObstacle(false);
 
         Node start, target;
         try {
@@ -167,7 +178,7 @@ public class JPSPathFinder extends PathFinder {
             System.err.println("blocked by obstacle; empty path returned");
             return nullPath(startPos);
         } finally {
-            if (!keeper && circumventPenalty) setPenalty(true);
+            if (!keeper && circumventPenalty) setPenaltyObstacle(true);
         }
     }
 
@@ -253,6 +264,7 @@ public class JPSPathFinder extends PathFinder {
 
         do {
             node = path.poll();
+            assert node != null;
             if (trunc && inPenalty(node)) {
                 vec_path.add(convert.fromInd(end.getX(), end.getY()));
                 vec_path.add(convert.fromInd(node.getX(), node.getY()));
