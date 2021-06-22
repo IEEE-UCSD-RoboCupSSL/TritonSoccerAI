@@ -155,6 +155,8 @@ public class AttackPlanSummer2021 extends Tactics {
                         ArrayList<Ally> decoysCopy = new ArrayList<>(decoys);
                         System.out.println("[Attack2021] decoy list: " + getDecoyListString(decoysCopy));
 //                        runDecoyBackGndTasks(ball.getPos());
+
+                        //
                         penetrate(decoys, 0);
                         if (tdksOutput.getTotalProbabilityProduct() > toPassThreshold) {
                             currState = States.ExecutePassPath;
@@ -213,8 +215,8 @@ public class AttackPlanSummer2021 extends Tactics {
                                     (PDG.AllyRecepNode) attackerNodes.get(1), ball, basicEstimator);
 
                             try {
-                                LocalDateTime then = LocalDateTime.now().plusSeconds(1);
-                                while (LocalDateTime.now().isBefore(then)) {
+
+                                while (passResult == CoordinatedPass.PassShootResult.Executing) {
 //                                    System.out.println("\t[ExecutePassPath] Kick vec: " + ((PDG.AllyPassNode) attackerNodes.get(0)).getKickVec());
 //                                    System.out.println("\t[ExecutePassPath] All nodes in attacker nodes: [" + attackerNodes + "]");
                                     for (int i = 2; i < attackerNodes.size(); i++) {
@@ -224,16 +226,9 @@ public class AttackPlanSummer2021 extends Tactics {
                                             recepNode.getBot().curveTo(recepNode.getReceptionPoint(), recepNode.getAngle());
                                         }
                                     }
+                                    passResult = cp.execute();
 
                                     delay(3);
-                                }
-                                LocalDateTime then2 = LocalDateTime.now().plusSeconds(5);
-                                while (passResult == CoordinatedPass.PassShootResult.Executing) {
-                                    if(LocalDateTime.now().isAfter(then2)){
-                                        passResult = CoordinatedPass.PassShootResult.fail;
-                                        break;
-                                    }
-                                    passResult = cp.execute();
                                 }
                             } catch (ExecutionException | InterruptedException e) {
                                 e.printStackTrace();

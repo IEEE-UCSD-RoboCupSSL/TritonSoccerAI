@@ -217,6 +217,7 @@ public class Ally extends Robot implements AllySkills {
         }
 
 
+        // Ad hoc
         while(kickVel.y > kickVel.x){
             kickVel.y /= 1.75;
             kickVel.x *= 1.25;
