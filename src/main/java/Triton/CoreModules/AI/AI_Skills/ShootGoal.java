@@ -79,6 +79,9 @@ public class ShootGoal extends Skills {
     }
 
     public boolean shoot(Vec2D shootPos, Vec2D target) {
+        if (target == null || shootPos == null)
+            return false;
+
         boolean hasKicked = false;
         double shootAngle = target.sub(shootPos).toPlayerAngle();
 
