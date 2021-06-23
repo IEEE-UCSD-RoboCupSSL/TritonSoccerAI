@@ -85,7 +85,7 @@ public class AI implements Module {
                         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
                             ErForceClientModule.turnAllDribOff();
                         }
-                        while(System.currentTimeMillis() - t0 < 1900
+                        while(System.currentTimeMillis() - t0 < 1800
                                 && gameCtrl.getGameState().getName() == GameStateName.STOP) {
                             delay(3);
                             Vec2D bpos = ball.getPos();

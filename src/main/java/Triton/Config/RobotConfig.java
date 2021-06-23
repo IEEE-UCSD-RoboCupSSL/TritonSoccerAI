@@ -1,5 +1,6 @@
 package Triton.Config;
 
+import Triton.Config.GlobalVariblesAndConstants.GvcFilter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.linsol.svd.SolvePseudoInverseSvd_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -73,6 +74,9 @@ public class RobotConfig implements IniConfig {
         motorMaxTorque = iniParser.get("dynamics-specs", "motor-max-torque", double.class);
 
         calculateDynamicsSpecs();
+
+
+        GvcFilter.smoothing = iniParser.get("Filter", "smoothing", double.class);
     }
 
 

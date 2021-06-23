@@ -47,7 +47,7 @@ public class JPSPathFinder extends PathFinder {
                         GvcPathfinder.NODE_RADIUS - this.worldSizeY / 2),
                 false, true);
 
-        penaltyRegions = GvcGeometry.getPenaltyRegions(0.0);
+        penaltyRegions = GvcGeometry.getPenaltyRegions(PENALTY_SAFE_DIST);
         leftPenaltyUL  = convert.fromPos(penaltyRegions[0].anchor.add(new Vec2D(0.0, penaltyRegions[0].height)));
         leftPenaltyBR  = convert.fromPos(penaltyRegions[0].anchor.add(new Vec2D(penaltyRegions[0].width, 0.0)));
         rightPenaltyUL = convert.fromPos(penaltyRegions[1].anchor.add(new Vec2D(0.0, penaltyRegions[1].height)));

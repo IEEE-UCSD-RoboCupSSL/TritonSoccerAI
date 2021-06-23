@@ -18,7 +18,6 @@ import static Triton.Config.GlobalVariblesAndConstants.GvcFilter.smoothing;
  * Stores data about robot object
  */
 public class RobotData {
-    public static double MAX_POS_LEN = 8000;
 
     private static class TimePairComparator<T> implements Comparator<Pair<T, Double>> {
         @Override
@@ -119,7 +118,7 @@ public class RobotData {
 
         botPos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
 
-        if(botPos.sub(smoothedValue).mag() > 0.01) {
+        if(botPos.sub(smoothedValue).mag() > 1.0) { // unit is mm
             smoothedValue = smoothedValue.add((botPos.sub(smoothedValue)).scale(1.00 / smoothing));
             botPos = smoothedValue;
         }

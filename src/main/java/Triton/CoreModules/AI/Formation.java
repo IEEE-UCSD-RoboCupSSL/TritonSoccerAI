@@ -59,10 +59,10 @@ public class Formation {
             "kickoff-offense", new FormationType(
                     new ArrayList<>(Arrays.asList(
                             new Vec2D(0.00, -250.00),
-                            new Vec2D(600.00, -600.00),
-                            new Vec2D(1200.00, -200.00),
-                            new Vec2D(-600.00, -600.00),
-                            new Vec2D(-1200.00, -200.00)
+                            new Vec2D(1000.00, -600.00),
+                            new Vec2D(2000.00, -200.00),
+                            new Vec2D(-1000.00, -600.00),
+                            new Vec2D(-2000.00, -200.00)
                     )),
                     new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
                     new Vec2D(0.00, -4200.00),
@@ -71,13 +71,13 @@ public class Formation {
 
             "kickoff-defense", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -600.00),
+                            new Vec2D(0.00, -1000.00),
                             new Vec2D(600.00, -600.00),
-                            new Vec2D(1200.00, -900.00),
+                            new Vec2D(300.00, -2000.00),
                             new Vec2D(-600.00, -600.00),
-                            new Vec2D(-1200.00, -900.00)
+                            new Vec2D(-300.00, -2000.00)
                     )),
-                    new ArrayList<>(Arrays.asList(0.0, 30.0, 30.0, -30.0, -30.0)),
+                    new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0)),
                     new Vec2D(0.00, -4200.00),
                     0.0
             ),

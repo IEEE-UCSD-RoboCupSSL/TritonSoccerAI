@@ -79,7 +79,7 @@ public class BallData {
 //        }
         ballPos = PerspectiveConverter.audienceToPlayer(audienceBallPos);
 
-        if(ballPos.sub(smoothedValue).mag() > 0.01) {
+        if(ballPos.sub(smoothedValue).mag() > 1.00) { //unit is mm
             smoothedValue = smoothedValue.add((ballPos.sub(smoothedValue)).scale(1.00 / smoothing));
             ballPos = smoothedValue;
         }

@@ -15,7 +15,7 @@ import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
 
 public class ErForceClientModule extends SimClientModule {
-    private static final float MAX_KICK_SPEED = 6.45f;
+    private static final float MAX_KICK_SPEED = 6.00f;
     private static final float MAX_DRIB_SPEED = 1000.0f;
     private static float dribSpeed = 1000.0f;
     private static final FieldPubSubPair<Boolean> allDribOffPubSub =
