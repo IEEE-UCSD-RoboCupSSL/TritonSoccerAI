@@ -13,6 +13,8 @@ import org.javatuples.Pair;
 import java.util.Comparator;
 import java.util.LinkedList;
 
+import static Triton.Config.GlobalVariblesAndConstants.GvcFilter.smoothing;
+
 /**
  * Class to store information about the ball
  */
@@ -64,6 +66,9 @@ public class BallData {
         updateVel();
     }
 
+    public Vec2D smoothedValue = new Vec2D(0, 0);
+
+
     public void update(SslVisionDetection.SSL_DetectionBall detection, double time, Config config) {
         Vec2D ballPos;
         Vec2D audienceBallPos;
@@ -74,7 +79,10 @@ public class BallData {
 //        }
         ballPos = PerspectiveConverter.audienceToPlayer(audienceBallPos);
 
-
+        if(ballPos.sub(smoothedValue).mag() > 0.01) {
+            smoothedValue = smoothedValue.add((ballPos.sub(smoothedValue)).scale(1.00 / smoothing));
+            ballPos = smoothedValue;
+        }
         Pair<Vec2D, Double> posTimePair = new Pair<>(ballPos, time);
 
         updatePos(posTimePair);

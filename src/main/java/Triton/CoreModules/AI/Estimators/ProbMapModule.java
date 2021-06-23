@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.Estimators;
 
 import Triton.App;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
@@ -49,37 +50,7 @@ public abstract class ProbMapModule {
 
 
     public static Rect2D[] getPenaltyRegions() {
-        Vec2D lpA = audienceToPlayer(LEFT_PENALTY_STRETCH.p1);
-        Vec2D lpB = audienceToPlayer(LEFT_PENALTY_STRETCH.p2);
-        Vec2D rpA = audienceToPlayer(RIGHT_PENALTY_STRETCH.p1);
-        Vec2D rpB = audienceToPlayer(RIGHT_PENALTY_STRETCH.p2);
-
-        if (lpA.x > lpB.x) {
-            Vec2D tmp = lpA;
-            lpA = lpB;
-            lpB = tmp;
-        }
-        if (rpA.x > rpB.x) {
-            Vec2D tmp = rpA;
-            rpA = rpB;
-            rpB = tmp;
-        }
-        double penaltyWidth = lpA.sub(lpB).mag();
-        double penaltyHeight;
-        if (lpA.y < 0) {
-            penaltyHeight = (new Vec2D(lpA.x, -FIELD_LENGTH / 2)).sub(lpA).mag();
-        } else {
-            penaltyHeight = (new Vec2D(lpA.x, FIELD_LENGTH / 2)).sub(lpA).mag();
-        }
-        if (lpA.y < rpA.y) {
-            Vec2D lpC = new Vec2D(lpA.x, -FIELD_LENGTH / 2);
-            return new Rect2D[]{new Rect2D(lpC, penaltyWidth, penaltyHeight),
-                    new Rect2D(rpA, penaltyWidth, penaltyHeight)};
-        } else {
-            Vec2D rpC = new Vec2D(rpA.x, -FIELD_LENGTH / 2);
-            return new Rect2D[]{new Rect2D(rpC, penaltyWidth, penaltyHeight),
-                    new Rect2D(lpA, penaltyWidth, penaltyHeight)};
-        }
+        return GvcGeometry.getPenaltyRegions(500);
     }
 
 

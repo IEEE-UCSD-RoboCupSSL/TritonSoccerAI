@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import static Triton.Util.delay;
 
 public class SoccerObjects {
+    public RobotList<Ally> allFielders;
     public RobotList<Ally> fielders;
     public Ally keeper;
     public RobotList<Foe> foes;

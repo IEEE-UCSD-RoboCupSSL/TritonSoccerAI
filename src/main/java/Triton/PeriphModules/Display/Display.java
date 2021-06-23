@@ -146,7 +146,7 @@ public class Display extends JPanel implements Runnable {
      * @param g2d Graphics2D object to paint to
      */
     private void paintGeo(Graphics2D g2d) {
-        FIELD_LINES.forEach((name, line) -> {
+        fieldLines.forEach((name, line) -> {
             if (name.equals("CenterLine"))
                 return;
             int[] p1 = convert.fromPos(PerspectiveConverter.audienceToPlayer(line.p1));

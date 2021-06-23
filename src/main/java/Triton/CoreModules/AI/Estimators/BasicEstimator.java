@@ -52,12 +52,25 @@ public class BasicEstimator {
     public Robot getBallHolder() {
         Vec2D ballPos = ball.getPos();
 
-        RobotList<Robot> bots = new RobotList<Robot>();
-        bots.addAll(fielders);
-        bots.addAll(foes);
-        bots.add(keeper);
+        RobotList<Ally> allyBots = new RobotList<>();
+        allyBots.addAll(fielders);
+        allyBots.add(keeper);
 
-        for (Robot bot : bots) {
+        for (Ally bot : allyBots) {
+            Vec2D botPos = bot.getPos();
+            double botAngle = bot.getDir();
+            double dist = Vec2D.dist(ballPos, botPos);
+            double ballFaceAngle = ballPos.sub(botPos).toPlayerAngle();
+            double angleDiff = PerspectiveConverter.calcAngDiff(ballFaceAngle, botAngle);
+            double absAngleDiff = Math.abs(angleDiff);
+
+            if(bot.isHoldingBall()) {
+                return bot;
+            }
+        }
+
+
+        for (Foe bot : foes) {
             Vec2D botPos = bot.getPos();
             double botAngle = bot.getDir();
             double dist = Vec2D.dist(ballPos, botPos);
@@ -141,7 +154,9 @@ public class BasicEstimator {
 
     public Ally getNearestFielderToBall() {
         RobotList<Ally> allowedFielders = (RobotList<Ally>) fielders.clone();
-        if(prevKickLauncher != null) allowedFielders.remove(prevKickLauncher);
+        if(prevKickLauncher != null) {
+            allowedFielders.remove(prevKickLauncher);
+        }
         Ally nearestFielder = null;
         for (Ally fielder : allowedFielders) {
             if (nearestFielder == null ||

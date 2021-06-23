@@ -70,10 +70,12 @@ public final class Util {
      *  Side Note: ScheduledThreadPoolExecutor.schedule is of nano second precision
      */
     public static long toPeriod(double freqInHz, TimeUnit unit) {
-
-        long periodInNanos = (long)(1e9 / freqInHz);
-
-        return unit.convert(periodInNanos, TimeUnit.NANOSECONDS);
+//
+//        long periodInNanos = (long)(1e9 / freqInHz);
+//
+//        return unit.convert(periodInNanos, TimeUnit.NANOSECONDS);
+        long periodInMillis = (long)(1000.00 / freqInHz);
+        return  unit.convert(periodInMillis, TimeUnit.MILLISECONDS);
     }
 
 
@@ -88,7 +90,7 @@ public final class Util {
 
     public static void sleepForever() {
         while (true) {
-            delay(1000);
+            delay(10000);
         }
     }
 

@@ -2,6 +2,7 @@ package Triton.PeriphModules.Detection;
 
 import Proto.SslVisionDetection;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcErForceSim;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -123,8 +124,11 @@ public class DetectionModule implements Module {
             yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
         }
 
+
+
         if (frame.getBallsCount() > 0)
             ballData.update(frame.getBalls(0), time);
+
         ballPub.publish(ballData);
     }
 
@@ -150,8 +154,20 @@ public class DetectionModule implements Module {
             yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
         }
 
-        if (frame.getBallsCount() > 0)
+        if (frame.getBallsCount() > 0) {
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                GvcErForceSim.ballDisappearedPubSub.pub.publish(false);
+            }
             ballData.update(frame.getBalls(0), time, config);
+        } else {
+            if(frame.getBallsCount() == 0) {
+                if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                    GvcErForceSim.ballDisappearedPubSub.pub.publish(true);
+                }
+            }
+        }
+
+
         ballPub.publish(ballData);
     }
 }

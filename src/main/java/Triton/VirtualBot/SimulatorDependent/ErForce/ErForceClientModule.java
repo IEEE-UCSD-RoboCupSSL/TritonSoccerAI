@@ -15,6 +15,7 @@ import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
 
 public class ErForceClientModule extends SimClientModule {
+    private static final float MAX_KICK_SPEED = 6.45f;
     private static final float MAX_DRIB_SPEED = 1000.0f;
     private static float dribSpeed = 1000.0f;
     private static final FieldPubSubPair<Boolean> allDribOffPubSub =
@@ -49,6 +50,11 @@ public class ErForceClientModule extends SimClientModule {
             VirtualBotCmds cmd = virtualBotCmdSubs.get(i).getMsg();
             Vec2D kickXZ = new Vec2D(cmd.getKickX(), cmd.getKickZ());
             float kickSpeed = (float) kickXZ.mag();
+
+            if(kickSpeed > MAX_KICK_SPEED) {
+                kickSpeed = MAX_KICK_SPEED;
+            }
+
             float kickAngle = (float) Math.toDegrees(Math.atan2(kickXZ.y, kickXZ.x));
             RobotCommand robotCmd = RobotCommand.newBuilder()
                     .setId(i)

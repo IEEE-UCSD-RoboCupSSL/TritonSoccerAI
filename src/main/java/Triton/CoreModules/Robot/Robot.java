@@ -4,11 +4,17 @@ import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.PeriphModules.Detection.RobotData;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class Robot implements Module {
     private final FieldSubscriber<RobotData> dataSub;
     protected Team team;
     protected int ID;
+
+    @Getter
+    @Setter
+    protected boolean isFoulOut = false;
 
     public Robot(Team team, int ID) {
         this.team = team;
@@ -60,4 +66,8 @@ public abstract class Robot implements Module {
     public int getID() {
         return ID;
     }
+
+
+
+
 }

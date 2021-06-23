@@ -11,16 +11,18 @@ public class RobotFactory {
     public static RobotList<Ally> createAllyFielderBots(Config config) {
         /* Instantiate & run Our Robots (Ally) modules */
         RobotList<Ally> allies = new RobotList<Ally>();
-        for (int id = 0; id < config.numAllyRobots - 1; id++) {
-            Ally ally = new Ally(config, id);
-            allies.add(ally);
+        for (int id = 0; id < config.numAllyRobots; id++) {
+            if(id != GvcGeneral.keeperId) {
+                Ally ally = new Ally(config, id);
+                allies.add(ally);
+            }
         }
         return allies;
     }
 
     /* GoalKeeper always uses our robot of the last ID */
     public static Ally createGoalKeeperBot(Config config) {
-        return new Ally(config, config.numAllyRobots - 1);
+        return new Ally(config, GvcGeneral.keeperId);
     }
 
     /* Do include the opponent goalkeeper */

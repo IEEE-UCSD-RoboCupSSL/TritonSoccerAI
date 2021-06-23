@@ -168,4 +168,10 @@ public class Line2D implements Drawable2D {
         int[] displayPoint2 = convert.fromPos(p2);
         g2d.drawLine(displayPoint1[0], displayPoint1[1], displayPoint2[0], displayPoint2[1]);
     }
+
+
+    public Line2D extend(double extraLength) {
+        Vec2D dir = this.p2.sub(this.p1).normalized();
+        return new Line2D(this.p1.sub(dir), this.p2.add(dir));
+    }
 }

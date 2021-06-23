@@ -63,6 +63,11 @@ public class App {
          return App.threadPool.scheduleAtFixedRate(
                 module,
             0, Util.toPeriod(frequencyInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+
+//         // Ad Hoc for competition to lower CPU load
+//         return App.threadPool.scheduleWithFixedDelay(
+//                module,
+//            0, Util.toPeriod(frequencyInHz, TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
     }
 
     public static void main(String[] args) {
@@ -96,7 +101,8 @@ public class App {
                 delay(500);
 //            /* Instantiate & Run the main AI module, which is the core of this software */
                 App.runModule(new AI(config, soccerObjects, gameCtrlModule), GvcModuleFreqs.AI_MODULE_FREQ);
-                Util.sleepForever(appCanceller.sub);
+                //Util.sleepForever(appCanceller.sub);
+                Util.sleepForever();
             }
             case Test -> {
                 handleTestMode(config, scanner);

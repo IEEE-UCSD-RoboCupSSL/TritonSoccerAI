@@ -12,6 +12,8 @@ import org.javatuples.Pair;
 import java.util.Comparator;
 import java.util.LinkedList;
 
+import static Triton.Config.GlobalVariblesAndConstants.GvcFilter.smoothing;
+
 /**
  * Stores data about robot object
  */
@@ -101,6 +103,11 @@ public class RobotData {
         updateAngleVel();
     }
 
+
+    public Vec2D smoothedValue = new Vec2D(0, 0);
+
+
+
     public void update(SslVisionDetection.SSL_DetectionRobot detection, double time, Config config) {
         Vec2D botPos;
         Vec2D audienceRobotPos;
@@ -109,7 +116,14 @@ public class RobotData {
 //        } else {
 //            audienceRobotPos = new Vec2D(-detection.getX(), -detection.getY());
 //        }
+
         botPos = PerspectiveConverter.audienceToPlayer(audienceRobotPos);
+
+        if(botPos.sub(smoothedValue).mag() > 0.01) {
+            smoothedValue = smoothedValue.add((botPos.sub(smoothedValue)).scale(1.00 / smoothing));
+            botPos = smoothedValue;
+        }
+
         Pair<Vec2D, Double> posTimePair = new Pair<>(botPos, time);
 
         double audienceRobotAngle = Math.toDegrees(detection.getOrientation());

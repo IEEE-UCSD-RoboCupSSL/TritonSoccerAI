@@ -7,7 +7,6 @@ import Triton.Legacy.OldGrSimProto.protosrcs.MessagesRobocupSslWrapper.SSL_Wrapp
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
-import Triton.Misc.ModulePubSubSystem.FieldPublisher;
 import Triton.Misc.ModulePubSubSystem.MQPublisher;
 import Triton.Misc.ModulePubSubSystem.Publisher;
 
@@ -85,12 +84,12 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         SSL_GeometryFieldSize field = geometryData.getField();
 
         // Field Lines
-        GvcGeometry.FIELD_LINES = new HashMap<>();
+        GvcGeometry.fieldLines = new HashMap<>();
         for (SSL_FieldLineSegment sslLine : field.getFieldLinesList()) {
             Vec2D p1 = new Vec2D(sslLine.getP1().getX(), sslLine.getP1().getY());
             Vec2D p2 = new Vec2D(sslLine.getP2().getX(), sslLine.getP2().getY());
             Line2D line = new Line2D(p1, p2);
-            GvcGeometry.FIELD_LINES.put(sslLine.getName(), line);
+            GvcGeometry.fieldLines.put(sslLine.getName(), line);
 
             switch (sslLine.getName()) {
                 case "TopTouchLine" -> GvcGeometry.TOP_TOUCH_LINE = line;
@@ -160,8 +159,8 @@ public class GrSimVisionModule_OldProto extends VisionModule {
         System.out.println("FIELD_CIRCLE_RADIUS: " + GvcGeometry.FIELD_CIRCLE_RADIUS);
         System.out.println("FIELD_CIRCLE: " + GvcGeometry.FIELD_CIRCLE);
 
-        for (String key : GvcGeometry.FIELD_LINES.keySet()) {
-            System.out.println(key + ": " + GvcGeometry.FIELD_LINES.get(key));
+        for (String key : GvcGeometry.fieldLines.keySet()) {
+            System.out.println(key + ": " + GvcGeometry.fieldLines.get(key));
         }
     }
 }

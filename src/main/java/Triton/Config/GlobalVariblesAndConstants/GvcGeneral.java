@@ -15,5 +15,8 @@ public class GvcGeneral {
 
 
     public static final int TotalNumOfThreads = 150;
-    public static int socketBufferSize = 1024;
+
+
+
+    public static int keeperId = 5;
 }

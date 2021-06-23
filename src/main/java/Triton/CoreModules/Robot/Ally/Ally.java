@@ -3,6 +3,7 @@ package Triton.CoreModules.Robot.Ally;
 import Proto.RemoteAPI;
 import Triton.App;
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcErForceSim;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.Config.OldConfigs.ObjectConfig;
@@ -26,6 +27,8 @@ import Triton.PeriphModules.Detection.BallData;
 import Triton.PeriphModules.Detection.RobotData;
 import Triton.PeriphModules.Display.Display;
 import Triton.Util;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +62,11 @@ public class Ally extends Robot implements AllySkills {
     private final Subscriber<Vec2D> pointSub, kickVelSub, holdBallPosSub;
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
+
+    @Getter
+    @Setter
+    protected boolean isMotionLocked = false;
+
 
 //    private final ArrayList<FieldSubscriber<Boolean>> isBotContactBallSubs = new ArrayList<>();
 
@@ -170,10 +178,10 @@ public class Ally extends Robot implements AllySkills {
         //System.err.println("Don't use this for erforcesim");
 
     }
-
-    public void vAutoCap(Ball ball) {
-        VirtualAutoCap.exec(this, ball);
-    }
+//
+//    public void vAutoCap(Ball ball) {
+//        VirtualAutoCap.exec(this, ball);
+//    }
 
     @Override
     public void stop() {
@@ -247,6 +255,7 @@ public class Ally extends Robot implements AllySkills {
             }
             kickVelPub.publish(new Vec2D(0, 0));
         });
+        System.out.println("Bot " + this.ID + " : kick " + kickVel);
         BasicEstimator.setPrevKickLauncher(this);
     }
 
@@ -359,6 +368,11 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isHoldingBall() {
+//        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//            if(GvcErForceSim.ballDisappearedPubSub.sub.getMsg()) {
+//                return true;
+//            }
+//        }
         if (!isDribbledSub.isSubscribed()) {
             return false;
         }
@@ -443,12 +457,13 @@ public class Ally extends Robot implements AllySkills {
     // Everything in run() runs in the Ally Thread
     @Override
     public void run() {
+
         if (isFirstRun) {
             try {
                 subscribe();
                 super.run();
                 pathFinder = new JPSPathFinder(FIELD_WIDTH, FIELD_LENGTH, config,
-                        this.ID == config.numAllyRobots - 1);
+                        this.ID == GvcGeneral.keeperId);
 
                 ScheduledFuture<?> sendTCPFuture = App.threadPool.scheduleAtFixedRate(conn.getTCPConnection().getSendTCP(),
                         0,
@@ -473,6 +488,12 @@ public class Ally extends Robot implements AllySkills {
 
             isFirstRun = false;
         }
+
+
+        if(isMotionLocked) {
+            stop();
+        }
+
 
         RemoteAPI.CommandData command;
         MotionState state = stateSub.getMsg();
