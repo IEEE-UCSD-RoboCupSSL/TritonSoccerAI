@@ -149,10 +149,18 @@ public class JPSPathFinder extends PathFinder {
         Node start, target;
         try {
             start = nodeList.get(startIdx[1]).get(startIdx[0]);
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println("start position " + startPos + " out of bound; navigating back to the field");
+            startIdx[0] = Math.min(Math.max(startIdx[0], 1), numCols - 1);
+            startIdx[1] = Math.min(Math.max(startIdx[1], 1), numRows - 1);
+            Vec2D newTargetPos = convert.fromInd(startIdx);
+            return new ArrayList<Vec2D>((Arrays.asList(startPos, newTargetPos)));
+        }
+
+        try {
             target = nodeList.get(targetIdx[1]).get(targetIdx[0]);
         } catch (IndexOutOfBoundsException e) {
-            System.err.println(startPos + ", " + targetPos);
-            System.err.println("position out of bound; empty path returned");
+            System.err.println("target position " + targetPos + " out of bound; empty path returned");
             return nullPath(startPos);
         }
 
