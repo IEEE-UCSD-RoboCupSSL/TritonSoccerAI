@@ -2,12 +2,17 @@ package Triton.Misc.Math.Coordinates;
 
 import Triton.CoreModules.Robot.Side;
 import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 
 public class PerspectiveConverter {
     private static Side mySide = Side.GoalToGuardAtLeft; // default
     public static void setSide(Side team) {
         PerspectiveConverter.mySide = team;
+    }
+
+    public static Line2D audienceToPlayer(Line2D audienceLine) {
+        return new Line2D(audienceToPlayer(audienceLine.p1), audienceToPlayer(audienceLine.p2));
     }
     
     public static Vec2D audienceToPlayer(Vec2D audienceVector) {

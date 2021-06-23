@@ -171,7 +171,15 @@ public class Line2D implements Drawable2D {
 
 
     public Line2D extend(double extraLength) {
-        Vec2D dir = this.p2.sub(this.p1).normalized();
+        Vec2D dir = this.p2.sub(this.p1).normalized().scale(extraLength);
         return new Line2D(this.p1.sub(dir), this.p2.add(dir));
+    }
+
+    public Line2D shiftX(double deltaX) {
+        return new Line2D(this.p1.add(new Vec2D(deltaX, 0.0)), this.p2.add(new Vec2D(deltaX, 0.0)));
+    }
+
+    public Line2D shiftY(double deltaY) {
+        return new Line2D(this.p1.sub(new Vec2D(0.0, deltaY)), this.p2.add(new Vec2D(0.0, deltaY)));
     }
 }

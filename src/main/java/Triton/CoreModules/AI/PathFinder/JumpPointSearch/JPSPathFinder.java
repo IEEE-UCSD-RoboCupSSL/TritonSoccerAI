@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
 import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
@@ -31,7 +32,7 @@ public class JPSPathFinder extends PathFinder {
     private ArrayList<Vec2D> path = new ArrayList<>();
     private final Config config;
     private final int[] leftPenaltyUL, leftPenaltyBR, rightPenaltyUL, rightPenaltyBR;
-    private final Rect2D leftPenaltyRegion, rightPenaltyRegion;
+    private final Rect2D[] penaltyRegions;
 
     public JPSPathFinder(double worldSizeX, double worldSizeY, Config config, boolean keeper) {
         super("JPS");
@@ -46,21 +47,11 @@ public class JPSPathFinder extends PathFinder {
                         GvcPathfinder.NODE_RADIUS - this.worldSizeY / 2),
                 false, true);
 
-        // Two penalty regions
-        double y = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.x;
-        double x = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p2.y;
-        double wy = RIGHT_FIELD_RIGHT_PENALTY_STRETCH.p1.x;
-
-        leftPenaltyUL = convert.fromPos(new Vec2D(-x - PENALTY_SAFE_DIST, -y + PENALTY_SAFE_DIST));
-        leftPenaltyBR = convert.fromPos(new Vec2D(x + PENALTY_SAFE_DIST, -wy - PENALTY_SAFE_DIST));
-        rightPenaltyUL = convert.fromPos(new Vec2D(-x - PENALTY_SAFE_DIST, wy + PENALTY_SAFE_DIST));
-        rightPenaltyBR = convert.fromPos(new Vec2D(x + PENALTY_SAFE_DIST, y - PENALTY_SAFE_DIST));
-
-        Rect2D[] penaltyRegions = PassProbMapModule.getPenaltyRegions();
-        leftPenaltyRegion = new Rect2D(penaltyRegions[0].anchor.sub(new Vec2D(PENALTY_SAFE_DIST, PENALTY_SAFE_DIST)),
-                penaltyRegions[0].width + 2 * PENALTY_SAFE_DIST, penaltyRegions[0].height  + 2 * PENALTY_SAFE_DIST);
-        rightPenaltyRegion = new Rect2D(penaltyRegions[1].anchor.sub(new Vec2D(PENALTY_SAFE_DIST, PENALTY_SAFE_DIST)),
-                penaltyRegions[1].width + 2 * PENALTY_SAFE_DIST, penaltyRegions[1].height  + 2 * PENALTY_SAFE_DIST);
+        penaltyRegions = GvcGeometry.getPenaltyRegions(0.0);
+        leftPenaltyUL  = convert.fromPos(penaltyRegions[0].anchor.add(new Vec2D(0.0, penaltyRegions[0].height)));
+        leftPenaltyBR  = convert.fromPos(penaltyRegions[0].anchor.add(new Vec2D(penaltyRegions[0].width, 0.0)));
+        rightPenaltyUL = convert.fromPos(penaltyRegions[1].anchor.add(new Vec2D(0.0, penaltyRegions[1].height)));
+        rightPenaltyBR = convert.fromPos(penaltyRegions[1].anchor.add(new Vec2D(penaltyRegions[1].width, 0.0)));
 
         numCols = convert.numCols(this.worldSizeX);
         numRows = convert.numRows(this.worldSizeY);
@@ -128,13 +119,21 @@ public class JPSPathFinder extends PathFinder {
     public void setPenaltyObstacle(boolean walkable) {
         for (int col = leftPenaltyUL[0]; col < leftPenaltyBR[0]; col++) {
             for (int row = leftPenaltyUL[1]; row <= leftPenaltyBR[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(walkable);
+                try {
+                    nodeList.get(row).get(col).setWalkable(walkable);
+                } catch (IndexOutOfBoundsException e) {
+                    // do nothing
+                }
             }
         }
 
         for (int col = rightPenaltyUL[0]; col < rightPenaltyBR[0]; col++) {
             for (int row = rightPenaltyUL[1]; row <= rightPenaltyBR[1]; row++) {
-                nodeList.get(row).get(col).setWalkable(walkable);
+                try {
+                    nodeList.get(row).get(col).setWalkable(walkable);
+                } catch (IndexOutOfBoundsException e) {
+                    // do nothing
+                }
             }
         }
     }
@@ -258,7 +257,7 @@ public class JPSPathFinder extends PathFinder {
     }
 
     public boolean inPenalty(Vec2D pos) {
-        return leftPenaltyRegion.isInside(pos) || rightPenaltyRegion.isInside(pos);
+        return penaltyRegions[0].isInside(pos) || penaltyRegions[1].isInside(pos);
     }
 
     private ArrayList<Vec2D> toVec2DPath(Queue<Node> path, boolean trunc) {

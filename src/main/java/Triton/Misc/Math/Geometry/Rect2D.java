@@ -2,6 +2,7 @@ package Triton.Misc.Math.Geometry;
 
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -15,15 +16,49 @@ public class Rect2D extends Geometry2D {
     public final double height;
 
     /**
-     * Constructs a Rect2D with specified left edge and bottom edge
-     *
-     * @param left   left edge of the rectangle
-     * @param bottom bottom edge of the rectangle
+     * Constructs a Rect2D with two parallel edges
      */
-    public Rect2D(Line2D left, Line2D bottom) {
-        this.anchor = left.p1;
-        this.width = bottom.length();
-        this.height = left.length();
+    public Rect2D(Line2D edge1, Line2D edge2) {
+        if (edge1.p1.x == edge2.p1.x && edge1.p2.x == edge2.p2.x &&
+            edge1.p1.y == edge1.p2.y && edge2.p1.y == edge2.p2.y) {
+            // two horizontal lines
+            if (edge2.p1.y > edge1.p1.y) {
+                // swap lines to keep edge2 lower than edge1
+                Line2D temp = edge2;
+                edge2 = edge1;
+                edge1 = temp;
+            }
+            boolean flag = edge2.p2.x - edge2.p1.x < 0;
+            this.anchor = flag ? edge2.p2 : edge2.p1;
+            this.width = flag ? edge2.p1.x - edge2.p2.x : edge2.p2.x - edge2.p1.x;
+            this.height = Math.abs(edge1.p1.y - edge2.p1.y);
+        } else if (edge1.p1.y == edge2.p1.y && edge1.p2.y == edge2.p2.y &&
+                   edge1.p1.x == edge1.p2.x && edge2.p1.x == edge2.p2.x) {
+            // two vertical lines
+            if (edge2.p1.x > edge1.p1.x) {
+                // swap lines to keep edge2 lefter than edge1
+                Line2D temp = edge2;
+                edge2 = edge1;
+                edge1 = temp;
+            }
+            boolean flag = edge2.p2.y - edge2.p1.y < 0;
+            this.anchor = flag ? edge2.p2 : edge2.p1;
+            this.height = flag ? edge2.p1.y - edge2.p2.y : edge2.p2.y - edge2.p1.y;
+            this.width = Math.abs(edge1.p1.x - edge2.p1.x);
+        } else {
+            System.err.println("unqualified edges for Rect2D");
+            this.anchor = null;
+            this.height = 0;
+            this.width = 0;
+        }
+    }
+
+    public Rect2D extend(double xExtend, double yExtend) {
+        return new Rect2D(
+            this.anchor.sub(new Vec2D(xExtend, yExtend)),
+            this.width  + 2.0 * xExtend,
+            this.height + 2.0 * yExtend
+        );
     }
 
     /**
