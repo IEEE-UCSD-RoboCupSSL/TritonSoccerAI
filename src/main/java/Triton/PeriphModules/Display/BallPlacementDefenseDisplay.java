@@ -34,7 +34,7 @@ public class BallPlacementDefenseDisplay extends Display {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        ArrayList<Vec2D> formation = AI.HandleBallPlacementDefense.getDefenseFormation(config, ballPos);
+        ArrayList<Vec2D> formation = AI.HandleBallPlacementDefense.getDefenseFormation(config, ballPos).getValue0();
         for (Vec2D point : formation) {
             paintPoint(point, g2d, Color.YELLOW);
         }

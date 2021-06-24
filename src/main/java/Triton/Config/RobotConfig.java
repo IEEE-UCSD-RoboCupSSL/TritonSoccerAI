@@ -1,5 +1,6 @@
 package Triton.Config;
 
+import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.Config.GlobalVariblesAndConstants.GvcFilter;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
@@ -81,6 +82,8 @@ public class RobotConfig implements IniConfig {
         GvcFilter.smoothing = iniParser.get("Filter", "smoothing", double.class);
 
         GvcGeneral.MAX_KICK_SPEED = iniParser.get("ErForceSim", "MAX_KICK_SPEED", float.class);
+        GvcAI.FREE_KICK_BALL_DIST = iniParser.get("ErForceSim", "FREE_KICK_BALL_DIST", float.class);
+        GvcAI.FREE_KICK_MAG_FACTOR = iniParser.get("ErForceSim", "FREE_KICK_MAG_FACTOR", float.class);
     }
 
 

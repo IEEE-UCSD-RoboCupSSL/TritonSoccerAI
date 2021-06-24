@@ -256,6 +256,8 @@ public class Ally extends Robot implements AllySkills {
     // runs in the caller thread
     @Override
     public void kick(Vec2D kickVel) {
+        //moveAt(new Vec2D(0, 10));
+
         double mag = kickVel.mag();
         if (mag >= MAX_KICK_VEL) {
             kickVel = kickVel.normalized().scale(MAX_KICK_VEL);
@@ -284,7 +286,7 @@ public class Ally extends Robot implements AllySkills {
         Vec2D currPos = getPos();
         spinTo(targetAngle);
         if (!isPosArrived(endPoint)) {
-            moveAt(endPoint.sub(currPos).normalized().scale((1.25 / config.botConfig.robotMaxAbsoluteLinearSpeed) * 100.00));
+            moveAt(endPoint.sub(currPos).normalized().scale((0.5 / config.botConfig.robotMaxAbsoluteLinearSpeed) * 100.00));
         } else {
             moveAt(new Vec2D(0, 0));
         }

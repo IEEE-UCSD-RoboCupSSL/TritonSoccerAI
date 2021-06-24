@@ -58,7 +58,7 @@ public class Formation {
 
             "kickoff-offense", new FormationType(
                     new ArrayList<>(Arrays.asList(
-                            new Vec2D(0.00, -250.00),
+                            new Vec2D(1, -250.00),
                             new Vec2D(1000.00, -600.00),
                             new Vec2D(2000.00, -200.00),
                             new Vec2D(-1000.00, -600.00),

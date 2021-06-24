@@ -4,6 +4,7 @@ import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
+import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.AI_Strategies.DEPRECATED_BasicPlay;
 import Triton.CoreModules.AI.AI_Strategies.Strategies;
 import Triton.CoreModules.AI.Estimators.BasicEstimator;
@@ -23,10 +24,13 @@ import Triton.PeriphModules.GameControl.GameCtrlModule;
 import Triton.PeriphModules.GameControl.GameStates.*;
 import Triton.SoccerObjects;
 import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
+import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static Triton.Config.GlobalVariblesAndConstants.GvcAI.FREE_KICK_BALL_DIST;
+import static Triton.Config.GlobalVariblesAndConstants.GvcAI.FREE_KICK_MAG_FACTOR;
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Util.delay;
 
@@ -34,7 +38,8 @@ import static Triton.Util.delay;
 public class AI implements Module {
     private static final double KICK_DIST = 100;
     private static final double STOP_DIST = 500;
-    private static final double BALL_DIST = 500;
+    private static final double BALL_DIST = 300;
+
     
     private final RobotList<Ally> fielders;
     private final Ally keeper;
@@ -89,28 +94,65 @@ public class AI implements Module {
                         handleStop();
                     }
                     case PREPARE_KICKOFF -> {
+                        unlockAllys(fielders);
                         handlePreparedKickOff((PrepareKickoffGameState) currGameState);
                     }
                     case PREPARE_DIRECT_FREE -> {
+                        unlockAllys(fielders);
                         handleFreeKick((PrepareDirectFreeGameState) currGameState);
                     }
                     case PREPARE_PENALTY -> {
+                        unlockAllys(fielders);
                         handlePenaltyKick((PreparePenaltyGameState) currGameState);
                     }
-                    case NORMAL_START, FORCE_START -> {
+                    case NORMAL_START -> {
+                        normalStartKick();
                         handleTooCloseToPenaltiesFoul(fielders);
                         strategyToPlay.play();
                     }
+                    case FORCE_START -> {
+                        handleTooCloseToPenaltiesFoul(fielders);
+                        strategyToPlay.play();
+                    }
+
                     case BALL_PLACEMENT -> {
+                        unlockAllys(fielders);
                         handleBallPlacement((BallPlacementGameState) currGameState);
                     }
                 }
                 prevState = currGameState;
-                delay(3);
+                delay(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void normalStartKick() {
+        ArrayList<Vec2D> adHocPoints = new ArrayList<>();
+        ArrayList<Double> adHocAng = new ArrayList<>();
+        adHocPoints.add(new Vec2D(2500, 2500));
+        adHocPoints.add(new Vec2D(-2500, 2500));
+        adHocPoints.add(new Vec2D(1000, -1000));
+        adHocPoints.add(new Vec2D(-1000, -1000));
+        adHocAng.add(45.0);
+        adHocAng.add(-45.0);
+        adHocAng.add(0.0);
+        adHocAng.add(0.0);
+        RobotList<Ally> remainders = (RobotList<Ally>) fielders.clone();
+        Ally koAlly = basicEstimator.getNearestFielderToBall();
+        remainders.remove(koAlly);
+        Swarm swarm = new Swarm(remainders, config);
+        while(!koAlly.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.NORMAL_START)  {
+            koAlly.getBall(ball);
+            swarm.groupTo(adHocPoints, adHocAng);
+            delay(3);
+        }
+        koAlly.kick(new Vec2D(5.0, 0.0));
+        delay(300);
+        koAlly.moveAt(new Vec2D(0, 100));
+        delay(600);
+
     }
 
     private void handleStop() {
@@ -118,6 +160,11 @@ public class AI implements Module {
         if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
             ErForceClientModule.turnAllDribOff();
         }
+
+        for(Ally fielder : fielders) {
+            fielder.kick(new Vec2D(0.5, 0));
+        }
+
         while(System.currentTimeMillis() - t0 < 1800
                 && gameCtrl.getGameState().getName() == GameStateName.STOP) {
             delay(3);
@@ -127,9 +174,9 @@ public class AI implements Module {
                 if (fpos.sub(bpos).mag() < STOP_DIST) {
                     fielder.slowTo(bpos.sub(fpos).scale(-1000));
                 } else {
-                    Rect2D[] pas = GvcGeometry.getPenaltyRegions(1500);
+                    Rect2D[] pas = GvcGeometry.getPenaltyRegions(2000);
                     if(pas[0].isInside(fpos) || pas[1].isInside(fpos)) {
-                        fielder.slowTo(new Vec2D(0, 0));
+                        fielder.slowTo(fielder.getPos().sub(GvcGeometry.GOAL_CENTER_FOE).normalized().scale(3000));
                     } else {
                         fielder.stop();
                     }
@@ -172,12 +219,13 @@ public class AI implements Module {
 
     private void handleBallPlacement(BallPlacementGameState gameState) {
         Team ballPlacementTeam = gameState.getTeam();
+        Vec2D receivedTargetPos = PerspectiveConverter.audienceToPlayer(gameState.getTargetPos());
 
         if (ballPlacementTeam == config.myTeam) {
             if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
                 ErForceClientModule.resetTurnAllDribOff();
             }
-            Vec2D receivedTargetPos = PerspectiveConverter.audienceToPlayer(gameState.getTargetPos());
+
             Vec2D offsetVec = receivedTargetPos.sub(GvcGeometry.GOAL_CENTER_FOE).normalized().scale(GvcAI.BALL_HOLD_DIST_THRESH);
             double aimAngle = offsetVec.scale(-1.0).toPlayerAngle();
             Vec2D targetPos = receivedTargetPos.add(offsetVec);
@@ -220,20 +268,26 @@ public class AI implements Module {
                 delay(3);
             }
         } else {
-
+            handleTooCloseToPenaltiesFoul(fielders);
+            Pair<ArrayList<Vec2D>, ArrayList<Double>> defense =
+                    HandleBallPlacementDefense.getDefenseFormation(config, ball.getPos());
+            new Swarm(fielders, config).groupTo(defense.getValue0(), defense.getValue1());
         }
     }
 
 
     private void handlePreparedKickOff(PrepareKickoffGameState gameState){
+        BasicEstimator.setPrevKickLauncher(null);
+
         if (gameState.getTeam() == config.myTeam) {
             for (Ally fielder : fielders) {
                 fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
             }
             keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
 
-            while (!Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)
-                    && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+            int cnt = 0;
+            while (cnt < 200 && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+                if(Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)) cnt++;
                 delay(3);
             }
 
@@ -253,28 +307,66 @@ public class AI implements Module {
     }
 
     private void handleFreeKick(PrepareDirectFreeGameState gameState) {
+        BasicEstimator.setPrevKickLauncher(null);
         if(gameState.getTeam() == config.myTeam) {
+
+
 
             Vec2D ballPos = ball.getPos();
             Vec2D aimVec = GvcGeometry.GOAL_CENTER_FOE.sub(ballPos).normalized();
             Vec2D targtePos = ballPos.sub(aimVec.scale(300));
             Ally fkAlly = basicEstimator.getNearestFielderToBall();
 
-            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+
+
+            ArrayList<Vec2D> adHocPoints = new ArrayList<>();
+            ArrayList<Double> adHocAng = new ArrayList<>();
+            adHocPoints.add(new Vec2D(1500, 1500));
+            adHocPoints.add(new Vec2D(-1500, 1500));
+            adHocPoints.add(new Vec2D(1000, -1000));
+            adHocPoints.add(new Vec2D(-1000, -1000));
+            adHocAng.add(45.0);
+            adHocAng.add(-45.0);
+            adHocAng.add(0.0);
+            adHocAng.add(0.0);
+            RobotList<Ally> remainders = (RobotList<Ally>) fielders.clone();
+            remainders.remove(fkAlly);
+            Swarm swarm = new Swarm(remainders, config);
+
+
+
+            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), FREE_KICK_BALL_DIST, false);
             while (!fkAlly.isPosArrived(targtePos) && !fkAlly.isDirAimed(aimVec.toPlayerAngle())
                     && (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE)) {
                 fkAlly.curveTo(targtePos, aimVec.toPlayerAngle());
+                swarm.groupTo(adHocPoints, adHocAng);
                 delay(3);
             }
             fkAlly.stop();
-            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), FREE_KICK_BALL_DIST, true);
+
+            delay(300);
+            while (!fkAlly.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.PREPARE_DIRECT_FREE ) {
+                fkAlly.getBall(ball);
+                swarm.groupTo(adHocPoints, adHocAng);
+                delay(3);
+            }
+
+            double kickMag = GvcGeometry.GOAL_CENTER_FOE.sub(ball.getPos()).mag() * FREE_KICK_MAG_FACTOR;
+            fkAlly.kick(new Vec2D(1, 1).normalized().scale(kickMag));
+            delay(300);
+            fkAlly.moveAt(new Vec2D(0, 100));
+            delay(600);
 
 
             while (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE) {
+                fielders.stopAll();
                 delay(3);
             }
         } else {
-
+            Pair<ArrayList<Vec2D>, ArrayList<Double>> defense =
+                    HandleBallPlacementDefense.getDefenseFormation(config, ball.getPos());
+            new Swarm(fielders, config).groupTo(defense.getValue0(), defense.getValue1());
         }
     }
 
@@ -282,13 +374,17 @@ public class AI implements Module {
 
 
     // To-do: add to ini
-    public static double penaltySafetyOffset = 1000;
+    public static double penaltySafetyOffset = 1500;
 
-    public static void handleTooCloseToPenaltiesFoul(RobotList<Ally> fielders) {
+    public static void unlockAllys(RobotList<Ally> fielders) {
         // unlock all fielders
         for(Ally bot : fielders) {
             bot.setMotionLocked(false);
         }
+    }
+
+    public static void handleTooCloseToPenaltiesFoul(RobotList<Ally> fielders) {
+        unlockAllys(fielders);
 
         for(Rect2D penalty : GvcGeometry.getPenaltyRegions(penaltySafetyOffset)) {
             for(Ally bot : fielders) {
@@ -322,12 +418,13 @@ public class AI implements Module {
         ));
         private static final double DEFENSE_SAFE_DIST = 500.0;
 
-        public static ArrayList<Vec2D> getDefenseFormation(Config config, Vec2D ballPos) {
+        public static Pair<ArrayList<Vec2D>, ArrayList<Double>> getDefenseFormation(Config config, Vec2D ballPos) {
             double A = ballPos.sub(ANCHOR).toPlayerAngle();
             double cosA = Math.cos(Math.toRadians(A));
             double sinA = Math.sin(Math.toRadians(A));
 
             ArrayList<Vec2D> defenseFormation = new ArrayList<>();
+            ArrayList<Double> defenseAngle = new ArrayList<>();
             for (int i = 0; i < config.numAllyRobots - 1; i++) {
                 Vec2D point = DEFAULT_DEFENSE_FORMATION.get(i);
                 Vec2D anchorToPoint = point.sub(ANCHOR);
@@ -339,9 +436,10 @@ public class AI implements Module {
                     }
                 }
                 defenseFormation.add(newPoint);
+                defenseAngle.add(ballPos.sub(newPoint).toPlayerAngle());
             }
 
-            return defenseFormation;
+            return new Pair<>(defenseFormation, defenseAngle);
         }
     }
 
