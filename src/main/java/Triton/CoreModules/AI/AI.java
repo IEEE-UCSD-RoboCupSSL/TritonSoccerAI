@@ -45,11 +45,11 @@ public class AI implements Module {
     private final RobotList<Foe> foes;
     private final Ball ball;
 
-    private final Strategies strategyToPlay;
+    private final Strategies strategyToPlay = null;
     private final GameCtrlModule gameCtrl;
 
-    private final AttackSupportMapModule atkSupportMap;
-    private final PassProbMapModule passProbMap;
+    private final AttackSupportMapModule atkSupportMap = null;
+    private final PassProbMapModule passProbMap = null;
 
     private GameState prevState = new GameState(GameStateName.HALT);
 
@@ -66,9 +66,9 @@ public class AI implements Module {
         }
         this.config = config;
         this.gameCtrl = gameCtrl;
-        atkSupportMap = new AttackSupportMapModule(soccerObjects);
-        passProbMap = new PassProbMapModule(soccerObjects);
-        strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, atkSupportMap, passProbMap);
+        // atkSupportMap = new AttackSupportMapModule(soccerObjects);
+        // passProbMap = new PassProbMapModule(soccerObjects);
+        // strategyToPlay = new DEPRECATED_BasicPlay(config, soccerObjects, atkSupportMap, passProbMap);
         basicEstimator = new BasicEstimator(fielders, keeper, foes, ball);
     }
 
