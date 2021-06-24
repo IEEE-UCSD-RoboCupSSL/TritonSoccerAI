@@ -2,6 +2,7 @@ package Triton.CoreModules.AI.AI_Skills;
 
 import Triton.Config.Config;
 import Triton.CoreModules.Robot.Ally.Ally;
+import Triton.CoreModules.Robot.Robot;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.Misc.Math.Geometry.Line2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -114,6 +115,8 @@ public class Swarm extends Skills {
 
         @SuppressWarnings("unchecked")
         RobotList<Ally> bots = (RobotList<Ally>) botList.clone();
+        bots.removeIf(Robot::isFoulOut);
+        System.err.println("Remaining fielders: " + bots.size());
 
         boolean rtn = true;
 

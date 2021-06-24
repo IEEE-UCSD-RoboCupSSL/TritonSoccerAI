@@ -57,6 +57,7 @@ public class Ally extends Robot implements AllySkills {
     /*** external pub sub ***/
     private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
     private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
+    private final ArrayList<Subscriber<Boolean>> foulSubs;
     private final Subscriber<BallData> ballSub;
     private final Subscriber<Boolean> isDribbledSub;
     private final Publisher<RemoteAPI.CommandData> commandsPub;
@@ -106,9 +107,11 @@ public class Ally extends Robot implements AllySkills {
 
         blueRobotSubs = new ArrayList<>();
         yellowRobotSubs = new ArrayList<>();
+        foulSubs = new ArrayList<>();
         for (int i = 0; i < config.numAllyRobots; i++) {
             blueRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.BLUE.name() + i));
             yellowRobotSubs.add(new FieldSubscriber<>("From:DetectionModule", Team.YELLOW.name() + i));
+            foulSubs.add(new FieldSubscriber<>("From:DetectionModule", "" + i));
         }
         ballSub = new FieldSubscriber<>("From:DetectionModule", "Ball");
 
@@ -524,6 +527,7 @@ public class Ally extends Robot implements AllySkills {
 
         RemoteAPI.CommandData command;
         MotionState state = stateSub.getMsg();
+        isFoulOut = foulSubs.get(ID).getMsg();
 
         switch (state) {
             case MOVE_TDRD -> command = createTDRDCmd();
@@ -557,6 +561,7 @@ public class Ally extends Robot implements AllySkills {
             for (int i = 0; i < config.numAllyRobots; i++) {
                 yellowRobotSubs.get(i).subscribe(1000);
                 blueRobotSubs.get(i).subscribe(1000);
+                foulSubs.get(i).subscribe(1000);
             }
             ballSub.subscribe(1000);
 

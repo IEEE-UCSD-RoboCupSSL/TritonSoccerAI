@@ -183,6 +183,10 @@ public class Formation {
     }
 
     public boolean moveToFormation(FormationType formation, RobotList<Ally> bots, Ally keeper) throws NullPointerException{
+        if (formation == null) {
+            System.err.println("Invalid formation name, moving to default formation...");
+            moveToFormation(preset.get("default"), bots, keeper);
+        }
         if (!formation.keeper || keeper == null) {
             return moveToFormation(formation.points, formation.angles, bots);
         }
@@ -197,7 +201,7 @@ public class Formation {
         if (!moveToFormation(formationPoints, formationAngle, bots)) {
             return false;
         }
-        //System.out.println("Keeper is moving...");
+        if (keeper.isFoulOut()) return true;
         return keeper.isPosArrived(keeperPoint) && keeper.isDirAimed(keeperAngle);
     }
 
