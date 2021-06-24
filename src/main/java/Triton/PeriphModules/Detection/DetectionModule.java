@@ -4,6 +4,7 @@ import Proto.SslVisionDetection;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcErForceSim;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
+import Triton.Config.GlobalVariblesAndConstants.GvcModuleFreqs;
 import Triton.CoreModules.Robot.Team;
 import Triton.Misc.ModulePubSubSystem.Module;
 import Triton.Misc.ModulePubSubSystem.*;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
  * Module to process object detection data from VisionModule
  */
 public class DetectionModule implements Module {
+
+    private final static double MISS_COUNT_LIMIT = 0.5; // unit: second
 
     private final Config config;
 
@@ -30,6 +33,10 @@ public class DetectionModule implements Module {
     private final ArrayList<Publisher<RobotData>> yellowRobotPubs;
     private final ArrayList<Publisher<RobotData>> blueRobotPubs;
     private final Publisher<BallData> ballPub;
+    private final ArrayList<Publisher<Boolean>> foulPubs;
+
+    // Number of missed detection
+    private final ArrayList<Integer> missCount;
 
     private boolean isFirstRun = true;
 
@@ -64,6 +71,15 @@ public class DetectionModule implements Module {
 
         ballData = new BallData();
         ballPub = new FieldPublisher<>("From:DetectionModule", "Ball", ballData);
+
+        foulPubs = new ArrayList<>();
+        for (int i = 0; i < config.numAllyRobots; i++) {
+            foulPubs.add(new FieldPublisher<>("From:DetectionModule", "" + i, false));
+        }
+        missCount = new ArrayList<>();
+        for (int i = 0; i < config.numAllyRobots; i++) {
+            missCount.add(0);
+        }
     }
 
     /**
@@ -146,12 +162,27 @@ public class DetectionModule implements Module {
             int id = robotFrame.getRobotId();
             blueRobotsData.get(id).update(robotFrame, time, config);
             blueRobotPubs.get(id).publish(blueRobotsData.get(id));
+            if (config.myTeam == Team.BLUE) {
+                missCount.set(id, 0);
+            }
         }
 
         for (SslVisionDetection.SSL_DetectionRobot robotFrame : frame.getRobotsYellowList()) {
             int id = robotFrame.getRobotId();
             yellowRobotsData.get(id).update(robotFrame, time, config);
             yellowRobotPubs.get(id).publish(yellowRobotsData.get(id));
+            if (config.myTeam == Team.YELLOW) {
+                missCount.set(id, 0);
+            }
+        }
+
+        for (int id = 0; id < config.numAllyRobots; id++) {
+            missCount.set(id, missCount.get(id) + 1);
+            if (missCount.get(id) > GvcModuleFreqs.VISION_MODULE_FREQ * MISS_COUNT_LIMIT) {
+                foulPubs.get(id).publish(true);
+            } else {
+                foulPubs.get(id).publish(false);
+            }
         }
 
         if (frame.getBallsCount() > 0) {
