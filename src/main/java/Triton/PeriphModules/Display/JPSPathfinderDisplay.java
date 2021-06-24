@@ -24,6 +24,9 @@ import static Triton.PeriphModules.Display.PaintOption.*;
 
 public class JPSPathfinderDisplay extends Display {
 
+    /**
+     * TODO: remove useless reference
+     */
     private final JPSPathFinder JPS;
     private ArrayList<Vec2D> path;
 
@@ -40,7 +43,7 @@ public class JPSPathfinderDisplay extends Display {
         this.JPS = JPS;
 
         Timer findPathTimer = new Timer();
-        FindPathTask JPSTask = new FindPathTask(this);
+        FindPathTask JPSTask = new FindPathTask();
         findPathTimer.scheduleAtFixedRate(JPSTask, 0, 20);
         addMouseListener(new DisplayMouseInputAdapter(JPSTask));
     }
@@ -135,7 +138,6 @@ public class JPSPathfinderDisplay extends Display {
 
 
     class FindPathTask extends TimerTask {
-        private final JPSPathfinderDisplay display;
         private final ArrayList<Subscriber<RobotData>> yellowRobotSubs;
         private final ArrayList<Subscriber<RobotData>> blueRobotSubs;
         private final Subscriber<BallData> ballSub;
@@ -144,8 +146,7 @@ public class JPSPathfinderDisplay extends Display {
         private Vec2D start;
         private Vec2D dest;
 
-        public FindPathTask(JPSPathfinderDisplay display) {
-            this.display = display;
+        public FindPathTask() {
             yellowRobotSubs = new ArrayList<>();
             blueRobotSubs = new ArrayList<>();
 
@@ -210,12 +211,12 @@ public class JPSPathfinderDisplay extends Display {
                     obstacles.add(new Circle2D(robot.getPos(), ObjectConfig.ROBOT_RADIUS));
                 }
 
-                display.getJPS().setObstacles(obstacles);
+                getJPS().setObstacles(obstacles);
                 if (customPath) {
-                    ArrayList<Vec2D> path = display.getJPS().findPath(start, dest);
-                    display.setPath(path);
+                    ArrayList<Vec2D> path = getJPS().findPath(start, dest);
+                    setPath(path);
                 } else {
-                    display.setPath(display.getJPS().findPath(closestRobotPos, ballPos));
+                    setPath(getJPS().findPath(closestRobotPos, ballPos));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
