@@ -118,17 +118,17 @@ public class DummySummer2021Play extends Strategies {
                     if(GvcGeometry.GOAL_CENTER_FOE.sub(attacker.getPos()).mag() > 4000) {
                         Vec2D pos = attacker.getPos();
                         if(pos.x > 1000) {
-                            if(attacker.isDirAimed(-45)) {
+                            if(attacker.isDirAimed(45)) {
                                 attacker.kick(new Vec2D(3, 2));
                             } else {
-                                attacker.rotateTo(-45);
+                                attacker.rotateTo(45);
                             }
                         } else {
                             if(pos.x < -1000) {
-                                if(attacker.isDirAimed(45)) {
+                                if(attacker.isDirAimed(-45)) {
                                     attacker.kick(new Vec2D(3, 2));
                                 } else {
-                                    attacker.rotateTo(45);
+                                    attacker.rotateTo(-45);
                                 }
                             }else {
                                 attacker.kick(new Vec2D(2, 3));
