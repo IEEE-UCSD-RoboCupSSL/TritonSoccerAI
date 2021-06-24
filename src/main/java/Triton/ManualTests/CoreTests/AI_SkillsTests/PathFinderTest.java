@@ -7,9 +7,7 @@ import Triton.CoreModules.Ball.Ball;
 import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.ManualTests.TritonTestable;
-import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.PeriphModules.Display.Display;
-import Triton.PeriphModules.Display.JPSPathfinderDisplay;
 import Triton.Util;
 
 import java.util.concurrent.ScheduledFuture;

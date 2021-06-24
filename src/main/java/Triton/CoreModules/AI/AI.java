@@ -22,6 +22,9 @@ import Triton.PeriphModules.GameControl.GameStates.*;
 import Triton.SoccerObjects;
 import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static Triton.Misc.Math.Coordinates.PerspectiveConverter.audienceToPlayer;
 import static Triton.Util.delay;
 
@@ -263,6 +266,41 @@ public class AI implements Module {
         for(Circle2D pCircle : GvcGeometry.getPenaltyCircles(safetyOffset)) {
             Vec2D outVec = allyPos.sub(pCircle.center).normalized().scale(pCircle.radius);
             ally.curveTo(allyPos.add(outVec));
+        }
+    }
+
+
+    public static class HandleBallPlacementDefense {
+        private static final Vec2D ANCHOR = new Vec2D(0.00, -4500.00);
+        private static final ArrayList<Vec2D> DEFAULT_DEFENSE_FORMATION = new ArrayList<>(Arrays.asList(
+                new Vec2D(0.00, -2500.00),
+                new Vec2D(350.00, -2800.00),
+                new Vec2D(700.00, -2500.00),
+                new Vec2D(-350.00, -2800.00),
+                new Vec2D(-700.00, -2500.00)
+        ));
+        private static final double DEFENSE_SAFE_DIST = 500.0;
+
+        public static ArrayList<Vec2D> getDefenseFormation(Config config, Vec2D ballPos) {
+            double A = ballPos.sub(ANCHOR).toPlayerAngle();
+            double cosA = Math.cos(Math.toRadians(A));
+            double sinA = Math.sin(Math.toRadians(A));
+
+            ArrayList<Vec2D> defenseFormation = new ArrayList<>();
+            for (int i = 0; i < config.numAllyRobots - 1; i++) {
+                Vec2D point = DEFAULT_DEFENSE_FORMATION.get(i);
+                Vec2D anchorToPoint = point.sub(ANCHOR);
+                Vec2D newPoint = new Vec2D(anchorToPoint.dot(new Vec2D(cosA, -sinA)),
+                        anchorToPoint.dot(new Vec2D(sinA, cosA))).add(ANCHOR);
+                for (Rect2D penaltyRegion : GvcGeometry.getPenaltyRegions()) {
+                    while (penaltyRegion.distTo(newPoint) < DEFENSE_SAFE_DIST) {
+                        newPoint = newPoint.add(newPoint.sub(ANCHOR).normalized());
+                    }
+                }
+                defenseFormation.add(newPoint);
+            }
+
+            return defenseFormation;
         }
     }
 
