@@ -3,6 +3,7 @@ package Triton.CoreModules.AI.AI_Strategies;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.AI.AI_Skills.Swarm;
 import Triton.CoreModules.AI.AI_Tactics.AttackPlanSummer2021;
 import Triton.CoreModules.AI.AI_Tactics.DefendPlanA;
@@ -100,7 +101,10 @@ public class DummySummer2021Play extends Strategies {
                 }
             }
             case GETBALL -> {
-                getBall.exec();
+                //getBall.exec();
+                Ally fielder = basicEstimator.getNearestFielderToBall();
+                fielder.dynamicIntercept(ball, GvcGeometry.GOAL_CENTER_FOE.sub(fielder.getPos()).toPlayerAngle());
+
                 if (basicEstimator.isAllyHavingTheBall()) {
                     currState = States.ATTACK;
                 }
@@ -110,7 +114,30 @@ public class DummySummer2021Play extends Strategies {
                 Robot holder = basicEstimator.getBallHolder();
                 if (holder instanceof Ally) {
                     attacker = (Ally) holder;
-                    shootingProcedure(attacker);
+
+                    if(GvcGeometry.GOAL_CENTER_FOE.sub(attacker.getPos()).mag() > 4000) {
+                        Vec2D pos = attacker.getPos();
+                        if(pos.x > 1000) {
+                            if(attacker.isDirAimed(-45)) {
+                                attacker.kick(new Vec2D(3, 2));
+                            } else {
+                                attacker.rotateTo(-45);
+                            }
+                        } else {
+                            if(pos.x < -1000) {
+                                if(attacker.isDirAimed(45)) {
+                                    attacker.kick(new Vec2D(3, 2));
+                                } else {
+                                    attacker.rotateTo(45);
+                                }
+                            }else {
+                                attacker.kick(new Vec2D(2, 3));
+                            }
+                        }
+
+                    } else {
+                        shootingProcedure(attacker);
+                    }
                 }
                 currState = States.START;
             }

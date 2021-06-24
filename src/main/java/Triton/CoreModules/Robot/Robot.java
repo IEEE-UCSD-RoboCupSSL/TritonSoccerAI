@@ -1,5 +1,6 @@
 package Triton.CoreModules.Robot;
 
+import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
 import Triton.Misc.ModulePubSubSystem.FieldSubscriber;
 import Triton.Misc.ModulePubSubSystem.Module;
@@ -24,6 +25,7 @@ public abstract class Robot implements Module {
     }
 
     public Vec2D getPos() {
+        if (isFoulOut) return new Vec2D(-GvcGeometry.FIELD_WIDTH / 2.0, -GvcGeometry.FIELD_LENGTH / 2.0);
         return getData().getPos();
     }
 

@@ -149,7 +149,7 @@ public class AI implements Module {
             swarm.groupTo(adHocPoints, adHocAng);
             delay(3);
         }
-        koAlly.kick(new Vec2D(5.0, 0.0));
+        koAlly.kick(new Vec2D(5.0, 1.0));
         delay(300);
         koAlly.moveAt(new Vec2D(0, 100));
         delay(600);
@@ -227,23 +227,18 @@ public class AI implements Module {
                 ErForceClientModule.resetTurnAllDribOff();
             }
 
-            Vec2D offsetVec = receivedTargetPos.sub(GvcGeometry.GOAL_CENTER_FOE).normalized().scale(GvcAI.BALL_HOLD_DIST_THRESH);
+            Vec2D offsetVec = receivedTargetPos.sub(GvcGeometry.GOAL_CENTER_FOE).normalized().scale(GvcAI.BALL_HOLD_DIST_THRESH * 2.5);
             double aimAngle = offsetVec.scale(-1.0).toPlayerAngle();
             Vec2D targetPos = receivedTargetPos.add(offsetVec);
             Ally bpAlly = basicEstimator.getNearestFielderToBall();
-            while (!bpAlly.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT ) {
-                bpAlly.getBall(ball);
-                delay(3);
-            }
-            bpAlly.moveAt(ball.getPos().sub(bpAlly.getPos()).normalized().scale(1));
-            bpAlly.spinTo(ball.getPos().sub(bpAlly.getPos()).toPlayerAngle());
-            delay(300);
-            bpAlly.stop();
-
-//            delay(200);
-//            bpAlly.moveAt(new Vec2D(0, -5));
-//            bpAlly.spinTo(bpAlly.getDir());
+//            while (!bpAlly.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT ) {
+//                bpAlly.getBall(ball);
+//                delay(3);
+//            }
+//            bpAlly.moveAt(ball.getPos().sub(bpAlly.getPos()).normalized().scale(1));
+//            bpAlly.spinTo(ball.getPos().sub(bpAlly.getPos()).toPlayerAngle());
 //            delay(300);
+//            bpAlly.stop();
 
             delay(500);
             while(!bpAlly.isPosArrived(targetPos, 50) && !bpAlly.isDirAimed(aimAngle) &&
@@ -257,7 +252,7 @@ public class AI implements Module {
                 ErForceClientModule.turnAllDribOff();
             }
             delay(500);
-            bpAlly.moveAt(new Vec2D(0, -3.0));
+//            bpAlly.moveAt(new Vec2D(0, -3.0));
             bpAlly.spinTo(bpAlly.getDir());
             delay(800);
             bpAlly.stop();
@@ -265,7 +260,7 @@ public class AI implements Module {
                 ErForceClientModule.resetTurnAllDribOff();
             }
             while(gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT
-                    && ball.getPos().sub(receivedTargetPos).mag() < 150) {
+                    /*&& ball.getPos().sub(receivedTargetPos).mag() < 150 */) {
                 delay(3);
             }
         } else {
@@ -308,14 +303,18 @@ public class AI implements Module {
     }
 
     private void handleFreeKick(PrepareDirectFreeGameState gameState) {
+        delay(300);
         BasicEstimator.setPrevKickLauncher(null);
         if(gameState.getTeam() == config.myTeam) {
 
-
+            for (Ally fielder : fielders) {
+                fielder.getPathFinder().setPointObstacle(ball.getPos(), 250, false);
+            }
+            keeper.getPathFinder().setPointObstacle(ball.getPos(), 250, false);
 
             Vec2D ballPos = ball.getPos();
-            Vec2D aimVec = GvcGeometry.GOAL_CENTER_FOE.sub(ballPos).normalized();
-            Vec2D targtePos = ballPos.sub(aimVec.scale(300));
+            Vec2D aimVec = GvcGeometry.GOAL_CENTER_FOE.sub(ballPos);
+            Vec2D targtePos = ballPos.sub(aimVec.normalized().scale(200));
             Ally fkAlly = basicEstimator.getNearestFielderToBall();
 
 
@@ -354,10 +353,16 @@ public class AI implements Module {
             }
 
             double kickMag = GvcGeometry.GOAL_CENTER_FOE.sub(ball.getPos()).mag() * FREE_KICK_MAG_FACTOR;
-            fkAlly.kick(new Vec2D(1, 0.1).normalized().scale(kickMag));
+            fkAlly.kick(new Vec2D(1, 0.0).normalized().scale(kickMag));
             delay(300);
-            fkAlly.moveAt(new Vec2D(0, 100));
+            fkAlly.moveAt(new Vec2D(0, -100));
             delay(600);
+
+
+            for (Ally fielder : fielders) {
+                fielder.getPathFinder().setPointObstacle(ball.getPos(), 250, true);
+            }
+            keeper.getPathFinder().setPointObstacle(ball.getPos(), 250, true);
 
 
             while (gameCtrl.getGameState().getName() == GameStateName.PREPARE_DIRECT_FREE) {
@@ -375,7 +380,7 @@ public class AI implements Module {
 
 
     // To-do: add to ini
-    public static double penaltySafetyOffset = 1500;
+    public static double penaltySafetyOffset = 1000;
 
     public static void unlockAllys(RobotList<Ally> fielders) {
         // unlock all fielders
@@ -401,10 +406,16 @@ public class AI implements Module {
 
     public static void pushAllyAwayFromPenalties(Ally ally, double safetyOffset) {
         Vec2D allyPos = ally.getPos();
-        for(Circle2D pCircle : GvcGeometry.getPenaltyCircles(safetyOffset)) {
-            Vec2D outVec = allyPos.sub(pCircle.center).normalized().scale(pCircle.radius);
+//        for(Circle2D pCircle : GvcGeometry.getPenaltyCircles(safetyOffset)) {
+//            //Vec2D outVec = allyPos.sub(pCircle.center).normalized().scale(pCircle.radius);
+            Vec2D outVec;
+            if(allyPos.x > 0) {
+                outVec = new Vec2D(2500, 0);
+            } else {
+                outVec = new Vec2D(-2500, 0);
+            }
             ally.curveTo(allyPos.add(outVec));
-        }
+//        }
     }
 
 

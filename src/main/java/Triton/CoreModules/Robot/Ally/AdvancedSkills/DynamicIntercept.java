@@ -12,7 +12,7 @@ import static Triton.Config.OldConfigs.ObjectConfig.DRIBBLER_OFFSET;
 
 public class DynamicIntercept {
     private static final double interpolationRate = 0.5;
-    public static final double INTERCEPT_CIRCLE_RADIUS = 110;
+    public static final double INTERCEPT_CIRCLE_RADIUS = 80;
 
     public static void exec(Ally ally, Ball ball) {
         Vec2D ballPos = ball.getPos();
