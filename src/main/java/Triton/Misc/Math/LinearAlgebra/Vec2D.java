@@ -127,8 +127,8 @@ public class Vec2D {
      * @return angle starting from x-axis, positive is counter clockwise
      */
     public double toAngle() {
-        if (Math.abs(x) <= 0.00001) {
-            return y > 0 ? 0 : 180;
+        if (Math.abs(x) <= 0.1) {
+            return y > 0 ? 90 : -90;
         }
 
         return Math.toDegrees(Math.atan2(y, x));

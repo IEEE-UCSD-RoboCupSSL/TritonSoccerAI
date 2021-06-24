@@ -19,4 +19,6 @@ public class GvcGeneral {
 
 
     public static int keeperId = 5;
+
+    public static float MAX_KICK_SPEED = 5.00f;
 }

@@ -155,17 +155,17 @@ public class DetectionModule implements Module {
         }
 
         if (frame.getBallsCount() > 0) {
-            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                GvcErForceSim.ballDisappearedPubSub.pub.publish(false);
-            }
+//            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//                GvcErForceSim.ballDisappearedPubSub.pub.publish(false);
+//            }
             ballData.update(frame.getBalls(0), time, config);
-        } else {
-            if(frame.getBallsCount() == 0) {
-                if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                    GvcErForceSim.ballDisappearedPubSub.pub.publish(true);
-                }
-            }
-        }
+        } //else {
+//            if(frame.getBallsCount() == 0) {
+//                if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+//                    GvcErForceSim.ballDisappearedPubSub.pub.publish(true);
+//                }
+//            }
+//        }
 
 
         ballPub.publish(ballData);

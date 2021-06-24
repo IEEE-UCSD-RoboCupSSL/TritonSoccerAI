@@ -1,6 +1,7 @@
 package Triton.CoreModules.AI;
 
 import Triton.Config.Config;
+import Triton.Config.GlobalVariblesAndConstants.GvcAI;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.CoreModules.AI.AI_Strategies.DEPRECATED_BasicPlay;
@@ -13,6 +14,7 @@ import Triton.CoreModules.Robot.Ally.Ally;
 import Triton.CoreModules.Robot.Foe.Foe;
 import Triton.CoreModules.Robot.RobotList;
 import Triton.CoreModules.Robot.Team;
+import Triton.Misc.Math.Coordinates.PerspectiveConverter;
 import Triton.Misc.Math.Geometry.Circle2D;
 import Triton.Misc.Math.Geometry.Rect2D;
 import Triton.Misc.Math.LinearAlgebra.Vec2D;
@@ -81,73 +83,23 @@ public class AI implements Module {
                         keeper.stop();
                     }
                     case STOP -> {
-                        long t0 = System.currentTimeMillis();
-                        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                            ErForceClientModule.turnAllDribOff();
-                        }
-                        while(System.currentTimeMillis() - t0 < 1800
-                                && gameCtrl.getGameState().getName() == GameStateName.STOP) {
-                            delay(3);
-                            Vec2D bpos = ball.getPos();
-                            for (Ally fielder : fielders) {
-                                Vec2D fpos = fielder.getPos();
-                                if (fpos.sub(bpos).mag() < STOP_DIST) {
-                                    fielder.slowTo(bpos.sub(fpos).scale(-1000));
-                                } else {
-                                    Rect2D[] pas = GvcGeometry.getPenaltyRegions(1500);
-                                    if(pas[0].isInside(fpos) || pas[1].isInside(fpos)) {
-                                        fielder.slowTo(new Vec2D(0, 0));
-                                    } else {
-                                        fielder.stop();
-                                    }
-                                }
-                            }
-                            Vec2D kpos = keeper.getPos();
-                            if (kpos.sub(bpos).mag() < STOP_DIST) {
-                                keeper.slowTo(bpos.sub(kpos).scale(-1000));
-                            } else {
-                                keeper.stop();
-                            }
-                        }
-                        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
-                            ErForceClientModule.resetTurnAllDribOff();
-                        }
-                        while(gameCtrl.getGameState().getName() == GameStateName.STOP) {
-                            fielders.stopAll();
-                            keeper.stop();
-                            delay(3);
-                        }
-                        fielders.stopAll();
-                        keeper.stop();
+                        handleStop();
                     }
-                    case PREPARE_DIRECT_FREE, PREPARE_INDIRECT_FREE, PREPARE_KICKOFF, PREPARE_PENALTY -> {
-                        preparedStart();
+                    case PREPARE_KICKOFF -> {
+                        handlePreparedKickOff((PrepareKickoffGameState) currGameState);
+                    }
+                    case PREPARE_DIRECT_FREE -> {
+                        handleFreeKick((PrepareDirectFreeGameState) currGameState);
+                    }
+                    case PREPARE_PENALTY -> {
+                        handlePenaltyKick((PreparePenaltyGameState) currGameState);
                     }
                     case NORMAL_START, FORCE_START -> {
                         handleTooCloseToPenaltiesFoul(fielders);
                         strategyToPlay.play();
                     }
                     case BALL_PLACEMENT -> {
-                        BallPlacementGameState ballPlacementGameState = (BallPlacementGameState) currGameState;
-                        Team ballPlacementTeam = ballPlacementGameState.getTeam();
-//
-//                        if (ballPlacementTeam == config.myTeam) {
-//                            Vec2D teamTargetPos = PerspectiveConverter.audienceToPlayer(ballPlacementGameState.getTargetPos());
-//                            // ballPlacement(teamTargetPos);
-//                        } else {
-//
-//                        }
-
-                        for (Ally fielder : fielders) {
-                            fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
-                        }
-                        keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
-                        Formation.getInstance().moveToFormation("ballplacement-defense", fielders, keeper);
-                        for (Ally fielder : fielders) {
-                            fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
-                        }
-                        keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
-
+                        handleBallPlacement((BallPlacementGameState) currGameState);
                     }
                 }
                 prevState = currGameState;
@@ -158,83 +110,172 @@ public class AI implements Module {
         }
     }
 
-
-    private void preparedStart() throws InterruptedException {
-        switch (prevState.getName()) {
-            case PREPARE_KICKOFF  -> { // Ad Hoc
-                if (prevState.getTeam() == config.myTeam) {
-                    for (Ally fielder : fielders) {
-                        fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
-                    }
-                    keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
-
-                    long t0 = System.currentTimeMillis();
-                    int cnt = 0;
-                    while (cnt < 20 && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
-                        if(Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)) {
-                            cnt++;
-                        }
-                        delay(3);
-                    }
-
-                    for (Ally fielder : fielders) {
-                        fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
-                    }
-                    keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
-
-                    while(gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
-                        fielders.stopAll();
-                        keeper.stop();
-                        delay(3);
-                    }
+    private void handleStop() {
+        long t0 = System.currentTimeMillis();
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            ErForceClientModule.turnAllDribOff();
+        }
+        while(System.currentTimeMillis() - t0 < 1800
+                && gameCtrl.getGameState().getName() == GameStateName.STOP) {
+            delay(3);
+            Vec2D bpos = ball.getPos();
+            for (Ally fielder : fielders) {
+                Vec2D fpos = fielder.getPos();
+                if (fpos.sub(bpos).mag() < STOP_DIST) {
+                    fielder.slowTo(bpos.sub(fpos).scale(-1000));
                 } else {
-                    Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
+                    Rect2D[] pas = GvcGeometry.getPenaltyRegions(1500);
+                    if(pas[0].isInside(fpos) || pas[1].isInside(fpos)) {
+                        fielder.slowTo(new Vec2D(0, 0));
+                    } else {
+                        fielder.stop();
+                    }
                 }
             }
-            case PREPARE_DIRECT_FREE ->{
-                AD_HOC_handleStart(GameStateName.PREPARE_DIRECT_FREE);
+            Vec2D kpos = keeper.getPos();
+            if (kpos.sub(bpos).mag() < STOP_DIST) {
+                keeper.slowTo(bpos.sub(kpos).scale(-1000));
+            } else {
+                keeper.stop();
             }
-            case PREPARE_INDIRECT_FREE -> {
-                AD_HOC_handleStart(GameStateName.PREPARE_INDIRECT_FREE);
-            }
+        }
+        if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+            ErForceClientModule.resetTurnAllDribOff();
+        }
+        while(gameCtrl.getGameState().getName() == GameStateName.STOP) {
+            fielders.stopAll();
+            keeper.stop();
+            delay(3);
+        }
+        fielders.stopAll();
+        keeper.stop();
+    }
 
-            case PREPARE_PENALTY -> {
-                if (prevState.getTeam() == config.myTeam) {
 
-                } else {
+    private void handlePenaltyKick(PreparePenaltyGameState gameState) {
+        if (gameState.getTeam() == config.myTeam) {
+
+        } else {
 //                    Vec2D ballPos = ball.getPos();
 //                    Vec2D ourGoalPos = new Vec2D(0, -4500); //Ad Hoc
 //
 //                    Vec2D aimDir = ourGoalPos.sub(ballPos).normalized();
 //                    Mat2D perpenAimDir1 = Mat2D.rotation(90).mult(new Mat2D(aimDir.toEJML()));
 
-                    Formation.getInstance().moveToFormation("penalty-defense", fielders, keeper);
+            Formation.getInstance().moveToFormation("penalty-defense", fielders, keeper);
 
-                }
+        }
+    }
+
+    private void handleBallPlacement(BallPlacementGameState gameState) {
+        Team ballPlacementTeam = gameState.getTeam();
+
+        if (ballPlacementTeam == config.myTeam) {
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                ErForceClientModule.resetTurnAllDribOff();
             }
-            default -> {}
+            Vec2D receivedTargetPos = PerspectiveConverter.audienceToPlayer(gameState.getTargetPos());
+            Vec2D offsetVec = receivedTargetPos.sub(GvcGeometry.GOAL_CENTER_FOE).normalized().scale(GvcAI.BALL_HOLD_DIST_THRESH);
+            double aimAngle = offsetVec.scale(-1.0).toPlayerAngle();
+            Vec2D targetPos = receivedTargetPos.add(offsetVec);
+            Ally bpAlly = basicEstimator.getNearestFielderToBall();
+            while (!bpAlly.isHoldingBall() && gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT ) {
+                bpAlly.getBall(ball);
+                delay(3);
+            }
+            bpAlly.moveAt(ball.getPos().sub(bpAlly.getPos()).normalized().scale(1));
+            bpAlly.spinTo(ball.getPos().sub(bpAlly.getPos()).toPlayerAngle());
+            delay(300);
+            bpAlly.stop();
+
+//            delay(200);
+//            bpAlly.moveAt(new Vec2D(0, -5));
+//            bpAlly.spinTo(bpAlly.getDir());
+//            delay(300);
+
+            delay(500);
+            while(!bpAlly.isPosArrived(targetPos, 50) && !bpAlly.isDirAimed(aimAngle) &&
+                    gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT) {
+                bpAlly.curveTo(targetPos, aimAngle);
+                delay(3);
+            }
+            bpAlly.stop();
+
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                ErForceClientModule.turnAllDribOff();
+            }
+            delay(500);
+            bpAlly.moveAt(new Vec2D(0, -3.0));
+            bpAlly.spinTo(bpAlly.getDir());
+            delay(800);
+            bpAlly.stop();
+            if(config.cliConfig.simulator == GvcGeneral.SimulatorName.ErForceSim) {
+                ErForceClientModule.resetTurnAllDribOff();
+            }
+            while(gameCtrl.getGameState().getName() == GameStateName.BALL_PLACEMENT
+                    && ball.getPos().sub(receivedTargetPos).mag() < 150) {
+                delay(3);
+            }
+        } else {
+
         }
-
-
     }
 
 
+    private void handlePreparedKickOff(PrepareKickoffGameState gameState){
+        if (gameState.getTeam() == config.myTeam) {
+            for (Ally fielder : fielders) {
+                fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+            }
+            keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
 
-    private void AD_HOC_handleStart(GameStateName name) {
-        handleTooCloseToPenaltiesFoul(fielders);
-        Ally starter = basicEstimator.getNearestFielderToBall();
-        while(!starter.isHoldingBall() && gameCtrl.getGameState().getName() == name) {
-            starter.getBall(ball);
-            delay(3);
+            while (!Formation.getInstance().moveToFormation("kickoff-offense", fielders, keeper)
+                    && gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+                delay(3);
+            }
+
+            for (Ally fielder : fielders) {
+                fielder.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+            }
+            keeper.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+
+            while(gameCtrl.getGameState().getName() == GameStateName.PREPARE_KICKOFF) {
+                fielders.stopAll();
+                keeper.stop();
+                delay(3);
+            }
+        } else {
+            Formation.getInstance().moveToFormation("kickoff-defense", fielders, keeper);
         }
-
-//        starter.moveAt(new Vec2D(0, 50));
-//        starter.spinTo(starter.getDir());
-//        delay(300);
-//        starter.stop();
-
-
     }
+
+    private void handleFreeKick(PrepareDirectFreeGameState gameState) {
+        if(gameState.getTeam() == config.myTeam) {
+
+            Vec2D ballPos = ball.getPos();
+            Vec2D aimVec = GvcGeometry.GOAL_CENTER_FOE.sub(ballPos).normalized();
+            Vec2D targtePos = ballPos.sub(aimVec.scale(300));
+            Ally fkAlly = basicEstimator.getNearestFielderToBall();
+
+            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, false);
+            while (!fkAlly.isPosArrived(targtePos) && !fkAlly.isDirAimed(aimVec.toPlayerAngle())
+                    && (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE)) {
+                fkAlly.curveTo(targtePos, aimVec.toPlayerAngle());
+                delay(3);
+            }
+            fkAlly.stop();
+            fkAlly.getPathFinder().setPointObstacle(ball.getPos(), BALL_DIST, true);
+
+
+            while (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE) {
+                delay(3);
+            }
+        } else {
+
+        }
+    }
+
+
 
 
     // To-do: add to ini

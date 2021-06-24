@@ -14,8 +14,9 @@ import Proto.SslSimulationRobotControl.RobotMoveCommand;
 import Proto.SslSimulationRobotControl.MoveLocalVelocity;
 import Proto.SslSimulationRobotControl.RobotControl;
 
+import static Triton.Config.GlobalVariblesAndConstants.GvcGeneral.MAX_KICK_SPEED;
+
 public class ErForceClientModule extends SimClientModule {
-    private static final float MAX_KICK_SPEED = 6.00f;
     private static final float MAX_DRIB_SPEED = 1000.0f;
     private static float dribSpeed = 1000.0f;
     private static final FieldPubSubPair<Boolean> allDribOffPubSub =
@@ -55,7 +56,9 @@ public class ErForceClientModule extends SimClientModule {
                 kickSpeed = MAX_KICK_SPEED;
             }
 
-            float kickAngle = (float) Math.toDegrees(Math.atan2(kickXZ.y, kickXZ.x));
+            float kickAngle;
+            if(kickSpeed > 0.01) kickAngle = (float) Math.toDegrees(Math.atan2(kickXZ.y, kickXZ.x));
+            else kickAngle = 0.0f;
             RobotCommand robotCmd = RobotCommand.newBuilder()
                     .setId(i)
                     .setMoveCommand(RobotMoveCommand.newBuilder()

@@ -16,10 +16,9 @@ public class GetBall {
 //        System.out.println("[CurrPosToBall] " + currPosToBall);
 
         if (currPosToBall.mag() <= GvcPathfinder.AUTOCAP_DIST_THRESH) {
-//            System.out.println("Fucking executing autoCap");
             ally.autoCap();
         } else {
-            ally.curveTo(ballLoc, currPosToBall.toPlayerAngle());
+            ally.curveTo(ballLoc, ballLoc.sub(currPos).toPlayerAngle());
         }
         //DynamicIntercept.exec(ally, ball);
     }

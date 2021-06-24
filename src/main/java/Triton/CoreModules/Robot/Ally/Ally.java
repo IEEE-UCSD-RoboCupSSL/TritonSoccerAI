@@ -31,7 +31,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -63,6 +66,11 @@ public class Ally extends Robot implements AllySkills {
     private final Publisher<Double> angPub;
     private final Subscriber<Double> angSub;
 
+
+    private final int sampleSize = 10;
+    private Queue<Boolean> isPosArrivedQueue;
+    private Queue<Boolean> isDirAimedQueue;
+
     @Getter
     @Setter
     protected boolean isMotionLocked = false;
@@ -83,6 +91,14 @@ public class Ally extends Robot implements AllySkills {
         super(config.myTeam, ID);
         this.config = config;
         this.threadPool = App.threadPool;
+
+        isPosArrivedQueue = new LinkedList<>();
+        isDirAimedQueue = new LinkedList<>();
+        for(int i = 0; i < sampleSize; i++) {
+            isPosArrivedQueue.add(false);
+            isDirAimedQueue.add(false);
+        }
+
 
         asyncProcedure = new AsyncProcedure(this.threadPool);
 
@@ -390,9 +406,15 @@ public class Ally extends Robot implements AllySkills {
         return isPosArrived(pos, POS_PRECISION);
     }
 
+
     @Override
     public boolean isPosArrived(Vec2D pos, double dist) {
-        return pos.sub(getPos()).mag() < dist;
+        isPosArrivedQueue.add(pos.sub(getPos()).mag() < dist);
+        isPosArrivedQueue.remove();
+        for(Boolean isPosArr : isPosArrivedQueue) {
+            if(!isPosArr) return false;
+        }
+        return true;
     }
 
     @Override
@@ -402,7 +424,12 @@ public class Ally extends Robot implements AllySkills {
 
     @Override
     public boolean isDirAimed(double angle, double angleDiff) {
-        return Math.abs(calcAngDiff(angle, getDir())) < angleDiff;
+        isDirAimedQueue.add(Math.abs(calcAngDiff(angle, getDir())) < angleDiff);
+        isDirAimedQueue.remove();
+        for(Boolean isDirAim : isDirAimedQueue) {
+            if(!isDirAim) return false;
+        }
+        return true;
     }
 
     /**

@@ -1,6 +1,8 @@
 package Triton.Config;
 
 import Triton.Config.GlobalVariblesAndConstants.GvcFilter;
+import Triton.Config.GlobalVariblesAndConstants.GvcGeneral;
+import Triton.VirtualBot.SimulatorDependent.ErForce.ErForceClientModule;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.linsol.svd.SolvePseudoInverseSvd_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -77,6 +79,8 @@ public class RobotConfig implements IniConfig {
 
 
         GvcFilter.smoothing = iniParser.get("Filter", "smoothing", double.class);
+
+        GvcGeneral.MAX_KICK_SPEED = iniParser.get("ErForceSim", "MAX_KICK_SPEED", float.class);
     }
 
 
