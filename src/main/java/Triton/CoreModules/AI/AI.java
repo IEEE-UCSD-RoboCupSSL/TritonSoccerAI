@@ -337,7 +337,7 @@ public class AI implements Module {
 
             fkAlly.getPathFinder().setPointObstacle(ball.getPos(), FREE_KICK_BALL_DIST, false);
             while (!fkAlly.isPosArrived(targtePos) && !fkAlly.isDirAimed(aimVec.toPlayerAngle())
-                    && (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE)) {
+                    && (gameCtrl.getGameState().getName() == GameStateName.PREPARE_DIRECT_FREE)) {
                 fkAlly.curveTo(targtePos, aimVec.toPlayerAngle());
                 swarm.groupTo(adHocPoints, adHocAng);
                 delay(3);
@@ -353,13 +353,13 @@ public class AI implements Module {
             }
 
             double kickMag = GvcGeometry.GOAL_CENTER_FOE.sub(ball.getPos()).mag() * FREE_KICK_MAG_FACTOR;
-            fkAlly.kick(new Vec2D(1, 1).normalized().scale(kickMag));
+            fkAlly.kick(new Vec2D(1, 0.1).normalized().scale(kickMag));
             delay(300);
             fkAlly.moveAt(new Vec2D(0, 100));
             delay(600);
 
 
-            while (gameState.getName() == GameStateName.PREPARE_DIRECT_FREE) {
+            while (gameCtrl.getGameState().getName() == GameStateName.PREPARE_DIRECT_FREE) {
                 fielders.stopAll();
                 delay(3);
             }
