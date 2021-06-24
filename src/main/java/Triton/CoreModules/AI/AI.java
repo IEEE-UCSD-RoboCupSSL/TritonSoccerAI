@@ -38,8 +38,7 @@ import static Triton.Util.delay;
 public class AI implements Module {
     private static final double KICK_DIST = 100;
     private static final double STOP_DIST = 500;
-    private static final double BALL_DIST = 300;
-
+    private static final double BALL_DIST = 500;
     
     private final RobotList<Ally> fielders;
     private final Ally keeper;
@@ -123,7 +122,7 @@ public class AI implements Module {
                     }
                 }
                 prevState = currGameState;
-                delay(1);
+                delay(3);
             }
         } catch (Exception e) {
             e.printStackTrace();
