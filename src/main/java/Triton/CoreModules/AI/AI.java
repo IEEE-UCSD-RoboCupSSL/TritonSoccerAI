@@ -108,7 +108,9 @@ public class AI implements Module {
                     case NORMAL_START -> {
                         normalStartKick();
                         handleTooCloseToPenaltiesFoul(fielders);
-                        strategyToPlay.play();
+                        if(prevState.getTeam() == config.myTeam) {
+                            strategyToPlay.play();
+                        }
                     }
                     case FORCE_START -> {
                         handleTooCloseToPenaltiesFoul(fielders);
