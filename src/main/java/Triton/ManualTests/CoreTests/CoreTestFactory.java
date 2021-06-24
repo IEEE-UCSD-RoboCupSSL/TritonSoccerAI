@@ -66,6 +66,7 @@ public class CoreTestFactory {
         coreTestMap.put("atks-map", new AttackSupportMapTest(fielders, foes, ball));
         coreTestMap.put("pass-map", new PassProbMapTest(fielders, foes, ball));
         coreTestMap.put("path", new PathFinderTest(fielders, keeper, ball));
+        coreTestMap.put("stadium", new StadiumObstacleTest());
         coreTestMap.put("bpdefense", new BallPlacementDefenseTest());
         coreTestMap.put("gapgetball", new GapGetBallTest(fielders, keeper, foes, ball));
         coreTestMap.put("shoot", new ShootGoalTest(fielders.get(0), foes, ball));

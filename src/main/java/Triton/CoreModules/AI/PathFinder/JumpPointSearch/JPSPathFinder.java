@@ -3,7 +3,6 @@ package Triton.CoreModules.AI.PathFinder.JumpPointSearch;
 import Triton.Config.Config;
 import Triton.Config.GlobalVariblesAndConstants.GvcGeometry;
 import Triton.Config.GlobalVariblesAndConstants.GvcPathfinder;
-import Triton.CoreModules.AI.Estimators.PassProbMapModule;
 import Triton.CoreModules.AI.PathFinder.PathFinder;
 import Triton.Misc.Math.Coordinates.Gridify;
 import Triton.Misc.Math.Geometry.Circle2D;
@@ -16,9 +15,7 @@ import Triton.PeriphModules.Display.JPSPathfinderDisplay;
 import java.util.*;
 import java.util.concurrent.Future;
 
-import static Triton.Config.GlobalVariblesAndConstants.GvcGeometry.RIGHT_FIELD_RIGHT_PENALTY_STRETCH;
-import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.SAFE_DIST;
-import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.PENALTY_SAFE_DIST;
+import static Triton.Config.GlobalVariblesAndConstants.GvcPathfinder.*;
 
 public class JPSPathFinder extends PathFinder {
 
@@ -28,7 +25,8 @@ public class JPSPathFinder extends PathFinder {
     private final Gridify convert;
     private final int numRows, numCols;
     private final double worldSizeX, worldSizeY;
-    private final List<Node> lastObstacles = new ArrayList<>();
+    private final List<Node> lastRobotObstacles = new ArrayList<>();
+    private final List<Node> lastStadiumObstacles = new ArrayList<>();
     private ArrayList<Vec2D> path = new ArrayList<>();
     private final Config config;
     private final int[] leftPenaltyUL, leftPenaltyBR, rightPenaltyUL, rightPenaltyBR;
@@ -67,22 +65,66 @@ public class JPSPathFinder extends PathFinder {
         jps = JPS.JPSFactory.getJPS(new Graph<>(nodeList), Graph.Diagonal.NO_OBSTACLES);
     }
 
-    /* Set the robot surroundings as not walkable */
-    public void setObstacles(ArrayList<Circle2D> obstacles) {
-        // Free last obstacles
-        for (Node node : lastObstacles) {
+    public void freeStadiumObstacles() {
+        for (Node node : lastStadiumObstacles) {
             try {
                 node.setWalkable(true);
             } catch (NullPointerException e) {
                 // Do nothing
             }
         }
-        lastObstacles.clear();
+    }
+
+    /* Set the stadium region between two points as not walkable */
+    public void setStadiumObstacles(Vec2D start, Vec2D dest, double radius) {
+        // Free last obstacles
+        for (Node node : lastStadiumObstacles) {
+            try {
+                node.setWalkable(true);
+            } catch (NullPointerException e) {
+                // Do nothing
+            }
+        }
+        lastStadiumObstacles.addAll(setPointObstacle(start, radius, false));
+        lastStadiumObstacles.addAll(setPointObstacle(dest, radius, false));
+
+        Vec2D normal = new Vec2D(dest.sub(start).toPlayerAngle() - 90).scale(radius);
+        Vec2D v1 = start.add(normal);
+        Vec2D v2 =  dest.add(normal);
+
+        for (Vec2D v = v1; v.sub(v1).mag() < v2.sub(v1).mag();
+             v = v.add(v2.sub(v1).normalized().scale(NODE_DIAMETER / 1.42))) {
+            for (Vec2D w = v; w.sub(v).mag() < normal.mag() * 2;
+                 w = w.sub(normal.normalized().scale(NODE_DIAMETER / 1.42))) {
+                int[] ind = convert.fromPos(w);
+                Node node;
+                try {
+                    node = nodeList.get(ind[1]).get(ind[0]);
+                } catch (IndexOutOfBoundsException e) {
+                    continue;
+                }
+                node.setWalkable(false);
+                lastStadiumObstacles.add(node);
+            }
+        }
+    }
+
+    /* Set the robot surroundings as not walkable */
+    public void setObstacles(ArrayList<Circle2D> obstacles) {
+        // Free last obstacles
+        for (Node node : lastRobotObstacles) {
+            try {
+                node.setWalkable(true);
+            } catch (NullPointerException e) {
+                // Do nothing
+            }
+        }
+        lastRobotObstacles.clear();
 
         for (Circle2D obstacle : obstacles) {
             ArrayList<Node> nodes = setPointObstacle(obstacle.center,
                     obstacle.radius + GvcPathfinder.SAFE_DIST, false);
-            lastObstacles.addAll(nodes);
+            lastRobotObstacles.addAll(nodes);
         }
     }
 
