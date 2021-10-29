@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>Triton</groupId>
-  <artifactId>TritonSoccerAI</artifactId>
+  <groupId>triton</groupId>
+  <artifactId>tritonSoccerAi</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>TritonSoccerAI</name>
+  <name>tritonSoccerAi</name>
   <url>http://maven.apache.org</url>
 
 
@@ -204,7 +204,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
         <configuration>
-          <mainClass>Triton.App</mainClass>
+          <mainClass>triton.App</mainClass>
         </configuration>
       </plugin>
 
@@ -214,7 +214,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>Triton.App</mainClass>
+              <mainClass>triton.App</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -260,7 +260,7 @@
         <configuration>
           <sourceDirectory>config</sourceDirectory>
           <outputDirectory>src/main/generated-sources</outputDirectory>
-          <targetPackage>Triton.Config</targetPackage>
+          <targetPackage>triton.config</targetPackage>
           <sourceType>json</sourceType>
           <includeConstructors>true</includeConstructors>
         </configuration>
